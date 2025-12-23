@@ -476,19 +476,30 @@
         window.backToList = () => { document.getElementById("viewSection").classList.add("hidden"); document.getElementById("postListSection").classList.remove("hidden"); };
 
         window.toggleLike = async function() {
-            if(!currentUser) return;
+            if(!currentUser) return alert("로그인이 필요합니다");
             const ref = doc(db, "posts", currentPostId);
             const d = await getDoc(ref);
-            const likes = d.data().likes || [];
-            if(likes.includes(currentUser.uid)) {
+            if(!d.exists()) return;
+            
+            const postData = d.data();
+            const likes = postData.likes || [];
+            const currentLikeCount = postData.likeCount || 0;
+            const isLiked = likes.includes(currentUser.uid);
+            
+            if(isLiked) {
+                // 좋아요 취소
                 await updateDoc(ref, { likes: arrayRemove(currentUser.uid), likeCount: increment(-1) });
                 document.getElementById("likeBtn").classList.remove("liked");
-                document.getElementById("likeCount").textContent = parseInt(document.getElementById("likeCount").textContent) - 1;
+                document.getElementById("likeCount").textContent = Math.max(0, currentLikeCount - 1);
             } else {
+                // 좋아요 추가
                 await updateDoc(ref, { likes: arrayUnion(currentUser.uid), likeCount: increment(1) });
-                await updateDoc(doc(db, "users", d.data().authorUid), { coin: increment(5), totalEarned: increment(5) });
+                // 글 작성자에게 보상 (자기 글 제외)
+                if(postData.authorUid !== currentUser.uid) {
+                    await updateDoc(doc(db, "users", postData.authorUid), { coin: increment(5), totalEarned: increment(5) });
+                }
                 document.getElementById("likeBtn").classList.add("liked");
-                document.getElementById("likeCount").textContent = parseInt(document.getElementById("likeCount").textContent) + 1;
+                document.getElementById("likeCount").textContent = currentLikeCount + 1;
             }
         };
 
