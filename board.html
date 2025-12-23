@@ -365,11 +365,13 @@
                 snapshot.forEach(docSnap => {
                     const p = docSnap.data();
                     const boostBadge = p.boosted ? '<span class="boost-badge">🚀 부스트</span>' : '';
+                    const authorTitle = p.authorTitle ? `<span style="font-size: 10px; background: rgba(245,158,11,0.2); color: #f59e0b; padding: 2px 6px; border-radius: 10px; margin-right: 4px;">${p.authorTitle}</span>` : '';
+                    const authorFlag = p.authorCountry || '';
                     list.innerHTML += `
                         <div class="post-item" onclick="viewPost('${docSnap.id}')">
                             <div class="post-info">
                                 <div class="post-title">${p.title}${boostBadge}</div>
-                                <div class="post-meta">${p.authorName} · ${new Date(p.createdAt).toLocaleDateString()}</div>
+                                <div class="post-meta">${authorFlag} ${authorTitle}${p.authorName} · ${new Date(p.createdAt).toLocaleDateString()}</div>
                             </div>
                             <div class="post-stats">
                                 <span>❤️ ${p.likeCount||0}</span>
@@ -417,6 +419,8 @@
                         boardId, title, content,
                         authorUid: currentUser.uid,
                         authorName: currentUser.displayName,
+                        authorTitle: userData.title || '',
+                        authorCountry: userData.country || '',
                         likeCount: 0, commentCount: 0, likes: [],
                         boosted: false,
                         createdAt: new Date().toISOString()
@@ -521,11 +525,13 @@
                 list.innerHTML = "";
                 snapshot.forEach(docSnap => {
                     const c = docSnap.data();
+                    const authorTitle = c.authorTitle ? `<span style="font-size: 10px; background: rgba(245,158,11,0.2); color: #f59e0b; padding: 2px 6px; border-radius: 10px; margin-right: 4px;">${c.authorTitle}</span>` : '';
+                    const authorFlag = c.authorCountry || '';
                     list.innerHTML += `
                         <div class="comment-item">
                             <div class="comment-avatar">👤</div>
                             <div class="comment-content">
-                                <div class="comment-author">${c.authorName}</div>
+                                <div class="comment-author">${authorFlag} ${authorTitle}${c.authorName}</div>
                                 <div class="comment-text">${c.content}</div>
                                 <div class="comment-time">${new Date(c.createdAt).toLocaleString()}</div>
                             </div>
@@ -544,6 +550,8 @@
                 content,
                 authorUid: currentUser.uid,
                 authorName: currentUser.displayName,
+                authorTitle: userData?.title || '',
+                authorCountry: userData?.country || '',
                 createdAt: new Date().toISOString()
             });
             
