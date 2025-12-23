@@ -629,6 +629,8 @@
             btn.innerText = "처리 중...";
             btn.disabled = true;
 
+            const isFirstLand = (userData?.landCount || 0) === 0;
+
             try {
                 await runTransaction(db, async (t) => {
                     const landRef = doc(db, "lands", `${selectedRegionKey}-${selectedBlockIndex}`);
@@ -652,6 +654,25 @@
                         purchasedAt: new Date().toISOString()
                     });
                 });
+                
+                // 첫 땅 구매 시 초대 3단계 보상
+                if(isFirstLand && userData?.invitedBy) {
+                    try {
+                        // 초대자에게 3단계 보상 (400 BOK)
+                        await updateDoc(doc(db, "users", userData.invitedBy), { 
+                            coin: increment(400), 
+                            totalEarned: increment(400),
+                            inviteRewards: increment(400)
+                        });
+                        // 초대 기록 업데이트
+                        const inviteQuery = query(collection(db, "invites"), where("inviteeUid", "==", currentUser.uid));
+                        const inviteSnap = await getDocs(inviteQuery);
+                        if(!inviteSnap.empty) {
+                            await updateDoc(inviteSnap.docs[0].ref, { stage3: true, stage3At: new Date().toISOString() });
+                        }
+                    } catch(e) { console.log("초대 보상 오류:", e); }
+                }
+                
                 document.getElementById("buyModal").style.display = "none";
                 let msg = `🎉 구매 성공!\n\n`;
                 if(randomValue >= 800) msg += `🌟 대박!! ${randomValue} BOK 💎💎💎`;
