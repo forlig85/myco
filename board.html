@@ -291,14 +291,32 @@
         window.openImageViewer = (src) => { document.getElementById('viewerImage').src = src; document.getElementById('imageViewer').style.display = 'flex'; };
         window.closeImageViewer = () => document.getElementById('imageViewer').style.display = 'none';
 
+        // Auth 상태 체크 - 초기 로딩 시 바로 리다이렉트하지 않음
+        let authChecked = false;
         onAuthStateChanged(auth, async (user) => {
             if(user) {
                 currentUser = user;
                 const userDoc = await getDoc(doc(db, "users", user.uid));
-                userData = userDoc.data();
-                document.getElementById("walletBadge").innerHTML = `💰 ${(userData?.coin||0).toLocaleString()} BOK`;
+                if(userDoc.exists()) {
+                    userData = userDoc.data();
+                    document.getElementById("walletBadge").innerHTML = `💰 ${(userData?.coin||0).toLocaleString()} BOK`;
+                }
                 loadBoard();
-            } else { location.href = 'index.html'; }
+                authChecked = true;
+            } else {
+                // 첫 번째 호출에서는 리다이렉트하지 않음 (Auth 복원 대기)
+                if(authChecked) {
+                    location.href = 'index.html';
+                } else {
+                    // 2초 후에도 로그인 안되면 리다이렉트
+                    setTimeout(() => {
+                        if(!currentUser) {
+                            location.href = 'index.html';
+                        }
+                    }, 2000);
+                }
+                authChecked = true;
+            }
         });
 
         async function loadBoard() {
