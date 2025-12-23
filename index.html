@@ -3,17 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BOKLUCK PROTOCOL</title>
+    <title>BOKLUCK PROTOCOL (SECURE)</title>
     <style>
         /* 폰트 & 기본 설정 */
         @import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;700&family=Pretendard:wght@400;700&display=swap');
 
         body {
-            background-color: #050b14; /* 짙은 남색 배경 */
+            background-color: #050b14;
             background-image: 
                 linear-gradient(rgba(0, 243, 255, 0.03) 1px, transparent 1px),
                 linear-gradient(90deg, rgba(0, 243, 255, 0.03) 1px, transparent 1px);
-            background-size: 30px 30px; /* 격자 무늬 */
+            background-size: 30px 30px;
             color: #e0f7fa;
             font-family: 'Pretendard', sans-serif;
             max-width: 700px;
@@ -24,7 +24,7 @@
         /* 공통 네온 박스 스타일 */
         .cyber-box {
             background: rgba(10, 25, 47, 0.7);
-            border: 1px solid #00f3ff; /* 형광 민트 테두리 */
+            border: 1px solid #00f3ff;
             box-shadow: 0 0 10px rgba(0, 243, 255, 0.15);
             border-radius: 8px;
             padding: 20px;
@@ -58,36 +58,23 @@
             border: 1px solid #00f3ff;
             padding: 5px 15px;
             border-radius: 20px;
-            display: none; /* 로그인 전 숨김 */
+            display: none;
             background: rgba(0, 243, 255, 0.1);
         }
 
-        /* 대시보드 (현황판) */
+        /* 대시보드 */
         .dashboard-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 15px;
             margin-bottom: 15px;
         }
-        .stat-item {
-            text-align: center;
-        }
-        .stat-label {
-            font-size: 12px;
-            color: #8892b0;
-            margin-bottom: 5px;
-            text-transform: uppercase;
-        }
-        .stat-value {
-            font-family: 'Rajdhani', sans-serif;
-            font-size: 24px;
-            font-weight: bold;
-            color: #fff;
-        }
-        .accent { color: #00f3ff; text-shadow: 0 0 5px #00f3ff; } /* 민트 형광 */
-        .warning { color: #ff0055; text-shadow: 0 0 5px #ff0055; } /* 핑크 형광 */
+        .stat-item { text-align: center; }
+        .stat-label { font-size: 12px; color: #8892b0; margin-bottom: 5px; text-transform: uppercase; }
+        .stat-value { font-family: 'Rajdhani', sans-serif; font-size: 24px; font-weight: bold; color: #fff; }
+        .accent { color: #00f3ff; text-shadow: 0 0 5px #00f3ff; }
+        .warning { color: #ff0055; text-shadow: 0 0 5px #ff0055; }
 
-        /* 진행바 */
         .progress-container {
             height: 6px;
             background: #112240;
@@ -102,119 +89,59 @@
             transition: width 1s ease-in-out;
         }
 
-        /* 버튼 스타일 */
+        /* 버튼 */
         button {
-            width: 100%;
-            padding: 15px;
-            font-family: 'Rajdhani', sans-serif;
-            font-size: 18px;
-            font-weight: bold;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            cursor: pointer;
-            border: none;
-            transition: 0.3s;
+            width: 100%; padding: 15px;
+            font-family: 'Rajdhani', sans-serif; font-size: 18px; font-weight: bold;
+            text-transform: uppercase; letter-spacing: 1px;
+            cursor: pointer; border: none; transition: 0.3s;
         }
-        
         #loginBtn {
-            background: transparent;
-            border: 2px solid #00f3ff;
-            color: #00f3ff;
+            background: transparent; border: 2px solid #00f3ff; color: #00f3ff;
             box-shadow: 0 0 10px rgba(0, 243, 255, 0.2);
         }
         #loginBtn:hover {
-            background: #00f3ff;
-            color: #000;
-            box-shadow: 0 0 20px rgba(0, 243, 255, 0.6);
+            background: #00f3ff; color: #000; box-shadow: 0 0 20px rgba(0, 243, 255, 0.6);
         }
-
         .mine-btn {
-            background: linear-gradient(90deg, #00f3ff, #0077ff);
-            color: black;
-            border-radius: 4px;
-            margin-top: 10px;
+            background: linear-gradient(90deg, #00f3ff, #0077ff); color: black;
+            border-radius: 4px; margin-top: 10px;
         }
-        .mine-btn:hover {
-            transform: scale(1.02);
-            box-shadow: 0 0 15px rgba(0, 243, 255, 0.5);
-        }
-        .mine-btn:disabled {
-            background: #333;
-            color: #666;
-            cursor: not-allowed;
-            transform: none;
-            box-shadow: none;
-        }
+        .mine-btn:hover { transform: scale(1.02); box-shadow: 0 0 15px rgba(0, 243, 255, 0.5); }
+        .mine-btn:disabled { background: #333; color: #666; cursor: not-allowed; transform: none; box-shadow: none; }
 
         /* 입력창 */
         input, textarea {
-            width: 100%;
-            background: #050b14;
-            border: 1px solid #1d4ed8;
-            color: white;
-            padding: 12px;
-            margin-bottom: 10px;
-            border-radius: 4px;
-            box-sizing: border-box;
+            width: 100%; background: #050b14; border: 1px solid #1d4ed8; color: white;
+            padding: 12px; margin-bottom: 10px; border-radius: 4px; box-sizing: border-box;
             font-family: 'Pretendard', sans-serif;
         }
-        input:focus, textarea:focus {
-            outline: none;
-            border-color: #00f3ff;
-            box-shadow: 0 0 5px rgba(0, 243, 255, 0.3);
-        }
+        input:focus, textarea:focus { outline: none; border-color: #00f3ff; box-shadow: 0 0 5px rgba(0, 243, 255, 0.3); }
 
-        /* 리스트 스타일 */
-        .block-item {
-            padding: 15px;
-            border-bottom: 1px solid #112240;
-            position: relative;
-        }
+        /* 리스트 */
+        .block-item { padding: 15px; border-bottom: 1px solid #112240; position: relative; }
         .block-item:last-child { border-bottom: none; }
         .block-item::before {
-            content: '';
-            position: absolute;
-            left: 0;
-            top: 15px;
-            bottom: 15px;
-            width: 3px;
-            background: #00f3ff;
+            content: ''; position: absolute; left: 0; top: 15px; bottom: 15px; width: 3px; background: #00f3ff;
         }
-        .block-header {
-            display: flex;
-            justify-content: space-between;
-            font-size: 12px;
-            color: #8892b0;
-            margin-bottom: 5px;
-        }
-        .block-title {
-            font-size: 16px;
-            font-weight: bold;
-            color: #e6f1ff;
-        }
-        .block-hash {
-            font-family: monospace;
-            color: #00f3ff;
-            font-size: 12px;
-        }
+        .block-header { display: flex; justify-content: space-between; font-size: 12px; color: #8892b0; margin-bottom: 5px; }
+        .block-title { font-size: 16px; font-weight: bold; color: #e6f1ff; }
+        .block-hash { font-family: monospace; color: #00f3ff; font-size: 12px; }
 
-        /* 유틸리티 */
         .hidden { display: none; }
     </style>
 </head>
 <body>
 
     <header>
-        <div class="logo">BOKLUCK <span style="font-size:14px; color:#00f3ff;">PROTOCOL</span></div>
-        <div id="walletBadge" class="wallet-badge">
-            Connecting...
-        </div>
+        <div class="logo">BOKLUCK <span style="font-size:14px; color:#00f3ff;">SECURE</span></div>
+        <div id="walletBadge" class="wallet-badge">Connecting...</div>
     </header>
 
     <div id="authSection" class="cyber-box" style="text-align: center;">
         <h3 style="margin-top:0;">ACCESS REQUIRED</h3>
-        <p style="color:#8892b0; font-size:14px; margin-bottom:20px;">네트워크에 접속하려면 지갑을 연결하세요.</p>
-        <button id="loginBtn">CONNECT WALLET (GOOGLE)</button>
+        <p style="color:#8892b0; font-size:14px; margin-bottom:20px;">네트워크 접속을 위해 지갑 연결이 필요합니다.</p>
+        <button id="loginBtn">CONNECT WALLET</button>
     </div>
 
     <div id="mainDashboard" class="hidden">
@@ -240,9 +167,13 @@
         </div>
 
         <div class="cyber-box">
-            <h4 style="margin:0 0 15px 0; color:#00f3ff;">⚡ NEW BLOCK MINING</h4>
-            <input type="text" id="title" placeholder="블록 제목 (Title)">
-            <textarea id="content" rows="3" placeholder="기록할 데이터를 입력하세요..."></textarea>
+            <h4 style="margin:0 0 10px 0; color:#00f3ff;">⚡ SECURE MINING STATION</h4>
+            <p style="font-size:12px; color:#8892b0; margin-bottom:15px;">
+                * 규칙 1: 최소 10글자 이상 작성<br>
+                * 규칙 2: 연속 5회 초과 채굴 불가 (독점 방지)
+            </p>
+            <input type="text" id="title" placeholder="블록 제목">
+            <textarea id="content" rows="3" placeholder="의미 있는 데이터를 기록하세요 (최소 10자)"></textarea>
             <button id="mineBtn" class="mine-btn">START MINING</button>
         </div>
     </div>
@@ -250,7 +181,7 @@
     <div class="cyber-box">
         <h4 style="margin:0 0 15px 0; color:#8892b0;">RECENT BLOCKS</h4>
         <div id="blockList">
-            <div style="text-align:center; padding:20px; color:#8892b0;">Syncing Network...</div>
+            <div style="text-align:center; padding:20px; color:#8892b0;">Syncing...</div>
         </div>
     </div>
 
@@ -277,34 +208,24 @@
         const auth = getAuth(app);
         const provider = new GoogleAuthProvider();
 
-        // [설정]
         const HALVING_INTERVAL = 5; 
         const INITIAL_REWARD = 100;
         const MAX_SUPPLY = 1000000;
+        const CONSECUTIVE_LIMIT = 5; // 연속 채굴 제한 횟수
 
         let currentUser = null;
         
-        // UI Elements
         const authSection = document.getElementById("authSection");
         const mainDashboard = document.getElementById("mainDashboard");
         const walletBadge = document.getElementById("walletBadge");
         const loginBtn = document.getElementById("loginBtn");
         const mineBtn = document.getElementById("mineBtn");
 
-        // 1. 로그인 버튼 로직 (에러 처리 강화)
+        // 로그인
         loginBtn.addEventListener("click", () => {
-            console.log("Login button clicked..."); // 디버깅용
-            signInWithPopup(auth, provider)
-                .then((result) => {
-                    console.log("Login Success:", result.user);
-                })
-                .catch((error) => {
-                    console.error("Login Error:", error);
-                    alert(`🚫 로그인 실패!\n\n이유: ${error.code}\n\n[해결책]\nFirebase 콘솔 -> Authentication -> Settings -> '승인된 도메인'에 bokluck.com을 추가했는지 꼭 확인하세요!`);
-                });
+            signInWithPopup(auth, provider).catch(err => alert("로그인 오류: " + err.message));
         });
 
-        // 2. 상태 감지
         onAuthStateChanged(auth, async (user) => {
             if (user) {
                 currentUser = user;
@@ -312,7 +233,6 @@
                 mainDashboard.style.display = "block";
                 walletBadge.style.display = "block";
                 
-                // 지갑 잔액 표시
                 onSnapshot(doc(db, "users", user.uid), (doc) => {
                     const coin = doc.exists() ? doc.data().coin : 0;
                     walletBadge.innerHTML = `👤 ${user.displayName} <span style="color:#fff; margin-left:10px;">💰 ${coin.toLocaleString()} BOK</span>`;
@@ -320,11 +240,10 @@
             } else {
                 authSection.style.display = "block";
                 mainDashboard.style.display = "none";
-                walletBadge.style.display = "none";
             }
         });
 
-        // 3. 시스템 통계 (반감기 계산)
+        // 통계 모니터링
         const statsRef = doc(db, "system", "miningStats");
         onSnapshot(statsRef, (docSnap) => {
             let totalMined = 0;
@@ -343,94 +262,9 @@
             const nextHalvingBlock = (halvingCount + 1) * HALVING_INTERVAL;
             const blocksLeft = nextHalvingBlock - currentBlockHeight;
 
-            // UI 업데이트
             document.getElementById("currentReward").innerText = currentReward;
             document.getElementById("blocksToHalving").innerText = blocksLeft;
             document.getElementById("totalMined").innerText = totalMined.toLocaleString();
             
             const percent = (totalMined / MAX_SUPPLY) * 100;
-            document.getElementById("miningProgress").style.width = percent + "%";
-
-            if (!mineBtn.disabled) {
-                mineBtn.innerText = `MINING START (+${currentReward} BOK)`;
-            }
-        });
-
-        // 4. 채굴 (Transaction)
-        mineBtn.addEventListener("click", async () => {
-            const title = document.getElementById("title").value;
-            const content = document.getElementById("content").value;
-            if (!title || !content) return alert("데이터를 입력하세요.");
-
-            mineBtn.disabled = true;
-            mineBtn.innerText = "⏳ HASHING...";
-
-            try {
-                await runTransaction(db, async (transaction) => {
-                    const statsDoc = await transaction.get(statsRef);
-                    let currentStats = { totalBlocks: 0, totalMined: 0 };
-                    if (statsDoc.exists()) currentStats = statsDoc.data();
-
-                    const halvingCount = Math.floor(currentStats.totalBlocks / HALVING_INTERVAL);
-                    let reward = Math.floor(INITIAL_REWARD / Math.pow(2, halvingCount));
-                    if (reward < 1) reward = 1;
-
-                    if (currentStats.totalMined + reward > MAX_SUPPLY) throw "채굴 종료 (Max Supply Reached)";
-
-                    const newPostRef = doc(collection(db, "posts"));
-                    transaction.set(newPostRef, {
-                        title: title, content: content, author: currentUser.displayName,
-                        reward: reward, date: new Date().toISOString()
-                    });
-
-                    const userRef = doc(db, "users", currentUser.uid);
-                    transaction.set(userRef, { 
-                        coin: increment(reward), name: currentUser.displayName 
-                    }, { merge: true });
-
-                    transaction.set(statsRef, {
-                        totalBlocks: increment(1), totalMined: increment(reward)
-                    }, { merge: true });
-                });
-                
-                alert("SUCCESS! Block Mined.");
-                document.getElementById("title").value = "";
-                document.getElementById("content").value = "";
-            } catch (e) {
-                console.error(e);
-                alert("Error: " + e);
-            } finally {
-                mineBtn.disabled = false;
-            }
-        });
-
-        // 5. 리스트
-        const q = query(collection(db, "posts"), orderBy("date", "desc"));
-        onSnapshot(q, (snapshot) => {
-            const list = document.getElementById("blockList");
-            list.innerHTML = "";
-            if(snapshot.empty) list.innerHTML = "<div style='text-align:center; padding:10px;'>No Blocks yet.</div>";
-
-            snapshot.forEach((doc) => {
-                const data = doc.data();
-                const hash = doc.id.substring(0, 12).toUpperCase();
-                const reward = data.reward ? `+${data.reward}` : "GENESIS";
-                
-                list.innerHTML += `
-                    <div class="block-item">
-                        <div class="block-header">
-                            <span class="block-hash">HASH: ${hash}</span>
-                            <span>${new Date(data.date).toLocaleTimeString()}</span>
-                        </div>
-                        <div class="block-title">${data.title}</div>
-                        <div style="font-size:12px; color:#8892b0; margin-top:5px; display:flex; justify-content:space-between;">
-                            <span>BY: ${data.author}</span>
-                            <span style="color:#00f3ff; font-weight:bold;">${reward} BOK</span>
-                        </div>
-                    </div>
-                `;
-            });
-        });
-    </script>
-</body>
-</html>
+            document.getElementById("miningProgress").style.width = percent
