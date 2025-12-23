@@ -3,78 +3,116 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>내 커뮤니티 (테스트)</title>
+    <title>내 커뮤니티</title>
     <style>
-        /* 1. 기본 스타일 설정 */
-        body { font-family: 'Pretendard', sans-serif; margin: 0; padding: 0; background-color: #f8f9fa; color: #333; }
-        a { text-decoration: none; color: inherit; }
+        /* 디자인 스타일 (CSS) */
+        body { font-family: 'Pretendard', sans-serif; background-color: #f8f9fa; margin: 0; padding: 0; }
+        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
         
-        /* 2. 헤더 (로고 및 메뉴) */
-        header { background-color: #ffffff; border-bottom: 1px solid #eee; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; }
-        .logo { font-size: 24px; font-weight: bold; color: #2c3e50; }
-        .nav-btn { background-color: #3498db; color: white; padding: 8px 16px; border-radius: 5px; font-size: 14px; }
+        /* 입력창 디자인 */
+        .input-box { background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); margin-bottom: 20px; }
+        input, textarea { width: 100%; border: 1px solid #ddd; padding: 10px; margin-bottom: 10px; border-radius: 5px; box-sizing: border-box; }
+        button { background-color: #333; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; width: 100%; font-size: 16px; }
+        button:hover { background-color: #555; }
 
-        /* 3. 메인 컨텐츠 영역 */
-        .container { max-width: 800px; margin: 40px auto; padding: 0 20px; }
-        
-        /* 4. 게시판 리스트 디자인 */
-        .board-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-        .board-title { font-size: 28px; font-weight: bold; }
-        .write-btn { background-color: #2c3e50; color: white; padding: 10px 20px; border-radius: 5px; cursor: pointer; }
-
-        .post-card { background: white; border-radius: 10px; padding: 20px; margin-bottom: 15px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); transition: transform 0.2s; }
-        .post-card:hover { transform: translateY(-3px); box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
-        .post-category { font-size: 12px; color: #3498db; font-weight: bold; margin-bottom: 5px; }
-        .post-title { font-size: 18px; font-weight: bold; margin-bottom: 10px; }
-        .post-meta { font-size: 13px; color: #999; display: flex; justify-content: space-between; }
-
-        /* 5. 모바일 반응형 */
-        @media (max-width: 600px) {
-            .container { margin: 20px auto; }
-            .post-title { font-size: 16px; }
-        }
+        /* 게시글 목록 디자인 */
+        .post { background: white; padding: 20px; border-radius: 10px; margin-bottom: 15px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        .post-title { font-weight: bold; font-size: 18px; margin-bottom: 5px; }
+        .post-content { color: #555; font-size: 14px; white-space: pre-wrap; }
+        .post-date { font-size: 12px; color: #999; margin-top: 10px; text-align: right; }
     </style>
 </head>
 <body>
 
-    <header>
-        <div class="logo">My Community</div>
-        <a href="#" class="nav-btn">로그인</a>
-    </header>
-
     <div class="container">
-        <div class="board-header">
-            <div class="board-title">자유게시판</div>
-            <div class="write-btn" onclick="alert('아직 DB가 연결되지 않았습니다!')">글쓰기</div>
+        <h2>🔥 내 커뮤니티 (테스트)</h2>
+        
+        <div class="input-box">
+            <input type="text" id="title" placeholder="제목을 입력하세요">
+            <textarea id="content" rows="3" placeholder="내용을 입력하세요"></textarea>
+            <button id="saveBtn">글 올리기</button>
         </div>
 
-        <div class="post-card">
-            <div class="post-category">공지사항</div>
-            <div class="post-title">커뮤니티에 오신 것을 환영합니다! 🎉</div>
-            <div class="post-meta">
-                <span>관리자</span>
-                <span>2024.05.21</span>
-            </div>
-        </div>
-
-        <div class="post-card">
-            <div class="post-category">자유</div>
-            <div class="post-title">홈페이지 테스트 중인데 디자인 어떤가요?</div>
-            <div class="post-meta">
-                <span>테스터1</span>
-                <span>방금 전</span>
-            </div>
-        </div>
-
-        <div class="post-card">
-            <div class="post-category">질문</div>
-            <div class="post-title">GitHub Pages로 도메인 연결 어떻게 하나요?</div>
-            <div class="post-meta">
-                <span>뉴비</span>
-                <span>1시간 전</span>
-            </div>
+        <div id="postList">
+            <p style="text-align:center; color:#999;">로딩 중...</p>
         </div>
     </div>
 
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+        import { getFirestore, collection, addDoc, getDocs, query, orderBy, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+        // -----------------------------------------------------------
+        // 🔴 [중요] 아래 부분을 아까 복사한 내 설정값으로 바꿔주세요!
+        // -----------------------------------------------------------
+        // Import the functions you need from the SDKs you need
+import { initializeApp } from "firebase/app";
+// TODO: Add SDKs for Firebase products that you want to use
+// https://firebase.google.com/docs/web/setup#available-libraries
+
+// Your web app's Firebase configuration
+const firebaseConfig = {
+  apiKey: "AIzaSyBwQjuqgWM4YKnqu_gzNbeCg5alrC-jVcQ",
+  authDomain: "myco-737a0.firebaseapp.com",
+  projectId: "myco-737a0",
+  storageBucket: "myco-737a0.firebasestorage.app",
+  messagingSenderId: "942571332540",
+  appId: "1:942571332540:web:be0bb6fbdd32655501c1b9"
+};
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+        // -----------------------------------------------------------
+
+        // Firebase 시작
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // 1. 글 저장하기 기능
+        document.getElementById("saveBtn").addEventListener("click", async () => {
+            const title = document.getElementById("title").value;
+            const content = document.getElementById("content").value;
+
+            if (!title || !content) {
+                alert("제목과 내용을 모두 입력해주세요!");
+                return;
+            }
+
+            try {
+                await addDoc(collection(db, "posts"), {
+                    title: title,
+                    content: content,
+                    date: new Date().toISOString()
+                });
+                alert("글이 등록되었습니다!");
+                document.getElementById("title").value = ""; // 입력창 비우기
+                document.getElementById("content").value = "";
+            } catch (e) {
+                console.error("에러 발생: ", e);
+                alert("글쓰기 실패! 콘솔을 확인하세요.");
+            }
+        });
+
+        // 2. 글 불러오기 기능 (실시간 업데이트)
+        const q = query(collection(db, "posts"), orderBy("date", "desc"));
+        onSnapshot(q, (snapshot) => {
+            const postList = document.getElementById("postList");
+            postList.innerHTML = ""; // 기존 목록 초기화
+
+            snapshot.forEach((doc) => {
+                const post = doc.data();
+                const date = new Date(post.date).toLocaleString();
+                
+                const html = `
+                    <div class="post">
+                        <div class="post-title">${post.title}</div>
+                        <div class="post-content">${post.content}</div>
+                        <div class="post-date">${date}</div>
+                    </div>
+                `;
+                postList.innerHTML += html;
+            });
+        });
+    </script>
 </body>
 </html>
