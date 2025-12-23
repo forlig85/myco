@@ -106,7 +106,7 @@
             </div>
 
             <button id="confirmBuyBtn" class="modal-btn btn-confirm">구매 확정</button>
-            <button onclick="closeModal()" class="modal-btn btn-cancel">취소</button>
+            <button id="cancelBuyBtn" class="modal-btn btn-cancel">취소</button>
         </div>
     </div>
 
@@ -115,6 +115,7 @@
         import { getFirestore, collection, onSnapshot, doc, runTransaction, increment, query, where } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
         import { getAuth, onAuthStateChanged, signInWithPopup, GoogleAuthProvider } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
+        // ✅ 1. 설정 (키 적용됨)
         const firebaseConfig = {
           apiKey: "AIzaSyBwQjuqgWM4YKnqu_gzNbeCg5alrC-jVcQ",
           authDomain: "myco-737a0.firebaseapp.com",
@@ -128,35 +129,134 @@
         const db = getFirestore(app);
         const auth = getAuth(app);
 
+        // ✅ 2. 전역 변수
         let currentUser = null;
         let currentBalance = 0;
         const LAND_PRICE = 300;
         
-        // 도시 데이터
         const cities = {
             "KR": ["서울", "부산", "제주"],
             "US": ["뉴욕", "LA", "텍사스"],
             "JP": ["도쿄", "오사카"]
         };
 
+        // UI 요소
         const countrySelect = document.getElementById("countrySelect");
         const citySelect = document.getElementById("citySelect");
         const grid = document.getElementById("landGrid");
         const walletBadge = document.getElementById("walletBadge");
         const manualLoginBtn = document.getElementById("manualLoginBtn");
         
-        // 모달 관련 요소
+        // 모달 요소
         const buyModal = document.getElementById("buyModal");
         const inputName = document.getElementById("inputName");
         const inputColor = document.getElementById("inputColor");
         let selectedBlockIndex = null;
         let selectedRegionKey = null;
 
-        // --- 로그인 및 초기화 ---
-        manualLoginBtn.addEventListener("click", () => {
-            signInWithPopup(auth, new GoogleAuthProvider()).catch(err => alert("연결 실패: " + err.message));
+        // ✅ 3. 함수 정의 (사용되기 전에 먼저 선언)
+
+        // 모달 열기 함수 (전역 window에 등록 X -> 내부 로직으로 처리)
+        function openBuyModal(index, regionKey) {
+            if(!currentUser) {
+                alert("지갑 연결이 필요합니다. (상단 수동 연결 버튼 확인)");
+                return;
+            }
+            selectedBlockIndex = index;
+            selectedRegionKey = regionKey;
+            
+            inputName.value = "";
+            inputColor.value = "#0ea5e9"; // 기본 파랑
+            buyModal.style.display = "flex";
+        }
+
+        // 모달 닫기
+        document.getElementById("cancelBuyBtn").addEventListener("click", () => {
+            buyModal.style.display = "none";
         });
 
+        // 맵 로드 함수
+        let unsubscribeMap = null;
+        function loadMap() {
+            const regionKey = `${countrySelect.value}-${citySelect.value}`; 
+            
+            // 맵 초기화 (빈 땅 25개)
+            grid.innerHTML = "";
+            for(let i=0; i<25; i++) {
+                const div = document.createElement("div");
+                div.className = "land-block land-empty";
+                div.id = `block-${i}`;
+                div.innerHTML = `<span class="land-text">빈 땅</span><span class="land-sub">${LAND_PRICE} BOK</span>`;
+                
+                // ⭐ 중요: 함수가 정의된 후 연결
+                div.addEventListener('click', () => openBuyModal(i, regionKey));
+                
+                grid.appendChild(div);
+            }
+
+            if(unsubscribeMap) unsubscribeMap();
+            const q = query(collection(db, "lands"), where("region", "==", regionKey));
+            
+            unsubscribeMap = onSnapshot(q, (snapshot) => {
+                let myLandCount = 0;
+                snapshot.forEach(doc => {
+                    const data = doc.data();
+                    const el = document.getElementById(`block-${data.index}`);
+                    if(!el) return;
+
+                    // 땅 스타일 적용
+                    el.style.backgroundColor = data.color || "#334155";
+                    el.style.border = "1px solid rgba(255,255,255,0.2)";
+                    el.classList.remove("land-empty");
+
+                    // 텍스트 표시
+                    const valueText = data.randomValue ? `💎 가치: ${data.randomValue}` : "평가 중";
+                    
+                    if(currentUser && data.ownerUid === currentUser.uid) {
+                        el.innerHTML = `<span class="land-text" style="color:#fff;">${data.customName}</span><span class="land-sub" style="color:#fff;">${valueText}</span>`;
+                        myLandCount++;
+                    } else {
+                        el.innerHTML = `<span class="land-text" style="color:#fff;">${data.customName}</span><span class="land-sub" style="color:#ddd;">${data.ownerName}</span>`;
+                    }
+
+                    // 팔린 땅은 클릭 시 정보 표시 (이벤트 덮어쓰기)
+                    // 기존 이벤트를 제거하기 위해 cloneNode 사용
+                    const newEl = el.cloneNode(true);
+                    newEl.addEventListener('click', () => alert(`🔒 [소유 정보]\n\n이름: ${data.customName}\n소유자: ${data.ownerName}\n감정가: ${data.randomValue || 0} BOK`));
+                    el.parentNode.replaceChild(newEl, el);
+                });
+
+                // 점령 메시지
+                const statusBox = document.getElementById("conquestMessage");
+                if(myLandCount >= 13) {
+                    statusBox.style.display = "block";
+                    statusBox.innerText = `👑 축하합니다! [${citySelect.value}] 지역의 최대 소유자입니다! (${myLandCount}/25)`;
+                } else {
+                    statusBox.style.display = "none";
+                }
+            });
+        }
+
+        // ✅ 4. 이벤트 리스너 연결
+        
+        // 도시 변경 이벤트
+        function updateCityOptions() {
+            const list = cities[countrySelect.value];
+            citySelect.innerHTML = "";
+            list.forEach(c => {
+                const opt = document.createElement("option");
+                opt.value = c.split(' ')[0]; opt.innerText = c;
+                citySelect.appendChild(opt);
+            });
+            loadMap(); 
+        }
+        countrySelect.addEventListener("change", updateCityOptions);
+        citySelect.addEventListener("change", loadMap);
+        
+        // 초기 실행
+        updateCityOptions(); 
+
+        // 로그인/로그아웃 감지
         onAuthStateChanged(auth, (user) => {
             if (user) {
                 currentUser = user;
@@ -178,94 +278,12 @@
             }
         });
 
-        // --- 맵 로직 ---
-        function updateCityOptions() {
-            const list = cities[countrySelect.value];
-            citySelect.innerHTML = "";
-            list.forEach(c => {
-                const opt = document.createElement("option");
-                opt.value = c.split(' ')[0]; opt.innerText = c;
-                citySelect.appendChild(opt);
-            });
-            loadMap(); 
-        }
-        countrySelect.addEventListener("change", updateCityOptions);
-        citySelect.addEventListener("change", loadMap);
-        updateCityOptions(); 
+        // 수동 로그인
+        manualLoginBtn.addEventListener("click", () => {
+            signInWithPopup(auth, new GoogleAuthProvider()).catch(err => alert("오류: " + err.message));
+        });
 
-        let unsubscribeMap = null;
-        function loadMap() {
-            const regionKey = `${countrySelect.value}-${citySelect.value}`; 
-            
-            // 그리드 초기화 (빈 땅 25개)
-            grid.innerHTML = "";
-            for(let i=0; i<25; i++) {
-                const div = document.createElement("div");
-                div.className = "land-block land-empty";
-                div.id = `block-${i}`;
-                div.innerHTML = `<span class="land-text">빈 땅</span><span class="land-sub">${LAND_PRICE} BOK</span>`;
-                div.onclick = () => openBuyModal(i, regionKey); // 모달 열기
-                grid.appendChild(div);
-            }
-
-            if(unsubscribeMap) unsubscribeMap();
-            const q = query(collection(db, "lands"), where("region", "==", regionKey));
-            
-            unsubscribeMap = onSnapshot(q, (snapshot) => {
-                let myLandCount = 0;
-                snapshot.forEach(doc => {
-                    const data = doc.data();
-                    const el = document.getElementById(`block-${data.index}`);
-                    if(!el) return;
-
-                    // 땅 스타일 적용 (색상 포함)
-                    el.style.backgroundColor = data.color || "#334155"; // 사용자 지정 색상
-                    el.style.border = "1px solid rgba(255,255,255,0.2)";
-                    el.classList.remove("land-empty");
-
-                    // 텍스트 표시
-                    const valueText = data.randomValue ? `💎 가치: ${data.randomValue}` : "평가 중";
-                    
-                    if(currentUser && data.ownerUid === currentUser.uid) {
-                        el.innerHTML = `<span class="land-text" style="color:#fff;">${data.customName}</span><span class="land-sub" style="color:#fff;">${valueText}</span>`;
-                        myLandCount++;
-                    } else {
-                        el.innerHTML = `<span class="land-text" style="color:#fff;">${data.customName}</span><span class="land-sub" style="color:#ddd;">${data.ownerName}</span>`;
-                    }
-
-                    // 이미 팔린 땅 클릭 시
-                    el.onclick = () => alert(`🔒 [소유 정보]\n\n이름: ${data.customName}\n소유자: ${data.ownerName}\n감정가: ${data.randomValue || 0} BOK`);
-                });
-
-                // 점령 메시지
-                const statusBox = document.getElementById("conquestMessage");
-                if(myLandCount >= 13) {
-                    statusBox.style.display = "block";
-                    statusBox.innerText = `👑 축하합니다! [${citySelect.value}] 지역의 최대 소유자입니다! (${myLandCount}/25)`;
-                } else {
-                    statusBox.style.display = "none";
-                }
-            });
-        }
-
-        // --- 모달 & 구매 로직 ---
-        
-        // 1. 전역 함수로 등록 (HTML onclick에서 부르기 위해)
-        window.openBuyModal = (index, regionKey) => {
-            if(!currentUser) return alert("지갑 연결이 필요합니다.");
-            selectedBlockIndex = index;
-            selectedRegionKey = regionKey;
-            
-            inputName.value = "";
-            inputColor.value = "#0ea5e9"; // 기본 파랑
-            buyModal.style.display = "flex";
-        }
-
-        window.closeModal = () => {
-            buyModal.style.display = "none";
-        }
-
-        // 2. 구매 확정 버튼 클릭
+        // ✅ 5. 구매 확정 버튼 (트랜잭션)
         document.getElementById("confirmBuyBtn").addEventListener("click", async () => {
             if(currentBalance < LAND_PRICE) return alert(`자산 부족! (${currentBalance} BOK 보유)`);
             const name = inputName.value.trim();
@@ -273,9 +291,7 @@
             
             if(!name) return alert("땅 이름을 입력해주세요.");
 
-            // 🎲 랜덤 가치 생성 (1 ~ 1000)
             const randomValue = Math.floor(Math.random() * 1000) + 1;
-
             const btn = document.getElementById("confirmBuyBtn");
             btn.innerText = "처리 중...";
             btn.disabled = true;
@@ -295,14 +311,14 @@
                         ownerUid: currentUser.uid,
                         ownerName: currentUser.displayName,
                         customName: name,
-                        color: color,           // 🎨 색상 저장
-                        randomValue: randomValue, // 💎 랜덤 가치 저장
+                        color: color,
+                        randomValue: randomValue,
                         purchasedAt: new Date().toISOString()
                     });
                 });
                 
-                closeModal();
-                alert(`🎉 구매 성공!\n\n이 땅의 감정가는 [ ${randomValue} BOK ] 으로 책정되었습니다!`);
+                buyModal.style.display = "none";
+                alert(`🎉 구매 성공!\n\n이 땅의 감정가는 [ ${randomValue} BOK ] 입니다!`);
                 
             } catch(e) {
                 alert("구매 실패: " + e);
