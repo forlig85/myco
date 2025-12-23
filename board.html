@@ -382,7 +382,6 @@
                 });
             }, (e) => { console.error("글 로드 오류:", e); document.getElementById("postList").innerHTML = `<div class="empty-state"><div class="icon">⚠️</div><p>오류: ${e.message}</p></div>`; });
         }
-        }
 
         window.changeSort = (s) => { currentSort = s; document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active')); document.querySelector(`.tab[data-sort="${s}"]`).classList.add('active'); loadPosts(); };
         window.showWriteForm = () => { uploadedImages = []; renderPreviews(); document.getElementById("postTitle").value = ""; document.getElementById("postContent").value = ""; document.getElementById("postListSection").classList.add("hidden"); document.getElementById("writeSection").classList.remove("hidden"); };
