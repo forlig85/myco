@@ -3,28 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    
-    <!-- SEO 개선 -->
     <title>BOKLUCK - 글 쓰고 땅 사는 Web3 커뮤니티</title>
-    <meta name="description" content="BOKLUCK에서 콘텐츠를 작성하고 BOK 토큰을 받으세요. 가상 부동산을 구매하고 영토를 확장하는 새로운 경험!">
-    <meta name="keywords" content="BOKLUCK, BOK, 커뮤니티, 부동산, 토큰, Web3">
-    <meta property="og:title" content="BOKLUCK - 글 쓰고 땅 사는 Web3 커뮤니티">
-    <meta property="og:description" content="콘텐츠 작성으로 BOK 토큰을 획득하고, 가상 부동산에 투자하세요!">
-    <meta property="og:type" content="website">
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏠</text></svg>">
-    
-    <!-- Google Fonts -->
+    <meta name="description" content="BOKLUCK에서 콘텐츠를 작성하고 BOK 토큰을 받으세요.">
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
-
     <style>
-        * { 
-            box-sizing: border-box; 
-            margin: 0;
-            padding: 0;
-        }
-        
+        * { box-sizing: border-box; margin: 0; padding: 0; }
         :root {
             --primary: #6366f1;
             --primary-light: #818cf8;
@@ -32,6 +16,7 @@
             --accent: #f59e0b;
             --success: #10b981;
             --danger: #ef4444;
+            --pink: #ec4899;
             --bg-dark: #0a0a0f;
             --bg-card: #12121a;
             --bg-card-hover: #1a1a25;
@@ -40,247 +25,175 @@
             --text-muted: #8888a0;
             --gradient-primary: linear-gradient(135deg, #6366f1 0%, #06b6d4 100%);
             --gradient-gold: linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%);
+            --gradient-pink: linear-gradient(135deg, #ec4899 0%, #8b5cf6 100%);
         }
-        
         body { 
             background-color: var(--bg-dark);
-            background-image: 
-                radial-gradient(ellipse at top, rgba(99, 102, 241, 0.1) 0%, transparent 50%),
-                radial-gradient(ellipse at bottom, rgba(6, 182, 212, 0.05) 0%, transparent 50%);
+            background-image: radial-gradient(ellipse at top, rgba(99, 102, 241, 0.1) 0%, transparent 50%);
             color: var(--text); 
-            font-family: 'Noto Sans KR', -apple-system, BlinkMacSystemFont, sans-serif; 
-            max-width: 900px; 
-            margin: 0 auto; 
-            padding: 20px; 
+            font-family: 'Noto Sans KR', sans-serif; 
             min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            line-height: 1.6;
         }
         
-        main { flex: 1; }
-        
-        /* 카드 스타일 */
-        .card { 
+        /* 네비게이션 */
+        .navbar {
             background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 16px; 
-            padding: 24px; 
-            margin-bottom: 20px; 
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-            transition: all 0.3s ease;
+            border-bottom: 1px solid var(--border);
+            padding: 12px 20px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
         }
-        .card:hover {
-            border-color: rgba(99, 102, 241, 0.3);
-            box-shadow: 0 8px 30px rgba(99, 102, 241, 0.1);
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
-        
-        /* 버튼 스타일 */
-        button { 
-            cursor: pointer; 
-            border: none; 
-            border-radius: 12px; 
-            font-weight: 600; 
-            padding: 14px 24px; 
-            transition: all 0.3s ease; 
-            font-family: 'Noto Sans KR', sans-serif;
-            font-size: 15px;
-        }
-        button:hover { transform: translateY(-2px); }
-        button:active { transform: translateY(0); }
-        button:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
-        
-        .btn-primary { 
-            background: var(--gradient-primary);
-            color: white; 
-            width: 100%; 
-            font-size: 16px;
-            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4);
-        }
-        .btn-primary:hover { 
-            box-shadow: 0 6px 25px rgba(99, 102, 241, 0.5);
-        }
-        
-        .btn-market { 
-            background: var(--gradient-gold);
-            color: #1a1a2e; 
-            width: 100%; 
-            font-size: 18px; 
-            font-weight: 700;
-            margin-bottom: 24px; 
-            box-shadow: 0 4px 20px rgba(245, 158, 11, 0.4);
-            padding: 18px 24px;
-        }
-        .btn-market:hover { 
-            box-shadow: 0 8px 30px rgba(245, 158, 11, 0.5);
-        }
-        
-        .btn-small { 
-            padding: 8px 16px; 
-            font-size: 13px; 
-            border-radius: 8px;
-            font-weight: 600;
-        }
-        
-        .btn-success {
-            background: var(--success);
-            color: white;
-        }
-        
-        /* 테스트 버튼 */
-        .btn-cheat { 
-            background: transparent;
-            border: 1px dashed var(--danger);
-            color: var(--danger); 
-            width: 100%; 
-            margin-bottom: 16px;
-            font-size: 13px;
-            opacity: 0.6;
-            padding: 10px;
-        }
-        .btn-cheat:hover { opacity: 1; background: rgba(239, 68, 68, 0.1); }
-        
-        /* 헤더 */
-        header { 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            margin-bottom: 30px; 
-            padding: 20px 0;
-        }
-        
         .logo { 
-            font-size: 28px; 
+            font-size: 24px; 
             font-weight: 900; 
             background: var(--gradient-primary);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            background-clip: text;
-            letter-spacing: -1px;
+            cursor: pointer;
         }
-        
-        .wallet { 
-            background: var(--bg-card);
-            padding: 10px 20px; 
-            border-radius: 50px; 
+        .nav-links {
+            display: flex;
+            gap: 8px;
+        }
+        .nav-link {
+            padding: 8px 16px;
+            border-radius: 8px;
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+        .nav-link:hover, .nav-link.active {
+            background: var(--bg-card-hover);
+            color: var(--text);
+        }
+        .wallet-badge {
+            background: var(--bg-dark);
+            padding: 8px 16px;
+            border-radius: 50px;
             border: 1px solid var(--border);
             color: var(--secondary);
-            font-weight: 700; 
+            font-weight: 700;
             font-size: 14px;
             display: flex;
             align-items: center;
             gap: 8px;
         }
-        .wallet::before {
-            content: '💰';
-        }
-        
-        /* 보드/포스트 아이템 */
-        .board-item { 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            padding: 18px; 
-            border-bottom: 1px solid var(--border);
-            cursor: pointer; 
-            transition: all 0.2s ease;
-            border-radius: 8px;
-            margin: 4px 0;
-        }
-        .board-item:hover { 
-            background: var(--bg-card-hover);
-            border-color: transparent;
-        }
-        .board-item:last-child { border-bottom: none; }
-        
-        .board-name {
-            font-weight: 700;
-            font-size: 16px;
-            margin-bottom: 4px;
-        }
-        
-        .post-item { 
-            padding: 18px; 
-            border-bottom: 1px solid var(--border);
-            cursor: pointer; 
-            transition: all 0.2s ease;
-            border-radius: 8px;
-            margin: 4px 0;
-        }
-        .post-item:hover { 
-            background: var(--bg-card-hover);
-        }
-        .post-item:last-child { border-bottom: none; }
-        
-        .post-title {
-            font-weight: 600;
-            font-size: 15px;
-            margin-bottom: 6px;
-        }
-        
-        .post-meta {
+        .level-badge {
+            background: var(--gradient-gold);
+            color: #1a1a2e;
+            padding: 4px 10px;
+            border-radius: 20px;
             font-size: 12px;
-            color: var(--text-muted);
+            font-weight: 700;
         }
-        
-        /* 입력 필드 */
-        input, textarea { 
-            width: 100%; 
-            background: var(--bg-dark);
-            border: 1px solid var(--border);
-            color: var(--text); 
-            padding: 16px; 
-            border-radius: 12px; 
-            font-size: 15px; 
-            margin-bottom: 12px; 
-            font-family: 'Noto Sans KR', sans-serif;
-            transition: all 0.3s ease;
-        }
-        input:focus, textarea:focus { 
-            outline: none; 
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
-        }
-        input::placeholder, textarea::placeholder {
-            color: var(--text-muted);
-        }
-        
-        .hidden { display: none; }
-        
-        .back-link { 
-            color: var(--text-muted); 
-            cursor: pointer; 
-            font-size: 14px; 
-            margin-bottom: 16px; 
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            transition: color 0.2s;
-            font-weight: 500;
-        }
-        .back-link:hover { color: var(--text); }
 
-        /* ========== 히어로 섹션 ========== */
-        .hero-section {
+        /* 메인 컨테이너 */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 24px 20px;
+        }
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        .grid-3 {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+        }
+
+        /* 카드 */
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 24px;
+            transition: all 0.3s;
+        }
+        .card:hover {
+            border-color: rgba(99, 102, 241, 0.3);
+        }
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+        .card-title {
+            font-size: 18px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* 버튼 */
+        button {
+            cursor: pointer;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            padding: 12px 20px;
+            transition: all 0.3s;
+            font-family: 'Noto Sans KR', sans-serif;
+            font-size: 14px;
+        }
+        button:hover { transform: translateY(-2px); }
+        button:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+        .btn-primary {
+            background: var(--gradient-primary);
+            color: white;
+            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
+        }
+        .btn-gold {
+            background: var(--gradient-gold);
+            color: #1a1a2e;
+        }
+        .btn-pink {
+            background: var(--gradient-pink);
+            color: white;
+        }
+        .btn-outline {
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--text);
+        }
+        .btn-sm {
+            padding: 8px 14px;
+            font-size: 13px;
+        }
+        .btn-block { width: 100%; }
+
+        /* 히어로 섹션 */
+        .hero {
             text-align: center;
-            padding: 60px 30px;
+            padding: 60px 20px;
             background: var(--bg-card);
             border-radius: 24px;
-            margin-bottom: 30px;
+            margin-bottom: 24px;
             border: 1px solid var(--border);
             position: relative;
             overflow: hidden;
         }
-        .hero-section::before {
+        .hero::before {
             content: '';
             position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
+            top: 0; left: 0; right: 0;
             height: 3px;
             background: var(--gradient-primary);
         }
-        
         .hero-badge {
             display: inline-block;
             background: rgba(99, 102, 241, 0.1);
@@ -292,575 +205,1198 @@
             font-weight: 600;
             margin-bottom: 20px;
         }
-        
         .hero-title {
             font-size: 36px;
             font-weight: 900;
             margin-bottom: 16px;
             line-height: 1.3;
-            letter-spacing: -1px;
         }
         .hero-title .highlight {
             background: var(--gradient-primary);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            background-clip: text;
         }
-        
         .hero-subtitle {
             font-size: 16px;
             color: var(--text-muted);
-            margin-bottom: 40px;
-            line-height: 1.7;
+            margin-bottom: 32px;
         }
-        
-        /* 통계 */
+
+        /* 통계 바 */
         .stats-bar {
             display: flex;
             justify-content: center;
             gap: 40px;
-            margin-bottom: 40px;
-            flex-wrap: wrap;
+            margin-bottom: 32px;
         }
-        .stat-item {
-            text-align: center;
-        }
+        .stat-item { text-align: center; }
         .stat-number {
-            font-size: 32px;
+            font-size: 28px;
             font-weight: 900;
             background: var(--gradient-primary);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            background-clip: text;
         }
         .stat-label {
             font-size: 13px;
             color: var(--text-muted);
-            margin-top: 4px;
         }
 
         /* 기능 카드 */
-        .feature-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 16px;
-            margin-bottom: 24px;
-        }
-        
         .feature-card {
             background: var(--bg-card);
             border: 1px solid var(--border);
             border-radius: 16px;
-            padding: 24px 16px;
+            padding: 24px;
             text-align: center;
-            transition: all 0.3s ease;
+            transition: all 0.3s;
+            cursor: pointer;
         }
         .feature-card:hover {
             transform: translateY(-4px);
             border-color: var(--primary);
             box-shadow: 0 10px 30px rgba(99, 102, 241, 0.15);
         }
-        
-        .feature-icon { 
-            font-size: 40px; 
-            margin-bottom: 16px;
-            display: block;
-        }
-        .feature-title { 
-            font-size: 15px; 
-            font-weight: 700; 
-            margin-bottom: 8px; 
-        }
-        .feature-desc { 
-            font-size: 13px; 
-            color: var(--text-muted); 
-            line-height: 1.5; 
-        }
+        .feature-icon { font-size: 40px; margin-bottom: 16px; }
+        .feature-title { font-weight: 700; margin-bottom: 8px; }
+        .feature-desc { font-size: 13px; color: var(--text-muted); }
 
-        /* BOK 토큰 정보 */
-        .token-info {
-            background: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(6, 182, 212, 0.1) 100%);
-            border: 1px solid rgba(99, 102, 241, 0.2);
-            border-radius: 16px;
-            padding: 24px;
-            margin-bottom: 24px;
-        }
-        
-        .token-info h4 {
-            color: var(--secondary);
-            margin-bottom: 16px;
-            font-size: 16px;
-            font-weight: 700;
-        }
-        
-        .token-list {
+        /* 미션 아이템 */
+        .mission-item {
             display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-        }
-        
-        .token-item {
-            background: rgba(99, 102, 241, 0.15);
-            padding: 10px 16px;
-            border-radius: 10px;
-            font-size: 13px;
-            color: var(--primary-light);
-            font-weight: 500;
-        }
-
-        /* 온보딩 팁 */
-        .onboarding-tip {
-            background: linear-gradient(135deg, rgba(245, 158, 11, 0.15) 0%, rgba(251, 191, 36, 0.1) 100%);
-            border: 1px solid rgba(245, 158, 11, 0.3);
-            color: #fbbf24;
-            padding: 16px 20px;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px;
+            background: var(--bg-dark);
             border-radius: 12px;
-            font-size: 14px;
-            margin-bottom: 20px;
+            margin-bottom: 10px;
+            border: 1px solid var(--border);
+        }
+        .mission-info {
             display: flex;
             align-items: center;
             gap: 12px;
         }
-        .onboarding-tip .close-tip {
-            margin-left: auto;
-            cursor: pointer;
-            opacity: 0.7;
-            font-size: 18px;
-        }
-        .onboarding-tip .close-tip:hover { opacity: 1; }
-
-        /* 로딩 스켈레톤 */
-        .skeleton {
-            background: linear-gradient(90deg, var(--bg-card-hover) 25%, var(--border) 50%, var(--bg-card-hover) 75%);
-            background-size: 200% 100%;
-            animation: shimmer 1.5s infinite;
+        .mission-icon {
+            width: 40px;
+            height: 40px;
+            background: var(--bg-card-hover);
             border-radius: 10px;
-            height: 70px;
-            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
         }
-        @keyframes shimmer {
-            0% { background-position: 200% 0; }
-            100% { background-position: -200% 0; }
+        .mission-title { font-weight: 600; font-size: 14px; }
+        .mission-progress {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+        .mission-reward {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--success);
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+        }
+        .mission-complete {
+            background: var(--success);
+            color: white;
         }
 
-        /* 섹션 헤더 */
-        .section-header {
+        /* 프로그레스 바 */
+        .progress-bar {
+            height: 8px;
+            background: var(--bg-dark);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 8px;
+        }
+        .progress-fill {
+            height: 100%;
+            background: var(--gradient-primary);
+            border-radius: 4px;
+            transition: width 0.5s ease;
+        }
+
+        /* 랭킹 */
+        .ranking-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            background: var(--bg-dark);
+            border-radius: 10px;
+            margin-bottom: 8px;
+        }
+        .ranking-position {
+            width: 28px;
+            height: 28px;
+            background: var(--bg-card-hover);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 13px;
+        }
+        .ranking-position.gold { background: var(--gradient-gold); color: #1a1a2e; }
+        .ranking-position.silver { background: linear-gradient(135deg, #94a3b8, #cbd5e1); color: #1a1a2e; }
+        .ranking-position.bronze { background: linear-gradient(135deg, #b45309, #d97706); color: white; }
+        .ranking-name { flex: 1; font-weight: 500; }
+        .ranking-score { color: var(--secondary); font-weight: 700; }
+
+        /* 룰렛 */
+        .roulette-container {
+            text-align: center;
+            padding: 20px;
+        }
+        .roulette-wheel {
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            background: conic-gradient(
+                var(--primary) 0deg 45deg,
+                var(--secondary) 45deg 90deg,
+                var(--accent) 90deg 135deg,
+                var(--success) 135deg 180deg,
+                var(--pink) 180deg 225deg,
+                var(--danger) 225deg 270deg,
+                var(--primary-light) 270deg 315deg,
+                #fbbf24 315deg 360deg
+            );
+            margin: 0 auto 20px;
+            position: relative;
+            transition: transform 3s cubic-bezier(0.17, 0.67, 0.12, 0.99);
+            box-shadow: 0 0 30px rgba(99, 102, 241, 0.3);
+        }
+        .roulette-wheel::before {
+            content: '🎯';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 40px;
+            background: var(--bg-dark);
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .roulette-pointer {
+            position: absolute;
+            top: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 24px;
+        }
+
+        /* 프로필 */
+        .profile-header {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 24px;
+        }
+        .profile-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: var(--gradient-primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 36px;
+        }
+        .profile-info h2 {
+            font-size: 24px;
+            margin-bottom: 4px;
+        }
+        .profile-stats {
+            display: flex;
+            gap: 20px;
+            color: var(--text-muted);
+            font-size: 14px;
+        }
+
+        /* 업적 */
+        .achievement-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 14px;
+            background: var(--bg-dark);
+            border-radius: 12px;
+            margin-bottom: 10px;
+            border: 1px solid var(--border);
+        }
+        .achievement-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+        }
+        .achievement-locked {
+            background: var(--bg-card-hover);
+            opacity: 0.5;
+        }
+        .achievement-unlocked {
+            background: var(--gradient-gold);
+        }
+        .achievement-info { flex: 1; }
+        .achievement-title { font-weight: 600; font-size: 14px; }
+        .achievement-desc { font-size: 12px; color: var(--text-muted); }
+
+        /* 게시판 목록 */
+        .board-item {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 16px;
+            background: var(--bg-dark);
+            border-radius: 12px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 1px solid var(--border);
+        }
+        .board-item:hover {
+            background: var(--bg-card-hover);
+            border-color: var(--primary);
+        }
+        .board-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+        .board-info { flex: 1; }
+        .board-name { font-weight: 700; margin-bottom: 4px; }
+        .board-meta { font-size: 12px; color: var(--text-muted); }
+        .board-stats {
+            display: flex;
+            gap: 16px;
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+        .board-fee {
+            background: rgba(245, 158, 11, 0.1);
+            color: var(--accent);
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        /* 탭 */
+        .tabs {
+            display: flex;
+            gap: 4px;
+            background: var(--bg-dark);
+            padding: 4px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+        }
+        .tab {
+            flex: 1;
+            padding: 10px;
+            text-align: center;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: var(--text-muted);
+        }
+        .tab.active {
+            background: var(--bg-card);
+            color: var(--text);
+        }
+
+        /* 모달 */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0,0,0,0.8);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            backdrop-filter: blur(8px);
+        }
+        .modal-content {
+            background: var(--bg-card);
+            padding: 32px;
+            border-radius: 20px;
+            width: 90%;
+            max-width: 500px;
+            max-height: 80vh;
+            overflow-y: auto;
+            border: 1px solid var(--border);
+            position: relative;
+        }
+        .modal-close {
+            position: absolute;
+            top: 16px; right: 16px;
+            background: var(--bg-dark);
+            border: none;
+            width: 32px; height: 32px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 18px;
+            color: var(--text-muted);
+        }
+        .modal-title {
+            font-size: 22px;
+            font-weight: 900;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        /* 입력 필드 */
+        input, textarea, select {
+            width: 100%;
+            background: var(--bg-dark);
+            border: 1px solid var(--border);
+            color: var(--text);
+            padding: 14px 16px;
+            border-radius: 10px;
+            font-size: 15px;
+            font-family: 'Noto Sans KR', sans-serif;
+            margin-bottom: 12px;
+            transition: all 0.2s;
+        }
+        input:focus, textarea:focus, select:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+        label {
+            display: block;
+            font-size: 13px;
+            color: var(--text-muted);
+            margin-bottom: 6px;
+            font-weight: 500;
+        }
+
+        /* 토글 스위치 */
+        .toggle-row {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 16px;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--border);
         }
-        .section-header h3 {
-            font-size: 18px;
-            font-weight: 700;
-            display: flex;
-            align-items: center;
-            gap: 8px;
+        .toggle-label { font-size: 14px; }
+        .toggle-switch {
+            width: 48px;
+            height: 26px;
+            background: var(--bg-dark);
+            border-radius: 13px;
+            position: relative;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .toggle-switch.active { background: var(--success); }
+        .toggle-switch::before {
+            content: '';
+            position: absolute;
+            top: 3px; left: 3px;
+            width: 20px; height: 20px;
+            background: white;
+            border-radius: 50%;
+            transition: all 0.3s;
+        }
+        .toggle-switch.active::before { left: 25px; }
+
+        /* 초대 코드 */
+        .invite-box {
+            background: var(--bg-dark);
+            border: 2px dashed var(--border);
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+        }
+        .invite-code {
+            font-size: 24px;
+            font-weight: 900;
+            letter-spacing: 4px;
+            color: var(--secondary);
+            margin: 12px 0;
         }
 
-        /* 푸터 */
-        footer {
-            margin-top: 60px;
-            padding: 30px 0;
-            border-top: 1px solid var(--border);
-            text-align: center;
-            color: var(--text-muted);
-            font-size: 13px;
-        }
-        
-        footer a {
-            color: var(--text-muted);
-            text-decoration: none;
-            margin: 0 12px;
-            transition: color 0.2s;
-        }
-        footer a:hover { color: var(--text); }
-        
-        .footer-links { margin-bottom: 16px; }
-        
-        .footer-disclaimer {
-            margin-top: 12px;
-            font-size: 11px;
-            color: #666;
-            max-width: 400px;
-            margin-left: auto;
-            margin-right: auto;
-        }
+        .hidden { display: none !important; }
 
         /* 반응형 */
-        @media (max-width: 600px) {
+        @media (max-width: 768px) {
+            .grid-2, .grid-3 { grid-template-columns: 1fr; }
+            .nav-links { display: none; }
             .hero-title { font-size: 26px; }
-            .hero-subtitle { font-size: 14px; }
-            .feature-grid { grid-template-columns: 1fr; }
-            .stats-bar { gap: 24px; }
-            .stat-number { font-size: 26px; }
-            header { flex-direction: column; gap: 16px; }
-            .wallet { width: 100%; justify-content: center; }
+            .stats-bar { gap: 20px; }
+            .stat-number { font-size: 22px; }
         }
     </style>
 </head>
 <body>
-    <header>
-        <div class="logo">BOKLUCK</div>
-        <div id="walletBadge" class="wallet">연결 중...</div>
-    </header>
+    <!-- 네비게이션 -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo" onclick="showSection('home')">BOKLUCK</div>
+            <div class="nav-links" id="navLinks">
+                <a href="#" class="nav-link active" onclick="showSection('home')">🏠 홈</a>
+                <a href="#" class="nav-link" onclick="showSection('boards')">📂 게시판</a>
+                <a href="market.html" class="nav-link">🗺️ 부동산</a>
+                <a href="board-market.html" class="nav-link">🏪 마켓</a>
+                <a href="#" class="nav-link" onclick="showSection('profile')">👤 프로필</a>
+            </div>
+            <div style="display: flex; align-items: center; gap: 12px;">
+                <span class="level-badge" id="levelBadge">Lv.1</span>
+                <div class="wallet-badge" id="walletBadge">💰 연결 필요</div>
+            </div>
+        </div>
+    </nav>
 
-    <main>
-        <!-- 로그인 전: 랜딩 페이지 -->
+    <div class="container">
+        <!-- 로그인 전 -->
         <div id="authSection">
-            <div class="hero-section">
+            <div class="hero">
                 <span class="hero-badge">🚀 Web3 커뮤니티</span>
-                <h1 class="hero-title">
-                    글 쓰고, 땅 사고,<br><span class="highlight">부자 되자!</span>
-                </h1>
-                <p class="hero-subtitle">
-                    콘텐츠를 작성하면 BOK 토큰을 받고,<br>
-                    가상 부동산에 투자해서 영토를 확장하세요!
-                </p>
-                
-                <!-- 소셜 프루프 -->
+                <h1 class="hero-title">글 쓰고, 땅 사고,<br><span class="highlight">부자 되자!</span></h1>
+                <p class="hero-subtitle">콘텐츠를 작성하면 BOK 토큰을 받고,<br>가상 부동산에 투자해서 영토를 확장하세요!</p>
                 <div class="stats-bar">
                     <div class="stat-item">
-                        <div class="stat-number" id="statUsers">--</div>
+                        <div class="stat-number" id="statUsers">0</div>
                         <div class="stat-label">활성 유저</div>
                     </div>
                     <div class="stat-item">
-                        <div class="stat-number" id="statPosts">--</div>
+                        <div class="stat-number" id="statPosts">0</div>
                         <div class="stat-label">작성된 글</div>
                     </div>
                     <div class="stat-item">
-                        <div class="stat-number" id="statLands">--</div>
+                        <div class="stat-number" id="statLands">0</div>
                         <div class="stat-label">거래된 땅</div>
                     </div>
                 </div>
-                
-                <button id="loginBtn" class="btn-primary" style="max-width: 320px; margin: 0 auto;">
-                    Google 계정으로 시작하기
-                </button>
+                <button class="btn-primary" id="loginBtn" style="max-width: 320px;">Google 계정으로 시작하기</button>
+                <div style="margin-top: 20px;">
+                    <input type="text" id="inviteCodeInput" placeholder="초대 코드 입력 (선택)" style="max-width: 200px; text-align: center;">
+                </div>
             </div>
 
-            <div class="feature-grid">
+            <div class="grid-3">
                 <div class="feature-card">
-                    <span class="feature-icon">✍️</span>
+                    <div class="feature-icon">✍️</div>
                     <div class="feature-title">글쓰기 보상</div>
-                    <div class="feature-desc">글 하나당 100 BOK!<br>양질의 콘텐츠로 부자되세요</div>
+                    <div class="feature-desc">글 하나당 100 BOK!<br>댓글, 좋아요로 추가 수익</div>
                 </div>
                 <div class="feature-card">
-                    <span class="feature-icon">🏗️</span>
+                    <div class="feature-icon">🏗️</div>
                     <div class="feature-title">게시판 소유</div>
-                    <div class="feature-desc">1,000 BOK으로<br>나만의 게시판 운영</div>
+                    <div class="feature-desc">나만의 게시판 운영<br>입장료, 수수료 수익</div>
                 </div>
                 <div class="feature-card">
-                    <span class="feature-icon">🗺️</span>
+                    <div class="feature-icon">🗺️</div>
                     <div class="feature-title">부동산 투자</div>
-                    <div class="feature-desc">전 세계 가상 땅을<br>구매하고 영토 확장</div>
-                </div>
-            </div>
-
-            <div class="token-info">
-                <h4>💰 BOK 토큰 경제</h4>
-                <div class="token-list">
-                    <span class="token-item">📝 글쓰기 +100 BOK</span>
-                    <span class="token-item">🏠 땅 구매 300 BOK</span>
-                    <span class="token-item">📋 게시판 생성 1,000 BOK</span>
-                    <span class="token-item">🎁 가입 보너스 500 BOK</span>
+                    <div class="feature-desc">가상 땅 구매<br>랜덤 가치로 대박 찬스</div>
                 </div>
             </div>
         </div>
 
-        <!-- 로그인 후: 메인 대시보드 -->
-        <div id="mainDashboard" class="hidden">
-            <!-- 온보딩 팁 -->
-            <div id="onboardingTip" class="onboarding-tip hidden">
-                <span>💡</span>
-                <span><strong>처음이신가요?</strong> 게시판에 글을 쓰면 100 BOK을 받아요!</span>
-                <span class="close-tip" onclick="dismissTip()">✕</span>
-            </div>
-
-            <button class="btn-cheat" onclick="getRich()">🛠️ [테스트용] 100,000 BOK 충전</button>
-            <button class="btn-market" onclick="location.href='market.html'">🗺️ 부동산 마켓 입장</button>
-
-            <div id="boardListSection">
-                <div class="section-header">
-                    <h3>📂 커뮤니티 게시판</h3>
-                    <button class="btn-small btn-success" onclick="createBoard()">+ 게시판 구매</button>
-                </div>
-                <div class="card" id="boardList">
-                    <div class="skeleton"></div>
-                    <div class="skeleton"></div>
-                </div>
-            </div>
-
-            <div id="postListSection" class="hidden">
-                <span class="back-link" onclick="showBoardList()">← 게시판 목록</span>
-                <div class="section-header">
-                    <h3 id="currentBoardName">게시판</h3>
-                    <button class="btn-small btn-primary" onclick="showWriteForm()">🖊️ 글쓰기</button>
-                </div>
-                <div class="card" id="postList"></div>
-            </div>
-
-            <div id="writeSection" class="hidden">
-                <span class="back-link" onclick="backToPostList()">← 취소</span>
+        <!-- 홈 대시보드 -->
+        <div id="homeSection" class="hidden">
+            <div class="grid-2">
+                <!-- 왼쪽: 일일 미션 -->
                 <div class="card">
-                    <h3 style="margin-bottom: 20px;">📝 콘텐츠 생산</h3>
-                    <input type="text" id="title" placeholder="제목을 입력하세요" maxlength="100">
-                    <textarea id="content" rows="8" placeholder="내용을 작성하세요 (최소 10자)"></textarea>
-                    <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 16px;">💡 등록 완료 시 100 BOK이 지급됩니다!</p>
-                    <button id="saveBtn" class="btn-primary">등록 완료 (+100 BOK)</button>
-                </div>
-            </div>
-
-            <div id="viewSection" class="hidden">
-                <span class="back-link" onclick="backToPostList()">← 목록으로</span>
-                <div class="card">
-                    <h2 id="viewTitle" style="margin-bottom: 12px; font-size: 22px;">제목</h2>
-                    <div style="margin-bottom: 24px; color: var(--text-muted); font-size: 13px; display: flex; justify-content: space-between; align-items: center;">
-                        <span id="viewAuthor">작성자</span>
-                        <span id="viewControls"></span>
+                    <div class="card-header">
+                        <h3 class="card-title">📋 일일 미션</h3>
+                        <span style="color: var(--text-muted); font-size: 13px;" id="missionReset">00:00:00 후 리셋</span>
                     </div>
-                    <div id="viewContent" style="white-space: pre-wrap; line-height: 1.8; font-size: 15px;">내용</div>
+                    <div id="missionList">
+                        <div class="mission-item">
+                            <div class="mission-info">
+                                <div class="mission-icon">✍️</div>
+                                <div>
+                                    <div class="mission-title">글쓰기 1회</div>
+                                    <div class="mission-progress">0/1 완료</div>
+                                </div>
+                            </div>
+                            <span class="mission-reward">+100 BOK</span>
+                        </div>
+                        <div class="mission-item">
+                            <div class="mission-info">
+                                <div class="mission-icon">💬</div>
+                                <div>
+                                    <div class="mission-title">댓글 3개 작성</div>
+                                    <div class="mission-progress">0/3 완료</div>
+                                </div>
+                            </div>
+                            <span class="mission-reward">+30 BOK</span>
+                        </div>
+                        <div class="mission-item">
+                            <div class="mission-info">
+                                <div class="mission-icon">❤️</div>
+                                <div>
+                                    <div class="mission-title">좋아요 5개 누르기</div>
+                                    <div class="mission-progress">0/5 완료</div>
+                                </div>
+                            </div>
+                            <span class="mission-reward">+10 BOK</span>
+                        </div>
+                        <div class="mission-item">
+                            <div class="mission-info">
+                                <div class="mission-icon">🏠</div>
+                                <div>
+                                    <div class="mission-title">게시판 3곳 방문</div>
+                                    <div class="mission-progress">0/3 완료</div>
+                                </div>
+                            </div>
+                            <span class="mission-reward">+20 BOK</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 오른쪽: 출석 룰렛 -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">🎰 출석 룰렛</h3>
+                    </div>
+                    <div class="roulette-container">
+                        <div style="position: relative; display: inline-block;">
+                            <div class="roulette-pointer">▼</div>
+                            <div class="roulette-wheel" id="rouletteWheel"></div>
+                        </div>
+                        <p style="color: var(--text-muted); font-size: 14px; margin-bottom: 16px;">매일 1회 1~500 BOK 획득!</p>
+                        <button class="btn-gold btn-block" id="spinBtn" onclick="spinRoulette()">🎲 돌리기</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid-2" style="margin-top: 20px;">
+                <!-- 랭킹 -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">🏆 주간 랭킹</h3>
+                        <span style="color: var(--accent); font-size: 13px;">TOP 10 보상!</span>
+                    </div>
+                    <div id="rankingList">
+                        <div class="ranking-item">
+                            <div class="ranking-position gold">1</div>
+                            <div class="ranking-name">불러오는 중...</div>
+                            <div class="ranking-score">- BOK</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 빠른 액션 -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">⚡ 빠른 액션</h3>
+                    </div>
+                    <button class="btn-primary btn-block" style="margin-bottom: 12px;" onclick="showSection('boards')">📝 글쓰기 (+100 BOK)</button>
+                    <button class="btn-pink btn-block" style="margin-bottom: 12px;" onclick="location.href='market.html'">🗺️ 부동산 마켓</button>
+                    <button class="btn-gold btn-block" style="margin-bottom: 12px;" onclick="openModal('createBoardModal')">🏗️ 게시판 만들기</button>
+                    <button class="btn-outline btn-block" onclick="openModal('inviteModal')">👥 친구 초대 (+300 BOK)</button>
+                </div>
+            </div>
+
+            <!-- 인기 게시판 -->
+            <div class="card" style="margin-top: 20px;">
+                <div class="card-header">
+                    <h3 class="card-title">🔥 인기 게시판</h3>
+                    <button class="btn-sm btn-outline" onclick="showSection('boards')">전체보기</button>
+                </div>
+                <div id="popularBoards"></div>
+            </div>
+        </div>
+
+        <!-- 게시판 목록 -->
+        <div id="boardsSection" class="hidden">
+            <div class="card-header" style="margin-bottom: 20px;">
+                <h2 style="font-size: 24px;">📂 커뮤니티 게시판</h2>
+                <button class="btn-gold" onclick="openModal('createBoardModal')">+ 게시판 만들기</button>
+            </div>
+            
+            <div class="tabs">
+                <div class="tab active" onclick="filterBoards('all')">전체</div>
+                <div class="tab" onclick="filterBoards('my')">내 게시판</div>
+                <div class="tab" onclick="filterBoards('free')">무료</div>
+                <div class="tab" onclick="filterBoards('premium')">프리미엄</div>
+            </div>
+
+            <div id="boardsList"></div>
+        </div>
+
+        <!-- 프로필 -->
+        <div id="profileSection" class="hidden">
+            <div class="card">
+                <div class="profile-header">
+                    <div class="profile-avatar">👤</div>
+                    <div class="profile-info">
+                        <h2 id="profileName">사용자</h2>
+                        <div class="profile-stats">
+                            <span>📝 글 <strong id="profilePosts">0</strong></span>
+                            <span>💬 댓글 <strong id="profileComments">0</strong></span>
+                            <span>🏠 게시판 <strong id="profileBoards">0</strong></span>
+                            <span>🗺️ 땅 <strong id="profileLands">0</strong></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 레벨 & 경험치 -->
+                <div style="background: var(--bg-dark); padding: 20px; border-radius: 12px; margin-bottom: 20px;">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                        <span style="font-weight: 700;">레벨 <span id="currentLevel">1</span></span>
+                        <span style="color: var(--text-muted); font-size: 14px;"><span id="currentExp">0</span> / <span id="nextLevelExp">100</span> EXP</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="expProgress" style="width: 0%;"></div>
+                    </div>
+                    <p style="font-size: 12px; color: var(--text-muted); margin-top: 8px;">
+                        💡 레벨업 보상: 레벨 × 100 BOK
+                    </p>
+                </div>
+
+                <!-- 자산 현황 -->
+                <div class="grid-3" style="margin-bottom: 20px;">
+                    <div style="background: var(--bg-dark); padding: 16px; border-radius: 12px; text-align: center;">
+                        <div style="font-size: 24px; font-weight: 900; color: var(--secondary);" id="totalBok">0</div>
+                        <div style="font-size: 12px; color: var(--text-muted);">보유 BOK</div>
+                    </div>
+                    <div style="background: var(--bg-dark); padding: 16px; border-radius: 12px; text-align: center;">
+                        <div style="font-size: 24px; font-weight: 900; color: var(--accent);" id="totalEarned">0</div>
+                        <div style="font-size: 12px; color: var(--text-muted);">누적 수익</div>
+                    </div>
+                    <div style="background: var(--bg-dark); padding: 16px; border-radius: 12px; text-align: center;">
+                        <div style="font-size: 24px; font-weight: 900; color: var(--pink);" id="totalSpent">0</div>
+                        <div style="font-size: 12px; color: var(--text-muted);">누적 소비</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 업적 -->
+            <div class="card" style="margin-top: 20px;">
+                <div class="card-header">
+                    <h3 class="card-title">🏅 업적</h3>
+                    <span style="color: var(--text-muted); font-size: 13px;"><span id="achievementCount">0</span>/12 달성</span>
+                </div>
+                <div id="achievementList">
+                    <div class="achievement-item">
+                        <div class="achievement-icon achievement-unlocked">✍️</div>
+                        <div class="achievement-info">
+                            <div class="achievement-title">첫 글 작성</div>
+                            <div class="achievement-desc">첫 번째 글을 작성하세요</div>
+                        </div>
+                        <span class="mission-reward">+50 BOK</span>
+                    </div>
+                    <div class="achievement-item">
+                        <div class="achievement-icon achievement-locked">📝</div>
+                        <div class="achievement-info">
+                            <div class="achievement-title">글쓰기 마스터</div>
+                            <div class="achievement-desc">글 100개 작성</div>
+                        </div>
+                        <span style="color: var(--text-muted);">0/100</span>
+                    </div>
+                    <div class="achievement-item">
+                        <div class="achievement-icon achievement-locked">🏗️</div>
+                        <div class="achievement-info">
+                            <div class="achievement-title">게시판 사장님</div>
+                            <div class="achievement-desc">게시판 첫 개설</div>
+                        </div>
+                        <span class="mission-reward">+200 BOK</span>
+                    </div>
+                    <div class="achievement-item">
+                        <div class="achievement-icon achievement-locked">🗺️</div>
+                        <div class="achievement-info">
+                            <div class="achievement-title">부동산 재벌</div>
+                            <div class="achievement-desc">땅 10개 소유</div>
+                        </div>
+                        <span style="color: var(--text-muted);">0/10</span>
+                    </div>
+                    <div class="achievement-item">
+                        <div class="achievement-icon achievement-locked">👑</div>
+                        <div class="achievement-info">
+                            <div class="achievement-title">지역 정복자</div>
+                            <div class="achievement-desc">한 지역 최대 소유자 달성</div>
+                        </div>
+                        <span class="mission-reward">+1,000 BOK</span>
+                    </div>
+                    <div class="achievement-item">
+                        <div class="achievement-icon achievement-locked">👥</div>
+                        <div class="achievement-info">
+                            <div class="achievement-title">인플루언서</div>
+                            <div class="achievement-desc">친구 10명 초대</div>
+                        </div>
+                        <span style="color: var(--text-muted);">0/10</span>
+                    </div>
                 </div>
             </div>
         </div>
-    </main>
+    </div>
 
-    <!-- 푸터 -->
-    <footer>
-        <div class="footer-links">
-            <a href="#">이용약관</a>
-            <a href="#">개인정보처리방침</a>
-            <a href="#">FAQ</a>
-            <a href="#">문의하기</a>
+    <!-- 게시판 생성 모달 -->
+    <div class="modal-overlay" id="createBoardModal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeModal('createBoardModal')">✕</button>
+            <h2 class="modal-title">🏗️ 게시판 만들기</h2>
+            
+            <div style="background: rgba(245, 158, 11, 0.1); border: 1px solid rgba(245, 158, 11, 0.3); border-radius: 10px; padding: 14px; margin-bottom: 20px; text-align: center;">
+                <span style="color: var(--accent); font-weight: 700; font-size: 18px;">생성 비용: 1,000 BOK</span>
+            </div>
+
+            <label>게시판 이름</label>
+            <input type="text" id="boardName" placeholder="예: 비트코인 투자자 모임" maxlength="20">
+            
+            <label>설명</label>
+            <textarea id="boardDesc" rows="3" placeholder="게시판을 소개해주세요"></textarea>
+            
+            <label>카테고리</label>
+            <select id="boardCategory">
+                <option value="general">💬 자유</option>
+                <option value="investment">💰 투자</option>
+                <option value="game">🎮 게임</option>
+                <option value="tech">💻 기술</option>
+                <option value="life">🌱 일상</option>
+                <option value="humor">😂 유머</option>
+            </select>
+            
+            <label>테마 색상</label>
+            <input type="color" id="boardColor" value="#6366f1" style="height: 50px; padding: 5px;">
+            
+            <label>아이콘 (이모지)</label>
+            <input type="text" id="boardIcon" placeholder="📝" maxlength="2" style="font-size: 24px; text-align: center;">
+
+            <div style="border-top: 1px solid var(--border); margin: 20px 0; padding-top: 20px;">
+                <h4 style="margin-bottom: 12px;">💰 수익화 설정</h4>
+                
+                <label>입장료 (0 = 무료)</label>
+                <input type="number" id="boardEntryFee" value="0" min="0" max="100" placeholder="0~100 BOK">
+                
+                <label>글쓰기 수수료 (작성자 → 소유자)</label>
+                <input type="number" id="boardWriteFee" value="0" min="0" max="50" placeholder="0~50 BOK">
+            </div>
+
+            <div style="border-top: 1px solid var(--border); margin: 20px 0; padding-top: 20px;">
+                <h4 style="margin-bottom: 12px;">⚙️ 운영 설정</h4>
+                
+                <div class="toggle-row">
+                    <span class="toggle-label">승인제 게시판</span>
+                    <div class="toggle-switch" id="toggleApproval" onclick="this.classList.toggle('active')"></div>
+                </div>
+                <div class="toggle-row">
+                    <span class="toggle-label">댓글 허용</span>
+                    <div class="toggle-switch active" id="toggleComments" onclick="this.classList.toggle('active')"></div>
+                </div>
+            </div>
+
+            <button class="btn-gold btn-block" onclick="createBoard()">게시판 생성하기</button>
         </div>
-        <p>© 2024 BOKLUCK. All rights reserved.</p>
-        <p class="footer-disclaimer">
-            BOK은 BOKLUCK 플랫폼 내에서만 사용 가능한 가상 포인트이며, 실제 화폐 가치를 보장하지 않습니다.
-        </p>
-    </footer>
+    </div>
+
+    <!-- 친구 초대 모달 -->
+    <div class="modal-overlay" id="inviteModal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeModal('inviteModal')">✕</button>
+            <h2 class="modal-title">👥 친구 초대</h2>
+            
+            <div class="invite-box">
+                <p style="color: var(--text-muted);">내 초대 코드</p>
+                <div class="invite-code" id="myInviteCode">ABC123</div>
+                <button class="btn-primary btn-sm" onclick="copyInviteCode()">📋 복사하기</button>
+            </div>
+            
+            <div style="margin-top: 24px; padding: 16px; background: var(--bg-dark); border-radius: 12px;">
+                <h4 style="margin-bottom: 12px;">🎁 초대 보상</h4>
+                <p style="font-size: 14px; color: var(--text-muted); line-height: 1.6;">
+                    • 초대한 사람: <strong style="color: var(--success);">+300 BOK</strong><br>
+                    • 초대받은 사람: <strong style="color: var(--success);">+300 BOK</strong> (기본 500 + 300)
+                </p>
+            </div>
+            
+            <div style="margin-top: 20px;">
+                <h4 style="margin-bottom: 12px;">📊 초대 현황</h4>
+                <div style="display: flex; justify-content: space-around; text-align: center;">
+                    <div>
+                        <div style="font-size: 24px; font-weight: 900; color: var(--secondary);" id="inviteCount">0</div>
+                        <div style="font-size: 12px; color: var(--text-muted);">초대한 친구</div>
+                    </div>
+                    <div>
+                        <div style="font-size: 24px; font-weight: 900; color: var(--accent);" id="inviteEarned">0</div>
+                        <div style="font-size: 12px; color: var(--text-muted);">획득 BOK</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 룰렛 결과 모달 -->
+    <div class="modal-overlay" id="rouletteResultModal">
+        <div class="modal-content" style="text-align: center;">
+            <h2 class="modal-title">🎉 축하합니다!</h2>
+            <div style="font-size: 48px; margin: 20px 0;">🎰</div>
+            <div style="font-size: 36px; font-weight: 900; color: var(--accent); margin-bottom: 20px;">
+                +<span id="rouletteResult">0</span> BOK
+            </div>
+            <button class="btn-primary btn-block" onclick="closeModal('rouletteResultModal')">확인</button>
+        </div>
+    </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-        import { getFirestore, collection, addDoc, query, orderBy, onSnapshot, doc, setDoc, getDoc, updateDoc, runTransaction, increment, where, getDocs } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+        import { getFirestore, collection, doc, setDoc, getDoc, getDocs, updateDoc, onSnapshot, query, orderBy, where, increment, runTransaction, limit } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
         import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
         const firebaseConfig = {
-          apiKey: "AIzaSyBwQjuqgWM4YKnqu_gzNbeCg5alrC-jVcQ",
-          authDomain: "myco-737a0.firebaseapp.com",
-          projectId: "myco-737a0",
-          storageBucket: "myco-737a0.firebasestorage.app",
-          messagingSenderId: "942571332540",
-          appId: "1:942571332540:web:be0bb6fbdd32655501c1b9"
+            apiKey: "AIzaSyBwQjuqgWM4YKnqu_gzNbeCg5alrC-jVcQ",
+            authDomain: "myco-737a0.firebaseapp.com",
+            projectId: "myco-737a0",
+            storageBucket: "myco-737a0.firebasestorage.app",
+            messagingSenderId: "942571332540",
+            appId: "1:942571332540:web:be0bb6fbdd32655501c1b9"
         };
-        
+
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
         const auth = getAuth(app);
 
         let currentUser = null;
-        let currentBoardId = null;
-        let currentPostId = null; 
-        let isEditMode = false;
+        let userData = null;
 
         // 통계 로드
         async function loadStats() {
             try {
-                const usersSnap = await getDocs(collection(db, "users"));
-                const postsSnap = await getDocs(collection(db, "posts"));
-                const landsSnap = await getDocs(collection(db, "lands"));
-                
-                document.getElementById("statUsers").textContent = usersSnap.size || "0";
-                document.getElementById("statPosts").textContent = postsSnap.size || "0";
-                document.getElementById("statLands").textContent = landsSnap.size || "0";
-            } catch(e) {
-                console.log("Stats load error:", e);
-            }
+                const [users, posts, lands] = await Promise.all([
+                    getDocs(collection(db, "users")),
+                    getDocs(collection(db, "posts")),
+                    getDocs(collection(db, "lands"))
+                ]);
+                document.getElementById("statUsers").textContent = users.size;
+                document.getElementById("statPosts").textContent = posts.size;
+                document.getElementById("statLands").textContent = lands.size;
+            } catch(e) { console.error(e); }
         }
         loadStats();
 
-        // 온보딩
-        window.dismissTip = () => {
-            document.getElementById("onboardingTip").style.display = "none";
-            localStorage.setItem("bokluck_tip_dismissed", "true");
-        }
-
-        function showOnboardingIfNeeded() {
-            if(!localStorage.getItem("bokluck_tip_dismissed")) {
-                document.getElementById("onboardingTip").classList.remove("hidden");
-            }
-        }
-
-        window.showBoardList = () => { hideAll(); document.getElementById("boardListSection").style.display = "block"; }
-        window.showPostList = (boardId, boardName) => {
-            currentBoardId = boardId;
-            document.getElementById("currentBoardName").innerText = boardName;
-            hideAll(); document.getElementById("postListSection").style.display = "block";
-            loadPosts(boardId);
-        }
-        window.showWriteForm = () => {
-            isEditMode = false;
-            document.getElementById("title").value = "";
-            document.getElementById("content").value = "";
-            document.getElementById("saveBtn").innerText = "등록 완료 (+100 BOK)";
-            hideAll(); document.getElementById("writeSection").style.display = "block";
-        }
-        window.backToPostList = () => { hideAll(); document.getElementById("postListSection").style.display = "block"; }
-        function hideAll() {
-            document.getElementById("boardListSection").style.display = "none";
-            document.getElementById("postListSection").style.display = "none";
-            document.getElementById("writeSection").style.display = "none";
-            document.getElementById("viewSection").style.display = "none";
-        }
-
-        window.getRich = async () => {
-            if(!currentUser) return;
-            if(!confirm("⚠️ 테스트용 기능입니다.\n100,000 BOK을 충전하시겠습니까?")) return;
-            await updateDoc(doc(db, "users", currentUser.uid), { coin: increment(100000) });
-            alert("충전 완료! 💸");
-        }
-
-        document.getElementById("loginBtn").addEventListener("click", () => {
-            signInWithPopup(auth, new GoogleAuthProvider());
+        // 로그인
+        document.getElementById("loginBtn").addEventListener("click", async () => {
+            const inviteCode = document.getElementById("inviteCodeInput").value.trim();
+            try {
+                const result = await signInWithPopup(auth, new GoogleAuthProvider());
+                // 초대 코드 처리
+                if(inviteCode && result.user) {
+                    await processInviteCode(result.user.uid, inviteCode);
+                }
+            } catch(e) { console.error(e); }
         });
 
-        onAuthStateChanged(auth, (user) => {
-            if (user) {
+        // 초대 코드 처리
+        async function processInviteCode(newUserId, code) {
+            try {
+                const inviterQuery = query(collection(db, "users"), where("inviteCode", "==", code));
+                const snapshot = await getDocs(inviterQuery);
+                if(!snapshot.empty) {
+                    const inviterDoc = snapshot.docs[0];
+                    if(inviterDoc.id !== newUserId) {
+                        // 초대자에게 보상
+                        await updateDoc(inviterDoc.ref, { 
+                            coin: increment(300),
+                            inviteCount: increment(1),
+                            totalEarned: increment(300)
+                        });
+                        // 피초대자에게 추가 보상
+                        await updateDoc(doc(db, "users", newUserId), { 
+                            coin: increment(300),
+                            invitedBy: inviterDoc.id
+                        });
+                    }
+                }
+            } catch(e) { console.error(e); }
+        }
+
+        // 인증 상태 변경
+        onAuthStateChanged(auth, async (user) => {
+            if(user) {
                 currentUser = user;
-                document.getElementById("authSection").style.display = "none";
-                document.getElementById("mainDashboard").classList.remove("hidden");
-                document.getElementById("mainDashboard").style.display = "block";
-                document.getElementById("walletBadge").style.display = "flex";
-                
-                showOnboardingIfNeeded();
-                
-                onSnapshot(doc(db, "users", user.uid), (d) => {
-                    const coin = d.exists() ? d.data().coin : 0;
-                    document.getElementById("walletBadge").innerText = `${coin.toLocaleString()} BOK`;
-                    if(!d.exists()) setDoc(doc.ref, {name: user.displayName, email: user.email, coin: 500, createdAt: new Date().toISOString()});
+                document.getElementById("authSection").classList.add("hidden");
+                document.getElementById("homeSection").classList.remove("hidden");
+                document.getElementById("navLinks").style.display = "flex";
+
+                // 유저 데이터 로드/생성
+                const userRef = doc(db, "users", user.uid);
+                onSnapshot(userRef, async (docSnap) => {
+                    if(!docSnap.exists()) {
+                        // 신규 유저 생성
+                        const inviteCode = generateInviteCode();
+                        await setDoc(userRef, {
+                            name: user.displayName,
+                            email: user.email,
+                            coin: 500,
+                            exp: 0,
+                            level: 1,
+                            totalEarned: 500,
+                            totalSpent: 0,
+                            postCount: 0,
+                            commentCount: 0,
+                            inviteCode: inviteCode,
+                            inviteCount: 0,
+                            lastRoulette: null,
+                            createdAt: new Date().toISOString()
+                        });
+                    }
+                    userData = docSnap.data();
+                    updateUI();
                 });
-                createDefaultBoard();
+
+                loadBoards();
+                loadRanking();
             } else {
-                document.getElementById("authSection").style.display = "block";
-                document.getElementById("mainDashboard").style.display = "none";
-                document.getElementById("walletBadge").innerText = "로그인 필요";
+                document.getElementById("authSection").classList.remove("hidden");
+                document.getElementById("homeSection").classList.add("hidden");
+                document.getElementById("boardsSection").classList.add("hidden");
+                document.getElementById("profileSection").classList.add("hidden");
             }
         });
 
-        async function createDefaultBoard() {}
-        onSnapshot(query(collection(db, "boards"), orderBy("createdAt", "desc")), (snapshot) => {
-            const list = document.getElementById("boardList");
-            list.innerHTML = "";
-            if(snapshot.empty) setDoc(doc(collection(db, "boards")), { name: "자유게시판", creatorName: "SYSTEM", isDefault: true, createdAt: new Date().toISOString() });
-            snapshot.forEach(doc => {
-                const b = doc.data();
-                const div = document.createElement("div");
-                div.className = "board-item";
-                div.innerHTML = `<div><div class="board-name">${b.name}</div><div style="font-size: 12px; color: var(--text-muted);">소유자: ${b.creatorName}</div></div><div style="color: var(--text-muted); font-size: 14px;">입장 →</div>`;
-                div.onclick = () => showPostList(doc.id, b.name);
-                list.appendChild(div);
-            });
-        });
+        function generateInviteCode() {
+            return Math.random().toString(36).substring(2, 8).toUpperCase();
+        }
 
-        window.createBoard = async () => {
-            const name = prompt("📋 게시판 이름을 입력하세요\n(비용: 1,000 BOK)");
-            if(!name) return;
+        function updateUI() {
+            if(!userData) return;
+            
+            // 지갑
+            document.getElementById("walletBadge").innerHTML = `💰 ${userData.coin?.toLocaleString() || 0} BOK`;
+            
+            // 레벨
+            const level = userData.level || 1;
+            document.getElementById("levelBadge").textContent = `Lv.${level}`;
+            document.getElementById("currentLevel").textContent = level;
+            
+            // 경험치
+            const exp = userData.exp || 0;
+            const nextExp = level * 100;
+            document.getElementById("currentExp").textContent = exp;
+            document.getElementById("nextLevelExp").textContent = nextExp;
+            document.getElementById("expProgress").style.width = `${(exp / nextExp) * 100}%`;
+            
+            // 프로필
+            document.getElementById("profileName").textContent = userData.name || "사용자";
+            document.getElementById("profilePosts").textContent = userData.postCount || 0;
+            document.getElementById("profileComments").textContent = userData.commentCount || 0;
+            document.getElementById("totalBok").textContent = (userData.coin || 0).toLocaleString();
+            document.getElementById("totalEarned").textContent = (userData.totalEarned || 0).toLocaleString();
+            document.getElementById("totalSpent").textContent = (userData.totalSpent || 0).toLocaleString();
+            
+            // 초대
+            document.getElementById("myInviteCode").textContent = userData.inviteCode || "------";
+            document.getElementById("inviteCount").textContent = userData.inviteCount || 0;
+            document.getElementById("inviteEarned").textContent = ((userData.inviteCount || 0) * 300).toLocaleString();
+            
+            // 룰렛 버튼 상태
+            const lastRoulette = userData.lastRoulette;
+            const today = new Date().toDateString();
+            if(lastRoulette && new Date(lastRoulette).toDateString() === today) {
+                document.getElementById("spinBtn").disabled = true;
+                document.getElementById("spinBtn").textContent = "✅ 오늘 완료";
+            }
+        }
+
+        // 게시판 로드
+        async function loadBoards() {
+            const q = query(collection(db, "boards"), orderBy("createdAt", "desc"));
+            onSnapshot(q, (snapshot) => {
+                const list = document.getElementById("boardsList");
+                const popular = document.getElementById("popularBoards");
+                list.innerHTML = "";
+                popular.innerHTML = "";
+                
+                if(snapshot.empty) {
+                    list.innerHTML = '<p style="text-align:center; color: var(--text-muted); padding: 40px;">아직 게시판이 없습니다.</p>';
+                    return;
+                }
+                
+                let count = 0;
+                snapshot.forEach(docSnap => {
+                    const b = docSnap.data();
+                    const html = createBoardItem(docSnap.id, b);
+                    list.innerHTML += html;
+                    if(count < 3) popular.innerHTML += html;
+                    count++;
+                });
+            });
+        }
+
+        function createBoardItem(id, b) {
+            const feeText = (b.entryFee > 0) ? `<span class="board-fee">${b.entryFee} BOK</span>` : '<span style="color: var(--success); font-size: 12px;">무료</span>';
+            return `
+                <div class="board-item" onclick="location.href='board.html?id=${id}'">
+                    <div class="board-icon" style="background: ${b.color || '#6366f1'};">${b.icon || '📝'}</div>
+                    <div class="board-info">
+                        <div class="board-name">${b.name}</div>
+                        <div class="board-meta">${b.description || '설명 없음'}</div>
+                    </div>
+                    <div style="text-align: right;">
+                        ${feeText}
+                        <div class="board-stats" style="margin-top: 4px;">
+                            <span>👤 ${b.memberCount || 0}</span>
+                            <span>📝 ${b.postCount || 0}</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // 랭킹 로드
+        async function loadRanking() {
+            const q = query(collection(db, "users"), orderBy("totalEarned", "desc"), limit(10));
+            const snapshot = await getDocs(q);
+            const list = document.getElementById("rankingList");
+            list.innerHTML = "";
+            
+            let rank = 1;
+            snapshot.forEach(docSnap => {
+                const u = docSnap.data();
+                const posClass = rank === 1 ? 'gold' : rank === 2 ? 'silver' : rank === 3 ? 'bronze' : '';
+                list.innerHTML += `
+                    <div class="ranking-item">
+                        <div class="ranking-position ${posClass}">${rank}</div>
+                        <div class="ranking-name">${u.name || '익명'}</div>
+                        <div class="ranking-score">${(u.totalEarned || 0).toLocaleString()} BOK</div>
+                    </div>
+                `;
+                rank++;
+            });
+        }
+
+        // 게시판 생성
+        window.createBoard = async function() {
+            if(!currentUser || !userData) return alert("로그인이 필요합니다.");
+            if(userData.coin < 1000) return alert("BOK이 부족합니다. (필요: 1,000 BOK)");
+            
+            const name = document.getElementById("boardName").value.trim();
+            const desc = document.getElementById("boardDesc").value.trim();
+            const category = document.getElementById("boardCategory").value;
+            const color = document.getElementById("boardColor").value;
+            const icon = document.getElementById("boardIcon").value || "📝";
+            const entryFee = parseInt(document.getElementById("boardEntryFee").value) || 0;
+            const writeFee = parseInt(document.getElementById("boardWriteFee").value) || 0;
+            const approval = document.getElementById("toggleApproval").classList.contains("active");
+            const comments = document.getElementById("toggleComments").classList.contains("active");
+            
+            if(!name) return alert("게시판 이름을 입력하세요.");
+            
             try {
                 await runTransaction(db, async (t) => {
                     const userRef = doc(db, "users", currentUser.uid);
-                    const userDoc = await t.get(userRef);
-                    if(userDoc.data().coin < 1000) throw "❌ BOK이 부족합니다. (필요: 1,000 BOK)";
-                    t.update(userRef, { coin: increment(-1000) });
-                    t.set(doc(collection(db, "boards")), { name: name, creatorName: currentUser.displayName, creatorUid: currentUser.uid, createdAt: new Date().toISOString() });
-                });
-                alert("🎉 게시판이 개설되었습니다!");
-            } catch(e) { alert(e); }
-        }
-
-        let unsubscribePosts = null;
-        function loadPosts(boardId) {
-            const postList = document.getElementById("postList");
-            postList.innerHTML = '<div class="skeleton"></div><div class="skeleton"></div>';
-            
-            if(unsubscribePosts) unsubscribePosts();
-            const q = query(collection(db, "posts"), where("boardId", "==", boardId));
-            unsubscribePosts = onSnapshot(q, (snapshot) => {
-                const list = document.getElementById("postList");
-                list.innerHTML = "";
-                let posts = [];
-                snapshot.forEach(d => posts.push({id: d.id, ...d.data()}));
-                
-                posts.sort((a, b) => new Date(b.date) - new Date(a.date));
-
-                if(posts.length === 0) {
-                    list.innerHTML = "<div style='padding: 40px; text-align: center; color: var(--text-muted);'>아직 글이 없습니다.<br><br>첫 글을 작성하고 <strong style=\"color: var(--secondary);\">100 BOK</strong>을 받아보세요! ✍️</div>";
-                }
-                
-                posts.forEach(p => {
-                    const div = document.createElement("div");
-                    div.className = "post-item";
-                    div.innerHTML = `<div class="post-title">${p.title}</div><div class="post-meta">${p.author} · ${new Date(p.date).toLocaleDateString()}</div>`;
-                    div.onclick = () => viewPost(p.id, p);
-                    list.appendChild(div);
-                });
-            });
-        }
-
-        function viewPost(postId, postData) {
-            currentPostId = postId;
-            document.getElementById("viewTitle").innerText = postData.title;
-            document.getElementById("viewAuthor").innerText = `${postData.author} · ${new Date(postData.date).toLocaleString()}`;
-            document.getElementById("viewContent").innerText = postData.content;
-            const controls = document.getElementById("viewControls");
-            controls.innerHTML = "";
-            if(currentUser && postData.uid === currentUser.uid) {
-                const editBtn = document.createElement("button");
-                editBtn.className = "btn-small";
-                editBtn.style.cssText = "background: var(--bg-card-hover); color: var(--text);";
-                editBtn.innerText = "수정";
-                editBtn.onclick = () => openEditForm(postData);
-                controls.appendChild(editBtn);
-            }
-            hideAll(); document.getElementById("viewSection").style.display = "block";
-        }
-
-        function openEditForm(postData) {
-            isEditMode = true;
-            document.getElementById("title").value = postData.title;
-            document.getElementById("content").value = postData.content;
-            document.getElementById("saveBtn").innerText = "수정 완료";
-            hideAll(); document.getElementById("writeSection").style.display = "block";
-        }
-
-        document.getElementById("saveBtn").addEventListener("click", async () => {
-            const title = document.getElementById("title").value.trim();
-            const content = document.getElementById("content").value.trim();
-            if(content.length < 10) return alert("내용을 10자 이상 작성해주세요.");
-            if(!title) return alert("제목을 입력해주세요.");
-
-            const btn = document.getElementById("saveBtn");
-            btn.disabled = true;
-            btn.innerText = "처리 중...";
-
-            try {
-                if(isEditMode) {
-                    await updateDoc(doc(db, "posts", currentPostId), { title: title, content: content });
-                    alert("✅ 수정되었습니다.");
-                    backToPostList(); 
-                } else {
-                    await runTransaction(db, async (t) => {
-                        t.set(doc(collection(db, "posts")), { boardId: currentBoardId, title: title, content: content, author: currentUser.displayName, uid: currentUser.uid, reward: 100, date: new Date().toISOString() });
-                        t.update(doc(db, "users", currentUser.uid), { coin: increment(100) });
+                    t.update(userRef, { 
+                        coin: increment(-1000),
+                        totalSpent: increment(1000)
                     });
-                    alert("🎉 등록 완료! (+100 BOK)");
-                    backToPostList();
-                }
-            } catch(e) { 
-                alert("오류가 발생했습니다: " + e); 
-            } finally {
-                btn.disabled = false;
-                btn.innerText = isEditMode ? "수정 완료" : "등록 완료 (+100 BOK)";
+                    
+                    const boardRef = doc(collection(db, "boards"));
+                    t.set(boardRef, {
+                        name, description: desc, category, color, icon,
+                        entryFee, writeFee,
+                        requireApproval: approval,
+                        allowComments: comments,
+                        ownerUid: currentUser.uid,
+                        ownerName: currentUser.displayName,
+                        memberCount: 1,
+                        postCount: 0,
+                        createdAt: new Date().toISOString()
+                    });
+                });
+                
+                alert("🎉 게시판이 생성되었습니다!");
+                closeModal('createBoardModal');
+            } catch(e) { alert("오류: " + e.message); }
+        };
+
+        // 룰렛
+        window.spinRoulette = async function() {
+            if(!currentUser || !userData) return;
+            
+            const lastRoulette = userData.lastRoulette;
+            const today = new Date().toDateString();
+            if(lastRoulette && new Date(lastRoulette).toDateString() === today) {
+                return alert("오늘은 이미 돌리셨습니다!");
             }
-        });
+            
+            const btn = document.getElementById("spinBtn");
+            btn.disabled = true;
+            
+            // 룰렛 애니메이션
+            const wheel = document.getElementById("rouletteWheel");
+            const randomDeg = 1800 + Math.random() * 360;
+            wheel.style.transform = `rotate(${randomDeg}deg)`;
+            
+            // 결과 계산 (1~500 가중치)
+            const rand = Math.random();
+            let reward;
+            if(rand < 0.5) reward = Math.floor(Math.random() * 50) + 1;        // 50%: 1~50
+            else if(rand < 0.8) reward = Math.floor(Math.random() * 100) + 50; // 30%: 50~150
+            else if(rand < 0.95) reward = Math.floor(Math.random() * 150) + 150; // 15%: 150~300
+            else reward = Math.floor(Math.random() * 200) + 300;               // 5%: 300~500
+            
+            setTimeout(async () => {
+                await updateDoc(doc(db, "users", currentUser.uid), {
+                    coin: increment(reward),
+                    totalEarned: increment(reward),
+                    lastRoulette: new Date().toISOString()
+                });
+                
+                document.getElementById("rouletteResult").textContent = reward;
+                openModal('rouletteResultModal');
+                btn.textContent = "✅ 오늘 완료";
+            }, 3000);
+        };
+
+        // 섹션 전환
+        window.showSection = function(section) {
+            document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+            document.getElementById("homeSection").classList.add("hidden");
+            document.getElementById("boardsSection").classList.add("hidden");
+            document.getElementById("profileSection").classList.add("hidden");
+            
+            if(section === 'home') {
+                document.getElementById("homeSection").classList.remove("hidden");
+                document.querySelector('.nav-link').classList.add('active');
+            } else if(section === 'boards') {
+                document.getElementById("boardsSection").classList.remove("hidden");
+            } else if(section === 'profile') {
+                document.getElementById("profileSection").classList.remove("hidden");
+            }
+        };
+
+        // 모달
+        window.openModal = function(id) {
+            document.getElementById(id).style.display = "flex";
+        };
+        window.closeModal = function(id) {
+            document.getElementById(id).style.display = "none";
+        };
+
+        // 초대 코드 복사
+        window.copyInviteCode = function() {
+            const code = document.getElementById("myInviteCode").textContent;
+            navigator.clipboard.writeText(code);
+            alert("초대 코드가 복사되었습니다!");
+        };
+
+        // 게시판 필터
+        window.filterBoards = function(type) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            event.target.classList.add('active');
+            // 필터 로직 구현 (생략)
+        };
     </script>
 </body>
 </html>
