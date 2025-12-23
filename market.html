@@ -3,57 +3,555 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BOKLUCK REAL ESTATE</title>
+    
+    <!-- SEO 개선 -->
+    <title>BOKLUCK 부동산 마켓 - 가상 땅 투자</title>
+    <meta name="description" content="BOKLUCK 부동산 마켓에서 전 세계 가상 땅을 구매하고 영토를 확장하세요. 랜덤 가치 시스템으로 대박 찬스!">
+    <meta name="keywords" content="BOKLUCK, 부동산, 가상땅, BOK, 투자">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🗺️</text></svg>">
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
+
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Pretendard:wght@400;600;800&display=swap');
+        * { 
+            box-sizing: border-box; 
+            margin: 0;
+            padding: 0;
+        }
         
-        body { background-color: #0f172a; color: #f8fafc; font-family: 'Pretendard', sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; }
+        :root {
+            --primary: #ec4899;
+            --primary-light: #f472b6;
+            --secondary: #8b5cf6;
+            --accent: #f59e0b;
+            --success: #10b981;
+            --danger: #ef4444;
+            --bg-dark: #0a0a0f;
+            --bg-card: #12121a;
+            --bg-card-hover: #1a1a25;
+            --border: #2a2a3a;
+            --text: #f0f0f5;
+            --text-muted: #8888a0;
+            --gradient-primary: linear-gradient(135deg, #ec4899 0%, #8b5cf6 100%);
+            --gradient-gold: linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%);
+        }
+        
+        body { 
+            background-color: var(--bg-dark);
+            background-image: 
+                radial-gradient(ellipse at top, rgba(236, 72, 153, 0.1) 0%, transparent 50%),
+                radial-gradient(ellipse at bottom, rgba(139, 92, 246, 0.05) 0%, transparent 50%);
+            color: var(--text); 
+            font-family: 'Noto Sans KR', -apple-system, BlinkMacSystemFont, sans-serif; 
+            max-width: 900px; 
+            margin: 0 auto; 
+            padding: 20px; 
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            line-height: 1.6;
+        }
+        
+        main { flex: 1; }
         
         /* 헤더 */
-        header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 2px solid #ec4899; padding-bottom: 15px; }
-        .logo { font-size: 24px; font-weight: 800; color: #ec4899; cursor:pointer; }
+        header { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            margin-bottom: 24px; 
+            padding: 20px 0;
+        }
+        
+        .logo { 
+            font-size: 24px; 
+            font-weight: 900; 
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+        .logo:hover { opacity: 0.8; }
         
         /* 지갑 정보 */
-        .wallet-wrapper { display: flex; align-items: center; gap: 10px; }
-        .wallet-info { font-weight: bold; color: #ec4899; font-size: 16px; }
-        .btn-connect { background: #ec4899; color: white; border: none; padding: 8px 12px; border-radius: 20px; font-weight: bold; cursor: pointer; display: none; }
+        .wallet-wrapper { display: flex; align-items: center; gap: 12px; }
+        .wallet-info { 
+            background: var(--bg-card);
+            padding: 10px 20px; 
+            border-radius: 50px; 
+            border: 1px solid var(--border);
+            color: var(--primary);
+            font-weight: 700; 
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .wallet-info::before {
+            content: '💰';
+        }
+        .btn-connect { 
+            background: var(--gradient-primary);
+            color: white; 
+            border: none; 
+            padding: 10px 20px; 
+            border-radius: 50px; 
+            font-weight: 700; 
+            cursor: pointer; 
+            display: none;
+            font-family: 'Noto Sans KR', sans-serif;
+            transition: all 0.3s ease;
+        }
+        .btn-connect:hover { 
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(236, 72, 153, 0.4);
+        }
         
         /* 뒤로가기 */
-        button.back-btn { background: #334155; color: white; padding: 10px 20px; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; margin-bottom: 20px; transition: 0.2s; }
-        button.back-btn:hover { background: #475569; }
+        .back-btn { 
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            color: var(--text); 
+            padding: 12px 24px; 
+            border-radius: 12px; 
+            cursor: pointer; 
+            font-weight: 600; 
+            margin-bottom: 24px; 
+            transition: all 0.2s ease;
+            font-family: 'Noto Sans KR', sans-serif;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .back-btn:hover { 
+            background: var(--bg-card-hover);
+            border-color: var(--primary);
+        }
+
+        /* 가이드 섹션 */
+        .guide-section {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 24px;
+            margin-bottom: 24px;
+            position: relative;
+            overflow: hidden;
+        }
+        .guide-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: var(--gradient-primary);
+        }
+        
+        .guide-section h4 {
+            color: var(--text);
+            margin-bottom: 20px;
+            font-size: 18px;
+            font-weight: 700;
+        }
+        
+        .guide-steps {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+        }
+        
+        .guide-step {
+            background: rgba(236, 72, 153, 0.08);
+            border: 1px solid rgba(236, 72, 153, 0.2);
+            padding: 16px 12px;
+            border-radius: 12px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+        .guide-step:hover {
+            background: rgba(236, 72, 153, 0.15);
+            transform: translateY(-2px);
+        }
+        
+        .guide-step .step-num {
+            font-size: 24px;
+            margin-bottom: 8px;
+        }
+        .guide-step .step-title {
+            font-weight: 700;
+            font-size: 13px;
+            margin-bottom: 4px;
+            color: var(--primary-light);
+        }
+        .guide-step .step-desc {
+            font-size: 11px;
+            color: var(--text-muted);
+        }
 
         /* 컨트롤 패널 */
-        .control-panel { background: #1e293b; padding: 20px; border-radius: 12px; margin-bottom: 20px; border: 1px solid #475569; }
-        .select-group { display: flex; gap: 10px; margin-bottom: 15px; }
-        select { background: #0f172a; color: white; border: 1px solid #64748b; padding: 10px; border-radius: 8px; flex: 1; font-size: 16px; font-family: 'Pretendard'; }
+        .control-panel { 
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            padding: 24px; 
+            border-radius: 20px; 
+            margin-bottom: 24px; 
+        }
+        .control-panel h3 {
+            font-size: 18px;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
         
-        /* 🗺️ 맵 그리드 */
-        .map-container { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; }
-        .land-block { aspect-ratio: 1/1; background: #334155; border-radius: 8px; display: flex; flex-direction: column; justify-content: center; align-items: center; cursor: pointer; border: 2px solid transparent; transition: 0.2s; position: relative; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.3); }
-        .land-block:hover { transform: scale(1.05); border-color: white; z-index: 10; }
+        .select-group { 
+            display: flex; 
+            gap: 12px; 
+            margin-bottom: 16px; 
+        }
+        select { 
+            background: var(--bg-dark);
+            color: var(--text); 
+            border: 1px solid var(--border);
+            padding: 14px 16px; 
+            border-radius: 12px; 
+            flex: 1; 
+            font-size: 15px; 
+            font-family: 'Noto Sans KR', sans-serif;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%238888a0' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            background-size: 16px;
+            padding-right: 40px;
+        }
+        select:focus { 
+            outline: none; 
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(236, 72, 153, 0.1);
+        }
         
-        .land-empty { opacity: 0.6; border: 1px dashed #64748b; }
-        .land-text { font-size: 13px; text-align: center; line-height: 1.2; word-break: break-all; padding: 4px; font-weight: 800; text-shadow: 0 1px 2px rgba(0,0,0,0.8); z-index: 2; }
-        .land-sub { font-size: 11px; margin-top: 4px; color: rgba(255,255,255,0.9); font-weight: 600; z-index: 2; text-shadow: 0 1px 2px rgba(0,0,0,0.8); }
+        .price-info {
+            background: rgba(236, 72, 153, 0.08);
+            border: 1px solid rgba(236, 72, 153, 0.2);
+            border-radius: 12px;
+            padding: 16px;
+            display: flex;
+            justify-content: space-around;
+            text-align: center;
+        }
+        .price-item {
+            flex: 1;
+        }
+        .price-label {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-bottom: 4px;
+        }
+        .price-value {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--primary-light);
+        }
+
+        /* 지역 통계 */
+        .region-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+        .region-stat {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 20px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+        .region-stat:hover {
+            border-color: var(--primary);
+        }
+        .region-stat-value {
+            font-size: 28px;
+            font-weight: 900;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .region-stat-label {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
 
         /* 점령 메시지 */
-        .conquest-status { background: linear-gradient(90deg, #ec4899, #8b5cf6); padding: 15px; border-radius: 8px; margin-bottom: 20px; text-align: center; font-weight: bold; display: none; animation: popIn 0.5s ease; }
-        @keyframes popIn { 0% { transform: scale(0.9); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+        .conquest-status { 
+            background: var(--gradient-primary);
+            padding: 20px; 
+            border-radius: 16px; 
+            margin-bottom: 24px; 
+            text-align: center; 
+            font-weight: 700;
+            font-size: 16px;
+            display: none; 
+            animation: popIn 0.5s ease;
+            box-shadow: 0 4px 20px rgba(236, 72, 153, 0.3);
+        }
+        @keyframes popIn { 
+            0% { transform: scale(0.95); opacity: 0; } 
+            100% { transform: scale(1); opacity: 1; } 
+        }
+        
+        /* 🗺️ 맵 그리드 */
+        .map-container { 
+            display: grid; 
+            grid-template-columns: repeat(5, 1fr); 
+            gap: 10px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 20px;
+        }
+        .land-block { 
+            aspect-ratio: 1/1; 
+            background: var(--bg-card-hover);
+            border-radius: 12px; 
+            display: flex; 
+            flex-direction: column; 
+            justify-content: center; 
+            align-items: center; 
+            cursor: pointer; 
+            border: 2px solid var(--border);
+            transition: all 0.3s ease; 
+            position: relative; 
+            overflow: hidden; 
+        }
+        .land-block:hover { 
+            transform: scale(1.08); 
+            border-color: var(--primary);
+            z-index: 10;
+            box-shadow: 0 8px 25px rgba(236, 72, 153, 0.3);
+        }
+        .land-block:focus {
+            outline: 2px solid var(--primary);
+            outline-offset: 2px;
+        }
+        
+        .land-empty { 
+            border-style: dashed;
+            opacity: 0.7;
+        }
+        .land-empty:hover { 
+            opacity: 1;
+            border-style: solid;
+        }
+        
+        .land-text { 
+            font-size: 12px; 
+            text-align: center; 
+            line-height: 1.3; 
+            word-break: break-all; 
+            padding: 4px; 
+            font-weight: 800; 
+            text-shadow: 0 2px 4px rgba(0,0,0,0.8); 
+            z-index: 2; 
+        }
+        .land-sub { 
+            font-size: 10px; 
+            margin-top: 4px; 
+            color: rgba(255,255,255,0.85); 
+            font-weight: 600; 
+            z-index: 2; 
+            text-shadow: 0 1px 3px rgba(0,0,0,0.8); 
+        }
 
-        /* ✨ 구매 모달창 스타일 */
-        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); display: none; justify-content: center; align-items: center; z-index: 100; backdrop-filter: blur(5px); }
-        .modal-content { background: #1e293b; padding: 30px; border-radius: 16px; width: 90%; max-width: 350px; border: 1px solid #ec4899; box-shadow: 0 0 20px rgba(236, 72, 153, 0.3); text-align: center; }
-        .modal-title { font-size: 20px; font-weight: bold; margin-bottom: 20px; color: #fff; }
-        .input-group { margin-bottom: 15px; text-align: left; }
-        .input-group label { display: block; font-size: 12px; color: #94a3b8; margin-bottom: 5px; }
-        .modal-input { width: 100%; padding: 10px; background: #0f172a; border: 1px solid #475569; border-radius: 6px; color: white; box-sizing: border-box; }
-        .color-picker { width: 100%; height: 40px; cursor: pointer; border: none; border-radius: 6px; }
+        /* ✨ 구매 모달창 */
+        .modal-overlay { 
+            position: fixed; 
+            top: 0; 
+            left: 0; 
+            width: 100%; 
+            height: 100%; 
+            background: rgba(0,0,0,0.8); 
+            display: none; 
+            justify-content: center; 
+            align-items: center; 
+            z-index: 100; 
+            backdrop-filter: blur(8px); 
+        }
+        .modal-content { 
+            background: var(--bg-card);
+            padding: 32px; 
+            border-radius: 24px; 
+            width: 90%; 
+            max-width: 380px; 
+            border: 1px solid var(--border);
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
+            position: relative;
+            overflow: hidden;
+        }
+        .modal-content::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: var(--gradient-primary);
+        }
         
-        .modal-btn { width: 100%; padding: 12px; border-radius: 8px; font-weight: bold; cursor: pointer; border: none; margin-top: 10px; font-size: 16px; }
-        .btn-confirm { background: #ec4899; color: white; }
-        .btn-confirm:hover { background: #db2777; }
-        .btn-cancel { background: #334155; color: white; margin-top: 10px; }
+        .modal-title { 
+            font-size: 22px; 
+            font-weight: 900; 
+            margin-bottom: 8px; 
+            color: var(--text);
+            text-align: center;
+        }
+        .modal-price {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .modal-price span {
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-size: 24px;
+            font-weight: 900;
+        }
         
+        .value-hint {
+            background: rgba(245, 158, 11, 0.1);
+            border: 1px solid rgba(245, 158, 11, 0.3);
+            color: #fbbf24;
+            padding: 14px;
+            border-radius: 12px;
+            font-size: 13px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .input-group { 
+            margin-bottom: 16px; 
+        }
+        .input-group label { 
+            display: block; 
+            font-size: 13px; 
+            color: var(--text-muted); 
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+        .modal-input { 
+            width: 100%; 
+            padding: 14px 16px; 
+            background: var(--bg-dark);
+            border: 1px solid var(--border);
+            border-radius: 12px; 
+            color: var(--text); 
+            font-family: 'Noto Sans KR', sans-serif;
+            font-size: 15px;
+            transition: all 0.2s ease;
+        }
+        .modal-input:focus { 
+            outline: none; 
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(236, 72, 153, 0.1);
+        }
+        
+        .color-picker { 
+            width: 100%; 
+            height: 50px; 
+            cursor: pointer; 
+            border: none; 
+            border-radius: 12px;
+            background: var(--bg-dark);
+        }
+        
+        .modal-btn { 
+            width: 100%; 
+            padding: 16px; 
+            border-radius: 12px; 
+            font-weight: 700; 
+            cursor: pointer; 
+            border: none; 
+            margin-top: 8px; 
+            font-size: 16px; 
+            font-family: 'Noto Sans KR', sans-serif;
+            transition: all 0.3s ease;
+        }
+        .btn-confirm { 
+            background: var(--gradient-primary);
+            color: white;
+            box-shadow: 0 4px 15px rgba(236, 72, 153, 0.4);
+        }
+        .btn-confirm:hover { 
+            transform: translateY(-2px);
+            box-shadow: 0 6px 25px rgba(236, 72, 153, 0.5);
+        }
+        .btn-confirm:disabled { 
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+        .btn-cancel { 
+            background: var(--bg-card-hover);
+            color: var(--text);
+            border: 1px solid var(--border);
+        }
+        .btn-cancel:hover { 
+            background: var(--border);
+        }
+
+        /* 푸터 */
+        footer {
+            margin-top: 60px;
+            padding: 30px 0;
+            border-top: 1px solid var(--border);
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 13px;
+        }
+        
+        footer a {
+            color: var(--text-muted);
+            text-decoration: none;
+            margin: 0 12px;
+            transition: color 0.2s;
+        }
+        footer a:hover { color: var(--text); }
+        
+        .footer-links { margin-bottom: 16px; }
+        
+        .footer-disclaimer {
+            margin-top: 12px;
+            font-size: 11px;
+            color: #666;
+            max-width: 400px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        /* 반응형 */
+        @media (max-width: 600px) {
+            .guide-steps { grid-template-columns: repeat(2, 1fr); }
+            .map-container { gap: 6px; padding: 12px; }
+            .land-text { font-size: 10px; }
+            .land-sub { font-size: 9px; }
+            .region-stats { grid-template-columns: 1fr; }
+            header { flex-direction: column; gap: 16px; }
+            .wallet-info { width: 100%; justify-content: center; }
+            .select-group { flex-direction: column; }
+        }
     </style>
 </head>
 <body>
@@ -61,48 +559,103 @@
     <header>
         <div class="logo" onclick="location.href='index.html'">BOKLUCK MARKET</div>
         <div class="wallet-wrapper">
-            <button id="manualLoginBtn" class="btn-connect">🔑 지갑 연결하기</button>
+            <button id="manualLoginBtn" class="btn-connect">🔑 지갑 연결</button>
             <div id="walletBadge" class="wallet-info">연결 중...</div>
         </div>
     </header>
 
-    <button class="back-btn" onclick="location.href='index.html'">← 메인으로 돌아가기</button>
+    <main>
+        <button class="back-btn" onclick="location.href='index.html'">← 메인으로</button>
 
-    <div id="conquestMessage" class="conquest-status">
-        👑 축하합니다! 당신은 이 지역의 [최대 소유자]입니다! (13/25 점령)
-    </div>
-
-    <div class="control-panel">
-        <h3 style="margin-top:0;">🗺️ 부동산 지역 선택</h3>
-        <div class="select-group">
-            <select id="countrySelect">
-                <option value="KR">🇰🇷 한국</option>
-                <option value="US">🇺🇸 미국</option>
-                <option value="JP">🇯🇵 일본</option>
-            </select>
-            <select id="citySelect"></select>
+        <!-- 가이드 섹션 -->
+        <div class="guide-section">
+            <h4>🎮 이용 가이드</h4>
+            <div class="guide-steps">
+                <div class="guide-step">
+                    <div class="step-num">1️⃣</div>
+                    <div class="step-title">지역 선택</div>
+                    <div class="step-desc">국가와 도시 선택</div>
+                </div>
+                <div class="guide-step">
+                    <div class="step-num">2️⃣</div>
+                    <div class="step-title">빈 땅 클릭</div>
+                    <div class="step-desc">점선 땅 = 구매 가능</div>
+                </div>
+                <div class="guide-step">
+                    <div class="step-num">3️⃣</div>
+                    <div class="step-title">커스텀</div>
+                    <div class="step-desc">이름 & 색상 설정</div>
+                </div>
+                <div class="guide-step">
+                    <div class="step-num">4️⃣</div>
+                    <div class="step-title">랜덤 가치</div>
+                    <div class="step-desc">1~1,000 BOK 랜덤!</div>
+                </div>
+            </div>
         </div>
-        <div style="font-size:14px; color:#94a3b8;">
-            * 구매 가격: <b>300 BOK</b> (고정)<br>
-            * 🎲 <b>랜덤 가치:</b> 구매 시 1~1,000 BOK 사이의 가치가 매겨집니다!
-        </div>
-    </div>
 
-    <div id="landGrid" class="map-container"></div>
+        <div id="conquestMessage" class="conquest-status">
+            👑 축하합니다! 최대 소유자입니다!
+        </div>
+
+        <div class="control-panel">
+            <h3>🗺️ 지역 선택</h3>
+            <div class="select-group">
+                <select id="countrySelect">
+                    <option value="KR">🇰🇷 한국</option>
+                    <option value="US">🇺🇸 미국</option>
+                    <option value="JP">🇯🇵 일본</option>
+                </select>
+                <select id="citySelect"></select>
+            </div>
+            <div class="price-info">
+                <div class="price-item">
+                    <div class="price-label">구매 가격</div>
+                    <div class="price-value">300 BOK</div>
+                </div>
+                <div class="price-item">
+                    <div class="price-label">랜덤 가치</div>
+                    <div class="price-value">1 ~ 1,000 BOK</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 지역 통계 -->
+        <div class="region-stats">
+            <div class="region-stat">
+                <div class="region-stat-value" id="statSold">-</div>
+                <div class="region-stat-label">판매된 땅</div>
+            </div>
+            <div class="region-stat">
+                <div class="region-stat-value" id="statAvailable">-</div>
+                <div class="region-stat-label">구매 가능</div>
+            </div>
+            <div class="region-stat">
+                <div class="region-stat-value" id="statMyLands">-</div>
+                <div class="region-stat-label">내 소유</div>
+            </div>
+        </div>
+
+        <div id="landGrid" class="map-container"></div>
+    </main>
 
     <div id="buyModal" class="modal-overlay">
         <div class="modal-content">
-            <div class="modal-title">🏗️ 땅 구매하기</div>
-            <p style="color:#ec4899; font-weight:bold; font-size:18px; margin-bottom:20px;">가격: 300 BOK</p>
+            <div class="modal-title">🏗️ 땅 구매</div>
+            <div class="modal-price"><span>300 BOK</span></div>
             
-            <div class="input-group">
-                <label>땅 이름</label>
-                <input type="text" id="inputName" class="modal-input" placeholder="예: 비트코인 타워">
+            <div class="value-hint">
+                🎰 구매 시 1~1,000 BOK 가치가 랜덤 결정!
             </div>
             
             <div class="input-group">
-                <label>내 땅 색상 선택</label>
-                <input type="color" id="inputColor" class="color-picker" value="#0ea5e9">
+                <label>땅 이름 (최대 10자)</label>
+                <input type="text" id="inputName" class="modal-input" placeholder="예: 비트코인 타워" maxlength="10">
+            </div>
+            
+            <div class="input-group">
+                <label>색상 선택</label>
+                <input type="color" id="inputColor" class="color-picker" value="#6366f1">
             </div>
 
             <button id="confirmBuyBtn" class="modal-btn btn-confirm">구매 확정</button>
@@ -110,12 +663,24 @@
         </div>
     </div>
 
+    <!-- 푸터 -->
+    <footer>
+        <div class="footer-links">
+            <a href="index.html">메인으로</a>
+            <a href="#">이용약관</a>
+            <a href="#">개인정보처리방침</a>
+        </div>
+        <p>© 2024 BOKLUCK. All rights reserved.</p>
+        <p class="footer-disclaimer">
+            가상 부동산의 '가치'는 플랫폼 내 재미 요소이며, 실제 자산 가치를 보장하지 않습니다.
+        </p>
+    </footer>
+
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
         import { getFirestore, collection, onSnapshot, doc, runTransaction, increment, query, where } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
         import { getAuth, onAuthStateChanged, signInWithPopup, GoogleAuthProvider } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
-        // ✅ 1. 설정 (키 적용됨)
         const firebaseConfig = {
           apiKey: "AIzaSyBwQjuqgWM4YKnqu_gzNbeCg5alrC-jVcQ",
           authDomain: "myco-737a0.firebaseapp.com",
@@ -129,10 +694,10 @@
         const db = getFirestore(app);
         const auth = getAuth(app);
 
-        // ✅ 2. 전역 변수
         let currentUser = null;
         let currentBalance = 0;
         const LAND_PRICE = 300;
+        const TOTAL_LANDS = 25;
         
         const cities = {
             "KR": ["서울", "부산", "제주"],
@@ -140,55 +705,63 @@
             "JP": ["도쿄", "오사카"]
         };
 
-        // UI 요소
         const countrySelect = document.getElementById("countrySelect");
         const citySelect = document.getElementById("citySelect");
         const grid = document.getElementById("landGrid");
         const walletBadge = document.getElementById("walletBadge");
         const manualLoginBtn = document.getElementById("manualLoginBtn");
         
-        // 모달 요소
         const buyModal = document.getElementById("buyModal");
         const inputName = document.getElementById("inputName");
         const inputColor = document.getElementById("inputColor");
         let selectedBlockIndex = null;
         let selectedRegionKey = null;
 
-        // ✅ 3. 함수 정의 (사용되기 전에 먼저 선언)
+        function updateRegionStats(soldCount, myCount) {
+            document.getElementById("statSold").textContent = soldCount;
+            document.getElementById("statAvailable").textContent = TOTAL_LANDS - soldCount;
+            document.getElementById("statMyLands").textContent = myCount;
+        }
 
-        // 모달 열기 함수 (전역 window에 등록 X -> 내부 로직으로 처리)
         function openBuyModal(index, regionKey) {
             if(!currentUser) {
-                alert("지갑 연결이 필요합니다. (상단 수동 연결 버튼 확인)");
+                alert("로그인이 필요합니다.\n상단의 '지갑 연결' 버튼을 클릭해주세요.");
+                return;
+            }
+            if(currentBalance < LAND_PRICE) {
+                alert(`BOK이 부족합니다!\n\n현재: ${currentBalance.toLocaleString()} BOK\n필요: ${LAND_PRICE} BOK\n\n메인에서 글쓰기로 BOK을 모아보세요!`);
                 return;
             }
             selectedBlockIndex = index;
             selectedRegionKey = regionKey;
             
             inputName.value = "";
-            inputColor.value = "#0ea5e9"; // 기본 파랑
+            inputColor.value = "#6366f1";
             buyModal.style.display = "flex";
+            inputName.focus();
         }
 
-        // 모달 닫기
         document.getElementById("cancelBuyBtn").addEventListener("click", () => {
             buyModal.style.display = "none";
         });
+        
+        document.addEventListener("keydown", (e) => {
+            if(e.key === "Escape" && buyModal.style.display === "flex") {
+                buyModal.style.display = "none";
+            }
+        });
 
-        // 맵 로드 함수
         let unsubscribeMap = null;
         function loadMap() {
             const regionKey = `${countrySelect.value}-${citySelect.value}`; 
             
-            // 맵 초기화 (빈 땅 25개)
             grid.innerHTML = "";
-            for(let i=0; i<25; i++) {
+            for(let i = 0; i < TOTAL_LANDS; i++) {
                 const div = document.createElement("div");
                 div.className = "land-block land-empty";
                 div.id = `block-${i}`;
                 div.innerHTML = `<span class="land-text">빈 땅</span><span class="land-sub">${LAND_PRICE} BOK</span>`;
                 
-                // ⭐ 중요: 함수가 정의된 후 연결
                 div.addEventListener('click', () => openBuyModal(i, regionKey));
                 
                 grid.appendChild(div);
@@ -199,53 +772,55 @@
             
             unsubscribeMap = onSnapshot(q, (snapshot) => {
                 let myLandCount = 0;
-                snapshot.forEach(doc => {
-                    const data = doc.data();
+                let soldCount = 0;
+                
+                snapshot.forEach(docSnap => {
+                    const data = docSnap.data();
                     const el = document.getElementById(`block-${data.index}`);
                     if(!el) return;
+                    
+                    soldCount++;
 
-                    // 땅 스타일 적용
-                    el.style.backgroundColor = data.color || "#334155";
-                    el.style.border = "1px solid rgba(255,255,255,0.2)";
+                    el.style.backgroundColor = data.color || "#6366f1";
+                    el.style.borderColor = "rgba(255,255,255,0.2)";
+                    el.style.borderStyle = "solid";
                     el.classList.remove("land-empty");
 
-                    // 텍스트 표시
-                    const valueText = data.randomValue ? `💎 가치: ${data.randomValue}` : "평가 중";
+                    const valueText = data.randomValue ? `💎 ${data.randomValue}` : "?";
                     
                     if(currentUser && data.ownerUid === currentUser.uid) {
-                        el.innerHTML = `<span class="land-text" style="color:#fff;">${data.customName}</span><span class="land-sub" style="color:#fff;">${valueText}</span>`;
+                        el.innerHTML = `<span class="land-text">${data.customName}</span><span class="land-sub">${valueText}</span>`;
                         myLandCount++;
                     } else {
-                        el.innerHTML = `<span class="land-text" style="color:#fff;">${data.customName}</span><span class="land-sub" style="color:#ddd;">${data.ownerName}</span>`;
+                        el.innerHTML = `<span class="land-text">${data.customName}</span><span class="land-sub">${data.ownerName}</span>`;
                     }
 
-                    // 팔린 땅은 클릭 시 정보 표시 (이벤트 덮어쓰기)
-                    // 기존 이벤트를 제거하기 위해 cloneNode 사용
                     const newEl = el.cloneNode(true);
-                    newEl.addEventListener('click', () => alert(`🔒 [소유 정보]\n\n이름: ${data.customName}\n소유자: ${data.ownerName}\n감정가: ${data.randomValue || 0} BOK`));
+                    newEl.addEventListener('click', () => {
+                        alert(`🔒 소유 정보\n\n📍 ${data.customName}\n👤 ${data.ownerName}\n💎 ${data.randomValue || 0} BOK`);
+                    });
                     el.parentNode.replaceChild(newEl, el);
                 });
 
-                // 점령 메시지
+                updateRegionStats(soldCount, myLandCount);
+
                 const statusBox = document.getElementById("conquestMessage");
                 if(myLandCount >= 13) {
                     statusBox.style.display = "block";
-                    statusBox.innerText = `👑 축하합니다! [${citySelect.value}] 지역의 최대 소유자입니다! (${myLandCount}/25)`;
+                    statusBox.innerText = `👑 [${citySelect.value}] 지역 최대 소유자! (${myLandCount}/${TOTAL_LANDS})`;
                 } else {
                     statusBox.style.display = "none";
                 }
             });
         }
 
-        // ✅ 4. 이벤트 리스너 연결
-        
-        // 도시 변경 이벤트
         function updateCityOptions() {
             const list = cities[countrySelect.value];
             citySelect.innerHTML = "";
             list.forEach(c => {
                 const opt = document.createElement("option");
-                opt.value = c.split(' ')[0]; opt.innerText = c;
+                opt.value = c; 
+                opt.innerText = c;
                 citySelect.appendChild(opt);
             });
             loadMap(); 
@@ -253,43 +828,45 @@
         countrySelect.addEventListener("change", updateCityOptions);
         citySelect.addEventListener("change", loadMap);
         
-        // 초기 실행
         updateCityOptions(); 
 
-        // 로그인/로그아웃 감지
         onAuthStateChanged(auth, (user) => {
             if (user) {
                 currentUser = user;
                 manualLoginBtn.style.display = "none";
-                walletBadge.innerText = "자산 확인 중...";
+                walletBadge.innerText = "확인 중...";
                 onSnapshot(doc(db, "users", user.uid), (d) => {
                     if (d.exists()) {
                         currentBalance = d.data().coin;
-                        walletBadge.innerText = `💰 자산: ${currentBalance.toLocaleString()} BOK`;
+                        walletBadge.innerText = `${currentBalance.toLocaleString()} BOK`;
                     } else {
                         currentBalance = 0;
-                        walletBadge.innerText = `💰 자산: 0 BOK`;
+                        walletBadge.innerText = `0 BOK`;
                     }
                 });
+                loadMap();
             } else {
                 currentUser = null;
                 walletBadge.innerText = "연결 필요";
                 manualLoginBtn.style.display = "block";
+                updateRegionStats(0, 0);
             }
         });
 
-        // 수동 로그인
         manualLoginBtn.addEventListener("click", () => {
             signInWithPopup(auth, new GoogleAuthProvider()).catch(err => alert("오류: " + err.message));
         });
 
-        // ✅ 5. 구매 확정 버튼 (트랜잭션)
         document.getElementById("confirmBuyBtn").addEventListener("click", async () => {
-            if(currentBalance < LAND_PRICE) return alert(`자산 부족! (${currentBalance} BOK 보유)`);
+            if(currentBalance < LAND_PRICE) {
+                return alert(`BOK이 부족합니다! (${currentBalance.toLocaleString()} BOK)`);
+            }
+            
             const name = inputName.value.trim();
             const color = inputColor.value;
             
             if(!name) return alert("땅 이름을 입력해주세요.");
+            if(name.length > 10) return alert("10자 이내로 입력해주세요.");
 
             const randomValue = Math.floor(Math.random() * 1000) + 1;
             const btn = document.getElementById("confirmBuyBtn");
@@ -300,9 +877,12 @@
                 await runTransaction(db, async (t) => {
                     const landRef = doc(db, "lands", `${selectedRegionKey}-${selectedBlockIndex}`);
                     const landDoc = await t.get(landRef);
-                    if(landDoc.exists()) throw "이미 판매된 땅입니다.";
+                    if(landDoc.exists()) throw "이미 판매된 땅입니다!";
                     
                     const userRef = doc(db, "users", currentUser.uid);
+                    const userDoc = await t.get(userRef);
+                    if(userDoc.data().coin < LAND_PRICE) throw "BOK이 부족합니다!";
+                    
                     t.update(userRef, { coin: increment(-LAND_PRICE) });
                     
                     t.set(landRef, {
@@ -318,10 +898,22 @@
                 });
                 
                 buyModal.style.display = "none";
-                alert(`🎉 구매 성공!\n\n이 땅의 감정가는 [ ${randomValue} BOK ] 입니다!`);
+                
+                let message = `🎉 구매 성공!\n\n`;
+                if(randomValue >= 800) {
+                    message += `🌟 대박!! ${randomValue} BOK 💎💎💎`;
+                } else if(randomValue >= 500) {
+                    message += `👍 좋아요! ${randomValue} BOK 💎`;
+                } else if(randomValue >= 100) {
+                    message += `😊 괜찮네요! ${randomValue} BOK`;
+                } else {
+                    message += `😅 ${randomValue} BOK\n다음엔 대박!`;
+                }
+                
+                alert(message);
                 
             } catch(e) {
-                alert("구매 실패: " + e);
+                alert("실패: " + e);
             } finally {
                 btn.innerText = "구매 확정";
                 btn.disabled = false;
