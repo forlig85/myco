@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>내 커뮤니티 (테스트)</title>
+    <style>
+        /* 1. 기본 스타일 설정 */
+        body { font-family: 'Pretendard', sans-serif; margin: 0; padding: 0; background-color: #f8f9fa; color: #333; }
+        a { text-decoration: none; color: inherit; }
+        
+        /* 2. 헤더 (로고 및 메뉴) */
+        header { background-color: #ffffff; border-bottom: 1px solid #eee; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-size: 24px; font-weight: bold; color: #2c3e50; }
+        .nav-btn { background-color: #3498db; color: white; padding: 8px 16px; border-radius: 5px; font-size: 14px; }
+
+        /* 3. 메인 컨텐츠 영역 */
+        .container { max-width: 800px; margin: 40px auto; padding: 0 20px; }
+        
+        /* 4. 게시판 리스트 디자인 */
+        .board-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .board-title { font-size: 28px; font-weight: bold; }
+        .write-btn { background-color: #2c3e50; color: white; padding: 10px 20px; border-radius: 5px; cursor: pointer; }
+
+        .post-card { background: white; border-radius: 10px; padding: 20px; margin-bottom: 15px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); transition: transform 0.2s; }
+        .post-card:hover { transform: translateY(-3px); box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+        .post-category { font-size: 12px; color: #3498db; font-weight: bold; margin-bottom: 5px; }
+        .post-title { font-size: 18px; font-weight: bold; margin-bottom: 10px; }
+        .post-meta { font-size: 13px; color: #999; display: flex; justify-content: space-between; }
+
+        /* 5. 모바일 반응형 */
+        @media (max-width: 600px) {
+            .container { margin: 20px auto; }
+            .post-title { font-size: 16px; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="logo">My Community</div>
+        <a href="#" class="nav-btn">로그인</a>
+    </header>
+
+    <div class="container">
+        <div class="board-header">
+            <div class="board-title">자유게시판</div>
+            <div class="write-btn" onclick="alert('아직 DB가 연결되지 않았습니다!')">글쓰기</div>
+        </div>
+
+        <div class="post-card">
+            <div class="post-category">공지사항</div>
+            <div class="post-title">커뮤니티에 오신 것을 환영합니다! 🎉</div>
+            <div class="post-meta">
+                <span>관리자</span>
+                <span>2024.05.21</span>
+            </div>
+        </div>
+
+        <div class="post-card">
+            <div class="post-category">자유</div>
+            <div class="post-title">홈페이지 테스트 중인데 디자인 어떤가요?</div>
+            <div class="post-meta">
+                <span>테스터1</span>
+                <span>방금 전</span>
+            </div>
+        </div>
+
+        <div class="post-card">
+            <div class="post-category">질문</div>
+            <div class="post-title">GitHub Pages로 도메인 연결 어떻게 하나요?</div>
+            <div class="post-meta">
+                <span>뉴비</span>
+                <span>1시간 전</span>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>
