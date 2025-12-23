@@ -120,7 +120,35 @@
         .title-option:hover { border-color: var(--primary); }
         .title-option.active { background: var(--gradient-gold); color: #1a1a2e; border-color: transparent; }
         .title-option.locked { opacity: 0.4; cursor: not-allowed; }
-        @media (max-width: 768px) { .grid-2, .grid-3 { grid-template-columns: 1fr; } .nav-links { display: none; } .hero-title { font-size: 26px; } .stats-bar { gap: 20px; } .stat-number { font-size: 22px; } }
+        
+        /* 초대 시스템 스타일 */
+        .invite-code { font-size: 28px; font-weight: 900; letter-spacing: 4px; color: var(--primary-light); background: var(--bg-dark); padding: 12px 24px; border-radius: 12px; font-family: monospace; }
+        .reward-steps { display: flex; flex-direction: column; gap: 12px; }
+        .reward-step { display: flex; align-items: center; gap: 12px; padding: 12px; background: var(--bg-card); border-radius: 10px; }
+        .step-icon { font-size: 20px; }
+        .step-info { flex: 1; }
+        .step-title { font-weight: 600; font-size: 14px; margin-bottom: 4px; }
+        .step-rewards { display: flex; gap: 8px; }
+        .reward-tag { font-size: 11px; padding: 3px 8px; border-radius: 10px; font-weight: 600; }
+        .reward-tag.inviter { background: rgba(16,185,129,0.15); color: var(--success); }
+        .reward-tag.invitee { background: rgba(99,102,241,0.15); color: var(--primary-light); }
+        .milestone-list { display: flex; flex-wrap: wrap; gap: 8px; }
+        .milestone-item { display: flex; align-items: center; justify-content: space-between; background: var(--bg-card); padding: 8px 12px; border-radius: 8px; flex: 1; min-width: 120px; font-size: 13px; }
+        .milestone-item.achieved { background: var(--gradient-gold); color: #1a1a2e; }
+        .milestone-reward { font-weight: 700; color: var(--accent); }
+        .milestone-item.achieved .milestone-reward { color: #1a1a2e; }
+        .invited-friend { display: flex; align-items: center; justify-content: space-between; padding: 10px; background: var(--bg-dark); border-radius: 8px; margin-bottom: 6px; font-size: 13px; }
+        .friend-status { display: flex; gap: 4px; }
+        .status-badge { width: 8px; height: 8px; border-radius: 50%; }
+        .status-badge.done { background: var(--success); }
+        .status-badge.pending { background: var(--border); }
+        
+        /* 가입 후 초대코드 입력 배너 */
+        .invite-banner { background: linear-gradient(135deg, rgba(99,102,241,0.1), rgba(236,72,153,0.1)); border: 1px solid rgba(99,102,241,0.3); border-radius: 12px; padding: 16px; margin-bottom: 20px; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+        .invite-banner-text { font-size: 14px; }
+        .invite-banner-text strong { color: var(--primary-light); }
+        
+        @media (max-width: 768px) { .grid-2, .grid-3 { grid-template-columns: 1fr; } .nav-links { display: none; } .hero-title { font-size: 26px; } .stats-bar { gap: 20px; } .stat-number { font-size: 22px; } .milestone-item { min-width: 100%; } }
     </style>
 </head>
 <body>
@@ -164,6 +192,14 @@
         </div>
 
         <div id="homeSection" class="hidden">
+            <!-- 초대 코드 입력 배너 (가입 7일 내, 미입력 시) -->
+            <div class="invite-banner hidden" id="inviteCodeBanner">
+                <div class="invite-banner-text">
+                    🎁 <strong>친구 초대 코드</strong>가 있나요? 지금 입력하면 <strong>+500 BOK</strong>!
+                </div>
+                <button class="btn-sm btn-gold" onclick="openModal('profileSettingsModal')">입력하기</button>
+            </div>
+            
             <div class="grid-2">
                 <div class="card">
                     <div class="card-header"><h3 class="card-title">📋 일일 미션</h3><span style="color: var(--text-muted); font-size: 13px;">매일 리셋</span></div>
@@ -276,9 +312,89 @@
         <div class="modal-content">
             <button class="modal-close" onclick="closeModal('inviteModal')">✕</button>
             <h2 class="modal-title">👥 친구 초대</h2>
-            <div class="invite-box"><p style="color: var(--text-muted);">내 초대 코드</p><div class="invite-code" id="myInviteCode">------</div><button class="btn-primary btn-sm" onclick="copyInviteCode()">📋 복사하기</button></div>
-            <div style="margin-top: 24px; padding: 16px; background: var(--bg-dark); border-radius: 12px;"><h4 style="margin-bottom: 12px;">🎁 초대 보상</h4><p style="font-size: 14px; color: var(--text-muted); line-height: 1.6;">• 초대한 사람: <strong style="color: var(--success);">+300 BOK</strong><br>• 초대받은 사람: <strong style="color: var(--success);">+300 BOK</strong></p></div>
-            <div style="margin-top: 20px;"><h4 style="margin-bottom: 12px;">📊 초대 현황</h4><div style="display: flex; justify-content: space-around; text-align: center;"><div><div style="font-size: 24px; font-weight: 900; color: var(--secondary);" id="inviteCount">0</div><div style="font-size: 12px; color: var(--text-muted);">초대한 친구</div></div><div><div style="font-size: 24px; font-weight: 900; color: var(--accent);" id="inviteEarned">0</div><div style="font-size: 12px; color: var(--text-muted);">획득 BOK</div></div></div></div>
+            
+            <!-- 초대 링크/코드 -->
+            <div class="invite-box">
+                <p style="color: var(--text-muted); margin-bottom: 8px;">📎 초대 링크</p>
+                <div style="display: flex; gap: 8px; margin-bottom: 12px;">
+                    <input type="text" id="inviteLinkInput" readonly style="flex: 1; margin: 0; font-size: 13px; padding: 10px;">
+                    <button class="btn-primary btn-sm" onclick="copyInviteLink()">복사</button>
+                </div>
+                <p style="color: var(--text-muted); margin-bottom: 8px;">🔑 초대 코드</p>
+                <div style="display: flex; align-items: center; justify-content: center; gap: 12px;">
+                    <div class="invite-code" id="myInviteCode">------</div>
+                    <button class="btn-outline btn-sm" onclick="copyInviteCode()">📋</button>
+                </div>
+            </div>
+            
+            <!-- 리워드 안내 -->
+            <div style="margin-top: 20px; padding: 20px; background: var(--bg-dark); border-radius: 12px;">
+                <h4 style="margin-bottom: 16px; text-align: center;">🎁 단계별 리워드 <span style="color: var(--accent);">(최대 1,000 BOK)</span></h4>
+                <div class="reward-steps">
+                    <div class="reward-step">
+                        <div class="step-icon">1️⃣</div>
+                        <div class="step-info">
+                            <div class="step-title">친구가 가입</div>
+                            <div class="step-rewards">
+                                <span class="reward-tag inviter">나 +300</span>
+                                <span class="reward-tag invitee">친구 +500</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="reward-step">
+                        <div class="step-icon">2️⃣</div>
+                        <div class="step-info">
+                            <div class="step-title">친구가 첫 글 작성</div>
+                            <div class="step-rewards">
+                                <span class="reward-tag inviter">나 +300</span>
+                                <span class="reward-tag invitee">친구 +100</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="reward-step">
+                        <div class="step-icon">3️⃣</div>
+                        <div class="step-info">
+                            <div class="step-title">친구가 첫 땅 구매</div>
+                            <div class="step-rewards">
+                                <span class="reward-tag inviter">나 +400</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 초대 현황 -->
+            <div style="margin-top: 20px;">
+                <h4 style="margin-bottom: 12px;">📊 초대 현황</h4>
+                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 16px;">
+                    <div style="background: var(--bg-dark); padding: 16px; border-radius: 12px; text-align: center;">
+                        <div style="font-size: 24px; font-weight: 900; color: var(--secondary);" id="inviteCount">0</div>
+                        <div style="font-size: 11px; color: var(--text-muted);">초대한 친구</div>
+                    </div>
+                    <div style="background: var(--bg-dark); padding: 16px; border-radius: 12px; text-align: center;">
+                        <div style="font-size: 24px; font-weight: 900; color: var(--success);" id="inviteActive">0</div>
+                        <div style="font-size: 11px; color: var(--text-muted);">활동 중</div>
+                    </div>
+                    <div style="background: var(--bg-dark); padding: 16px; border-radius: 12px; text-align: center;">
+                        <div style="font-size: 24px; font-weight: 900; color: var(--accent);" id="inviteEarned">0</div>
+                        <div style="font-size: 11px; color: var(--text-muted);">획득 BOK</div>
+                    </div>
+                </div>
+                
+                <!-- 초대한 친구 목록 -->
+                <div id="invitedFriendsList" style="max-height: 200px; overflow-y: auto;"></div>
+            </div>
+            
+            <!-- 마일스톤 -->
+            <div style="margin-top: 20px; padding: 16px; background: linear-gradient(135deg, rgba(245,158,11,0.1), rgba(236,72,153,0.1)); border-radius: 12px; border: 1px solid rgba(245,158,11,0.2);">
+                <h4 style="margin-bottom: 12px;">🏆 초대 마일스톤</h4>
+                <div class="milestone-list">
+                    <div class="milestone-item" id="milestone5"><span>👥 5명</span><span class="milestone-reward">+500 BOK</span></div>
+                    <div class="milestone-item" id="milestone10"><span>🌟 10명</span><span class="milestone-reward">+1,000 BOK</span></div>
+                    <div class="milestone-item" id="milestone25"><span>💎 25명</span><span class="milestone-reward">+3,000 BOK</span></div>
+                    <div class="milestone-item" id="milestone50"><span>👑 50명</span><span class="milestone-reward">+10,000 BOK</span></div>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -296,6 +412,17 @@
         <div class="modal-content">
             <button class="modal-close" onclick="closeModal('profileSettingsModal')">✕</button>
             <h2 class="modal-title">⚙️ 프로필 설정</h2>
+            
+            <!-- 초대 코드 입력 (가입 7일 내) -->
+            <div id="inviteCodeEntrySection" style="display: none; margin-bottom: 20px; padding: 16px; background: linear-gradient(135deg, rgba(99,102,241,0.1), rgba(236,72,153,0.1)); border: 1px solid rgba(99,102,241,0.3); border-radius: 12px;">
+                <h4 style="margin-bottom: 8px;">🎁 초대 코드 입력</h4>
+                <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 12px;">가입 7일 내 입력 가능! 입력 시 <strong style="color: var(--success);">+500 BOK</strong></p>
+                <div style="display: flex; gap: 8px;">
+                    <input type="text" id="enterInviteCode" placeholder="초대 코드 입력" style="flex: 1; margin: 0; text-transform: uppercase;">
+                    <button class="btn-gold" onclick="applyInviteCode()">적용</button>
+                </div>
+                <p id="inviteCodeDaysLeft" style="font-size: 11px; color: var(--accent); margin-top: 8px; text-align: center;"></p>
+            </div>
             
             <label>🌍 국가 선택</label>
             <select id="countrySelect" onchange="updateCountry()">
@@ -337,7 +464,7 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-        import { getFirestore, collection, doc, setDoc, getDoc, getDocs, updateDoc, onSnapshot, query, orderBy, where, increment, runTransaction, limit } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+        import { getFirestore, collection, doc, setDoc, getDoc, getDocs, updateDoc, onSnapshot, query, orderBy, where, increment, runTransaction, limit, addDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
         import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
         const firebaseConfig = { apiKey: "AIzaSyBwQjuqgWM4YKnqu_gzNbeCg5alrC-jVcQ", authDomain: "myco-737a0.firebaseapp.com", projectId: "myco-737a0", storageBucket: "myco-737a0.firebasestorage.app", messagingSenderId: "942571332540", appId: "1:942571332540:web:be0bb6fbdd32655501c1b9" };
@@ -357,9 +484,15 @@
         loadStats();
 
         document.getElementById("loginBtn").addEventListener("click", async () => {
-            const inviteCode = document.getElementById("inviteCodeInput").value.trim();
             try { await signInWithPopup(auth, new GoogleAuthProvider()); } catch(e) {}
         });
+
+        // URL에서 초대 코드 확인
+        const urlParams = new URLSearchParams(window.location.search);
+        const refCode = urlParams.get('ref');
+        if(refCode) {
+            document.getElementById("inviteCodeInput").value = refCode;
+        }
 
         onAuthStateChanged(auth, async (user) => {
             if(user) {
@@ -369,11 +502,71 @@
                 const userRef = doc(db, "users", user.uid);
                 onSnapshot(userRef, async (docSnap) => {
                     if(!docSnap.exists()) {
+                        // 새 사용자 생성
                         const inviteCode = Math.random().toString(36).substring(2, 8).toUpperCase();
-                        await setDoc(userRef, { name: user.displayName, email: user.email, coin: 500, exp: 0, level: 1, totalEarned: 500, totalSpent: 0, postCount: 0, commentCount: 0, inviteCode: inviteCode, inviteCount: 0, lastRoulette: null, createdAt: new Date().toISOString() });
+                        const inputCode = document.getElementById("inviteCodeInput").value.trim().toUpperCase() || refCode?.toUpperCase();
+                        
+                        let inviterUid = null;
+                        let inviterBonus = 0;
+                        
+                        // 초대 코드 검증
+                        if(inputCode) {
+                            const inviterQuery = query(collection(db, "users"), where("inviteCode", "==", inputCode));
+                            const inviterSnap = await getDocs(inviterQuery);
+                            if(!inviterSnap.empty) {
+                                const inviterDoc = inviterSnap.docs[0];
+                                inviterUid = inviterDoc.id;
+                                // 초대자에게 1단계 보상 (300 BOK)
+                                await updateDoc(doc(db, "users", inviterUid), { 
+                                    coin: increment(300), 
+                                    totalEarned: increment(300),
+                                    inviteCount: increment(1),
+                                    inviteRewards: increment(300)
+                                });
+                                // 초대 기록 저장
+                                await addDoc(collection(db, "invites"), {
+                                    inviterUid: inviterUid,
+                                    inviteeUid: user.uid,
+                                    inviteeName: user.displayName,
+                                    stage1: true,  // 가입 완료
+                                    stage2: false, // 첫 글 작성
+                                    stage3: false, // 첫 땅 구매
+                                    stage1At: new Date().toISOString(),
+                                    createdAt: new Date().toISOString()
+                                });
+                                inviterBonus = 500; // 가입자에게 추가 보너스 (기본 500 + 0)
+                            }
+                        }
+                        
+                        await setDoc(userRef, { 
+                            name: user.displayName, 
+                            email: user.email, 
+                            coin: 500 + (inviterUid ? 500 : 0), // 기본 500 + 초대받은 보너스 500
+                            exp: 0, 
+                            level: 1, 
+                            totalEarned: 500 + (inviterUid ? 500 : 0), 
+                            totalSpent: 0, 
+                            postCount: 0, 
+                            commentCount: 0,
+                            landCount: 0,
+                            boardCount: 0,
+                            inviteCode: inviteCode, 
+                            inviteCount: 0,
+                            inviteRewards: 0,
+                            invitedBy: inviterUid || null,
+                            inviteCodeUsed: !!inviterUid,
+                            lastRoulette: null, 
+                            createdAt: new Date().toISOString()
+                        });
+                        
+                        if(inviterUid) {
+                            alert("🎉 초대 코드 적용! +500 BOK 보너스를 받았습니다!");
+                        }
                     }
                     userData = docSnap.data();
                     updateUI();
+                    checkInviteCodeBanner();
+                    loadInvitedFriends();
                 });
                 loadBoards();
                 loadRanking();
@@ -402,7 +595,18 @@
             document.getElementById("totalSpent").textContent = (userData.totalSpent||0).toLocaleString();
             document.getElementById("myInviteCode").textContent = userData.inviteCode||"------";
             document.getElementById("inviteCount").textContent = userData.inviteCount||0;
-            document.getElementById("inviteEarned").textContent = ((userData.inviteCount||0)*300).toLocaleString();
+            document.getElementById("inviteEarned").textContent = (userData.inviteRewards||0).toLocaleString();
+            
+            // 초대 링크 설정
+            const baseUrl = window.location.origin + window.location.pathname;
+            document.getElementById("inviteLinkInput").value = `${baseUrl}?ref=${userData.inviteCode||''}`;
+            
+            // 마일스톤 체크
+            const count = userData.inviteCount || 0;
+            if(count >= 5) document.getElementById("milestone5").classList.add("achieved");
+            if(count >= 10) document.getElementById("milestone10").classList.add("achieved");
+            if(count >= 25) document.getElementById("milestone25").classList.add("achieved");
+            if(count >= 50) document.getElementById("milestone50").classList.add("achieved");
             
             // 국가 & 칭호
             document.getElementById("profileFlag").textContent = userData.country || "🌍";
@@ -477,6 +681,137 @@
             if(!confirm("로그아웃 하시겠습니까?")) return;
             await signOut(auth);
             location.reload();
+        };
+
+        // 초대 코드 배너 체크 (가입 7일 내, 미사용)
+        function checkInviteCodeBanner() {
+            if(!userData) return;
+            if(userData.inviteCodeUsed) {
+                document.getElementById("inviteCodeBanner").classList.add("hidden");
+                document.getElementById("inviteCodeEntrySection").style.display = "none";
+                return;
+            }
+            
+            const createdAt = new Date(userData.createdAt);
+            const now = new Date();
+            const daysDiff = Math.floor((now - createdAt) / (1000 * 60 * 60 * 24));
+            const daysLeft = 7 - daysDiff;
+            
+            if(daysLeft > 0) {
+                document.getElementById("inviteCodeBanner").classList.remove("hidden");
+                document.getElementById("inviteCodeEntrySection").style.display = "block";
+                document.getElementById("inviteCodeDaysLeft").textContent = `⏰ ${daysLeft}일 남음`;
+            } else {
+                document.getElementById("inviteCodeBanner").classList.add("hidden");
+                document.getElementById("inviteCodeEntrySection").style.display = "none";
+            }
+        }
+
+        // 가입 후 초대 코드 적용
+        window.applyInviteCode = async function() {
+            const code = document.getElementById("enterInviteCode").value.trim().toUpperCase();
+            if(!code) return alert("초대 코드를 입력하세요.");
+            if(code === userData.inviteCode) return alert("자신의 코드는 사용할 수 없습니다.");
+            if(userData.inviteCodeUsed) return alert("이미 초대 코드를 사용했습니다.");
+            
+            // 7일 체크
+            const createdAt = new Date(userData.createdAt);
+            const now = new Date();
+            const daysDiff = Math.floor((now - createdAt) / (1000 * 60 * 60 * 24));
+            if(daysDiff >= 7) return alert("초대 코드는 가입 7일 내에만 입력 가능합니다.");
+            
+            // 초대 코드 검증
+            const inviterQuery = query(collection(db, "users"), where("inviteCode", "==", code));
+            const inviterSnap = await getDocs(inviterQuery);
+            if(inviterSnap.empty) return alert("유효하지 않은 초대 코드입니다.");
+            
+            const inviterDoc = inviterSnap.docs[0];
+            const inviterUid = inviterDoc.id;
+            
+            try {
+                // 초대자에게 1단계 보상
+                await updateDoc(doc(db, "users", inviterUid), { 
+                    coin: increment(300), 
+                    totalEarned: increment(300),
+                    inviteCount: increment(1),
+                    inviteRewards: increment(300)
+                });
+                
+                // 가입자에게 보상
+                await updateDoc(doc(db, "users", currentUser.uid), { 
+                    coin: increment(500), 
+                    totalEarned: increment(500),
+                    invitedBy: inviterUid,
+                    inviteCodeUsed: true
+                });
+                
+                // 초대 기록 저장
+                await addDoc(collection(db, "invites"), {
+                    inviterUid: inviterUid,
+                    inviteeUid: currentUser.uid,
+                    inviteeName: currentUser.displayName,
+                    stage1: true,
+                    stage2: false,
+                    stage3: false,
+                    stage1At: new Date().toISOString(),
+                    createdAt: new Date().toISOString()
+                });
+                
+                alert("🎉 초대 코드 적용 완료! +500 BOK!");
+                closeModal('profileSettingsModal');
+                document.getElementById("inviteCodeBanner").classList.add("hidden");
+            } catch(e) {
+                alert("오류: " + e);
+            }
+        };
+
+        // 초대한 친구 목록 로드
+        async function loadInvitedFriends() {
+            if(!currentUser) return;
+            const q = query(collection(db, "invites"), where("inviterUid", "==", currentUser.uid), orderBy("createdAt", "desc"));
+            const snapshot = await getDocs(q);
+            
+            const list = document.getElementById("invitedFriendsList");
+            let activeCount = 0;
+            
+            if(snapshot.empty) {
+                list.innerHTML = '<p style="text-align: center; color: var(--text-muted); padding: 16px;">아직 초대한 친구가 없습니다.</p>';
+                return;
+            }
+            
+            list.innerHTML = "";
+            snapshot.forEach(docSnap => {
+                const inv = docSnap.data();
+                if(inv.stage2 || inv.stage3) activeCount++;
+                list.innerHTML += `
+                    <div class="invited-friend">
+                        <span>${inv.inviteeName || '친구'}</span>
+                        <div class="friend-status">
+                            <div class="status-badge ${inv.stage1 ? 'done' : 'pending'}" title="가입"></div>
+                            <div class="status-badge ${inv.stage2 ? 'done' : 'pending'}" title="첫 글"></div>
+                            <div class="status-badge ${inv.stage3 ? 'done' : 'pending'}" title="첫 땅"></div>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            document.getElementById("inviteActive").textContent = activeCount;
+        }
+
+        // 초대 링크 복사
+        window.copyInviteLink = function() {
+            const link = document.getElementById("inviteLinkInput").value;
+            navigator.clipboard.writeText(link).then(() => {
+                alert("📎 초대 링크가 복사되었습니다!");
+            });
+        };
+
+        // 초대 코드 복사
+        window.copyInviteCode = function() {
+            const code = userData?.inviteCode || '';
+            navigator.clipboard.writeText(code).then(() => {
+                alert("📋 초대 코드가 복사되었습니다!");
+            });
         };
 
         async function loadBoards() {
