@@ -17,7 +17,7 @@
         .card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 16px; padding: 24px; margin-bottom: 20px; }
         button { cursor: pointer; border: none; border-radius: 10px; font-weight: 600; padding: 12px 20px; transition: all 0.2s; font-family: 'Noto Sans KR', sans-serif; font-size: 14px; }
         button:hover { transform: translateY(-1px); }
-        button:disabled { opacity: 0.5; cursor: not-allowed; }
+        button:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
         .btn-primary { background: var(--gradient-primary); color: white; }
         .btn-gold { background: var(--gradient-gold); color: #1a1a2e; }
         .btn-outline { background: transparent; border: 1px solid var(--border); color: var(--text); }
@@ -30,36 +30,35 @@
         .back-btn { display: inline-flex; align-items: center; gap: 8px; color: var(--text-muted); text-decoration: none; font-size: 14px; margin-bottom: 20px; transition: color 0.2s; }
         .back-btn:hover { color: var(--text); }
         
-        /* 게시판 헤더 */
-        .board-header { display: flex; align-items: center; gap: 20px; margin-bottom: 24px; }
-        .board-icon { width: 64px; height: 64px; border-radius: 16px; display: flex; align-items: center; justify-content: center; font-size: 32px; }
+        .board-header { display: flex; align-items: center; gap: 20px; margin-bottom: 24px; flex-wrap: wrap; }
+        .board-icon { width: 64px; height: 64px; border-radius: 16px; display: flex; align-items: center; justify-content: center; font-size: 32px; flex-shrink: 0; }
         .board-title { font-size: 24px; font-weight: 900; margin-bottom: 4px; }
         .board-desc { color: var(--text-muted); font-size: 14px; }
         .board-meta { display: flex; gap: 16px; margin-top: 8px; font-size: 13px; color: var(--text-muted); }
         .board-actions { margin-left: auto; display: flex; gap: 8px; }
 
-        /* 탭 */
         .tabs { display: flex; gap: 4px; background: var(--bg-dark); padding: 4px; border-radius: 12px; margin-bottom: 20px; }
         .tab { flex: 1; padding: 10px; text-align: center; border-radius: 8px; font-weight: 600; font-size: 14px; cursor: pointer; color: var(--text-muted); transition: all 0.2s; }
         .tab.active { background: var(--bg-card); color: var(--text); }
 
-        /* 글 목록 */
         .post-item { display: flex; align-items: center; gap: 16px; padding: 16px; background: var(--bg-dark); border-radius: 12px; margin-bottom: 10px; cursor: pointer; border: 1px solid var(--border); transition: all 0.2s; }
         .post-item:hover { background: var(--bg-card-hover); border-color: var(--primary); }
-        .post-info { flex: 1; }
-        .post-title { font-weight: 700; margin-bottom: 4px; font-size: 15px; }
+        .post-thumb { width: 60px; height: 60px; border-radius: 8px; object-fit: cover; background: var(--bg-card-hover); flex-shrink: 0; }
+        .post-info { flex: 1; min-width: 0; }
+        .post-title { font-weight: 700; margin-bottom: 4px; font-size: 15px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .post-meta { font-size: 12px; color: var(--text-muted); }
-        .post-stats { display: flex; gap: 12px; font-size: 13px; color: var(--text-muted); }
+        .post-stats { display: flex; gap: 12px; font-size: 13px; color: var(--text-muted); flex-shrink: 0; }
         .post-stats span { display: flex; align-items: center; gap: 4px; }
 
-        /* 글 상세 */
         .post-content { line-height: 1.8; white-space: pre-wrap; margin: 24px 0; font-size: 15px; }
-        .post-actions { display: flex; gap: 12px; padding: 16px 0; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); margin-bottom: 24px; }
+        .post-images { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px; margin: 20px 0; }
+        .post-images img { width: 100%; border-radius: 12px; cursor: pointer; transition: transform 0.2s; }
+        .post-images img:hover { transform: scale(1.02); }
+        .post-actions { display: flex; gap: 12px; padding: 16px 0; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); margin-bottom: 24px; flex-wrap: wrap; }
         .action-btn { display: flex; align-items: center; gap: 6px; padding: 8px 16px; background: var(--bg-dark); border-radius: 20px; font-size: 14px; cursor: pointer; transition: all 0.2s; border: 1px solid var(--border); }
         .action-btn:hover { background: var(--bg-card-hover); }
         .action-btn.liked { color: var(--danger); border-color: var(--danger); }
 
-        /* 댓글 */
         .comment-section { margin-top: 24px; }
         .comment-input { display: flex; gap: 12px; margin-bottom: 20px; }
         .comment-input input { flex: 1; margin-bottom: 0; }
@@ -70,7 +69,6 @@
         .comment-text { font-size: 14px; line-height: 1.5; }
         .comment-time { font-size: 12px; color: var(--text-muted); margin-top: 4px; }
 
-        /* 설정 모달 */
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); display: none; justify-content: center; align-items: center; z-index: 1000; backdrop-filter: blur(8px); }
         .modal-content { background: var(--bg-card); padding: 32px; border-radius: 20px; width: 90%; max-width: 500px; max-height: 80vh; overflow-y: auto; border: 1px solid var(--border); position: relative; }
         .modal-close { position: absolute; top: 16px; right: 16px; background: var(--bg-dark); border: none; width: 32px; height: 32px; border-radius: 50%; cursor: pointer; font-size: 18px; color: var(--text-muted); }
@@ -86,12 +84,29 @@
         .empty-state { text-align: center; padding: 60px 20px; color: var(--text-muted); }
         .empty-state .icon { font-size: 48px; margin-bottom: 16px; }
 
-        /* 부스트 배지 */
         .boost-badge { background: var(--gradient-gold); color: #1a1a2e; padding: 2px 8px; border-radius: 10px; font-size: 11px; font-weight: 700; margin-left: 8px; }
+        .has-image-badge { background: var(--secondary); color: white; padding: 2px 6px; border-radius: 8px; font-size: 10px; margin-left: 6px; }
 
-        /* 입장료 안내 */
         .entry-fee-notice { background: rgba(245,158,11,0.1); border: 1px solid rgba(245,158,11,0.3); border-radius: 12px; padding: 20px; text-align: center; margin-bottom: 20px; }
         .entry-fee-notice .amount { font-size: 24px; font-weight: 900; color: var(--accent); margin: 8px 0; }
+
+        .image-upload-area { border: 2px dashed var(--border); border-radius: 12px; padding: 24px; text-align: center; cursor: pointer; transition: all 0.2s; margin-bottom: 12px; }
+        .image-upload-area:hover { border-color: var(--primary); background: rgba(99,102,241,0.05); }
+        .image-upload-area.dragover { border-color: var(--primary); background: rgba(99,102,241,0.1); }
+        .image-preview-container { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 12px; }
+        .image-preview-item { position: relative; width: 100px; height: 100px; }
+        .image-preview-item img { width: 100%; height: 100%; object-fit: cover; border-radius: 8px; }
+        .image-preview-item .remove-btn { position: absolute; top: -8px; right: -8px; width: 24px; height: 24px; background: var(--danger); color: white; border: none; border-radius: 50%; cursor: pointer; font-size: 14px; display: flex; align-items: center; justify-content: center; }
+
+        .image-viewer { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); display: none; justify-content: center; align-items: center; z-index: 2000; }
+        .image-viewer img { max-width: 90%; max-height: 90%; object-fit: contain; }
+        .image-viewer-close { position: absolute; top: 20px; right: 20px; background: rgba(255,255,255,0.1); border: none; color: white; width: 48px; height: 48px; border-radius: 50%; font-size: 24px; cursor: pointer; }
+
+        @media (max-width: 600px) {
+            .board-header { flex-direction: column; text-align: center; }
+            .board-actions { margin: 16px auto 0; }
+            .post-thumb { width: 50px; height: 50px; }
+        }
     </style>
 </head>
 <body>
@@ -105,18 +120,16 @@
     <div class="container">
         <a href="index.html" class="back-btn">← 게시판 목록</a>
 
-        <!-- 입장료 안내 (필요시) -->
         <div class="entry-fee-notice hidden" id="entryFeeNotice">
             <p>🔒 이 게시판은 입장료가 필요합니다</p>
             <div class="amount" id="entryFeeAmount">0 BOK</div>
-            <button class="btn-gold" id="payEntryBtn" onclick="payEntryFee()">입장료 지불하기</button>
+            <button class="btn-gold" onclick="payEntryFee()">입장료 지불하기</button>
         </div>
 
-        <!-- 게시판 헤더 -->
         <div class="card" id="boardHeader">
             <div class="board-header">
                 <div class="board-icon" id="boardIcon" style="background: #6366f1;">📝</div>
-                <div>
+                <div style="flex: 1;">
                     <h1 class="board-title" id="boardTitle">게시판</h1>
                     <p class="board-desc" id="boardDesc">설명</p>
                     <div class="board-meta">
@@ -126,38 +139,42 @@
                     </div>
                 </div>
                 <div class="board-actions">
-                    <button class="btn-sm btn-outline hidden" id="settingsBtn" onclick="openModal('settingsModal')">⚙️ 설정</button>
+                    <button class="btn-sm btn-outline hidden" id="settingsBtn" onclick="openModal('settingsModal')">⚙️</button>
                     <button class="btn-sm btn-primary" onclick="showWriteForm()">✍️ 글쓰기</button>
                 </div>
             </div>
         </div>
 
-        <!-- 글 목록 -->
         <div id="postListSection">
             <div class="tabs">
-                <div class="tab active">최신순</div>
-                <div class="tab">인기순</div>
-                <div class="tab">공지</div>
+                <div class="tab active" data-sort="latest" onclick="changeSort('latest')">최신순</div>
+                <div class="tab" data-sort="popular" onclick="changeSort('popular')">인기순</div>
             </div>
             <div id="postList">
-                <div class="empty-state">
-                    <div class="icon">📝</div>
-                    <p>아직 글이 없습니다.<br>첫 글을 작성해보세요!</p>
-                </div>
+                <div class="empty-state"><div class="icon">⏳</div><p>로딩 중...</p></div>
             </div>
         </div>
 
-        <!-- 글쓰기 -->
         <div id="writeSection" class="hidden">
             <div class="card">
                 <h3 style="margin-bottom: 20px;">📝 새 글 작성</h3>
                 <div id="writeFeeNotice" style="background: rgba(245,158,11,0.1); border: 1px solid rgba(245,158,11,0.3); border-radius: 10px; padding: 12px; margin-bottom: 16px; font-size: 14px; color: var(--accent); display: none;">
-                    💰 이 게시판은 글쓰기 수수료 <strong id="writeFeeAmount">0</strong> BOK이 있습니다
+                    💰 글쓰기 수수료 <strong id="writeFeeAmount">0</strong> BOK
                 </div>
                 <label>제목</label>
                 <input type="text" id="postTitle" placeholder="제목을 입력하세요" maxlength="100">
+                
+                <label>📷 이미지 첨부 (최대 3장)</label>
+                <div class="image-preview-container" id="imagePreviewContainer"></div>
+                <div class="image-upload-area" id="imageUploadArea" onclick="document.getElementById('imageInput').click()">
+                    <div style="font-size: 32px; margin-bottom: 8px;">📷</div>
+                    <div style="color: var(--text-muted); font-size: 14px;">클릭하거나 이미지를 드래그하세요</div>
+                    <div style="color: var(--text-muted); font-size: 12px; margin-top: 4px;">JPG, PNG, GIF (최대 2MB)</div>
+                </div>
+                <input type="file" id="imageInput" accept="image/*" multiple style="display: none;" onchange="handleImageSelect(event)">
+                
                 <label>내용</label>
-                <textarea id="postContent" rows="10" placeholder="내용을 작성하세요 (최소 10자)"></textarea>
+                <textarea id="postContent" rows="8" placeholder="내용을 작성하세요 (최소 10자)"></textarea>
                 <div style="display: flex; gap: 12px;">
                     <button class="btn-outline" style="flex: 1;" onclick="cancelWrite()">취소</button>
                     <button class="btn-primary" style="flex: 2;" onclick="submitPost()">등록하기</button>
@@ -165,36 +182,29 @@
             </div>
         </div>
 
-        <!-- 글 상세 -->
         <div id="viewSection" class="hidden">
             <div class="card">
-                <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 16px;">
-                    <div>
+                <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 16px; flex-wrap: wrap; gap: 12px;">
+                    <div style="flex: 1; min-width: 200px;">
                         <h2 id="viewTitle" style="font-size: 22px; margin-bottom: 8px;">제목</h2>
-                        <div style="font-size: 13px; color: var(--text-muted);">
-                            <span id="viewAuthor">작성자</span> · <span id="viewDate">날짜</span>
-                        </div>
+                        <div style="font-size: 13px; color: var(--text-muted);" id="viewMeta"></div>
                     </div>
                     <div id="viewControls"></div>
                 </div>
+                
+                <div class="post-images" id="viewImages"></div>
                 <div class="post-content" id="viewContent">내용</div>
+                
                 <div class="post-actions">
-                    <div class="action-btn" id="likeBtn" onclick="toggleLike()">
-                        <span>❤️</span> <span id="likeCount">0</span>
-                    </div>
-                    <div class="action-btn">
-                        <span>💬</span> <span id="commentCount">0</span>
-                    </div>
-                    <div class="action-btn" onclick="boostPost()">
-                        <span>🚀</span> 부스트 (200 BOK)
-                    </div>
+                    <div class="action-btn" id="likeBtn" onclick="toggleLike()">❤️ <span id="likeCount">0</span></div>
+                    <div class="action-btn">💬 <span id="commentCount">0</span></div>
+                    <div class="action-btn" onclick="boostPost()">🚀 부스트</div>
                 </div>
 
-                <!-- 댓글 섹션 -->
                 <div class="comment-section" id="commentSection">
                     <h4 style="margin-bottom: 16px;">💬 댓글</h4>
                     <div class="comment-input">
-                        <input type="text" id="commentInput" placeholder="댓글을 입력하세요">
+                        <input type="text" id="commentInput" placeholder="댓글을 입력하세요" onkeypress="if(event.key==='Enter')submitComment()">
                         <button class="btn-primary" onclick="submitComment()">등록</button>
                     </div>
                     <div id="commentList"></div>
@@ -204,62 +214,35 @@
         </div>
     </div>
 
-    <!-- 설정 모달 -->
+    <div class="image-viewer" id="imageViewer" onclick="closeImageViewer()">
+        <button class="image-viewer-close">✕</button>
+        <img id="viewerImage" src="" alt="">
+    </div>
+
     <div class="modal-overlay" id="settingsModal">
         <div class="modal-content">
             <button class="modal-close" onclick="closeModal('settingsModal')">✕</button>
             <h2 class="modal-title">⚙️ 게시판 설정</h2>
-            
             <label>게시판 이름</label>
             <input type="text" id="editBoardName" maxlength="20">
-            
             <label>설명</label>
             <textarea id="editBoardDesc" rows="3"></textarea>
-            
             <label>테마 색상</label>
             <input type="color" id="editBoardColor" style="height: 50px;">
-            
-            <label>아이콘 (이모지)</label>
+            <label>아이콘</label>
             <input type="text" id="editBoardIcon" maxlength="2" style="font-size: 24px; text-align: center;">
-
             <div style="border-top: 1px solid var(--border); margin: 20px 0; padding-top: 20px;">
-                <h4 style="margin-bottom: 12px;">💰 수익화 설정</h4>
-                <label>입장료 (0 = 무료)</label>
+                <h4 style="margin-bottom: 12px;">💰 수익화</h4>
+                <label>입장료</label>
                 <input type="number" id="editEntryFee" min="0" max="100">
                 <label>글쓰기 수수료</label>
                 <input type="number" id="editWriteFee" min="0" max="50">
             </div>
-
             <div style="border-top: 1px solid var(--border); margin: 20px 0; padding-top: 20px;">
-                <h4 style="margin-bottom: 12px;">⚙️ 운영 설정</h4>
-                <div class="toggle-row">
-                    <span>승인제 게시판</span>
-                    <div class="toggle-switch" id="editToggleApproval" onclick="this.classList.toggle('active')"></div>
-                </div>
-                <div class="toggle-row">
-                    <span>댓글 허용</span>
-                    <div class="toggle-switch active" id="editToggleComments" onclick="this.classList.toggle('active')"></div>
-                </div>
+                <div class="toggle-row"><span>승인제</span><div class="toggle-switch" id="editToggleApproval" onclick="this.classList.toggle('active')"></div></div>
+                <div class="toggle-row"><span>댓글 허용</span><div class="toggle-switch active" id="editToggleComments" onclick="this.classList.toggle('active')"></div></div>
             </div>
-
-            <button class="btn-primary btn-block" onclick="saveSettings()">저장하기</button>
-            
-            <div style="border-top: 1px solid var(--border); margin: 20px 0; padding-top: 20px;">
-                <h4 style="margin-bottom: 12px; color: var(--danger);">⚠️ 위험 구역</h4>
-                <button class="btn-outline btn-block" style="margin-bottom: 10px; border-color: var(--accent); color: var(--accent);" onclick="openModal('transferModal')">📤 게시판 양도</button>
-                <button class="btn-outline btn-block" style="margin-bottom: 10px; border-color: var(--pink); color: var(--pink);" onclick="listForSale()">🏷️ 판매 등록</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- 양도 모달 -->
-    <div class="modal-overlay" id="transferModal">
-        <div class="modal-content">
-            <button class="modal-close" onclick="closeModal('transferModal')">✕</button>
-            <h2 class="modal-title">📤 게시판 양도</h2>
-            <p style="color: var(--text-muted); margin-bottom: 20px; text-align: center;">양도할 사용자의 이메일을 입력하세요</p>
-            <input type="email" id="transferEmail" placeholder="example@email.com">
-            <button class="btn-danger btn-block" onclick="transferBoard()">양도하기</button>
+            <button class="btn-primary btn-block" onclick="saveSettings()">저장</button>
         </div>
     </div>
 
@@ -274,9 +257,39 @@
         const auth = getAuth(app);
 
         let currentUser = null, userData = null, boardData = null, currentPostId = null;
+        let currentSort = 'latest';
+        let uploadedImages = [];
         const boardId = new URLSearchParams(window.location.search).get('id');
 
         if(!boardId) { location.href = 'index.html'; }
+
+        // 이미지 업로드
+        const uploadArea = document.getElementById('imageUploadArea');
+        uploadArea.addEventListener('dragover', (e) => { e.preventDefault(); uploadArea.classList.add('dragover'); });
+        uploadArea.addEventListener('dragleave', () => uploadArea.classList.remove('dragover'));
+        uploadArea.addEventListener('drop', (e) => { e.preventDefault(); uploadArea.classList.remove('dragover'); handleFiles(e.dataTransfer.files); });
+
+        window.handleImageSelect = (e) => handleFiles(e.target.files);
+
+        function handleFiles(files) {
+            if(uploadedImages.length >= 3) return alert('최대 3장까지 업로드 가능');
+            Array.from(files).slice(0, 3 - uploadedImages.length).forEach(file => {
+                if(!file.type.startsWith('image/')) return;
+                if(file.size > 2 * 1024 * 1024) return alert('2MB 이하만 가능');
+                const reader = new FileReader();
+                reader.onload = (e) => { uploadedImages.push(e.target.result); renderPreviews(); };
+                reader.readAsDataURL(file);
+            });
+        }
+
+        function renderPreviews() {
+            const c = document.getElementById('imagePreviewContainer');
+            c.innerHTML = uploadedImages.map((src, i) => `<div class="image-preview-item"><img src="${src}"><button class="remove-btn" onclick="removeImage(${i})">✕</button></div>`).join('');
+        }
+
+        window.removeImage = (i) => { uploadedImages.splice(i, 1); renderPreviews(); };
+        window.openImageViewer = (src) => { document.getElementById('viewerImage').src = src; document.getElementById('imageViewer').style.display = 'flex'; };
+        window.closeImageViewer = () => document.getElementById('imageViewer').style.display = 'none';
 
         onAuthStateChanged(auth, async (user) => {
             if(user) {
@@ -285,17 +298,13 @@
                 userData = userDoc.data();
                 document.getElementById("walletBadge").innerHTML = `💰 ${(userData?.coin||0).toLocaleString()} BOK`;
                 loadBoard();
-            } else {
-                location.href = 'index.html';
-            }
+            } else { location.href = 'index.html'; }
         });
 
         async function loadBoard() {
-            const boardRef = doc(db, "boards", boardId);
-            onSnapshot(boardRef, (docSnap) => {
-                if(!docSnap.exists()) { alert("게시판을 찾을 수 없습니다."); location.href = 'index.html'; return; }
+            onSnapshot(doc(db, "boards", boardId), (docSnap) => {
+                if(!docSnap.exists()) { alert("게시판 없음"); location.href = 'index.html'; return; }
                 boardData = docSnap.data();
-                
                 document.getElementById("boardTitle").textContent = boardData.name;
                 document.getElementById("boardDesc").textContent = boardData.description || '';
                 document.getElementById("boardIcon").textContent = boardData.icon || '📝';
@@ -304,24 +313,19 @@
                 document.getElementById("postCount").textContent = boardData.postCount || 0;
                 document.getElementById("ownerInfo").textContent = `소유자: ${boardData.ownerName}`;
                 
-                // 소유자 설정 버튼
                 if(currentUser && boardData.ownerUid === currentUser.uid) {
                     document.getElementById("settingsBtn").classList.remove("hidden");
-                    // 설정 값 채우기
                     document.getElementById("editBoardName").value = boardData.name;
                     document.getElementById("editBoardDesc").value = boardData.description || '';
                     document.getElementById("editBoardColor").value = boardData.color || '#6366f1';
                     document.getElementById("editBoardIcon").value = boardData.icon || '📝';
                     document.getElementById("editEntryFee").value = boardData.entryFee || 0;
                     document.getElementById("editWriteFee").value = boardData.writeFee || 0;
-                    if(boardData.requireApproval) document.getElementById("editToggleApproval").classList.add("active");
-                    if(boardData.allowComments !== false) document.getElementById("editToggleComments").classList.add("active");
                 }
                 
-                // 입장료 체크
                 if(boardData.entryFee > 0 && boardData.ownerUid !== currentUser?.uid) {
-                    const paidMembers = boardData.paidMembers || [];
-                    if(!paidMembers.includes(currentUser?.uid)) {
+                    const paid = boardData.paidMembers || [];
+                    if(!paid.includes(currentUser?.uid)) {
                         document.getElementById("entryFeeNotice").classList.remove("hidden");
                         document.getElementById("entryFeeAmount").textContent = `${boardData.entryFee} BOK`;
                         document.getElementById("boardHeader").classList.add("hidden");
@@ -330,213 +334,144 @@
                     }
                 }
                 
-                // 글쓰기 수수료 안내
                 if(boardData.writeFee > 0) {
                     document.getElementById("writeFeeNotice").style.display = "block";
                     document.getElementById("writeFeeAmount").textContent = boardData.writeFee;
                 }
-                
                 loadPosts();
             });
         }
 
         window.payEntryFee = async function() {
-            if(!userData || userData.coin < boardData.entryFee) { return alert("BOK이 부족합니다."); }
+            if(!userData || userData.coin < boardData.entryFee) return alert("BOK 부족");
             try {
                 await runTransaction(db, async (t) => {
                     t.update(doc(db, "users", currentUser.uid), { coin: increment(-boardData.entryFee), totalSpent: increment(boardData.entryFee) });
                     t.update(doc(db, "users", boardData.ownerUid), { coin: increment(boardData.entryFee), totalEarned: increment(boardData.entryFee) });
                     t.update(doc(db, "boards", boardId), { paidMembers: arrayUnion(currentUser.uid), memberCount: increment(1) });
                 });
-                alert("입장 완료!");
-                location.reload();
+                alert("입장 완료!"); location.reload();
             } catch(e) { alert("오류: " + e); }
         };
 
-        async function loadPosts() {
-            const q = query(collection(db, "posts"), where("boardId", "==", boardId), orderBy("boosted", "desc"), orderBy("createdAt", "desc"));
+        function loadPosts() {
+            const q = query(collection(db, "posts"), where("boardId", "==", boardId), orderBy("createdAt", "desc"));
             onSnapshot(q, (snapshot) => {
                 const list = document.getElementById("postList");
                 list.innerHTML = "";
-                if(snapshot.empty) {
-                    list.innerHTML = '<div class="empty-state"><div class="icon">📝</div><p>아직 글이 없습니다.</p></div>';
-                    return;
-                }
-                snapshot.forEach(docSnap => {
-                    const p = docSnap.data();
-                    const boostBadge = p.boosted ? '<span class="boost-badge">🚀 부스트</span>' : '';
-                    const authorTitle = p.authorTitle ? `<span style="font-size: 10px; background: rgba(245,158,11,0.2); color: #f59e0b; padding: 2px 6px; border-radius: 10px; margin-right: 4px;">${p.authorTitle}</span>` : '';
-                    const authorFlag = p.authorCountry || '';
-                    list.innerHTML += `
-                        <div class="post-item" onclick="viewPost('${docSnap.id}')">
-                            <div class="post-info">
-                                <div class="post-title">${p.title}${boostBadge}</div>
-                                <div class="post-meta">${authorFlag} ${authorTitle}${p.authorName} · ${new Date(p.createdAt).toLocaleDateString()}</div>
-                            </div>
-                            <div class="post-stats">
-                                <span>❤️ ${p.likeCount||0}</span>
-                                <span>💬 ${p.commentCount||0}</span>
-                            </div>
-                        </div>
-                    `;
+                if(snapshot.empty) { list.innerHTML = '<div class="empty-state"><div class="icon">📝</div><p>아직 글이 없습니다.<br>첫 글을 작성해보세요!</p></div>'; return; }
+                
+                let posts = [];
+                snapshot.forEach(d => posts.push({ id: d.id, ...d.data() }));
+                if(currentSort === 'popular') posts.sort((a, b) => (b.likeCount||0) - (a.likeCount||0));
+                posts.sort((a, b) => (b.boosted?1:0) - (a.boosted?1:0));
+                
+                posts.forEach(p => {
+                    const boost = p.boosted ? '<span class="boost-badge">🚀</span>' : '';
+                    const imgBadge = (p.images?.length) ? '<span class="has-image-badge">📷</span>' : '';
+                    const title = p.authorTitle ? `<span style="font-size:10px;background:rgba(245,158,11,0.2);color:#f59e0b;padding:2px 6px;border-radius:10px;margin-right:4px;">${p.authorTitle}</span>` : '';
+                    const flag = p.authorCountry || '';
+                    const thumb = p.images?.length ? `<img class="post-thumb" src="${p.images[0]}">` : '';
+                    list.innerHTML += `<div class="post-item" onclick="viewPost('${p.id}')">${thumb}<div class="post-info"><div class="post-title">${p.title}${boost}${imgBadge}</div><div class="post-meta">${flag} ${title}${p.authorName} · ${new Date(p.createdAt).toLocaleDateString()}</div></div><div class="post-stats"><span>❤️ ${p.likeCount||0}</span><span>💬 ${p.commentCount||0}</span></div></div>`;
                 });
-            });
+            }, (e) => { document.getElementById("postList").innerHTML = `<div class="empty-state"><div class="icon">⚠️</div><p>오류: ${e.message}</p></div>`; });
         }
 
-        window.showWriteForm = function() {
-            document.getElementById("postListSection").classList.add("hidden");
-            document.getElementById("writeSection").classList.remove("hidden");
-        };
-
-        window.cancelWrite = function() {
-            document.getElementById("writeSection").classList.add("hidden");
-            document.getElementById("postListSection").classList.remove("hidden");
-        };
+        window.changeSort = (s) => { currentSort = s; document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active')); document.querySelector(`.tab[data-sort="${s}"]`).classList.add('active'); loadPosts(); };
+        window.showWriteForm = () => { uploadedImages = []; renderPreviews(); document.getElementById("postTitle").value = ""; document.getElementById("postContent").value = ""; document.getElementById("postListSection").classList.add("hidden"); document.getElementById("writeSection").classList.remove("hidden"); };
+        window.cancelWrite = () => { document.getElementById("writeSection").classList.add("hidden"); document.getElementById("postListSection").classList.remove("hidden"); };
 
         window.submitPost = async function() {
             const title = document.getElementById("postTitle").value.trim();
             const content = document.getElementById("postContent").value.trim();
-            if(!title) return alert("제목을 입력하세요.");
-            if(content.length < 10) return alert("내용을 10자 이상 작성하세요.");
-            
-            const writeFee = boardData.writeFee || 0;
-            const reward = 100;
-            
-            if(userData.coin < writeFee) return alert(`BOK이 부족합니다. (필요: ${writeFee} BOK)`);
-            
+            if(!title) return alert("제목 입력");
+            if(content.length < 10) return alert("10자 이상 작성");
+            const fee = boardData.writeFee || 0;
+            if(userData.coin < fee) return alert("BOK 부족");
             try {
                 await runTransaction(db, async (t) => {
-                    // 글쓰기 수수료
-                    if(writeFee > 0) {
-                        t.update(doc(db, "users", currentUser.uid), { coin: increment(-writeFee), totalSpent: increment(writeFee) });
-                        t.update(doc(db, "users", boardData.ownerUid), { coin: increment(writeFee), totalEarned: increment(writeFee) });
+                    if(fee > 0) {
+                        t.update(doc(db, "users", currentUser.uid), { coin: increment(-fee), totalSpent: increment(fee) });
+                        t.update(doc(db, "users", boardData.ownerUid), { coin: increment(fee), totalEarned: increment(fee) });
                     }
-                    // 보상 지급
-                    t.update(doc(db, "users", currentUser.uid), { coin: increment(reward), totalEarned: increment(reward), postCount: increment(1), exp: increment(10) });
-                    // 글 생성
-                    const postRef = doc(collection(db, "posts"));
-                    t.set(postRef, {
-                        boardId, title, content,
-                        authorUid: currentUser.uid,
-                        authorName: currentUser.displayName,
-                        authorTitle: userData.title || '',
-                        authorCountry: userData.country || '',
-                        likeCount: 0, commentCount: 0, likes: [],
-                        boosted: false,
-                        createdAt: new Date().toISOString()
-                    });
-                    // 게시판 글 수 증가
+                    t.update(doc(db, "users", currentUser.uid), { coin: increment(100), totalEarned: increment(100), postCount: increment(1), exp: increment(10) });
+                    t.set(doc(collection(db, "posts")), { boardId, title, content, images: uploadedImages, authorUid: currentUser.uid, authorName: currentUser.displayName, authorTitle: userData.title||'', authorCountry: userData.country||'', likeCount: 0, commentCount: 0, likes: [], boosted: false, createdAt: new Date().toISOString() });
                     t.update(doc(db, "boards", boardId), { postCount: increment(1) });
                 });
-                alert(`🎉 등록 완료! +${reward} BOK`);
-                document.getElementById("postTitle").value = "";
-                document.getElementById("postContent").value = "";
-                cancelWrite();
+                alert("🎉 등록 완료! +100 BOK"); uploadedImages = []; cancelWrite();
             } catch(e) { alert("오류: " + e); }
         };
 
         window.viewPost = async function(postId) {
             currentPostId = postId;
-            const postDoc = await getDoc(doc(db, "posts", postId));
-            if(!postDoc.exists()) return alert("글을 찾을 수 없습니다.");
-            const p = postDoc.data();
-            
+            const d = await getDoc(doc(db, "posts", postId));
+            if(!d.exists()) return alert("글 없음");
+            const p = d.data();
             document.getElementById("viewTitle").textContent = p.title;
-            document.getElementById("viewAuthor").textContent = p.authorName;
-            document.getElementById("viewDate").textContent = new Date(p.createdAt).toLocaleString();
+            const title = p.authorTitle ? `<span style="font-size:11px;background:rgba(245,158,11,0.2);color:#f59e0b;padding:2px 8px;border-radius:10px;margin-right:6px;">${p.authorTitle}</span>` : '';
+            document.getElementById("viewMeta").innerHTML = `${p.authorCountry||''} ${title}${p.authorName} · ${new Date(p.createdAt).toLocaleString()}`;
             document.getElementById("viewContent").textContent = p.content;
             document.getElementById("likeCount").textContent = p.likeCount || 0;
             document.getElementById("commentCount").textContent = p.commentCount || 0;
             
-            // 좋아요 상태
-            const likes = p.likes || [];
-            if(likes.includes(currentUser?.uid)) {
-                document.getElementById("likeBtn").classList.add("liked");
-            } else {
-                document.getElementById("likeBtn").classList.remove("liked");
-            }
+            const imgs = document.getElementById("viewImages");
+            imgs.innerHTML = (p.images||[]).map(s=>`<img src="${s}" onclick="openImageViewer('${s}')">`).join('');
             
-            // 수정/삭제 버튼
-            const controls = document.getElementById("viewControls");
-            controls.innerHTML = "";
-            if(currentUser && p.authorUid === currentUser.uid) {
-                controls.innerHTML = '<button class="btn-sm btn-outline" onclick="deletePost()">삭제</button>';
-            }
+            document.getElementById("likeBtn").classList.toggle("liked", (p.likes||[]).includes(currentUser?.uid));
+            document.getElementById("viewControls").innerHTML = (currentUser && p.authorUid === currentUser.uid) ? '<button class="btn-sm btn-danger" onclick="deletePost()">삭제</button>' : '';
             
-            // 댓글 숨김 여부
-            if(boardData.allowComments === false) {
-                document.getElementById("commentSection").classList.add("hidden");
-            } else {
-                document.getElementById("commentSection").classList.remove("hidden");
-                loadComments(postId);
-            }
+            if(boardData.allowComments === false) document.getElementById("commentSection").classList.add("hidden");
+            else { document.getElementById("commentSection").classList.remove("hidden"); loadComments(postId); }
             
             document.getElementById("postListSection").classList.add("hidden");
             document.getElementById("viewSection").classList.remove("hidden");
         };
 
-        window.backToList = function() {
-            document.getElementById("viewSection").classList.add("hidden");
-            document.getElementById("postListSection").classList.remove("hidden");
-        };
+        window.backToList = () => { document.getElementById("viewSection").classList.add("hidden"); document.getElementById("postListSection").classList.remove("hidden"); };
 
         window.toggleLike = async function() {
-            if(!currentUser) return alert("로그인 필요");
-            const postRef = doc(db, "posts", currentPostId);
-            const postDoc = await getDoc(postRef);
-            const likes = postDoc.data().likes || [];
-            
+            if(!currentUser) return;
+            const ref = doc(db, "posts", currentPostId);
+            const d = await getDoc(ref);
+            const likes = d.data().likes || [];
             if(likes.includes(currentUser.uid)) {
-                await updateDoc(postRef, { likes: arrayRemove(currentUser.uid), likeCount: increment(-1) });
+                await updateDoc(ref, { likes: arrayRemove(currentUser.uid), likeCount: increment(-1) });
                 document.getElementById("likeBtn").classList.remove("liked");
+                document.getElementById("likeCount").textContent = parseInt(document.getElementById("likeCount").textContent) - 1;
             } else {
-                await updateDoc(postRef, { likes: arrayUnion(currentUser.uid), likeCount: increment(1) });
-                await updateDoc(doc(db, "users", postDoc.data().authorUid), { coin: increment(5), totalEarned: increment(5) });
+                await updateDoc(ref, { likes: arrayUnion(currentUser.uid), likeCount: increment(1) });
+                await updateDoc(doc(db, "users", d.data().authorUid), { coin: increment(5), totalEarned: increment(5) });
                 document.getElementById("likeBtn").classList.add("liked");
+                document.getElementById("likeCount").textContent = parseInt(document.getElementById("likeCount").textContent) + 1;
             }
-            document.getElementById("likeCount").textContent = parseInt(document.getElementById("likeCount").textContent) + (likes.includes(currentUser.uid) ? -1 : 1);
         };
 
         window.boostPost = async function() {
-            if(!currentUser || !userData) return alert("로그인 필요");
-            if(userData.coin < 200) return alert("BOK 부족 (필요: 200)");
-            if(!confirm("200 BOK을 사용하여 이 글을 부스트하시겠습니까?")) return;
-            try {
-                await runTransaction(db, async (t) => {
-                    t.update(doc(db, "users", currentUser.uid), { coin: increment(-200), totalSpent: increment(200) });
-                    t.update(doc(db, "posts", currentPostId), { boosted: true });
-                });
-                alert("🚀 부스트 완료! 글이 상단에 고정됩니다.");
-            } catch(e) { alert("오류: " + e); }
+            if(!currentUser || userData.coin < 200) return alert("BOK 부족 (200 필요)");
+            if(!confirm("200 BOK으로 부스트?")) return;
+            await runTransaction(db, async (t) => {
+                t.update(doc(db, "users", currentUser.uid), { coin: increment(-200), totalSpent: increment(200) });
+                t.update(doc(db, "posts", currentPostId), { boosted: true });
+            });
+            alert("🚀 부스트 완료!");
         };
 
         window.deletePost = async function() {
-            if(!confirm("정말 삭제하시겠습니까?")) return;
+            if(!confirm("삭제?")) return;
             await deleteDoc(doc(db, "posts", currentPostId));
             await updateDoc(doc(db, "boards", boardId), { postCount: increment(-1) });
-            alert("삭제되었습니다.");
-            backToList();
+            alert("삭제됨"); backToList();
         };
 
-        async function loadComments(postId) {
+        function loadComments(postId) {
             const q = query(collection(db, "comments"), where("postId", "==", postId), orderBy("createdAt", "asc"));
             onSnapshot(q, (snapshot) => {
                 const list = document.getElementById("commentList");
-                list.innerHTML = "";
-                snapshot.forEach(docSnap => {
-                    const c = docSnap.data();
-                    const authorTitle = c.authorTitle ? `<span style="font-size: 10px; background: rgba(245,158,11,0.2); color: #f59e0b; padding: 2px 6px; border-radius: 10px; margin-right: 4px;">${c.authorTitle}</span>` : '';
-                    const authorFlag = c.authorCountry || '';
-                    list.innerHTML += `
-                        <div class="comment-item">
-                            <div class="comment-avatar">👤</div>
-                            <div class="comment-content">
-                                <div class="comment-author">${authorFlag} ${authorTitle}${c.authorName}</div>
-                                <div class="comment-text">${c.content}</div>
-                                <div class="comment-time">${new Date(c.createdAt).toLocaleString()}</div>
-                            </div>
-                        </div>
-                    `;
+                list.innerHTML = snapshot.empty ? '<p style="text-align:center;color:var(--text-muted);padding:20px;">댓글 없음</p>' : '';
+                snapshot.forEach(d => {
+                    const c = d.data();
+                    const t = c.authorTitle ? `<span style="font-size:10px;background:rgba(245,158,11,0.2);color:#f59e0b;padding:2px 6px;border-radius:10px;margin-right:4px;">${c.authorTitle}</span>` : '';
+                    list.innerHTML += `<div class="comment-item"><div class="comment-avatar">👤</div><div class="comment-content"><div class="comment-author">${c.authorCountry||''} ${t}${c.authorName}</div><div class="comment-text">${c.content}</div><div class="comment-time">${new Date(c.createdAt).toLocaleString()}</div></div></div>`;
                 });
             });
         }
@@ -544,70 +479,30 @@
         window.submitComment = async function() {
             const content = document.getElementById("commentInput").value.trim();
             if(!content) return;
-            
-            await addDoc(collection(db, "comments"), {
-                postId: currentPostId,
-                content,
-                authorUid: currentUser.uid,
-                authorName: currentUser.displayName,
-                authorTitle: userData?.title || '',
-                authorCountry: userData?.country || '',
-                createdAt: new Date().toISOString()
-            });
-            
+            await addDoc(collection(db, "comments"), { postId: currentPostId, content, authorUid: currentUser.uid, authorName: currentUser.displayName, authorTitle: userData?.title||'', authorCountry: userData?.country||'', createdAt: new Date().toISOString() });
             await updateDoc(doc(db, "posts", currentPostId), { commentCount: increment(1) });
             await updateDoc(doc(db, "users", currentUser.uid), { coin: increment(10), totalEarned: increment(10), commentCount: increment(1), exp: increment(2) });
-            
             document.getElementById("commentInput").value = "";
             document.getElementById("commentCount").textContent = parseInt(document.getElementById("commentCount").textContent) + 1;
         };
 
         window.saveSettings = async function() {
-            const name = document.getElementById("editBoardName").value.trim();
-            const desc = document.getElementById("editBoardDesc").value.trim();
-            const color = document.getElementById("editBoardColor").value;
-            const icon = document.getElementById("editBoardIcon").value || '📝';
-            const entryFee = parseInt(document.getElementById("editEntryFee").value) || 0;
-            const writeFee = parseInt(document.getElementById("editWriteFee").value) || 0;
-            const approval = document.getElementById("editToggleApproval").classList.contains("active");
-            const comments = document.getElementById("editToggleComments").classList.contains("active");
-            
             await updateDoc(doc(db, "boards", boardId), {
-                name, description: desc, color, icon, entryFee, writeFee,
-                requireApproval: approval, allowComments: comments
+                name: document.getElementById("editBoardName").value.trim(),
+                description: document.getElementById("editBoardDesc").value.trim(),
+                color: document.getElementById("editBoardColor").value,
+                icon: document.getElementById("editBoardIcon").value || '📝',
+                entryFee: parseInt(document.getElementById("editEntryFee").value) || 0,
+                writeFee: parseInt(document.getElementById("editWriteFee").value) || 0,
+                requireApproval: document.getElementById("editToggleApproval").classList.contains("active"),
+                allowComments: document.getElementById("editToggleComments").classList.contains("active")
             });
-            alert("저장되었습니다!");
-            closeModal('settingsModal');
-        };
-
-        window.transferBoard = async function() {
-            const email = document.getElementById("transferEmail").value.trim();
-            if(!email) return alert("이메일을 입력하세요.");
-            
-            const q = query(collection(db, "users"), where("email", "==", email));
-            const snapshot = await getDocs(q);
-            if(snapshot.empty) return alert("해당 사용자를 찾을 수 없습니다.");
-            
-            const newOwner = snapshot.docs[0];
-            if(newOwner.id === currentUser.uid) return alert("자신에게는 양도할 수 없습니다.");
-            
-            if(!confirm(`${newOwner.data().name}님에게 게시판을 양도하시겠습니까?`)) return;
-            
-            await updateDoc(doc(db, "boards", boardId), {
-                ownerUid: newOwner.id,
-                ownerName: newOwner.data().name
-            });
-            alert("양도 완료!");
-            location.reload();
-        };
-
-        window.listForSale = function() {
-            alert("마켓플레이스에 등록되었습니다! (board-market.html에서 확인)");
-            // 실제 구현 시 마켓 등록 로직 추가
+            alert("저장됨!"); closeModal('settingsModal');
         };
 
         window.openModal = (id) => document.getElementById(id).style.display = "flex";
         window.closeModal = (id) => document.getElementById(id).style.display = "none";
+        document.addEventListener('keydown', (e) => { if(e.key === 'Escape') { closeModal('settingsModal'); closeImageViewer(); } });
     </script>
 </body>
 </html>
