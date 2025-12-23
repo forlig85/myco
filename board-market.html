@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BOKLUCK 게시판 마켓</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        :root { --primary: #10b981; --primary-light: #34d399; --secondary: #06b6d4; --accent: #f59e0b; --success: #10b981; --danger: #ef4444; --pink: #ec4899; --bg-dark: #0a0a0f; --bg-card: #12121a; --bg-card-hover: #1a1a25; --border: #2a2a3a; --text: #f0f0f5; --text-muted: #8888a0; --gradient-primary: linear-gradient(135deg, #10b981 0%, #06b6d4 100%); --gradient-gold: linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%); }
+        body { background-color: var(--bg-dark); background-image: radial-gradient(ellipse at top, rgba(16,185,129,0.1) 0%, transparent 50%); color: var(--text); font-family: 'Noto Sans KR', sans-serif; min-height: 100vh; }
+        .navbar { background: var(--bg-card); border-bottom: 1px solid var(--border); padding: 12px 20px; position: sticky; top: 0; z-index: 100; }
+        .nav-container { max-width: 1000px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-size: 24px; font-weight: 900; background: var(--gradient-primary); -webkit-background-clip: text; -webkit-text-fill-color: transparent; cursor: pointer; text-decoration: none; }
+        .wallet-badge { background: var(--bg-dark); padding: 8px 16px; border-radius: 50px; border: 1px solid var(--border); color: var(--primary); font-weight: 700; font-size: 14px; }
+        .container { max-width: 1000px; margin: 0 auto; padding: 24px 20px; }
+        .card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 16px; padding: 24px; margin-bottom: 20px; }
+        button { cursor: pointer; border: none; border-radius: 10px; font-weight: 600; padding: 12px 20px; transition: all 0.2s; font-family: 'Noto Sans KR', sans-serif; font-size: 14px; }
+        button:hover { transform: translateY(-1px); }
+        button:disabled { opacity: 0.5; cursor: not-allowed; }
+        .btn-primary { background: var(--gradient-primary); color: white; }
+        .btn-gold { background: var(--gradient-gold); color: #1a1a2e; }
+        .btn-outline { background: transparent; border: 1px solid var(--border); color: var(--text); }
+        .btn-sm { padding: 8px 14px; font-size: 13px; }
+        .btn-block { width: 100%; }
+        input, select { width: 100%; background: var(--bg-dark); border: 1px solid var(--border); color: var(--text); padding: 14px 16px; border-radius: 10px; font-size: 15px; font-family: 'Noto Sans KR', sans-serif; margin-bottom: 12px; }
+        input:focus, select:focus { outline: none; border-color: var(--primary); }
+        label { display: block; font-size: 13px; color: var(--text-muted); margin-bottom: 6px; }
+        .back-btn { display: inline-flex; align-items: center; gap: 8px; color: var(--text-muted); text-decoration: none; font-size: 14px; margin-bottom: 20px; }
+        .back-btn:hover { color: var(--text); }
+
+        .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
+        .page-title { font-size: 28px; font-weight: 900; }
+        .page-desc { color: var(--text-muted); margin-top: 8px; }
+
+        .stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
+        .stat-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 16px; padding: 20px; text-align: center; }
+        .stat-value { font-size: 28px; font-weight: 900; background: var(--gradient-primary); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .stat-label { font-size: 12px; color: var(--text-muted); margin-top: 4px; }
+
+        .tabs { display: flex; gap: 4px; background: var(--bg-dark); padding: 4px; border-radius: 12px; margin-bottom: 20px; }
+        .tab { flex: 1; padding: 10px; text-align: center; border-radius: 8px; font-weight: 600; font-size: 14px; cursor: pointer; color: var(--text-muted); transition: all 0.2s; }
+        .tab.active { background: var(--bg-card); color: var(--text); }
+
+        .listing-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+        .listing-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 16px; padding: 20px; transition: all 0.3s; }
+        .listing-card:hover { border-color: var(--primary); box-shadow: 0 8px 30px rgba(16,185,129,0.15); }
+        .listing-header { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+        .listing-icon { width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 24px; }
+        .listing-name { font-size: 18px; font-weight: 700; }
+        .listing-category { font-size: 12px; color: var(--text-muted); }
+        .listing-stats { display: flex; gap: 16px; font-size: 13px; color: var(--text-muted); margin-bottom: 12px; }
+        .listing-price { display: flex; justify-content: space-between; align-items: center; padding-top: 12px; border-top: 1px solid var(--border); }
+        .listing-amount { font-size: 20px; font-weight: 900; color: var(--accent); }
+        .listing-owner { font-size: 12px; color: var(--text-muted); }
+
+        .auction-badge { background: var(--danger); color: white; padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; margin-left: 8px; }
+        .fixed-badge { background: var(--primary); color: white; padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; margin-left: 8px; }
+
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); display: none; justify-content: center; align-items: center; z-index: 1000; backdrop-filter: blur(8px); }
+        .modal-content { background: var(--bg-card); padding: 32px; border-radius: 20px; width: 90%; max-width: 500px; max-height: 80vh; overflow-y: auto; border: 1px solid var(--border); position: relative; }
+        .modal-close { position: absolute; top: 16px; right: 16px; background: var(--bg-dark); border: none; width: 32px; height: 32px; border-radius: 50%; cursor: pointer; font-size: 18px; color: var(--text-muted); }
+        .modal-title { font-size: 22px; font-weight: 900; margin-bottom: 20px; text-align: center; }
+
+        .empty-state { text-align: center; padding: 60px 20px; color: var(--text-muted); }
+        .empty-state .icon { font-size: 48px; margin-bottom: 16px; }
+
+        footer { margin-top: 60px; padding: 30px 0; border-top: 1px solid var(--border); text-align: center; color: var(--text-muted); font-size: 13px; }
+
+        @media (max-width: 768px) { .stats-row { grid-template-columns: repeat(2, 1fr); } .listing-grid { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="logo">🏪 BOARD MARKET</a>
+            <div class="wallet-badge" id="walletBadge">💰 연결 필요</div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <a href="index.html" class="back-btn">← 메인으로</a>
+
+        <div class="page-header">
+            <div>
+                <h1 class="page-title">게시판 마켓플레이스</h1>
+                <p class="page-desc">운영 중인 게시판을 사고팔 수 있는 거래소</p>
+            </div>
+            <button class="btn-gold" onclick="openModal('sellModal')">🏷️ 내 게시판 판매</button>
+        </div>
+
+        <div class="stats-row">
+            <div class="stat-card"><div class="stat-value" id="totalListings">0</div><div class="stat-label">판매 중</div></div>
+            <div class="stat-card"><div class="stat-value" id="totalSold">0</div><div class="stat-label">거래 완료</div></div>
+            <div class="stat-card"><div class="stat-value" id="avgPrice">0</div><div class="stat-label">평균 가격</div></div>
+            <div class="stat-card"><div class="stat-value" id="highestPrice">0</div><div class="stat-label">최고가</div></div>
+        </div>
+
+        <div class="tabs">
+            <div class="tab active" onclick="filterListings('all')">전체</div>
+            <div class="tab" onclick="filterListings('auction')">🔥 경매</div>
+            <div class="tab" onclick="filterListings('fixed')">💰 정가</div>
+            <div class="tab" onclick="filterListings('cheap')">💸 저가순</div>
+        </div>
+
+        <div class="listing-grid" id="listingGrid">
+            <div class="empty-state" style="grid-column: 1/-1;">
+                <div class="icon">🏪</div>
+                <p>아직 판매 중인 게시판이 없습니다.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- 판매 등록 모달 -->
+    <div class="modal-overlay" id="sellModal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeModal('sellModal')">✕</button>
+            <h2 class="modal-title">🏷️ 게시판 판매 등록</h2>
+            
+            <label>판매할 게시판</label>
+            <select id="sellBoardSelect">
+                <option value="">게시판을 선택하세요</option>
+            </select>
+            
+            <label>판매 방식</label>
+            <select id="sellType">
+                <option value="fixed">💰 정가 판매</option>
+                <option value="auction">🔥 경매</option>
+            </select>
+            
+            <div id="fixedPriceSection">
+                <label>판매 가격</label>
+                <input type="number" id="sellPrice" placeholder="BOK 단위" min="100">
+            </div>
+            
+            <div id="auctionSection" style="display: none;">
+                <label>시작가</label>
+                <input type="number" id="startPrice" placeholder="최소 100 BOK" min="100">
+                <label>경매 기간</label>
+                <select id="auctionDuration">
+                    <option value="24">24시간</option>
+                    <option value="48">48시간</option>
+                    <option value="72">72시간</option>
+                </select>
+            </div>
+            
+            <p style="font-size: 12px; color: var(--text-muted); margin: 16px 0;">💡 판매 수수료: 거래 금액의 5%</p>
+            
+            <button class="btn-primary btn-block" onclick="createListing()">판매 등록</button>
+        </div>
+    </div>
+
+    <!-- 구매 모달 -->
+    <div class="modal-overlay" id="buyModal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeModal('buyModal')">✕</button>
+            <h2 class="modal-title">🛒 게시판 구매</h2>
+            
+            <div style="background: var(--bg-dark); padding: 20px; border-radius: 12px; margin-bottom: 20px;">
+                <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
+                    <div class="listing-icon" id="buyBoardIcon" style="background: #6366f1;">📝</div>
+                    <div>
+                        <div style="font-weight: 700; font-size: 18px;" id="buyBoardName">게시판</div>
+                        <div style="font-size: 13px; color: var(--text-muted);" id="buyBoardStats">멤버 0 · 글 0</div>
+                    </div>
+                </div>
+                <div style="display: flex; justify-content: space-between; padding-top: 12px; border-top: 1px solid var(--border);">
+                    <span style="color: var(--text-muted);">판매자</span>
+                    <span id="buySellerName">-</span>
+                </div>
+            </div>
+            
+            <div id="fixedBuySection">
+                <div style="text-align: center; margin-bottom: 20px;">
+                    <div style="font-size: 14px; color: var(--text-muted);">구매 가격</div>
+                    <div style="font-size: 32px; font-weight: 900; color: var(--accent);" id="buyPrice">0 BOK</div>
+                </div>
+                <button class="btn-gold btn-block" id="confirmBuyBtn" onclick="confirmPurchase()">구매하기</button>
+            </div>
+            
+            <div id="auctionBuySection" style="display: none;">
+                <div style="text-align: center; margin-bottom: 20px;">
+                    <div style="font-size: 14px; color: var(--text-muted);">현재 최고 입찰가</div>
+                    <div style="font-size: 32px; font-weight: 900; color: var(--danger);" id="currentBid">0 BOK</div>
+                    <div style="font-size: 12px; color: var(--text-muted); margin-top: 4px;" id="auctionTimeLeft">남은 시간: --:--:--</div>
+                </div>
+                <label>입찰 금액</label>
+                <input type="number" id="bidAmount" placeholder="현재가보다 높게 입력">
+                <button class="btn-primary btn-block" onclick="placeBid()">입찰하기</button>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <p>© 2024 BOKLUCK. 게시판 거래는 플랫폼 내에서만 유효합니다.</p>
+    </footer>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+        import { getFirestore, collection, doc, getDoc, getDocs, setDoc, updateDoc, deleteDoc, onSnapshot, query, orderBy, where, increment, runTransaction } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+
+        const firebaseConfig = { apiKey: "AIzaSyBwQjuqgWM4YKnqu_gzNbeCg5alrC-jVcQ", authDomain: "myco-737a0.firebaseapp.com", projectId: "myco-737a0", storageBucket: "myco-737a0.firebasestorage.app", messagingSenderId: "942571332540", appId: "1:942571332540:web:be0bb6fbdd32655501c1b9" };
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const auth = getAuth(app);
+
+        let currentUser = null, userData = null, currentListingId = null, currentListingData = null;
+
+        onAuthStateChanged(auth, async (user) => {
+            if(user) {
+                currentUser = user;
+                const userDoc = await getDoc(doc(db, "users", user.uid));
+                userData = userDoc.data();
+                document.getElementById("walletBadge").innerHTML = `💰 ${(userData?.coin||0).toLocaleString()} BOK`;
+                loadMyBoards();
+                loadListings();
+            } else {
+                document.getElementById("walletBadge").innerHTML = "💰 로그인 필요";
+            }
+        });
+
+        async function loadMyBoards() {
+            const q = query(collection(db, "boards"), where("ownerUid", "==", currentUser.uid));
+            const snapshot = await getDocs(q);
+            const select = document.getElementById("sellBoardSelect");
+            select.innerHTML = '<option value="">게시판을 선택하세요</option>';
+            snapshot.forEach(docSnap => {
+                const b = docSnap.data();
+                if(!b.forSale) {
+                    select.innerHTML += `<option value="${docSnap.id}">${b.icon || '📝'} ${b.name}</option>`;
+                }
+            });
+        }
+
+        function loadListings() {
+            const q = query(collection(db, "boardListings"), orderBy("createdAt", "desc"));
+            onSnapshot(q, (snapshot) => {
+                const grid = document.getElementById("listingGrid");
+                grid.innerHTML = "";
+                
+                let total = 0, prices = [], highest = 0;
+                
+                if(snapshot.empty) {
+                    grid.innerHTML = '<div class="empty-state" style="grid-column: 1/-1;"><div class="icon">🏪</div><p>아직 판매 중인 게시판이 없습니다.</p></div>';
+                    return;
+                }
+                
+                snapshot.forEach(docSnap => {
+                    const l = docSnap.data();
+                    total++;
+                    const price = l.type === 'auction' ? (l.currentBid || l.startPrice) : l.price;
+                    prices.push(price);
+                    if(price > highest) highest = price;
+                    
+                    const badge = l.type === 'auction' ? '<span class="auction-badge">🔥 경매</span>' : '<span class="fixed-badge">💰 정가</span>';
+                    
+                    grid.innerHTML += `
+                        <div class="listing-card" onclick="openBuyModal('${docSnap.id}')">
+                            <div class="listing-header">
+                                <div class="listing-icon" style="background: ${l.boardColor || '#6366f1'};">${l.boardIcon || '📝'}</div>
+                                <div>
+                                    <div class="listing-name">${l.boardName}${badge}</div>
+                                    <div class="listing-category">${l.boardCategory || '자유'}</div>
+                                </div>
+                            </div>
+                            <div class="listing-stats">
+                                <span>👤 ${l.memberCount || 0}</span>
+                                <span>📝 ${l.postCount || 0}</span>
+                                ${l.monthlyRevenue ? `<span>💰 월 ${l.monthlyRevenue} BOK</span>` : ''}
+                            </div>
+                            <div class="listing-price">
+                                <div>
+                                    <div class="listing-amount">${price.toLocaleString()} BOK</div>
+                                    <div class="listing-owner">${l.sellerCountry || ''} ${l.sellerName}</div>
+                                </div>
+                                <button class="btn-sm btn-gold">${l.type === 'auction' ? '입찰' : '구매'}</button>
+                            </div>
+                        </div>
+                    `;
+                });
+                
+                document.getElementById("totalListings").textContent = total;
+                document.getElementById("avgPrice").textContent = prices.length ? Math.round(prices.reduce((a,b)=>a+b,0)/prices.length).toLocaleString() : '0';
+                document.getElementById("highestPrice").textContent = highest.toLocaleString();
+            });
+        }
+
+        window.openBuyModal = async function(listingId) {
+            if(!currentUser) return alert("로그인이 필요합니다.");
+            currentListingId = listingId;
+            const listingDoc = await getDoc(doc(db, "boardListings", listingId));
+            if(!listingDoc.exists()) return alert("판매 정보를 찾을 수 없습니다.");
+            currentListingData = listingDoc.data();
+            
+            document.getElementById("buyBoardIcon").textContent = currentListingData.boardIcon || '📝';
+            document.getElementById("buyBoardIcon").style.background = currentListingData.boardColor || '#6366f1';
+            document.getElementById("buyBoardName").textContent = currentListingData.boardName;
+            document.getElementById("buyBoardStats").textContent = `멤버 ${currentListingData.memberCount || 0} · 글 ${currentListingData.postCount || 0}`;
+            document.getElementById("buySellerName").textContent = `${currentListingData.sellerCountry || ''} ${currentListingData.sellerName}`;
+            
+            if(currentListingData.type === 'auction') {
+                document.getElementById("fixedBuySection").style.display = "none";
+                document.getElementById("auctionBuySection").style.display = "block";
+                document.getElementById("currentBid").textContent = `${(currentListingData.currentBid || currentListingData.startPrice).toLocaleString()} BOK`;
+                document.getElementById("bidAmount").value = "";
+                document.getElementById("bidAmount").min = (currentListingData.currentBid || currentListingData.startPrice) + 1;
+            } else {
+                document.getElementById("fixedBuySection").style.display = "block";
+                document.getElementById("auctionBuySection").style.display = "none";
+                document.getElementById("buyPrice").textContent = `${currentListingData.price.toLocaleString()} BOK`;
+            }
+            
+            openModal('buyModal');
+        };
+
+        window.createListing = async function() {
+            const boardId = document.getElementById("sellBoardSelect").value;
+            if(!boardId) return alert("게시판을 선택하세요.");
+            
+            const type = document.getElementById("sellType").value;
+            let price, startPrice, duration;
+            
+            if(type === 'fixed') {
+                price = parseInt(document.getElementById("sellPrice").value);
+                if(!price || price < 100) return alert("가격을 100 BOK 이상으로 설정하세요.");
+            } else {
+                startPrice = parseInt(document.getElementById("startPrice").value);
+                duration = parseInt(document.getElementById("auctionDuration").value);
+                if(!startPrice || startPrice < 100) return alert("시작가를 100 BOK 이상으로 설정하세요.");
+            }
+            
+            const boardDoc = await getDoc(doc(db, "boards", boardId));
+            const board = boardDoc.data();
+            
+            await setDoc(doc(collection(db, "boardListings")), {
+                boardId,
+                boardName: board.name,
+                boardIcon: board.icon,
+                boardColor: board.color,
+                boardCategory: board.category,
+                memberCount: board.memberCount || 0,
+                postCount: board.postCount || 0,
+                sellerUid: currentUser.uid,
+                sellerName: currentUser.displayName,
+                sellerCountry: userData?.country || '',
+                type,
+                price: type === 'fixed' ? price : null,
+                startPrice: type === 'auction' ? startPrice : null,
+                currentBid: type === 'auction' ? startPrice : null,
+                highestBidder: null,
+                endsAt: type === 'auction' ? new Date(Date.now() + duration * 60 * 60 * 1000).toISOString() : null,
+                createdAt: new Date().toISOString()
+            });
+            
+            await updateDoc(doc(db, "boards", boardId), { forSale: true });
+            
+            alert("🏷️ 판매 등록 완료!");
+            closeModal('sellModal');
+            loadMyBoards();
+        };
+
+        window.confirmPurchase = async function() {
+            if(!currentUser || !currentListingData) return;
+            if(currentListingData.sellerUid === currentUser.uid) return alert("자신의 게시판은 구매할 수 없습니다.");
+            
+            const price = currentListingData.price;
+            if(userData.coin < price) return alert("BOK이 부족합니다!");
+            
+            if(!confirm(`${currentListingData.boardName}을(를) ${price.toLocaleString()} BOK에 구매하시겠습니까?`)) return;
+            
+            try {
+                const fee = Math.floor(price * 0.05);
+                const sellerAmount = price - fee;
+                
+                await runTransaction(db, async (t) => {
+                    // 구매자 차감
+                    t.update(doc(db, "users", currentUser.uid), { coin: increment(-price), totalSpent: increment(price) });
+                    // 판매자 지급
+                    t.update(doc(db, "users", currentListingData.sellerUid), { coin: increment(sellerAmount), totalEarned: increment(sellerAmount) });
+                    // 게시판 소유권 이전
+                    t.update(doc(db, "boards", currentListingData.boardId), { 
+                        ownerUid: currentUser.uid, 
+                        ownerName: currentUser.displayName,
+                        forSale: false 
+                    });
+                    // 리스팅 삭제
+                    t.delete(doc(db, "boardListings", currentListingId));
+                });
+                
+                alert(`🎉 구매 완료! ${currentListingData.boardName}의 새 주인이 되었습니다.`);
+                closeModal('buyModal');
+            } catch(e) { alert("오류: " + e); }
+        };
+
+        window.placeBid = async function() {
+            if(!currentUser || !currentListingData) return;
+            const bidAmount = parseInt(document.getElementById("bidAmount").value);
+            const minBid = (currentListingData.currentBid || currentListingData.startPrice) + 1;
+            
+            if(!bidAmount || bidAmount < minBid) return alert(`최소 ${minBid.toLocaleString()} BOK 이상 입찰하세요.`);
+            if(userData.coin < bidAmount) return alert("BOK이 부족합니다!");
+            
+            await updateDoc(doc(db, "boardListings", currentListingId), {
+                currentBid: bidAmount,
+                highestBidder: currentUser.uid,
+                highestBidderName: currentUser.displayName
+            });
+            
+            alert(`🔥 ${bidAmount.toLocaleString()} BOK 입찰 완료!`);
+            closeModal('buyModal');
+        };
+
+        // 판매 방식 토글
+        document.getElementById("sellType").onchange = function() {
+            document.getElementById("fixedPriceSection").style.display = this.value === 'fixed' ? 'block' : 'none';
+            document.getElementById("auctionSection").style.display = this.value === 'auction' ? 'block' : 'none';
+        };
+
+        window.openModal = (id) => document.getElementById(id).style.display = "flex";
+        window.closeModal = (id) => document.getElementById(id).style.display = "none";
+        window.filterListings = (type) => { document.querySelectorAll('.tab').forEach(t => t.classList.remove('active')); event.target.classList.add('active'); };
+    </script>
+</body>
+</html>
