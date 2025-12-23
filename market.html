@@ -9,21 +9,16 @@
         
         body { background-color: #0f172a; color: #f8fafc; font-family: 'Pretendard', sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; }
         
-        /* 헤더 스타일 */
+        /* 헤더 */
         header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 2px solid #ec4899; padding-bottom: 15px; }
         .logo { font-size: 24px; font-weight: 800; color: #ec4899; cursor:pointer; }
         
-        /* 지갑 정보 및 수동 연결 버튼 */
+        /* 지갑 정보 */
         .wallet-wrapper { display: flex; align-items: center; gap: 10px; }
         .wallet-info { font-weight: bold; color: #ec4899; font-size: 16px; }
+        .btn-connect { background: #ec4899; color: white; border: none; padding: 8px 12px; border-radius: 20px; font-weight: bold; cursor: pointer; display: none; }
         
-        /* 로딩 애니메이션 (동기화 중일 때) */
-        .sync-loader { font-size: 12px; color: #94a3b8; animation: blink 1s infinite; }
-        @keyframes blink { 50% { opacity: 0.5; } }
-
-        .btn-connect { background: #ec4899; color: white; border: none; padding: 8px 12px; border-radius: 20px; font-weight: bold; cursor: pointer; font-size: 13px; display: none; } /* 기본 숨김 */
-
-        /* 뒤로가기 버튼 */
+        /* 뒤로가기 */
         button.back-btn { background: #334155; color: white; padding: 10px 20px; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; margin-bottom: 20px; transition: 0.2s; }
         button.back-btn:hover { background: #475569; }
 
@@ -32,20 +27,33 @@
         .select-group { display: flex; gap: 10px; margin-bottom: 15px; }
         select { background: #0f172a; color: white; border: 1px solid #64748b; padding: 10px; border-radius: 8px; flex: 1; font-size: 16px; font-family: 'Pretendard'; }
         
-        /* 맵 그리드 */
+        /* 🗺️ 맵 그리드 */
         .map-container { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; }
-        .land-block { aspect-ratio: 1/1; background: #334155; border-radius: 4px; display: flex; flex-direction: column; justify-content: center; align-items: center; cursor: pointer; border: 2px solid transparent; transition: 0.2s; position: relative; }
-        .land-block:hover { transform: scale(1.05); border-color: #ec4899; z-index: 10; }
+        .land-block { aspect-ratio: 1/1; background: #334155; border-radius: 8px; display: flex; flex-direction: column; justify-content: center; align-items: center; cursor: pointer; border: 2px solid transparent; transition: 0.2s; position: relative; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.3); }
+        .land-block:hover { transform: scale(1.05); border-color: white; z-index: 10; }
         
-        .land-empty { opacity: 0.6; }
-        .land-my { background: #0ea5e9; border-color: #38bdf8; color: white; box-shadow: 0 0 15px rgba(14, 165, 233, 0.4); }
-        .land-others { background: #475569; color: #cbd5e1; border: 1px solid #64748b; }
-        
-        .land-text { font-size: 12px; text-align: center; line-height: 1.2; word-break: break-all; padding: 2px; font-weight: 600; }
-        .land-sub { font-size: 10px; margin-top: 4px; opacity: 0.8; }
+        .land-empty { opacity: 0.6; border: 1px dashed #64748b; }
+        .land-text { font-size: 13px; text-align: center; line-height: 1.2; word-break: break-all; padding: 4px; font-weight: 800; text-shadow: 0 1px 2px rgba(0,0,0,0.8); z-index: 2; }
+        .land-sub { font-size: 11px; margin-top: 4px; color: rgba(255,255,255,0.9); font-weight: 600; z-index: 2; text-shadow: 0 1px 2px rgba(0,0,0,0.8); }
 
         /* 점령 메시지 */
-        .conquest-status { background: linear-gradient(90deg, #ec4899, #8b5cf6); padding: 15px; border-radius: 8px; margin-bottom: 20px; text-align: center; font-weight: bold; display: none; box-shadow: 0 4px 15px rgba(236, 72, 153, 0.4); }
+        .conquest-status { background: linear-gradient(90deg, #ec4899, #8b5cf6); padding: 15px; border-radius: 8px; margin-bottom: 20px; text-align: center; font-weight: bold; display: none; animation: popIn 0.5s ease; }
+        @keyframes popIn { 0% { transform: scale(0.9); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+
+        /* ✨ 구매 모달창 스타일 */
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); display: none; justify-content: center; align-items: center; z-index: 100; backdrop-filter: blur(5px); }
+        .modal-content { background: #1e293b; padding: 30px; border-radius: 16px; width: 90%; max-width: 350px; border: 1px solid #ec4899; box-shadow: 0 0 20px rgba(236, 72, 153, 0.3); text-align: center; }
+        .modal-title { font-size: 20px; font-weight: bold; margin-bottom: 20px; color: #fff; }
+        .input-group { margin-bottom: 15px; text-align: left; }
+        .input-group label { display: block; font-size: 12px; color: #94a3b8; margin-bottom: 5px; }
+        .modal-input { width: 100%; padding: 10px; background: #0f172a; border: 1px solid #475569; border-radius: 6px; color: white; box-sizing: border-box; }
+        .color-picker { width: 100%; height: 40px; cursor: pointer; border: none; border-radius: 6px; }
+        
+        .modal-btn { width: 100%; padding: 12px; border-radius: 8px; font-weight: bold; cursor: pointer; border: none; margin-top: 10px; font-size: 16px; }
+        .btn-confirm { background: #ec4899; color: white; }
+        .btn-confirm:hover { background: #db2777; }
+        .btn-cancel { background: #334155; color: white; margin-top: 10px; }
+        
     </style>
 </head>
 <body>
@@ -54,11 +62,11 @@
         <div class="logo" onclick="location.href='index.html'">BOKLUCK MARKET</div>
         <div class="wallet-wrapper">
             <button id="manualLoginBtn" class="btn-connect">🔑 지갑 연결하기</button>
-            <div id="walletBadge" class="wallet-info sync-loader">🔄 정보 동기화 중...</div>
+            <div id="walletBadge" class="wallet-info">연결 중...</div>
         </div>
     </header>
 
-    <button class="back-btn" onclick="location.href='index.html'">← 메인화면으로 돌아가기</button>
+    <button class="back-btn" onclick="location.href='index.html'">← 메인으로 돌아가기</button>
 
     <div id="conquestMessage" class="conquest-status">
         👑 축하합니다! 당신은 이 지역의 [최대 소유자]입니다! (13/25 점령)
@@ -68,27 +76,45 @@
         <h3 style="margin-top:0;">🗺️ 부동산 지역 선택</h3>
         <div class="select-group">
             <select id="countrySelect">
-                <option value="KR">🇰🇷 한국 (Korea)</option>
-                <option value="US">🇺🇸 미국 (USA)</option>
-                <option value="JP">🇯🇵 일본 (Japan)</option>
+                <option value="KR">🇰🇷 한국</option>
+                <option value="US">🇺🇸 미국</option>
+                <option value="JP">🇯🇵 일본</option>
             </select>
             <select id="citySelect"></select>
         </div>
         <div style="font-size:14px; color:#94a3b8;">
-            * 빈 땅 가격: <b>300 BOK</b><br>
-            * 과반수 룰: 25개 중 <b>13개 이상</b> 소유 시 '최대 소유자' 등극
+            * 구매 가격: <b>300 BOK</b> (고정)<br>
+            * 🎲 <b>랜덤 가치:</b> 구매 시 1~1,000 BOK 사이의 가치가 매겨집니다!
         </div>
     </div>
 
-    <div id="landGrid" class="map-container">
+    <div id="landGrid" class="map-container"></div>
+
+    <div id="buyModal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-title">🏗️ 땅 구매하기</div>
+            <p style="color:#ec4899; font-weight:bold; font-size:18px; margin-bottom:20px;">가격: 300 BOK</p>
+            
+            <div class="input-group">
+                <label>땅 이름</label>
+                <input type="text" id="inputName" class="modal-input" placeholder="예: 비트코인 타워">
+            </div>
+            
+            <div class="input-group">
+                <label>내 땅 색상 선택</label>
+                <input type="color" id="inputColor" class="color-picker" value="#0ea5e9">
+            </div>
+
+            <button id="confirmBuyBtn" class="modal-btn btn-confirm">구매 확정</button>
+            <button onclick="closeModal()" class="modal-btn btn-cancel">취소</button>
         </div>
+    </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
         import { getFirestore, collection, onSnapshot, doc, runTransaction, increment, query, where } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
         import { getAuth, onAuthStateChanged, signInWithPopup, GoogleAuthProvider } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
-        // 키 적용 완료
         const firebaseConfig = {
           apiKey: "AIzaSyBwQjuqgWM4YKnqu_gzNbeCg5alrC-jVcQ",
           authDomain: "myco-737a0.firebaseapp.com",
@@ -105,11 +131,12 @@
         let currentUser = null;
         let currentBalance = 0;
         const LAND_PRICE = 300;
-
+        
+        // 도시 데이터
         const cities = {
-            "KR": ["서울 (Seoul)", "부산 (Busan)", "제주 (Jeju)"],
-            "US": ["뉴욕 (New York)", "LA (Los Angeles)", "텍사스 (Texas)"],
-            "JP": ["도쿄 (Tokyo)", "오사카 (Osaka)"]
+            "KR": ["서울", "부산", "제주"],
+            "US": ["뉴욕", "LA", "텍사스"],
+            "JP": ["도쿄", "오사카"]
         };
 
         const countrySelect = document.getElementById("countrySelect");
@@ -117,17 +144,24 @@
         const grid = document.getElementById("landGrid");
         const walletBadge = document.getElementById("walletBadge");
         const manualLoginBtn = document.getElementById("manualLoginBtn");
+        
+        // 모달 관련 요소
+        const buyModal = document.getElementById("buyModal");
+        const inputName = document.getElementById("inputName");
+        const inputColor = document.getElementById("inputColor");
+        let selectedBlockIndex = null;
+        let selectedRegionKey = null;
 
-        // 1. 자동 로그인 감지 (핵심 로직)
+        // --- 로그인 및 초기화 ---
+        manualLoginBtn.addEventListener("click", () => {
+            signInWithPopup(auth, new GoogleAuthProvider()).catch(err => alert("연결 실패: " + err.message));
+        });
+
         onAuthStateChanged(auth, (user) => {
             if (user) {
-                // 로그인 성공! (자동으로 여기 진입함)
                 currentUser = user;
-                manualLoginBtn.style.display = "none"; // 버튼 숨김
-                walletBadge.classList.remove("sync-loader"); // 깜빡임 효과 제거
-                walletBadge.innerText = "💰 자산 불러오는 중...";
-                
-                // 잔액 실시간 동기화
+                manualLoginBtn.style.display = "none";
+                walletBadge.innerText = "자산 확인 중...";
                 onSnapshot(doc(db, "users", user.uid), (d) => {
                     if (d.exists()) {
                         currentBalance = d.data().coin;
@@ -138,27 +172,19 @@
                     }
                 });
             } else {
-                // 진짜 로그아웃 상태일 때만 수동 버튼 표시
                 currentUser = null;
-                walletBadge.classList.remove("sync-loader");
                 walletBadge.innerText = "연결 필요";
-                manualLoginBtn.style.display = "block"; 
+                manualLoginBtn.style.display = "block";
             }
         });
 
-        // 2. 수동 로그인 버튼 (혹시 몰라서 남겨둠)
-        manualLoginBtn.addEventListener("click", () => {
-            signInWithPopup(auth, new GoogleAuthProvider()).catch(err => alert("연결 실패: " + err.message));
-        });
-
-        // 3. 맵 로직 (기존과 동일)
+        // --- 맵 로직 ---
         function updateCityOptions() {
             const list = cities[countrySelect.value];
             citySelect.innerHTML = "";
             list.forEach(c => {
                 const opt = document.createElement("option");
-                opt.value = c.split(' ')[0]; 
-                opt.innerText = c;
+                opt.value = c.split(' ')[0]; opt.innerText = c;
                 citySelect.appendChild(opt);
             });
             loadMap(); 
@@ -170,13 +196,15 @@
         let unsubscribeMap = null;
         function loadMap() {
             const regionKey = `${countrySelect.value}-${citySelect.value}`; 
+            
+            // 그리드 초기화 (빈 땅 25개)
             grid.innerHTML = "";
             for(let i=0; i<25; i++) {
                 const div = document.createElement("div");
                 div.className = "land-block land-empty";
                 div.id = `block-${i}`;
                 div.innerHTML = `<span class="land-text">빈 땅</span><span class="land-sub">${LAND_PRICE} BOK</span>`;
-                div.onclick = () => buyLand(i, regionKey);
+                div.onclick = () => openBuyModal(i, regionKey); // 모달 열기
                 grid.appendChild(div);
             }
 
@@ -190,51 +218,100 @@
                     const el = document.getElementById(`block-${data.index}`);
                     if(!el) return;
 
+                    // 땅 스타일 적용 (색상 포함)
+                    el.style.backgroundColor = data.color || "#334155"; // 사용자 지정 색상
+                    el.style.border = "1px solid rgba(255,255,255,0.2)";
+                    el.classList.remove("land-empty");
+
+                    // 텍스트 표시
+                    const valueText = data.randomValue ? `💎 가치: ${data.randomValue}` : "평가 중";
+                    
                     if(currentUser && data.ownerUid === currentUser.uid) {
-                        el.className = "land-block land-my";
-                        el.innerHTML = `<span class="land-text">${data.customName}</span><span class="land-sub">소유 중</span>`;
+                        el.innerHTML = `<span class="land-text" style="color:#fff;">${data.customName}</span><span class="land-sub" style="color:#fff;">${valueText}</span>`;
                         myLandCount++;
                     } else {
-                        el.className = "land-block land-others";
-                        el.innerHTML = `<span class="land-text">${data.customName}</span><span class="land-sub">${data.ownerName}</span>`;
+                        el.innerHTML = `<span class="land-text" style="color:#fff;">${data.customName}</span><span class="land-sub" style="color:#ddd;">${data.ownerName}</span>`;
                     }
-                    el.onclick = () => alert(`🔒 [소유자 정보]\n\n이름: ${data.ownerName}\n땅 이름: ${data.customName}`);
+
+                    // 이미 팔린 땅 클릭 시
+                    el.onclick = () => alert(`🔒 [소유 정보]\n\n이름: ${data.customName}\n소유자: ${data.ownerName}\n감정가: ${data.randomValue || 0} BOK`);
                 });
 
+                // 점령 메시지
                 const statusBox = document.getElementById("conquestMessage");
                 if(myLandCount >= 13) {
                     statusBox.style.display = "block";
-                    statusBox.innerText = `👑 축하합니다! 당신은 [${citySelect.value}]의 최대 소유자입니다! (${myLandCount}/25)`;
+                    statusBox.innerText = `👑 축하합니다! [${citySelect.value}] 지역의 최대 소유자입니다! (${myLandCount}/25)`;
                 } else {
                     statusBox.style.display = "none";
                 }
             });
         }
 
-        async function buyLand(index, regionKey) {
-            if(!currentUser) {
-                alert("아직 지갑이 동기화되지 않았습니다. 잠시만 기다려주세요.");
-                return;
-            }
-            if(currentBalance < LAND_PRICE) return alert(`자산 부족! (보유: ${currentBalance} BOK)`);
+        // --- 모달 & 구매 로직 ---
+        
+        // 1. 전역 함수로 등록 (HTML onclick에서 부르기 위해)
+        window.openBuyModal = (index, regionKey) => {
+            if(!currentUser) return alert("지갑 연결이 필요합니다.");
+            selectedBlockIndex = index;
+            selectedRegionKey = regionKey;
+            
+            inputName.value = "";
+            inputColor.value = "#0ea5e9"; // 기본 파랑
+            buyModal.style.display = "flex";
+        }
 
-            if(!confirm(`[${regionKey}] ${index+1}번 땅을 구매하시겠습니까?`)) return;
-            const name = prompt("땅 이름 입력:");
-            if(!name) return;
+        window.closeModal = () => {
+            buyModal.style.display = "none";
+        }
+
+        // 2. 구매 확정 버튼 클릭
+        document.getElementById("confirmBuyBtn").addEventListener("click", async () => {
+            if(currentBalance < LAND_PRICE) return alert(`자산 부족! (${currentBalance} BOK 보유)`);
+            const name = inputName.value.trim();
+            const color = inputColor.value;
+            
+            if(!name) return alert("땅 이름을 입력해주세요.");
+
+            // 🎲 랜덤 가치 생성 (1 ~ 1000)
+            const randomValue = Math.floor(Math.random() * 1000) + 1;
+
+            const btn = document.getElementById("confirmBuyBtn");
+            btn.innerText = "처리 중...";
+            btn.disabled = true;
 
             try {
                 await runTransaction(db, async (t) => {
-                    const landRef = doc(db, "lands", `${regionKey}-${index}`);
+                    const landRef = doc(db, "lands", `${selectedRegionKey}-${selectedBlockIndex}`);
                     const landDoc = await t.get(landRef);
-                    if(landDoc.exists()) throw "이미 소유된 땅입니다.";
+                    if(landDoc.exists()) throw "이미 판매된 땅입니다.";
                     
                     const userRef = doc(db, "users", currentUser.uid);
                     t.update(userRef, { coin: increment(-LAND_PRICE) });
-                    t.set(landRef, { region: regionKey, index: index, ownerUid: currentUser.uid, ownerName: currentUser.displayName, customName: name, purchasedAt: new Date().toISOString() });
+                    
+                    t.set(landRef, {
+                        region: selectedRegionKey,
+                        index: selectedBlockIndex,
+                        ownerUid: currentUser.uid,
+                        ownerName: currentUser.displayName,
+                        customName: name,
+                        color: color,           // 🎨 색상 저장
+                        randomValue: randomValue, // 💎 랜덤 가치 저장
+                        purchasedAt: new Date().toISOString()
+                    });
                 });
-                alert("구매 성공!");
-            } catch(e) { alert(e); }
-        }
+                
+                closeModal();
+                alert(`🎉 구매 성공!\n\n이 땅의 감정가는 [ ${randomValue} BOK ] 으로 책정되었습니다!`);
+                
+            } catch(e) {
+                alert("구매 실패: " + e);
+            } finally {
+                btn.innerText = "구매 확정";
+                btn.disabled = false;
+            }
+        });
+
     </script>
 </body>
 </html>
