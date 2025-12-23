@@ -3,58 +3,77 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BOKLUCK MARKETPLACE</title>
+    <title>BOKLUCK REAL ESTATE</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;700&family=Pretendard:wght@400;700&display=swap');
-        body { background-color: #050b14; background-image: linear-gradient(rgba(255, 0, 204, 0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 0, 204, 0.05) 1px, transparent 1px); background-size: 40px 40px; color: #e0f7fa; font-family: 'Pretendard', sans-serif; max-width: 700px; margin: 0 auto; padding: 20px; }
-        .cyber-box { background: rgba(20, 10, 40, 0.9); border: 1px solid #ff00cc; box-shadow: 0 0 15px rgba(255, 0, 204, 0.2); border-radius: 8px; padding: 20px; margin-bottom: 25px; }
-        header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; border-bottom: 2px solid #ff00cc; padding-bottom: 15px; }
-        .logo { font-family: 'Rajdhani'; font-size: 28px; font-weight: 700; color: #fff; text-shadow: 0 0 10px #ff00cc; cursor:pointer; }
-        .wallet-badge { font-family: 'Rajdhani'; font-size: 18px; color: #ff00cc; border: 1px solid #ff00cc; padding: 5px 15px; border-radius: 20px; background: rgba(255, 0, 204, 0.1); }
+        @import url('https://fonts.googleapis.com/css2?family=Pretendard:wght@400;600;800&display=swap');
         
-        /* 그리드 맵 */
-        .map-container { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin-top: 20px; }
-        .land-block { aspect-ratio: 1/1; border: 1px solid #555; background: rgba(255,255,255,0.05); display: flex; flex-direction: column; justify-content: center; align-items: center; cursor: pointer; transition: 0.2s; position: relative; overflow: hidden; }
-        .land-block:hover { border-color: #ff00cc; transform: scale(1.05); z-index: 10; box-shadow: 0 0 15px rgba(255,0,204,0.5); }
+        body { background-color: #0f172a; color: #f8fafc; font-family: 'Pretendard', sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; }
         
-        /* 땅 상태별 스타일 */
-        .land-my { border: 2px solid #00f3ff; background: rgba(0, 243, 255, 0.2); } /* 내 땅 */
-        .land-others { border: 1px solid #777; background: rgba(255,255,255,0.1); opacity: 0.8; } /* 남의 땅 */
-        .land-sale { border: 2px solid #ff0055; background: rgba(255, 0, 85, 0.2); animation: pulse 2s infinite; } /* 판매중 */
+        /* 헤더 스타일 */
+        header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 2px solid #ec4899; padding-bottom: 15px; }
+        .logo { font-size: 24px; font-weight: 800; color: #ec4899; cursor:pointer; }
         
-        @keyframes pulse { 0% {box-shadow: 0 0 0 0 rgba(255,0,85,0.4);} 70% {box-shadow: 0 0 0 10px rgba(255,0,85,0);} 100% {box-shadow: 0 0 0 0 rgba(255,0,85,0);} }
+        /* 컨트롤 패널 */
+        .control-panel { background: #1e293b; padding: 20px; border-radius: 12px; margin-bottom: 20px; border: 1px solid #475569; }
+        .select-group { display: flex; gap: 10px; margin-bottom: 15px; }
+        select { background: #0f172a; color: white; border: 1px solid #64748b; padding: 10px; border-radius: 8px; flex: 1; font-size: 16px; font-family: 'Pretendard'; }
+        
+        /* 맵 그리드 */
+        .map-container { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; }
+        .land-block { aspect-ratio: 1/1; background: #334155; border-radius: 4px; display: flex; flex-direction: column; justify-content: center; align-items: center; cursor: pointer; border: 2px solid transparent; transition: 0.2s; }
+        .land-block:hover { transform: scale(1.05); border-color: #ec4899; }
+        
+        /* 땅 상태 컬러 */
+        .land-empty { opacity: 0.5; }
+        .land-my { background: #0ea5e9; border-color: #38bdf8; color: white; box-shadow: 0 0 10px rgba(14, 165, 233, 0.5); }
+        .land-others { background: #475569; color: #cbd5e1; }
+        
+        .land-text { font-size: 12px; text-align: center; line-height: 1.2; word-break: break-all; padding: 2px; }
+        .land-price { font-size: 10px; font-weight: bold; margin-top: 4px; }
 
-        .land-name { font-size: 11px; font-weight: bold; text-align: center; word-break: keep-all; line-height: 1.2; padding: 2px; }
-        .land-tag { font-size: 10px; padding: 2px 4px; border-radius: 4px; margin-top: 4px; font-weight: bold; }
-        .tag-sale { background: #ff0055; color: white; }
-        .tag-price { color: #ff00cc; font-size: 12px; font-weight: bold; }
+        /* 점령 상태창 */
+        .conquest-status { background: linear-gradient(90deg, #ec4899, #8b5cf6); padding: 15px; border-radius: 8px; margin-bottom: 20px; text-align: center; font-weight: bold; display: none; }
+        
+        button.back-btn { background: #334155; color: white; padding: 10px 20px; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; margin-bottom: 20px; }
+        button.back-btn:hover { background: #475569; }
 
-        .back-btn { background: #333; color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; font-weight: bold; margin-bottom: 20px; }
-        .back-btn:hover { background: #555; }
     </style>
 </head>
 <body>
     <header>
-        <div class="logo" onclick="location.href='index.html'">BOKLUCK <span style="color:#ff00cc;">MARKET</span></div>
-        <div id="walletBadge" class="wallet-badge">Loading...</div>
+        <div class="logo" onclick="location.href='index.html'">BOKLUCK LAND</div>
+        <div id="walletBadge" style="font-weight:bold; color:#ec4899;">Loading...</div>
     </header>
 
-    <button class="back-btn" onclick="location.href='index.html'">⬅️ BACK TO MINING</button>
+    <button class="back-btn" onclick="location.href='index.html'">← 게시판으로 돌아가기</button>
 
-    <div class="cyber-box">
-        <h3 style="margin:0; color:#ff00cc;">🌍 REAL ESTATE EXCHANGE</h3>
-        <p style="font-size:13px; color:#aaa; margin-bottom:20px;">
-            * 빈 땅 가격: <b>300 BOK</b><br>
-            * 유저간 거래: <b>판매자가 설정한 가격</b> (판매 시 즉시 입금됨)
-        </p>
-        
-        <div id="landGrid" class="map-container">
-            </div>
+    <div id="conquestMessage" class="conquest-status">
+        👑 축하합니다! 당신은 현재 이 도시의 시장(Governor)입니다! (13/25 점령)
     </div>
+
+    <div class="control-panel">
+        <h3 style="margin-top:0;">🗺️ 지역 선택</h3>
+        <div class="select-group">
+            <select id="countrySelect">
+                <option value="KR">🇰🇷 한국 (Korea)</option>
+                <option value="US">🇺🇸 미국 (USA)</option>
+                <option value="JP">🇯🇵 일본 (Japan)</option>
+            </select>
+            <select id="citySelect">
+                </select>
+        </div>
+        <div style="font-size:14px; color:#94a3b8;">
+            * 빈 땅 가격: <b>300 BOK</b><br>
+            * 점령 룰: 25개 중 <b>13개 이상</b> 소유 시 '시장' 등극
+        </div>
+    </div>
+
+    <div id="landGrid" class="map-container">
+        </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-        import { getFirestore, collection, onSnapshot, doc, getDoc, runTransaction, increment } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+        import { getFirestore, collection, onSnapshot, doc, runTransaction, increment, query, where } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
         const firebaseConfig = { apiKey: "AIzaSyBwQjuqgWM4YKnqu_gzNbeCg5alrC-jVcQ", authDomain: "myco-737a0.firebaseapp.com", projectId: "myco-737a0", storageBucket: "myco-737a0.firebasestorage.app", messagingSenderId: "942571332540", appId: "1:942571332540:web:be0bb6fbdd32655501c1b9" };
@@ -62,158 +81,139 @@
         const db = getFirestore(app);
         const auth = getAuth(app);
 
-        const TOTAL_LANDS = 25;
-        const SYSTEM_PRICE = 300;
         let currentUser = null;
         let currentBalance = 0;
+        const LAND_PRICE = 300;
 
-        // 1. 맵 UI 초기화
+        // 도시 데이터
+        const cities = {
+            "KR": ["서울 (Seoul)", "부산 (Busan)", "제주 (Jeju)"],
+            "US": ["뉴욕 (New York)", "LA (Los Angeles)", "텍사스 (Texas)"],
+            "JP": ["도쿄 (Tokyo)", "오사카 (Osaka)"]
+        };
+
+        // UI 요소
+        const countrySelect = document.getElementById("countrySelect");
+        const citySelect = document.getElementById("citySelect");
         const grid = document.getElementById("landGrid");
-        for(let i=0; i<TOTAL_LANDS; i++) {
-            const div = document.createElement("div");
-            div.className = "land-block";
-            div.id = `land-${i}`;
-            div.innerHTML = `<span class="land-name" style="color:#555;">EMPTY</span><span class="land-tag" style="color:#555;">${SYSTEM_PRICE} BOK</span>`;
-            div.onclick = () => handleLandClick(i); // 클릭 이벤트 연결
-            grid.appendChild(div);
-        }
 
-        // 2. 인증 및 잔액 확인
+        // 1. 셀렉트 박스 로직
+        function updateCityOptions() {
+            const country = countrySelect.value;
+            const cityList = cities[country];
+            citySelect.innerHTML = "";
+            cityList.forEach(city => {
+                const opt = document.createElement("option");
+                opt.value = city.split(' ')[0]; // "서울"만 값으로 사용
+                opt.innerText = city;
+                citySelect.appendChild(opt);
+            });
+            loadMap(); // 도시 바뀌면 맵 로드
+        }
+        countrySelect.addEventListener("change", updateCityOptions);
+        citySelect.addEventListener("change", loadMap);
+        updateCityOptions(); // 초기 실행
+
+        // 2. 인증 확인
         onAuthStateChanged(auth, (user) => {
             if(user) {
                 currentUser = user;
                 onSnapshot(doc(db, "users", user.uid), (d) => {
                     if(d.exists()) {
                         currentBalance = d.data().coin;
-                        document.getElementById("walletBadge").innerHTML = `💰 ${currentBalance.toLocaleString()} BOK`;
+                        document.getElementById("walletBadge").innerText = `💰 ${currentBalance.toLocaleString()} BOK`;
                     }
                 });
             } else {
-                alert("로그인이 필요합니다. 메인화면으로 이동합니다.");
-                location.href = 'index.html';
+                alert("로그인 필요"); location.href='index.html';
             }
         });
 
-        // 3. 실시간 땅 데이터 연동
-        onSnapshot(collection(db, "lands"), (snapshot) => {
-            snapshot.forEach((doc) => {
-                const data = doc.data();
-                const el = document.getElementById(doc.id);
-                if(!el) return;
+        // 3. 맵 로드 (핵심)
+        let unsubscribeMap = null;
+        function loadMap() {
+            const country = countrySelect.value;
+            const city = citySelect.value;
+            const regionKey = `${country}-${city}`; // 예: KR-서울
 
-                // 데이터 저장 (클릭 시 참조용)
-                el.dataset.ownerUid = data.ownerUid;
-                el.dataset.price = data.price || SYSTEM_PRICE;
-                el.dataset.status = data.status || 'owned'; // owned, forSale
-                el.dataset.customName = data.customName || "이름 없음";
+            // 그리드 초기화
+            grid.innerHTML = "";
+            for(let i=0; i<25; i++) {
+                const div = document.createElement("div");
+                div.className = "land-block land-empty";
+                div.id = `block-${i}`;
+                div.innerHTML = `<span class="land-text">빈 땅</span><span class="land-price">${LAND_PRICE}</span>`;
+                div.onclick = () => buyLand(i, regionKey);
+                grid.appendChild(div);
+            }
 
-                // 스타일 초기화
-                el.className = "land-block";
-                
-                // 내 땅
-                if(currentUser && data.ownerUid === currentUser.uid) {
-                    el.classList.add("land-my");
-                    let statusHtml = data.status === 'forSale' ? `<span class="land-tag tag-sale">판매중: ${data.price}</span>` : `<span class="land-tag" style="color:#00f3ff">내 땅</span>`;
-                    el.innerHTML = `<span class="land-name">${data.customName}</span>${statusHtml}`;
-                } 
-                // 판매중인 땅
-                else if(data.status === 'forSale') {
-                    el.classList.add("land-sale");
-                    el.innerHTML = `<span class="land-name">${data.customName}</span><span class="land-tag tag-sale">${data.price} BOK</span>`;
-                }
-                // 그냥 남의 땅
-                else {
-                    el.classList.add("land-others");
-                    el.innerHTML = `<span class="land-name">${data.customName}</span><span class="land-tag">${data.ownerName}</span>`;
+            // 실시간 데이터 구독
+            if(unsubscribeMap) unsubscribeMap();
+            const q = query(collection(db, "lands"), where("region", "==", regionKey));
+            
+            unsubscribeMap = onSnapshot(q, (snapshot) => {
+                let myLandCount = 0;
+
+                snapshot.forEach(doc => {
+                    const data = doc.data();
+                    const idx = data.index;
+                    const el = document.getElementById(`block-${idx}`);
+                    
+                    if(currentUser && data.ownerUid === currentUser.uid) {
+                        el.className = "land-block land-my";
+                        el.innerHTML = `<span class="land-text">${data.customName}</span><span class="land-price">내 땅</span>`;
+                        myLandCount++;
+                    } else {
+                        el.className = "land-block land-others";
+                        el.innerHTML = `<span class="land-text">${data.customName}</span><span class="land-price">${data.ownerName}</span>`;
+                    }
+                    // 이미 팔린 땅은 클릭 이벤트 덮어쓰기 (거래 기능은 여기서 생략하고 단순화)
+                    el.onclick = () => alert(`소유자: ${data.ownerName}\n땅 이름: ${data.customName}`);
+                });
+
+                // 점령(Conquest) 체크
+                const statusBox = document.getElementById("conquestMessage");
+                if(myLandCount >= 13) {
+                    statusBox.style.display = "block";
+                    statusBox.innerText = `👑 축하합니다! 당신은 [${city}]의 시장입니다! (${myLandCount}/25 점령)`;
+                } else {
+                    statusBox.style.display = "none";
                 }
             });
-        });
-
-        // 4. 클릭 핸들러 (핵심 로직)
-        async function handleLandClick(index) {
-            const el = document.getElementById(`land-${index}`);
-            const ownerUid = el.dataset.ownerUid;
-            const status = el.dataset.status;
-            const price = parseInt(el.dataset.price) || SYSTEM_PRICE;
-            const landName = el.dataset.customName;
-
-            // [상황 1] 빈 땅 구매 (시스템 거래)
-            if(!ownerUid) {
-                if(currentBalance < SYSTEM_PRICE) return alert("잔액이 부족합니다.");
-                if(!confirm(`#${index+1}번 땅을 구매하시겠습니까? (300 BOK)`)) return;
-                
-                const customName = prompt("땅 이름을 지어주세요! (예: 강남 본점)");
-                if(!customName) return alert("이름을 짓지 않아 취소되었습니다.");
-
-                buyLandTransaction(index, SYSTEM_PRICE, null, customName); // 판매자 없음(null)
-            }
-            // [상황 2] 내 땅 관리 (판매 등록/취소)
-            else if(ownerUid === currentUser.uid) {
-                if(status === 'forSale') {
-                    if(confirm("판매를 취소하시겠습니까?")) updateLandStatus(index, 'owned', 0);
-                } else {
-                    const sellPrice = prompt("판매 가격을 입력하세요 (BOK)", "1000");
-                    if(!sellPrice || isNaN(sellPrice) || sellPrice <= 0) return;
-                    updateLandStatus(index, 'forSale', parseInt(sellPrice));
-                }
-            }
-            // [상황 3] 남의 땅 구매 (유저간 거래)
-            else {
-                if(status === 'forSale') {
-                    if(currentBalance < price) return alert(`잔액 부족! ${price} BOK이 필요합니다.`);
-                    if(confirm(`"${landName}" 땅을 구매하시겠습니까?\n가격: ${price} BOK\n(판매자에게 즉시 입금됩니다)`)) {
-                        buyLandTransaction(index, price, ownerUid, landName); // 판매자 UID 전달
-                    }
-                } else {
-                    alert(`🔒 [${landName}]\n소유자: ${el.innerHTML.split('span').pop().replace(/<[^>]*>/g, '')}\n판매 중이 아닙니다.`);
-                }
-            }
         }
 
-        // 트랜잭션: 구매 (시스템 or 유저)
-        async function buyLandTransaction(index, price, sellerUid, newName) {
-            const landId = `land-${index}`;
+        // 4. 땅 구매
+        async function buyLand(index, regionKey) {
+            if(currentBalance < LAND_PRICE) return alert("잔액 부족!");
+            if(!confirm(`${regionKey} 지역의 ${index+1}번 땅을 구매하시겠습니까?`)) return;
+
+            const name = prompt("땅 이름을 지어주세요!");
+            if(!name) return;
+
             try {
                 await runTransaction(db, async (t) => {
+                    const landId = `${regionKey}-${index}`;
+                    const landRef = doc(db, "lands", landId);
+                    const landDoc = await t.get(landRef);
+                    
+                    if(landDoc.exists()) throw "이미 판매된 땅입니다.";
+                    
                     const userRef = doc(db, "users", currentUser.uid);
                     const userDoc = await t.get(userRef);
-                    if(userDoc.data().coin < price) throw "잔액 부족";
+                    if(userDoc.data().coin < LAND_PRICE) throw "잔액 부족";
 
-                    // 구매자 돈 차감
-                    t.update(userRef, { coin: increment(-price) });
-
-                    // 판매자가 있으면 (유저 거래) -> 판매자에게 돈 입금
-                    if(sellerUid) {
-                        const sellerRef = doc(db, "users", sellerUid);
-                        t.update(sellerRef, { coin: increment(price) });
-                    }
-
-                    // 땅 명의 변경
-                    const landRef = doc(db, "lands", landId);
-                    // 기존 데이터 유지하면서 업데이트
-                    let updateData = {
+                    t.update(userRef, { coin: increment(-LAND_PRICE) });
+                    t.set(landRef, {
+                        region: regionKey,
+                        index: index,
                         ownerUid: currentUser.uid,
                         ownerName: currentUser.displayName,
-                        status: 'owned',
+                        customName: name,
                         purchasedAt: new Date().toISOString()
-                    };
-                    if(newName) updateData.customName = newName; // 이름 변경 시에만
-
-                    t.set(landRef, updateData, { merge: true });
+                    });
                 });
-                alert("🎉 거래 성공! 부동산 등기가 완료되었습니다.");
-            } catch(e) { alert("거래 실패: " + e); }
-        }
-
-        // 내 땅 상태 변경 (판매중 <-> 보유중)
-        async function updateLandStatus(index, status, price) {
-            try {
-                await runTransaction(db, async (t) => {
-                    const landRef = doc(db, "lands", `land-${index}`);
-                    t.update(landRef, { status: status, price: price });
-                });
-                alert(status === 'forSale' ? `매물 등록 완료! (${price} BOK)` : "판매 취소 완료!");
-            } catch(e) { alert("오류: " + e); }
+                alert("구매 성공! 땅 주인이 되셨습니다.");
+            } catch(e) { alert(e); }
         }
     </script>
 </body>
