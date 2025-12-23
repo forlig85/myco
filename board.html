@@ -355,7 +355,9 @@
         };
 
         function loadPosts() {
-            const q = query(collection(db, "posts"), where("boardId", "==", boardId), orderBy("createdAt", "desc"));
+            // 인덱스 없이 작동하도록 where만 사용하고 정렬은 클라이언트에서
+            const q = query(collection(db, "posts"), where("boardId", "==", boardId));
+            
             onSnapshot(q, (snapshot) => {
                 const list = document.getElementById("postList");
                 list.innerHTML = "";
@@ -363,7 +365,11 @@
                 
                 let posts = [];
                 snapshot.forEach(d => posts.push({ id: d.id, ...d.data() }));
+                
+                // 클라이언트 측 정렬
+                posts.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
                 if(currentSort === 'popular') posts.sort((a, b) => (b.likeCount||0) - (a.likeCount||0));
+                // 부스트된 글 상단
                 posts.sort((a, b) => (b.boosted?1:0) - (a.boosted?1:0));
                 
                 posts.forEach(p => {
@@ -374,7 +380,8 @@
                     const thumb = p.images?.length ? `<img class="post-thumb" src="${p.images[0]}">` : '';
                     list.innerHTML += `<div class="post-item" onclick="viewPost('${p.id}')">${thumb}<div class="post-info"><div class="post-title">${p.title}${boost}${imgBadge}</div><div class="post-meta">${flag} ${title}${p.authorName} · ${new Date(p.createdAt).toLocaleDateString()}</div></div><div class="post-stats"><span>❤️ ${p.likeCount||0}</span><span>💬 ${p.commentCount||0}</span></div></div>`;
                 });
-            }, (e) => { document.getElementById("postList").innerHTML = `<div class="empty-state"><div class="icon">⚠️</div><p>오류: ${e.message}</p></div>`; });
+            }, (e) => { console.error("글 로드 오류:", e); document.getElementById("postList").innerHTML = `<div class="empty-state"><div class="icon">⚠️</div><p>오류: ${e.message}</p></div>`; });
+        }
         }
 
         window.changeSort = (s) => { currentSort = s; document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active')); document.querySelector(`.tab[data-sort="${s}"]`).classList.add('active'); loadPosts(); };
@@ -486,16 +493,22 @@
         };
 
         function loadComments(postId) {
-            const q = query(collection(db, "comments"), where("postId", "==", postId), orderBy("createdAt", "asc"));
+            // 인덱스 없이 작동하도록 where만 사용
+            const q = query(collection(db, "comments"), where("postId", "==", postId));
             onSnapshot(q, (snapshot) => {
                 const list = document.getElementById("commentList");
                 list.innerHTML = snapshot.empty ? '<p style="text-align:center;color:var(--text-muted);padding:20px;">댓글 없음</p>' : '';
-                snapshot.forEach(d => {
-                    const c = d.data();
+                
+                // 클라이언트 측 정렬 (오래된 순)
+                let comments = [];
+                snapshot.forEach(d => comments.push({ id: d.id, ...d.data() }));
+                comments.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
+                
+                comments.forEach(c => {
                     const t = c.authorTitle ? `<span style="font-size:10px;background:rgba(245,158,11,0.2);color:#f59e0b;padding:2px 6px;border-radius:10px;margin-right:4px;">${c.authorTitle}</span>` : '';
                     list.innerHTML += `<div class="comment-item"><div class="comment-avatar">👤</div><div class="comment-content"><div class="comment-author">${c.authorCountry||''} ${t}${c.authorName}</div><div class="comment-text">${c.content}</div><div class="comment-time">${new Date(c.createdAt).toLocaleString()}</div></div></div>`;
                 });
-            });
+            }, (e) => { console.error("댓글 로드 오류:", e); });
         }
 
         window.submitComment = async function() {
