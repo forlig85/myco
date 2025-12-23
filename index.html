@@ -3,116 +3,123 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>내 커뮤니티</title>
+    <title>내 커뮤니티 (myco-737a0)</title>
     <style>
-        /* 디자인 스타일 (CSS) */
-        body { font-family: 'Pretendard', sans-serif; background-color: #f8f9fa; margin: 0; padding: 0; }
-        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-        
-        /* 입력창 디자인 */
-        .input-box { background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); margin-bottom: 20px; }
-        input, textarea { width: 100%; border: 1px solid #ddd; padding: 10px; margin-bottom: 10px; border-radius: 5px; box-sizing: border-box; }
-        button { background-color: #333; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; width: 100%; font-size: 16px; }
-        button:hover { background-color: #555; }
-
-        /* 게시글 목록 디자인 */
-        .post { background: white; padding: 20px; border-radius: 10px; margin-bottom: 15px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
-        .post-title { font-weight: bold; font-size: 18px; margin-bottom: 5px; }
-        .post-content { color: #555; font-size: 14px; white-space: pre-wrap; }
-        .post-date { font-size: 12px; color: #999; margin-top: 10px; text-align: right; }
+        body { font-family: 'Pretendard', sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background: #f0f2f5; }
+        h2 { text-align: center; color: #333; }
+        .input-box { background: white; padding: 20px; border-radius: 10px; margin-bottom: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        input, textarea { width: 100%; padding: 10px; margin-bottom: 10px; border: 1px solid #ddd; border-radius: 5px; box-sizing: border-box; }
+        button { width: 100%; padding: 12px; background: #007bff; color: white; border: none; border-radius: 5px; font-weight: bold; cursor: pointer; }
+        button:hover { background: #0056b3; }
+        .post { background: white; padding: 15px; border-radius: 8px; margin-bottom: 10px; border-left: 5px solid #007bff; }
+        .post small { color: #666; display: block; margin-top: 5px; }
+        .error-msg { color: #721c24; background-color: #f8d7da; border: 1px solid #f5c6cb; padding: 10px; border-radius: 5px; margin-bottom: 10px; display: none; }
     </style>
 </head>
 <body>
 
-    <div class="container">
-        <h2>🔥 내 커뮤니티 (테스트)</h2>
-        
-        <div class="input-box">
-            <input type="text" id="title" placeholder="제목을 입력하세요">
-            <textarea id="content" rows="3" placeholder="내용을 입력하세요"></textarea>
-            <button id="saveBtn">글 올리기</button>
-        </div>
+    <h2>🔥 커뮤니티 테스트 (myco-737a0)</h2>
+    
+    <div id="errorBox" class="error-msg"></div>
 
-        <div id="postList">
-            <p style="text-align:center; color:#999;">로딩 중...</p>
-        </div>
+    <div class="input-box">
+        <input type="text" id="title" placeholder="제목을 입력하세요">
+        <textarea id="content" rows="3" placeholder="내용을 입력하세요"></textarea>
+        <button id="saveBtn">글 올리기</button>
+    </div>
+
+    <div id="postList">
+        <p style="text-align:center; color:#666;">데이터베이스 연결 중...</p>
     </div>
 
     <script type="module">
+        // 웹 브라우저용 Firebase 주소로 변경했습니다.
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
         import { getFirestore, collection, addDoc, getDocs, query, orderBy, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
         // -----------------------------------------------------------
-        // 🔴 [중요] 아래 부분을 아까 복사한 내 설정값으로 바꿔주세요!
+        // 🟢 사용자님이 보내주신 키를 적용했습니다.
         // -----------------------------------------------------------
-        // Import the functions you need from the SDKs you need
-import { initializeApp } from "firebase/app";
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
-
-// Your web app's Firebase configuration
-const firebaseConfig = {
-  apiKey: "AIzaSyBwQjuqgWM4YKnqu_gzNbeCg5alrC-jVcQ",
-  authDomain: "myco-737a0.firebaseapp.com",
-  projectId: "myco-737a0",
-  storageBucket: "myco-737a0.firebasestorage.app",
-  messagingSenderId: "942571332540",
-  appId: "1:942571332540:web:be0bb6fbdd32655501c1b9"
-};
-
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
+        const firebaseConfig = {
+          apiKey: "AIzaSyBwQjuqgWM4YKnqu_gzNbeCg5alrC-jVcQ",
+          authDomain: "myco-737a0.firebaseapp.com",
+          projectId: "myco-737a0",
+          storageBucket: "myco-737a0.firebasestorage.app",
+          messagingSenderId: "942571332540",
+          appId: "1:942571332540:web:be0bb6fbdd32655501c1b9"
+        };
         // -----------------------------------------------------------
 
-        // Firebase 시작
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
+        // 에러 표시 함수
+        function showError(msg) {
+            const box = document.getElementById("errorBox");
+            box.style.display = "block";
+            box.innerText = "⚠️ " + msg;
+            alert("오류 발생!\n" + msg);
+        }
 
-        // 1. 글 저장하기 기능
-        document.getElementById("saveBtn").addEventListener("click", async () => {
-            const title = document.getElementById("title").value;
-            const content = document.getElementById("content").value;
+        try {
+            const app = initializeApp(firebaseConfig);
+            const db = getFirestore(app);
 
-            if (!title || !content) {
-                alert("제목과 내용을 모두 입력해주세요!");
-                return;
-            }
+            // 1. 글쓰기 기능
+            document.getElementById("saveBtn").addEventListener("click", async () => {
+                const title = document.getElementById("title").value;
+                const content = document.getElementById("content").value;
 
-            try {
-                await addDoc(collection(db, "posts"), {
-                    title: title,
-                    content: content,
-                    date: new Date().toISOString()
-                });
-                alert("글이 등록되었습니다!");
-                document.getElementById("title").value = ""; // 입력창 비우기
-                document.getElementById("content").value = "";
-            } catch (e) {
-                console.error("에러 발생: ", e);
-                alert("글쓰기 실패! 콘솔을 확인하세요.");
-            }
-        });
+                if (!title || !content) return alert("제목과 내용을 모두 입력해주세요.");
 
-        // 2. 글 불러오기 기능 (실시간 업데이트)
-        const q = query(collection(db, "posts"), orderBy("date", "desc"));
-        onSnapshot(q, (snapshot) => {
-            const postList = document.getElementById("postList");
-            postList.innerHTML = ""; // 기존 목록 초기화
-
-            snapshot.forEach((doc) => {
-                const post = doc.data();
-                const date = new Date(post.date).toLocaleString();
-                
-                const html = `
-                    <div class="post">
-                        <div class="post-title">${post.title}</div>
-                        <div class="post-content">${post.content}</div>
-                        <div class="post-date">${date}</div>
-                    </div>
-                `;
-                postList.innerHTML += html;
+                try {
+                    await addDoc(collection(db, "posts"), {
+                        title: title,
+                        content: content,
+                        date: new Date().toISOString()
+                    });
+                    alert("성공! 글이 등록되었습니다.");
+                    document.getElementById("title").value = "";
+                    document.getElementById("content").value = "";
+                } catch (e) {
+                    console.error(e);
+                    if (e.message.includes("Missing or insufficient permissions")) {
+                        showError("데이터베이스 잠금 해제가 필요합니다. (규칙 수정 필요)");
+                    } else {
+                        showError("글쓰기 실패: " + e.message);
+                    }
+                }
             });
-        });
+
+            // 2. 글 목록 불러오기 (실시간)
+            const q = query(collection(db, "posts"), orderBy("date", "desc"));
+            onSnapshot(q, (snapshot) => {
+                const postList = document.getElementById("postList");
+                postList.innerHTML = ""; 
+                
+                if (snapshot.empty) {
+                    postList.innerHTML = "<p style='text-align:center'>작성된 글이 없습니다.</p>";
+                    return;
+                }
+
+                snapshot.forEach((doc) => {
+                    const post = doc.data();
+                    const div = document.createElement("div");
+                    div.className = "post";
+                    div.innerHTML = `<strong>${post.title}</strong><small>${post.content}</small>`;
+                    postList.appendChild(div);
+                });
+            }, (error) => {
+                console.error(error);
+                if (error.message.includes("Missing or insufficient permissions")) {
+                    showError("권한 오류: 데이터베이스 규칙을 'true'로 바꿔주세요.");
+                } else if (error.code === "failed-precondition") {
+                     showError("데이터베이스가 생성되지 않았습니다. Firebase 콘솔에서 Firestore를 만들어주세요.");
+                } else {
+                    showError("불러오기 실패: " + error.message);
+                }
+            });
+
+        } catch (initialError) {
+            showError("초기 설정 오류: " + initialError.message);
+        }
     </script>
 </body>
 </html>
