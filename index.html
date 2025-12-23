@@ -3,43 +3,95 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>내 커뮤니티 (myco-737a0)</title>
+    <title>Bokluck Protocol (Mainnet)</title>
     <style>
-        body { font-family: 'Pretendard', sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background: #f0f2f5; }
-        h2 { text-align: center; color: #333; }
-        .input-box { background: white; padding: 20px; border-radius: 10px; margin-bottom: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-        input, textarea { width: 100%; padding: 10px; margin-bottom: 10px; border: 1px solid #ddd; border-radius: 5px; box-sizing: border-box; }
-        button { width: 100%; padding: 12px; background: #007bff; color: white; border: none; border-radius: 5px; font-weight: bold; cursor: pointer; }
-        button:hover { background: #0056b3; }
-        .post { background: white; padding: 15px; border-radius: 8px; margin-bottom: 10px; border-left: 5px solid #007bff; }
-        .post small { color: #666; display: block; margin-top: 5px; }
-        .error-msg { color: #721c24; background-color: #f8d7da; border: 1px solid #f5c6cb; padding: 10px; border-radius: 5px; margin-bottom: 10px; display: none; }
+        /* 비트코인 거래소 스타일 (다크 & 골드) */
+        body { font-family: 'Pretendard', sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background: #0b0e11; color: #eaecef; }
+        
+        /* 헤더 */
+        header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid #2d3136; padding-bottom: 15px; }
+        .logo { font-size: 22px; font-weight: 800; color: #F7931A; letter-spacing: -0.5px; } /* 비트코인 컬러 */
+        .wallet-badge { background: #1e2329; padding: 8px 16px; border-radius: 4px; border: 1px solid #474d57; font-size: 14px; font-family: monospace; display: none; }
+        .coin-text { color: #F7931A; font-weight: bold; }
+
+        /* 현황판 (대시보드) */
+        .dashboard { background: #1e2329; padding: 20px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #2d3136; }
+        .dash-row { display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 14px; color: #848e9c; }
+        .dash-val { color: #eaecef; font-weight: bold; font-family: monospace; font-size: 16px; }
+        .progress-bg { background: #2d3136; height: 10px; border-radius: 5px; overflow: hidden; margin-top: 5px; }
+        .progress-bar { background: #F7931A; height: 100%; width: 0%; transition: width 0.5s; }
+        .halving-info { text-align: center; margin-top: 15px; padding-top: 15px; border-top: 1px dashed #2d3136; font-size: 13px; color: #F7931A; }
+
+        /* 로그인 버튼 */
+        #loginBtn { background: #F7931A; color: white; border: none; padding: 12px; width: 100%; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 16px; margin-bottom: 20px; }
+        #loginBtn:hover { background: #e08312; }
+
+        /* 채굴기 (글쓰기) */
+        .mining-area { display: none; margin-bottom: 30px; }
+        input, textarea { width: 100%; padding: 15px; margin-bottom: 10px; border: 1px solid #474d57; background: #0b0e11; color: white; border-radius: 4px; box-sizing: border-box; font-family: inherit; }
+        input:focus, textarea:focus { outline: none; border-color: #F7931A; }
+        
+        button.mine-btn { width: 100%; padding: 15px; background: #20b26c; color: white; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 16px; transition: 0.2s; }
+        button.mine-btn:hover { background: #0e9656; }
+        button:disabled { background: #474d57; cursor: not-allowed; }
+
+        /* 블록 리스트 */
+        .block-list { border-top: 1px solid #2d3136; padding-top: 20px; }
+        .block-item { background: #161a1e; padding: 15px; border-bottom: 1px solid #2d3136; }
+        .block-header { display: flex; justify-content: space-between; font-size: 12px; color: #848e9c; margin-bottom: 5px; }
+        .block-reward { color: #20b26c; font-weight: bold; font-family: monospace; }
+        .block-title { font-size: 16px; font-weight: bold; margin-bottom: 5px; }
+        
+        .loading { text-align: center; color: #848e9c; padding: 20px; }
     </style>
 </head>
 <body>
 
-    <h2>🔥 커뮤니티 테스트 (myco-737a0)</h2>
-    
-    <div id="errorBox" class="error-msg"></div>
+    <header>
+        <div class="logo">BOKLUCK NETWORK</div>
+        <div id="wallet" class="wallet-badge">
+            <span id="userCoin" class="coin-text">0</span> BOK
+        </div>
+    </header>
 
-    <div class="input-box">
-        <input type="text" id="title" placeholder="제목을 입력하세요">
-        <textarea id="content" rows="3" placeholder="내용을 입력하세요"></textarea>
-        <button id="saveBtn">글 올리기</button>
+    <div class="dashboard">
+        <div class="dash-row">
+            <span>⛏️ 현재 블록 보상 (Current Reward)</span>
+            <span class="dash-val"><span id="currentReward">100</span> BOK</span>
+        </div>
+        <div class="dash-row">
+            <span>📊 총 채굴량 (Total Mined)</span>
+            <span class="dash-val"><span id="totalMined">0</span> / 1,000,000</span>
+        </div>
+        <div class="progress-bg">
+            <div id="miningProgress" class="progress-bar"></div>
+        </div>
+        <div class="halving-info">
+            ⚠️ 다음 반감기까지 <span id="blocksToHalving" style="font-weight:bold; color:white;">5</span>개의 블록(글) 남음
+        </div>
     </div>
 
-    <div id="postList">
-        <p style="text-align:center; color:#666;">데이터베이스 연결 중...</p>
+    <button id="loginBtn">지갑 연결 (Google Login)</button>
+
+    <div id="miningArea" class="mining-area">
+        <input type="text" id="title" placeholder="블록 데이터 입력 (제목)">
+        <textarea id="content" rows="3" placeholder="내용을 입력하여 해시를 생성하세요."></textarea>
+        <button id="mineBtn" class="mine-btn">채굴 시작 (글쓰기)</button>
+    </div>
+
+    <h4 style="color:#848e9c; margin-bottom:10px;">RECENT BLOCKS</h4>
+    <div id="blockList" class="block-list">
+        <div class="loading">네트워크 동기화 중...</div>
     </div>
 
     <script type="module">
-        // 웹 브라우저용 Firebase 주소로 변경했습니다.
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-        import { getFirestore, collection, addDoc, getDocs, query, orderBy, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, query, orderBy, onSnapshot, doc, getDoc, setDoc, runTransaction, increment } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+        import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
-        // -----------------------------------------------------------
-        // 🟢 사용자님이 보내주신 키를 적용했습니다.
-        // -----------------------------------------------------------
+        // ============================================================
+        // 🚨 여기에 본인의 키를 붙여넣으세요! (안 하면 작동 안 함)
+        // ============================================================
         const firebaseConfig = {
           apiKey: "AIzaSyBwQjuqgWM4YKnqu_gzNbeCg5alrC-jVcQ",
           authDomain: "myco-737a0.firebaseapp.com",
@@ -48,78 +100,174 @@
           messagingSenderId: "942571332540",
           appId: "1:942571332540:web:be0bb6fbdd32655501c1b9"
         };
-        // -----------------------------------------------------------
+        // ============================================================
 
-        // 에러 표시 함수
-        function showError(msg) {
-            const box = document.getElementById("errorBox");
-            box.style.display = "block";
-            box.innerText = "⚠️ " + msg;
-            alert("오류 발생!\n" + msg);
-        }
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const auth = getAuth(app);
+        const provider = new GoogleAuthProvider();
 
-        try {
-            const app = initializeApp(firebaseConfig);
-            const db = getFirestore(app);
+        // ⚙️ [설정] 반감기 규칙 (테스트용)
+        // 실제 운영시는 HALVING_INTERVAL을 1000 등으로 늘리세요.
+        const HALVING_INTERVAL = 5; // 글 5개마다 보상 절반
+        const INITIAL_REWARD = 100; // 초기 보상
+        const MAX_SUPPLY = 1000000; // 총 발행량
 
-            // 1. 글쓰기 기능
-            document.getElementById("saveBtn").addEventListener("click", async () => {
-                const title = document.getElementById("title").value;
-                const content = document.getElementById("content").value;
+        let currentUser = null;
 
-                if (!title || !content) return alert("제목과 내용을 모두 입력해주세요.");
+        // UI 요소
+        const loginBtn = document.getElementById("loginBtn");
+        const wallet = document.getElementById("wallet");
+        const miningArea = document.getElementById("miningArea");
+        const mineBtn = document.getElementById("mineBtn");
 
-                try {
-                    await addDoc(collection(db, "posts"), {
+        // 1. 시스템 통계 초기화 및 실시간 감시
+        const statsRef = doc(db, "system", "miningStats");
+        
+        onSnapshot(statsRef, (docSnap) => {
+            let totalMined = 0;
+            let currentBlockHeight = 0;
+
+            if (docSnap.exists()) {
+                const data = docSnap.data();
+                totalMined = data.totalMined || 0;
+                currentBlockHeight = data.totalBlocks || 0;
+            }
+
+            // 반감기 계산 로직
+            const halvingCount = Math.floor(currentBlockHeight / HALVING_INTERVAL);
+            // 보상 계산: 100 -> 50 -> 25 ... (최소 1)
+            let currentReward = Math.floor(INITIAL_REWARD / Math.pow(2, halvingCount));
+            if (currentReward < 1) currentReward = 1;
+
+            // 다음 반감기까지 남은 블록
+            const nextHalvingBlock = (halvingCount + 1) * HALVING_INTERVAL;
+            const blocksLeft = nextHalvingBlock - currentBlockHeight;
+
+            // UI 업데이트
+            document.getElementById("totalMined").innerText = totalMined.toLocaleString();
+            document.getElementById("currentReward").innerText = currentReward;
+            document.getElementById("blocksToHalving").innerText = blocksLeft;
+            
+            // 진행률 바
+            const percent = (totalMined / MAX_SUPPLY) * 100;
+            document.getElementById("miningProgress").style.width = percent + "%";
+
+            // 버튼 텍스트 업데이트
+            if(mineBtn.disabled === false) {
+                 mineBtn.innerText = `채굴 시작 (+${currentReward} BOK)`;
+            }
+        });
+
+        // 2. 로그인 로직
+        loginBtn.addEventListener("click", () => signInWithPopup(auth, provider));
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                currentUser = user;
+                loginBtn.style.display = "none";
+                wallet.style.display = "block";
+                miningArea.style.display = "block";
+
+                // 사용자 지갑 감시
+                onSnapshot(doc(db, "users", user.uid), (doc) => {
+                    const coin = doc.exists() ? doc.data().coin : 0;
+                    document.getElementById("userCoin").innerText = coin.toLocaleString();
+                });
+            }
+        });
+
+        // 3. 채굴 (트랜잭션 적용 - 동시에 눌러도 오류 없게)
+        mineBtn.addEventListener("click", async () => {
+            if (!currentUser) return;
+            const title = document.getElementById("title").value;
+            const content = document.getElementById("content").value;
+            if (!title || !content) return alert("데이터를 입력하세요.");
+
+            mineBtn.disabled = true;
+            mineBtn.innerText = "⛏️ 채굴 연산 중...";
+
+            try {
+                await runTransaction(db, async (transaction) => {
+                    // (1) 중앙 통계 데이터 가져오기
+                    const statsDoc = await transaction.get(statsRef);
+                    let currentStats = { totalBlocks: 0, totalMined: 0 };
+                    
+                    if (statsDoc.exists()) {
+                        currentStats = statsDoc.data();
+                    }
+
+                    // (2) 현재 시점의 보상 계산
+                    const halvingCount = Math.floor(currentStats.totalBlocks / HALVING_INTERVAL);
+                    let reward = Math.floor(INITIAL_REWARD / Math.pow(2, halvingCount));
+                    if (reward < 1) reward = 1;
+
+                    // (3) 총량 제한 체크
+                    if (currentStats.totalMined + reward > MAX_SUPPLY) {
+                        throw "채굴이 종료되었습니다! (총 발행량 도달)";
+                    }
+
+                    // (4) 글 저장 (Posts 컬렉션)
+                    const newPostRef = doc(collection(db, "posts"));
+                    transaction.set(newPostRef, {
                         title: title,
                         content: content,
+                        author: currentUser.displayName,
+                        reward: reward,
                         date: new Date().toISOString()
                     });
-                    alert("성공! 글이 등록되었습니다.");
-                    document.getElementById("title").value = "";
-                    document.getElementById("content").value = "";
-                } catch (e) {
-                    console.error(e);
-                    if (e.message.includes("Missing or insufficient permissions")) {
-                        showError("데이터베이스 잠금 해제가 필요합니다. (규칙 수정 필요)");
-                    } else {
-                        showError("글쓰기 실패: " + e.message);
-                    }
-                }
-            });
 
-            // 2. 글 목록 불러오기 (실시간)
-            const q = query(collection(db, "posts"), orderBy("date", "desc"));
-            onSnapshot(q, (snapshot) => {
-                const postList = document.getElementById("postList");
-                postList.innerHTML = ""; 
-                
-                if (snapshot.empty) {
-                    postList.innerHTML = "<p style='text-align:center'>작성된 글이 없습니다.</p>";
-                    return;
-                }
+                    // (5) 사용자 지갑 업데이트
+                    const userRef = doc(db, "users", currentUser.uid);
+                    transaction.set(userRef, { 
+                        coin: increment(reward),
+                        email: currentUser.email,
+                        name: currentUser.displayName
+                    }, { merge: true });
 
-                snapshot.forEach((doc) => {
-                    const post = doc.data();
-                    const div = document.createElement("div");
-                    div.className = "post";
-                    div.innerHTML = `<strong>${post.title}</strong><small>${post.content}</small>`;
-                    postList.appendChild(div);
+                    // (6) 중앙 통계 업데이트
+                    transaction.set(statsRef, {
+                        totalBlocks: increment(1),
+                        totalMined: increment(reward)
+                    }, { merge: true });
                 });
-            }, (error) => {
-                console.error(error);
-                if (error.message.includes("Missing or insufficient permissions")) {
-                    showError("권한 오류: 데이터베이스 규칙을 'true'로 바꿔주세요.");
-                } else if (error.code === "failed-precondition") {
-                     showError("데이터베이스가 생성되지 않았습니다. Firebase 콘솔에서 Firestore를 만들어주세요.");
-                } else {
-                    showError("불러오기 실패: " + error.message);
-                }
-            });
 
-        } catch (initialError) {
-            showError("초기 설정 오류: " + initialError.message);
-        }
+                alert("블록 생성 성공! 보상이 지급되었습니다.");
+                document.getElementById("title").value = "";
+                document.getElementById("content").value = "";
+
+            } catch (e) {
+                console.error(e);
+                alert("채굴 실패: " + e);
+            } finally {
+                mineBtn.disabled = false;
+            }
+        });
+
+        // 4. 블록 리스트
+        const q = query(collection(db, "posts"), orderBy("date", "desc"));
+        onSnapshot(q, (snapshot) => {
+            const list = document.getElementById("blockList");
+            list.innerHTML = "";
+            snapshot.forEach((doc) => {
+                const data = doc.data();
+                const hash = doc.id.substring(0, 8).toUpperCase();
+                const reward = data.reward ? `+${data.reward} BOK` : "Genesis";
+                
+                list.innerHTML += `
+                    <div class="block-item">
+                        <div class="block-header">
+                            <span>📦 BLOCK #${hash}</span>
+                            <span>${new Date(data.date).toLocaleTimeString()}</span>
+                        </div>
+                        <div class="block-title">${data.title}</div>
+                        <div style="display:flex; justify-content:space-between; align-items:center;">
+                            <span style="font-size:12px; color:#848e9c;">Miner: ${data.author}</span>
+                            <span class="block-reward">${reward}</span>
+                        </div>
+                    </div>
+                `;
+            });
+        });
     </script>
 </body>
 </html>
