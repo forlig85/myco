@@ -1,1 +1,867 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- SEO 개선 -->
+    <title>BOKLUCK - 글 쓰고 땅 사는 Web3 커뮤니티</title>
+    <meta name="description" content="BOKLUCK에서 콘텐츠를 작성하고 BOK 토큰을 받으세요. 가상 부동산을 구매하고 영토를 확장하는 새로운 경험!">
+    <meta name="keywords" content="BOKLUCK, BOK, 커뮤니티, 부동산, 토큰, Web3">
+    <meta property="og:title" content="BOKLUCK - 글 쓰고 땅 사는 Web3 커뮤니티">
+    <meta property="og:description" content="콘텐츠 작성으로 BOK 토큰을 획득하고, 가상 부동산에 투자하세요!">
+    <meta property="og:type" content="website">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏠</text></svg>">
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
+
+    <style>
+        * { 
+            box-sizing: border-box; 
+            margin: 0;
+            padding: 0;
+        }
+        
+        :root {
+            --primary: #6366f1;
+            --primary-light: #818cf8;
+            --secondary: #06b6d4;
+            --accent: #f59e0b;
+            --success: #10b981;
+            --danger: #ef4444;
+            --bg-dark: #0a0a0f;
+            --bg-card: #12121a;
+            --bg-card-hover: #1a1a25;
+            --border: #2a2a3a;
+            --text: #f0f0f5;
+            --text-muted: #8888a0;
+            --gradient-primary: linear-gradient(135deg, #6366f1 0%, #06b6d4 100%);
+            --gradient-gold: linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%);
+        }
+        
+        body { 
+            background-color: var(--bg-dark);
+            background-image: 
+                radial-gradient(ellipse at top, rgba(99, 102, 241, 0.1) 0%, transparent 50%),
+                radial-gradient(ellipse at bottom, rgba(6, 182, 212, 0.05) 0%, transparent 50%);
+            color: var(--text); 
+            font-family: 'Noto Sans KR', -apple-system, BlinkMacSystemFont, sans-serif; 
+            max-width: 900px; 
+            margin: 0 auto; 
+            padding: 20px; 
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            line-height: 1.6;
+        }
+        
+        main { flex: 1; }
+        
+        /* 카드 스타일 */
+        .card { 
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px; 
+            padding: 24px; 
+            margin-bottom: 20px; 
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease;
+        }
+        .card:hover {
+            border-color: rgba(99, 102, 241, 0.3);
+            box-shadow: 0 8px 30px rgba(99, 102, 241, 0.1);
+        }
+        
+        /* 버튼 스타일 */
+        button { 
+            cursor: pointer; 
+            border: none; 
+            border-radius: 12px; 
+            font-weight: 600; 
+            padding: 14px 24px; 
+            transition: all 0.3s ease; 
+            font-family: 'Noto Sans KR', sans-serif;
+            font-size: 15px;
+        }
+        button:hover { transform: translateY(-2px); }
+        button:active { transform: translateY(0); }
+        button:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+        
+        .btn-primary { 
+            background: var(--gradient-primary);
+            color: white; 
+            width: 100%; 
+            font-size: 16px;
+            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4);
+        }
+        .btn-primary:hover { 
+            box-shadow: 0 6px 25px rgba(99, 102, 241, 0.5);
+        }
+        
+        .btn-market { 
+            background: var(--gradient-gold);
+            color: #1a1a2e; 
+            width: 100%; 
+            font-size: 18px; 
+            font-weight: 700;
+            margin-bottom: 24px; 
+            box-shadow: 0 4px 20px rgba(245, 158, 11, 0.4);
+            padding: 18px 24px;
+        }
+        .btn-market:hover { 
+            box-shadow: 0 8px 30px rgba(245, 158, 11, 0.5);
+        }
+        
+        .btn-small { 
+            padding: 8px 16px; 
+            font-size: 13px; 
+            border-radius: 8px;
+            font-weight: 600;
+        }
+        
+        .btn-success {
+            background: var(--success);
+            color: white;
+        }
+        
+        /* 테스트 버튼 */
+        .btn-cheat { 
+            background: transparent;
+            border: 1px dashed var(--danger);
+            color: var(--danger); 
+            width: 100%; 
+            margin-bottom: 16px;
+            font-size: 13px;
+            opacity: 0.6;
+            padding: 10px;
+        }
+        .btn-cheat:hover { opacity: 1; background: rgba(239, 68, 68, 0.1); }
+        
+        /* 헤더 */
+        header { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            margin-bottom: 30px; 
+            padding: 20px 0;
+        }
+        
+        .logo { 
+            font-size: 28px; 
+            font-weight: 900; 
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: -1px;
+        }
+        
+        .wallet { 
+            background: var(--bg-card);
+            padding: 10px 20px; 
+            border-radius: 50px; 
+            border: 1px solid var(--border);
+            color: var(--secondary);
+            font-weight: 700; 
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .wallet::before {
+            content: '💰';
+        }
+        
+        /* 보드/포스트 아이템 */
+        .board-item { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            padding: 18px; 
+            border-bottom: 1px solid var(--border);
+            cursor: pointer; 
+            transition: all 0.2s ease;
+            border-radius: 8px;
+            margin: 4px 0;
+        }
+        .board-item:hover { 
+            background: var(--bg-card-hover);
+            border-color: transparent;
+        }
+        .board-item:last-child { border-bottom: none; }
+        
+        .board-name {
+            font-weight: 700;
+            font-size: 16px;
+            margin-bottom: 4px;
+        }
+        
+        .post-item { 
+            padding: 18px; 
+            border-bottom: 1px solid var(--border);
+            cursor: pointer; 
+            transition: all 0.2s ease;
+            border-radius: 8px;
+            margin: 4px 0;
+        }
+        .post-item:hover { 
+            background: var(--bg-card-hover);
+        }
+        .post-item:last-child { border-bottom: none; }
+        
+        .post-title {
+            font-weight: 600;
+            font-size: 15px;
+            margin-bottom: 6px;
+        }
+        
+        .post-meta {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+        
+        /* 입력 필드 */
+        input, textarea { 
+            width: 100%; 
+            background: var(--bg-dark);
+            border: 1px solid var(--border);
+            color: var(--text); 
+            padding: 16px; 
+            border-radius: 12px; 
+            font-size: 15px; 
+            margin-bottom: 12px; 
+            font-family: 'Noto Sans KR', sans-serif;
+            transition: all 0.3s ease;
+        }
+        input:focus, textarea:focus { 
+            outline: none; 
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+        }
+        input::placeholder, textarea::placeholder {
+            color: var(--text-muted);
+        }
+        
+        .hidden { display: none; }
+        
+        .back-link { 
+            color: var(--text-muted); 
+            cursor: pointer; 
+            font-size: 14px; 
+            margin-bottom: 16px; 
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: color 0.2s;
+            font-weight: 500;
+        }
+        .back-link:hover { color: var(--text); }
+
+        /* ========== 히어로 섹션 ========== */
+        .hero-section {
+            text-align: center;
+            padding: 60px 30px;
+            background: var(--bg-card);
+            border-radius: 24px;
+            margin-bottom: 30px;
+            border: 1px solid var(--border);
+            position: relative;
+            overflow: hidden;
+        }
+        .hero-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: var(--gradient-primary);
+        }
+        
+        .hero-badge {
+            display: inline-block;
+            background: rgba(99, 102, 241, 0.1);
+            border: 1px solid rgba(99, 102, 241, 0.3);
+            color: var(--primary-light);
+            padding: 6px 16px;
+            border-radius: 50px;
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+        
+        .hero-title {
+            font-size: 36px;
+            font-weight: 900;
+            margin-bottom: 16px;
+            line-height: 1.3;
+            letter-spacing: -1px;
+        }
+        .hero-title .highlight {
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .hero-subtitle {
+            font-size: 16px;
+            color: var(--text-muted);
+            margin-bottom: 40px;
+            line-height: 1.7;
+        }
+        
+        /* 통계 */
+        .stats-bar {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            margin-bottom: 40px;
+            flex-wrap: wrap;
+        }
+        .stat-item {
+            text-align: center;
+        }
+        .stat-number {
+            font-size: 32px;
+            font-weight: 900;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .stat-label {
+            font-size: 13px;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
+
+        /* 기능 카드 */
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        
+        .feature-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 24px 16px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+        .feature-card:hover {
+            transform: translateY(-4px);
+            border-color: var(--primary);
+            box-shadow: 0 10px 30px rgba(99, 102, 241, 0.15);
+        }
+        
+        .feature-icon { 
+            font-size: 40px; 
+            margin-bottom: 16px;
+            display: block;
+        }
+        .feature-title { 
+            font-size: 15px; 
+            font-weight: 700; 
+            margin-bottom: 8px; 
+        }
+        .feature-desc { 
+            font-size: 13px; 
+            color: var(--text-muted); 
+            line-height: 1.5; 
+        }
+
+        /* BOK 토큰 정보 */
+        .token-info {
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(6, 182, 212, 0.1) 100%);
+            border: 1px solid rgba(99, 102, 241, 0.2);
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+        
+        .token-info h4 {
+            color: var(--secondary);
+            margin-bottom: 16px;
+            font-size: 16px;
+            font-weight: 700;
+        }
+        
+        .token-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        .token-item {
+            background: rgba(99, 102, 241, 0.15);
+            padding: 10px 16px;
+            border-radius: 10px;
+            font-size: 13px;
+            color: var(--primary-light);
+            font-weight: 500;
+        }
+
+        /* 온보딩 팁 */
+        .onboarding-tip {
+            background: linear-gradient(135deg, rgba(245, 158, 11, 0.15) 0%, rgba(251, 191, 36, 0.1) 100%);
+            border: 1px solid rgba(245, 158, 11, 0.3);
+            color: #fbbf24;
+            padding: 16px 20px;
+            border-radius: 12px;
+            font-size: 14px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .onboarding-tip .close-tip {
+            margin-left: auto;
+            cursor: pointer;
+            opacity: 0.7;
+            font-size: 18px;
+        }
+        .onboarding-tip .close-tip:hover { opacity: 1; }
+
+        /* 로딩 스켈레톤 */
+        .skeleton {
+            background: linear-gradient(90deg, var(--bg-card-hover) 25%, var(--border) 50%, var(--bg-card-hover) 75%);
+            background-size: 200% 100%;
+            animation: shimmer 1.5s infinite;
+            border-radius: 10px;
+            height: 70px;
+            margin-bottom: 10px;
+        }
+        @keyframes shimmer {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+
+        /* 섹션 헤더 */
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+        .section-header h3 {
+            font-size: 18px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* 푸터 */
+        footer {
+            margin-top: 60px;
+            padding: 30px 0;
+            border-top: 1px solid var(--border);
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 13px;
+        }
+        
+        footer a {
+            color: var(--text-muted);
+            text-decoration: none;
+            margin: 0 12px;
+            transition: color 0.2s;
+        }
+        footer a:hover { color: var(--text); }
+        
+        .footer-links { margin-bottom: 16px; }
+        
+        .footer-disclaimer {
+            margin-top: 12px;
+            font-size: 11px;
+            color: #666;
+            max-width: 400px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        /* 반응형 */
+        @media (max-width: 600px) {
+            .hero-title { font-size: 26px; }
+            .hero-subtitle { font-size: 14px; }
+            .feature-grid { grid-template-columns: 1fr; }
+            .stats-bar { gap: 24px; }
+            .stat-number { font-size: 26px; }
+            header { flex-direction: column; gap: 16px; }
+            .wallet { width: 100%; justify-content: center; }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo">BOKLUCK</div>
+        <div id="walletBadge" class="wallet">연결 중...</div>
+    </header>
+
+    <main>
+        <!-- 로그인 전: 랜딩 페이지 -->
+        <div id="authSection">
+            <div class="hero-section">
+                <span class="hero-badge">🚀 Web3 커뮤니티</span>
+                <h1 class="hero-title">
+                    글 쓰고, 땅 사고,<br><span class="highlight">부자 되자!</span>
+                </h1>
+                <p class="hero-subtitle">
+                    콘텐츠를 작성하면 BOK 토큰을 받고,<br>
+                    가상 부동산에 투자해서 영토를 확장하세요!
+                </p>
+                
+                <!-- 소셜 프루프 -->
+                <div class="stats-bar">
+                    <div class="stat-item">
+                        <div class="stat-number" id="statUsers">--</div>
+                        <div class="stat-label">활성 유저</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number" id="statPosts">--</div>
+                        <div class="stat-label">작성된 글</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number" id="statLands">--</div>
+                        <div class="stat-label">거래된 땅</div>
+                    </div>
+                </div>
+                
+                <button id="loginBtn" class="btn-primary" style="max-width: 320px; margin: 0 auto;">
+                    Google 계정으로 시작하기
+                </button>
+            </div>
+
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <span class="feature-icon">✍️</span>
+                    <div class="feature-title">글쓰기 보상</div>
+                    <div class="feature-desc">글 하나당 100 BOK!<br>양질의 콘텐츠로 부자되세요</div>
+                </div>
+                <div class="feature-card">
+                    <span class="feature-icon">🏗️</span>
+                    <div class="feature-title">게시판 소유</div>
+                    <div class="feature-desc">1,000 BOK으로<br>나만의 게시판 운영</div>
+                </div>
+                <div class="feature-card">
+                    <span class="feature-icon">🗺️</span>
+                    <div class="feature-title">부동산 투자</div>
+                    <div class="feature-desc">전 세계 가상 땅을<br>구매하고 영토 확장</div>
+                </div>
+            </div>
+
+            <div class="token-info">
+                <h4>💰 BOK 토큰 경제</h4>
+                <div class="token-list">
+                    <span class="token-item">📝 글쓰기 +100 BOK</span>
+                    <span class="token-item">🏠 땅 구매 300 BOK</span>
+                    <span class="token-item">📋 게시판 생성 1,000 BOK</span>
+                    <span class="token-item">🎁 가입 보너스 500 BOK</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- 로그인 후: 메인 대시보드 -->
+        <div id="mainDashboard" class="hidden">
+            <!-- 온보딩 팁 -->
+            <div id="onboardingTip" class="onboarding-tip hidden">
+                <span>💡</span>
+                <span><strong>처음이신가요?</strong> 게시판에 글을 쓰면 100 BOK을 받아요!</span>
+                <span class="close-tip" onclick="dismissTip()">✕</span>
+            </div>
+
+            <button class="btn-cheat" onclick="getRich()">🛠️ [테스트용] 100,000 BOK 충전</button>
+            <button class="btn-market" onclick="location.href='market.html'">🗺️ 부동산 마켓 입장</button>
+
+            <div id="boardListSection">
+                <div class="section-header">
+                    <h3>📂 커뮤니티 게시판</h3>
+                    <button class="btn-small btn-success" onclick="createBoard()">+ 게시판 구매</button>
+                </div>
+                <div class="card" id="boardList">
+                    <div class="skeleton"></div>
+                    <div class="skeleton"></div>
+                </div>
+            </div>
+
+            <div id="postListSection" class="hidden">
+                <span class="back-link" onclick="showBoardList()">← 게시판 목록</span>
+                <div class="section-header">
+                    <h3 id="currentBoardName">게시판</h3>
+                    <button class="btn-small btn-primary" onclick="showWriteForm()">🖊️ 글쓰기</button>
+                </div>
+                <div class="card" id="postList"></div>
+            </div>
+
+            <div id="writeSection" class="hidden">
+                <span class="back-link" onclick="backToPostList()">← 취소</span>
+                <div class="card">
+                    <h3 style="margin-bottom: 20px;">📝 콘텐츠 생산</h3>
+                    <input type="text" id="title" placeholder="제목을 입력하세요" maxlength="100">
+                    <textarea id="content" rows="8" placeholder="내용을 작성하세요 (최소 10자)"></textarea>
+                    <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 16px;">💡 등록 완료 시 100 BOK이 지급됩니다!</p>
+                    <button id="saveBtn" class="btn-primary">등록 완료 (+100 BOK)</button>
+                </div>
+            </div>
+
+            <div id="viewSection" class="hidden">
+                <span class="back-link" onclick="backToPostList()">← 목록으로</span>
+                <div class="card">
+                    <h2 id="viewTitle" style="margin-bottom: 12px; font-size: 22px;">제목</h2>
+                    <div style="margin-bottom: 24px; color: var(--text-muted); font-size: 13px; display: flex; justify-content: space-between; align-items: center;">
+                        <span id="viewAuthor">작성자</span>
+                        <span id="viewControls"></span>
+                    </div>
+                    <div id="viewContent" style="white-space: pre-wrap; line-height: 1.8; font-size: 15px;">내용</div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- 푸터 -->
+    <footer>
+        <div class="footer-links">
+            <a href="#">이용약관</a>
+            <a href="#">개인정보처리방침</a>
+            <a href="#">FAQ</a>
+            <a href="#">문의하기</a>
+        </div>
+        <p>© 2024 BOKLUCK. All rights reserved.</p>
+        <p class="footer-disclaimer">
+            BOK은 BOKLUCK 플랫폼 내에서만 사용 가능한 가상 포인트이며, 실제 화폐 가치를 보장하지 않습니다.
+        </p>
+    </footer>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+        import { getFirestore, collection, addDoc, query, orderBy, onSnapshot, doc, setDoc, getDoc, updateDoc, runTransaction, increment, where, getDocs } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+        import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+
+        const firebaseConfig = {
+          apiKey: "AIzaSyBwQjuqgWM4YKnqu_gzNbeCg5alrC-jVcQ",
+          authDomain: "myco-737a0.firebaseapp.com",
+          projectId: "myco-737a0",
+          storageBucket: "myco-737a0.firebasestorage.app",
+          messagingSenderId: "942571332540",
+          appId: "1:942571332540:web:be0bb6fbdd32655501c1b9"
+        };
+        
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const auth = getAuth(app);
+
+        let currentUser = null;
+        let currentBoardId = null;
+        let currentPostId = null; 
+        let isEditMode = false;
+
+        // 통계 로드
+        async function loadStats() {
+            try {
+                const usersSnap = await getDocs(collection(db, "users"));
+                const postsSnap = await getDocs(collection(db, "posts"));
+                const landsSnap = await getDocs(collection(db, "lands"));
+                
+                document.getElementById("statUsers").textContent = usersSnap.size || "0";
+                document.getElementById("statPosts").textContent = postsSnap.size || "0";
+                document.getElementById("statLands").textContent = landsSnap.size || "0";
+            } catch(e) {
+                console.log("Stats load error:", e);
+            }
+        }
+        loadStats();
+
+        // 온보딩
+        window.dismissTip = () => {
+            document.getElementById("onboardingTip").style.display = "none";
+            localStorage.setItem("bokluck_tip_dismissed", "true");
+        }
+
+        function showOnboardingIfNeeded() {
+            if(!localStorage.getItem("bokluck_tip_dismissed")) {
+                document.getElementById("onboardingTip").classList.remove("hidden");
+            }
+        }
+
+        window.showBoardList = () => { hideAll(); document.getElementById("boardListSection").style.display = "block"; }
+        window.showPostList = (boardId, boardName) => {
+            currentBoardId = boardId;
+            document.getElementById("currentBoardName").innerText = boardName;
+            hideAll(); document.getElementById("postListSection").style.display = "block";
+            loadPosts(boardId);
+        }
+        window.showWriteForm = () => {
+            isEditMode = false;
+            document.getElementById("title").value = "";
+            document.getElementById("content").value = "";
+            document.getElementById("saveBtn").innerText = "등록 완료 (+100 BOK)";
+            hideAll(); document.getElementById("writeSection").style.display = "block";
+        }
+        window.backToPostList = () => { hideAll(); document.getElementById("postListSection").style.display = "block"; }
+        function hideAll() {
+            document.getElementById("boardListSection").style.display = "none";
+            document.getElementById("postListSection").style.display = "none";
+            document.getElementById("writeSection").style.display = "none";
+            document.getElementById("viewSection").style.display = "none";
+        }
+
+        window.getRich = async () => {
+            if(!currentUser) return;
+            if(!confirm("⚠️ 테스트용 기능입니다.\n100,000 BOK을 충전하시겠습니까?")) return;
+            await updateDoc(doc(db, "users", currentUser.uid), { coin: increment(100000) });
+            alert("충전 완료! 💸");
+        }
+
+        document.getElementById("loginBtn").addEventListener("click", () => {
+            signInWithPopup(auth, new GoogleAuthProvider());
+        });
+
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                currentUser = user;
+                document.getElementById("authSection").style.display = "none";
+                document.getElementById("mainDashboard").classList.remove("hidden");
+                document.getElementById("mainDashboard").style.display = "block";
+                document.getElementById("walletBadge").style.display = "flex";
+                
+                showOnboardingIfNeeded();
+                
+                onSnapshot(doc(db, "users", user.uid), (d) => {
+                    const coin = d.exists() ? d.data().coin : 0;
+                    document.getElementById("walletBadge").innerText = `${coin.toLocaleString()} BOK`;
+                    if(!d.exists()) setDoc(doc.ref, {name: user.displayName, email: user.email, coin: 500, createdAt: new Date().toISOString()});
+                });
+                createDefaultBoard();
+            } else {
+                document.getElementById("authSection").style.display = "block";
+                document.getElementById("mainDashboard").style.display = "none";
+                document.getElementById("walletBadge").innerText = "로그인 필요";
+            }
+        });
+
+        async function createDefaultBoard() {}
+        onSnapshot(query(collection(db, "boards"), orderBy("createdAt", "desc")), (snapshot) => {
+            const list = document.getElementById("boardList");
+            list.innerHTML = "";
+            if(snapshot.empty) setDoc(doc(collection(db, "boards")), { name: "자유게시판", creatorName: "SYSTEM", isDefault: true, createdAt: new Date().toISOString() });
+            snapshot.forEach(doc => {
+                const b = doc.data();
+                const div = document.createElement("div");
+                div.className = "board-item";
+                div.innerHTML = `<div><div class="board-name">${b.name}</div><div style="font-size: 12px; color: var(--text-muted);">소유자: ${b.creatorName}</div></div><div style="color: var(--text-muted); font-size: 14px;">입장 →</div>`;
+                div.onclick = () => showPostList(doc.id, b.name);
+                list.appendChild(div);
+            });
+        });
+
+        window.createBoard = async () => {
+            const name = prompt("📋 게시판 이름을 입력하세요\n(비용: 1,000 BOK)");
+            if(!name) return;
+            try {
+                await runTransaction(db, async (t) => {
+                    const userRef = doc(db, "users", currentUser.uid);
+                    const userDoc = await t.get(userRef);
+                    if(userDoc.data().coin < 1000) throw "❌ BOK이 부족합니다. (필요: 1,000 BOK)";
+                    t.update(userRef, { coin: increment(-1000) });
+                    t.set(doc(collection(db, "boards")), { name: name, creatorName: currentUser.displayName, creatorUid: currentUser.uid, createdAt: new Date().toISOString() });
+                });
+                alert("🎉 게시판이 개설되었습니다!");
+            } catch(e) { alert(e); }
+        }
+
+        let unsubscribePosts = null;
+        function loadPosts(boardId) {
+            const postList = document.getElementById("postList");
+            postList.innerHTML = '<div class="skeleton"></div><div class="skeleton"></div>';
+            
+            if(unsubscribePosts) unsubscribePosts();
+            const q = query(collection(db, "posts"), where("boardId", "==", boardId));
+            unsubscribePosts = onSnapshot(q, (snapshot) => {
+                const list = document.getElementById("postList");
+                list.innerHTML = "";
+                let posts = [];
+                snapshot.forEach(d => posts.push({id: d.id, ...d.data()}));
+                
+                posts.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+                if(posts.length === 0) {
+                    list.innerHTML = "<div style='padding: 40px; text-align: center; color: var(--text-muted);'>아직 글이 없습니다.<br><br>첫 글을 작성하고 <strong style=\"color: var(--secondary);\">100 BOK</strong>을 받아보세요! ✍️</div>";
+                }
+                
+                posts.forEach(p => {
+                    const div = document.createElement("div");
+                    div.className = "post-item";
+                    div.innerHTML = `<div class="post-title">${p.title}</div><div class="post-meta">${p.author} · ${new Date(p.date).toLocaleDateString()}</div>`;
+                    div.onclick = () => viewPost(p.id, p);
+                    list.appendChild(div);
+                });
+            });
+        }
+
+        function viewPost(postId, postData) {
+            currentPostId = postId;
+            document.getElementById("viewTitle").innerText = postData.title;
+            document.getElementById("viewAuthor").innerText = `${postData.author} · ${new Date(postData.date).toLocaleString()}`;
+            document.getElementById("viewContent").innerText = postData.content;
+            const controls = document.getElementById("viewControls");
+            controls.innerHTML = "";
+            if(currentUser && postData.uid === currentUser.uid) {
+                const editBtn = document.createElement("button");
+                editBtn.className = "btn-small";
+                editBtn.style.cssText = "background: var(--bg-card-hover); color: var(--text);";
+                editBtn.innerText = "수정";
+                editBtn.onclick = () => openEditForm(postData);
+                controls.appendChild(editBtn);
+            }
+            hideAll(); document.getElementById("viewSection").style.display = "block";
+        }
+
+        function openEditForm(postData) {
+            isEditMode = true;
+            document.getElementById("title").value = postData.title;
+            document.getElementById("content").value = postData.content;
+            document.getElementById("saveBtn").innerText = "수정 완료";
+            hideAll(); document.getElementById("writeSection").style.display = "block";
+        }
+
+        document.getElementById("saveBtn").addEventListener("click", async () => {
+            const title = document.getElementById("title").value.trim();
+            const content = document.getElementById("content").value.trim();
+            if(content.length < 10) return alert("내용을 10자 이상 작성해주세요.");
+            if(!title) return alert("제목을 입력해주세요.");
+
+            const btn = document.getElementById("saveBtn");
+            btn.disabled = true;
+            btn.innerText = "처리 중...";
+
+            try {
+                if(isEditMode) {
+                    await updateDoc(doc(db, "posts", currentPostId), { title: title, content: content });
+                    alert("✅ 수정되었습니다.");
+                    backToPostList(); 
+                } else {
+                    await runTransaction(db, async (t) => {
+                        t.set(doc(collection(db, "posts")), { boardId: currentBoardId, title: title, content: content, author: currentUser.displayName, uid: currentUser.uid, reward: 100, date: new Date().toISOString() });
+                        t.update(doc(db, "users", currentUser.uid), { coin: increment(100) });
+                    });
+                    alert("🎉 등록 완료! (+100 BOK)");
+                    backToPostList();
+                }
+            } catch(e) { 
+                alert("오류가 발생했습니다: " + e); 
+            } finally {
+                btn.disabled = false;
+                btn.innerText = isEditMode ? "수정 완료" : "등록 완료 (+100 BOK)";
+            }
+        });
+    </script>
+</body>
+</html>
 
