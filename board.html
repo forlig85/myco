@@ -389,6 +389,8 @@
             const fee = boardData.writeFee || 0;
             if(userData.coin < fee) return alert("BOK 부족");
             try {
+                const isFirstPost = (userData.postCount || 0) === 0;
+                
                 await runTransaction(db, async (t) => {
                     if(fee > 0) {
                         t.update(doc(db, "users", currentUser.uid), { coin: increment(-fee), totalSpent: increment(fee) });
@@ -398,6 +400,26 @@
                     t.set(doc(collection(db, "posts")), { boardId, title, content, images: uploadedImages, authorUid: currentUser.uid, authorName: currentUser.displayName, authorTitle: userData.title||'', authorCountry: userData.country||'', likeCount: 0, commentCount: 0, likes: [], boosted: false, createdAt: new Date().toISOString() });
                     t.update(doc(db, "boards", boardId), { postCount: increment(1) });
                 });
+                
+                // 첫 글 작성 시 초대 2단계 보상
+                if(isFirstPost && userData.invitedBy) {
+                    try {
+                        // 초대자에게 2단계 보상 (300 BOK)
+                        await updateDoc(doc(db, "users", userData.invitedBy), { 
+                            coin: increment(300), 
+                            totalEarned: increment(300),
+                            inviteRewards: increment(300)
+                        });
+                        // 가입자에게 추가 보상 (100 BOK) - 이미 글쓰기 보상 100 받았으므로 별도 지급 안함
+                        // 초대 기록 업데이트
+                        const inviteQuery = query(collection(db, "invites"), where("inviteeUid", "==", currentUser.uid));
+                        const inviteSnap = await getDocs(inviteQuery);
+                        if(!inviteSnap.empty) {
+                            await updateDoc(inviteSnap.docs[0].ref, { stage2: true, stage2At: new Date().toISOString() });
+                        }
+                    } catch(e) { console.log("초대 보상 오류:", e); }
+                }
+                
                 alert("🎉 등록 완료! +100 BOK"); uploadedImages = []; cancelWrite();
             } catch(e) { alert("오류: " + e); }
         };
