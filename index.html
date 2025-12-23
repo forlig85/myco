@@ -768,7 +768,8 @@
         // 초대한 친구 목록 로드
         async function loadInvitedFriends() {
             if(!currentUser) return;
-            const q = query(collection(db, "invites"), where("inviterUid", "==", currentUser.uid), orderBy("createdAt", "desc"));
+            // 인덱스 없이 작동하도록 where만 사용
+            const q = query(collection(db, "invites"), where("inviterUid", "==", currentUser.uid));
             const snapshot = await getDocs(q);
             
             const list = document.getElementById("invitedFriendsList");
@@ -779,9 +780,13 @@
                 return;
             }
             
+            // 클라이언트 측 정렬 (최신순)
+            let invites = [];
+            snapshot.forEach(docSnap => invites.push({ id: docSnap.id, ...docSnap.data() }));
+            invites.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+            
             list.innerHTML = "";
-            snapshot.forEach(docSnap => {
-                const inv = docSnap.data();
+            invites.forEach(inv => {
                 if(inv.stage2 || inv.stage3) activeCount++;
                 list.innerHTML += `
                     <div class="invited-friend">
