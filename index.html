@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BOKLUCK PROTOCOL (SECURE)</title>
+    <title>BOKLUCK METAVERSE</title>
     <style>
         /* 폰트 & 기본 설정 */
         @import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;700&family=Pretendard:wght@400;700&display=swap');
@@ -11,9 +11,9 @@
         body {
             background-color: #050b14;
             background-image: 
-                linear-gradient(rgba(0, 243, 255, 0.03) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(0, 243, 255, 0.03) 1px, transparent 1px);
-            background-size: 30px 30px;
+                linear-gradient(rgba(0, 243, 255, 0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 243, 255, 0.05) 1px, transparent 1px);
+            background-size: 40px 40px;
             color: #e0f7fa;
             font-family: 'Pretendard', sans-serif;
             max-width: 700px;
@@ -23,12 +23,12 @@
 
         /* 공통 네온 박스 스타일 */
         .cyber-box {
-            background: rgba(10, 25, 47, 0.7);
+            background: rgba(10, 25, 47, 0.8);
             border: 1px solid #00f3ff;
-            box-shadow: 0 0 10px rgba(0, 243, 255, 0.15);
+            box-shadow: 0 0 15px rgba(0, 243, 255, 0.1);
             border-radius: 8px;
             padding: 20px;
-            margin-bottom: 20px;
+            margin-bottom: 25px;
             backdrop-filter: blur(5px);
         }
 
@@ -58,93 +58,104 @@
             border: 1px solid #00f3ff;
             padding: 5px 15px;
             border-radius: 20px;
-            display: none;
             background: rgba(0, 243, 255, 0.1);
+            display: none;
         }
 
-        /* 대시보드 */
-        .dashboard-grid {
+        /* 🗺️ 부동산 맵 (GRID SYSTEM) */
+        .map-container {
             display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
-            margin-bottom: 15px;
+            grid-template-columns: repeat(5, 1fr); /* 5x5 그리드 */
+            gap: 8px;
+            margin-top: 15px;
         }
+        .land-block {
+            aspect-ratio: 1 / 1;
+            border: 1px solid #1d4ed8;
+            background: rgba(13, 25, 48, 0.8);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            transition: 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+        .land-block:hover {
+            border-color: #00f3ff;
+            box-shadow: 0 0 10px rgba(0, 243, 255, 0.5);
+            transform: scale(1.05);
+            z-index: 10;
+        }
+        .land-id { font-size: 10px; color: #556; position: absolute; top: 2px; left: 4px; }
+        .land-price { font-size: 12px; font-weight: bold; color: #00f3ff; }
+        
+        /* 점령된 땅 스타일 */
+        .land-owned {
+            background: rgba(0, 243, 255, 0.2);
+            border: 2px solid #00f3ff;
+            color: #fff;
+        }
+        .owner-name { font-size: 11px; font-weight: bold; text-align: center; word-break: break-all; padding: 2px; }
+
+        /* 대시보드 및 기타 */
+        .dashboard-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px; }
         .stat-item { text-align: center; }
         .stat-label { font-size: 12px; color: #8892b0; margin-bottom: 5px; text-transform: uppercase; }
         .stat-value { font-family: 'Rajdhani', sans-serif; font-size: 24px; font-weight: bold; color: #fff; }
         .accent { color: #00f3ff; text-shadow: 0 0 5px #00f3ff; }
         .warning { color: #ff0055; text-shadow: 0 0 5px #ff0055; }
 
-        .progress-container {
-            height: 6px;
-            background: #112240;
-            border-radius: 3px;
-            overflow: hidden;
-            margin-top: 10px;
-        }
-        .progress-bar {
-            height: 100%;
-            background: linear-gradient(90deg, #00f3ff, #bc13fe);
-            width: 0%;
-            transition: width 1s ease-in-out;
-        }
-
-        /* 버튼 */
         button {
-            width: 100%; padding: 15px;
-            font-family: 'Rajdhani', sans-serif; font-size: 18px; font-weight: bold;
-            text-transform: uppercase; letter-spacing: 1px;
-            cursor: pointer; border: none; transition: 0.3s;
+            width: 100%; padding: 15px; font-family: 'Rajdhani', sans-serif; font-size: 18px; font-weight: bold;
+            cursor: pointer; border: none; transition: 0.3s; text-transform: uppercase;
         }
-        #loginBtn {
-            background: transparent; border: 2px solid #00f3ff; color: #00f3ff;
-            box-shadow: 0 0 10px rgba(0, 243, 255, 0.2);
-        }
-        #loginBtn:hover {
-            background: #00f3ff; color: #000; box-shadow: 0 0 20px rgba(0, 243, 255, 0.6);
-        }
-        .mine-btn {
-            background: linear-gradient(90deg, #00f3ff, #0077ff); color: black;
-            border-radius: 4px; margin-top: 10px;
-        }
+        #loginBtn { background: transparent; border: 2px solid #00f3ff; color: #00f3ff; box-shadow: 0 0 10px rgba(0, 243, 255, 0.2); }
+        #loginBtn:hover { background: #00f3ff; color: #000; }
+        .mine-btn { background: linear-gradient(90deg, #00f3ff, #0077ff); color: black; border-radius: 4px; margin-top: 10px; }
         .mine-btn:hover { transform: scale(1.02); box-shadow: 0 0 15px rgba(0, 243, 255, 0.5); }
         .mine-btn:disabled { background: #333; color: #666; cursor: not-allowed; transform: none; box-shadow: none; }
 
-        /* 입력창 */
         input, textarea {
             width: 100%; background: #050b14; border: 1px solid #1d4ed8; color: white;
-            padding: 12px; margin-bottom: 10px; border-radius: 4px; box-sizing: border-box;
-            font-family: 'Pretendard', sans-serif;
+            padding: 12px; margin-bottom: 10px; border-radius: 4px; box-sizing: border-box; font-family: 'Pretendard', sans-serif;
         }
-        input:focus, textarea:focus { outline: none; border-color: #00f3ff; box-shadow: 0 0 5px rgba(0, 243, 255, 0.3); }
+        input:focus, textarea:focus { outline: none; border-color: #00f3ff; }
 
-        /* 리스트 */
         .block-item { padding: 15px; border-bottom: 1px solid #112240; position: relative; }
         .block-item:last-child { border-bottom: none; }
-        .block-item::before {
-            content: ''; position: absolute; left: 0; top: 15px; bottom: 15px; width: 3px; background: #00f3ff;
-        }
         .block-header { display: flex; justify-content: space-between; font-size: 12px; color: #8892b0; margin-bottom: 5px; }
-        .block-title { font-size: 16px; font-weight: bold; color: #e6f1ff; }
-        .block-hash { font-family: monospace; color: #00f3ff; font-size: 12px; }
-
         .hidden { display: none; }
     </style>
 </head>
 <body>
 
     <header>
-        <div class="logo">BOKLUCK <span style="font-size:14px; color:#00f3ff;">SECURE</span></div>
+        <div class="logo">BOKLUCK <span style="font-size:14px; color:#00f3ff;">LAND</span></div>
         <div id="walletBadge" class="wallet-badge">Connecting...</div>
     </header>
 
     <div id="authSection" class="cyber-box" style="text-align: center;">
-        <h3 style="margin-top:0;">ACCESS REQUIRED</h3>
-        <p style="color:#8892b0; font-size:14px; margin-bottom:20px;">네트워크 접속을 위해 지갑 연결이 필요합니다.</p>
+        <h3 style="margin-top:0;">ACCESS BOKLUCK WORLD</h3>
+        <p style="color:#8892b0; font-size:14px; margin-bottom:20px;">지갑을 연결하고 디지털 부동산을 소유하세요.</p>
         <button id="loginBtn">CONNECT WALLET</button>
     </div>
 
     <div id="mainDashboard" class="hidden">
+        
+        <div class="cyber-box">
+            <h4 style="margin:0 0 10px 0; color:#00f3ff; display:flex; justify-content:space-between;">
+                <span>🌍 DIGITAL LAND MAP</span>
+                <span style="font-size:12px; color:#fff;">PRICE: 300 BOK / BLOCK</span>
+            </h4>
+            <div id="landGrid" class="map-container">
+                </div>
+            <p style="font-size:12px; color:#8892b0; text-align:center; margin-top:10px;">
+                * 빈 땅을 클릭하면 구매할 수 있습니다. (1인 1땅 제한 없음)
+            </p>
+        </div>
+
         <div class="cyber-box">
             <div class="dashboard-grid">
                 <div class="stat-item">
@@ -156,32 +167,21 @@
                     <div class="stat-value warning"><span id="blocksToHalving">5</span> BLOCKS</div>
                 </div>
             </div>
-            
-            <div style="display:flex; justify-content:space-between; font-size:12px; color:#8892b0; margin-top:10px;">
-                <span>Total Mined</span>
-                <span><span id="totalMined">0</span> / 1,000,000</span>
-            </div>
-            <div class="progress-container">
-                <div id="miningProgress" class="progress-bar"></div>
-            </div>
+            <div style="font-size:12px; color:#8892b0; text-align:center;">Total Mined: <span id="totalMined">0</span> / 1,000,000</div>
         </div>
 
         <div class="cyber-box">
-            <h4 style="margin:0 0 10px 0; color:#00f3ff;">⚡ SECURE MINING STATION</h4>
-            <p style="font-size:12px; color:#8892b0; margin-bottom:15px;">
-                * 규칙 1: 최소 10글자 이상 작성<br>
-                * 규칙 2: 연속 5회 초과 채굴 불가 (독점 방지)
-            </p>
+            <h4 style="margin:0 0 10px 0; color:#8892b0;">⚡ MINING STATION</h4>
             <input type="text" id="title" placeholder="블록 제목">
-            <textarea id="content" rows="3" placeholder="의미 있는 데이터를 기록하세요 (최소 10자)"></textarea>
+            <textarea id="content" rows="3" placeholder="내용 입력 (최소 10자, 연속 5회 제한)"></textarea>
             <button id="mineBtn" class="mine-btn">START MINING</button>
         </div>
-    </div>
 
-    <div class="cyber-box">
-        <h4 style="margin:0 0 15px 0; color:#8892b0;">RECENT BLOCKS</h4>
-        <div id="blockList">
-            <div style="text-align:center; padding:20px; color:#8892b0;">Syncing...</div>
+        <div class="cyber-box">
+            <h4 style="margin:0 0 15px 0; color:#8892b0;">RECENT BLOCKS</h4>
+            <div id="blockList">
+                <div style="text-align:center; padding:20px; color:#8892b0;">Syncing...</div>
+            </div>
         </div>
     </div>
 
@@ -191,7 +191,7 @@
         import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
         // ============================================================
-        // 🚨 본인의 KEY를 정확히 입력하세요!
+        // 🟢 사용자님 키가 적용되었습니다 (복사해서 그대로 쓰세요)
         // ============================================================
         const firebaseConfig = {
           apiKey: "AIzaSyBwQjuqgWM4YKnqu_gzNbeCg5alrC-jVcQ",
@@ -208,20 +208,88 @@
         const auth = getAuth(app);
         const provider = new GoogleAuthProvider();
 
+        // [게임 규칙 설정]
         const HALVING_INTERVAL = 5; 
         const INITIAL_REWARD = 100;
         const MAX_SUPPLY = 1000000;
-        const CONSECUTIVE_LIMIT = 5; // 연속 채굴 제한 횟수
+        const LAND_PRICE = 300; // 땅 가격
+        const TOTAL_LANDS = 25; // 5x5 그리드
 
         let currentUser = null;
-        
-        const authSection = document.getElementById("authSection");
-        const mainDashboard = document.getElementById("mainDashboard");
-        const walletBadge = document.getElementById("walletBadge");
+        let currentBalance = 0;
+
+        // UI 요소
         const loginBtn = document.getElementById("loginBtn");
         const mineBtn = document.getElementById("mineBtn");
+        const landGrid = document.getElementById("landGrid");
 
-        // 로그인
+        // 1. 맵 초기화
+        function initMap() {
+            landGrid.innerHTML = "";
+            for(let i=0; i<TOTAL_LANDS; i++) {
+                const div = document.createElement("div");
+                div.className = "land-block";
+                div.id = `land-${i}`;
+                div.innerHTML = `<span class="land-id">#${i+1}</span><span class="land-price">${LAND_PRICE} BOK</span>`;
+                div.onclick = () => buyLand(i);
+                landGrid.appendChild(div);
+            }
+        }
+        initMap();
+
+        // 2. 실시간 부동산 데이터 연동
+        const mapRef = collection(db, "lands");
+        onSnapshot(mapRef, (snapshot) => {
+            snapshot.forEach((doc) => {
+                const data = doc.data();
+                const blockId = doc.id; 
+                const el = document.getElementById(blockId);
+                
+                if(el) {
+                    el.classList.add("land-owned");
+                    el.innerHTML = `<span class="land-id">#${blockId.replace('land-', '')*1 + 1}</span>
+                                    <span class="owner-name">${data.ownerName}</span>`;
+                    el.onclick = () => alert(`🔒 이미 소유된 땅입니다.\n소유자: ${data.ownerName}\n구매일: ${new Date(data.purchasedAt).toLocaleDateString()}`);
+                }
+            });
+        });
+
+        // 3. 땅 구매 로직
+        async function buyLand(index) {
+            if(!currentUser) return alert("지갑 연결이 필요합니다.");
+            
+            const landId = `land-${index}`;
+            if(currentBalance < LAND_PRICE) {
+                return alert(`❌ 잔액이 부족합니다!\n필요: ${LAND_PRICE} BOK\n보유: ${currentBalance} BOK`);
+            }
+
+            if(!confirm(`🌍 #${index+1}번 땅을 구매하시겠습니까?`)) return;
+
+            try {
+                await runTransaction(db, async (transaction) => {
+                    const landRef = doc(db, "lands", landId);
+                    const landDoc = await transaction.get(landRef);
+                    if(landDoc.exists()) throw "방금 다른 사용자가 이 땅을 구매했습니다!";
+
+                    const userRef = doc(db, "users", currentUser.uid);
+                    const userDoc = await transaction.get(userRef);
+                    if(!userDoc.exists() || userDoc.data().coin < LAND_PRICE) throw "잔액 부족";
+
+                    transaction.update(userRef, { coin: increment(-LAND_PRICE) });
+                    transaction.set(landRef, {
+                        ownerUid: currentUser.uid,
+                        ownerName: currentUser.displayName,
+                        price: LAND_PRICE,
+                        purchasedAt: new Date().toISOString()
+                    });
+                });
+                alert(`🎉 구매 성공! #${index+1}번 땅의 주인이 되셨습니다!`);
+            } catch(e) {
+                alert("거래 실패: " + e);
+            }
+        }
+
+        // 4. 로그인 및 기본 로직
         loginBtn.addEventListener("click", () => {
             signInWithPopup(auth, provider).catch(err => alert("로그인 오류: " + err.message));
         });
@@ -229,42 +297,111 @@
         onAuthStateChanged(auth, async (user) => {
             if (user) {
                 currentUser = user;
-                authSection.style.display = "none";
-                mainDashboard.style.display = "block";
-                walletBadge.style.display = "block";
+                document.getElementById("authSection").style.display = "none";
+                document.getElementById("mainDashboard").style.display = "block";
+                document.getElementById("walletBadge").style.display = "block";
                 
                 onSnapshot(doc(db, "users", user.uid), (doc) => {
-                    const coin = doc.exists() ? doc.data().coin : 0;
-                    walletBadge.innerHTML = `👤 ${user.displayName} <span style="color:#fff; margin-left:10px;">💰 ${coin.toLocaleString()} BOK</span>`;
+                    if (doc.exists()) {
+                        const coin = doc.data().coin;
+                        currentBalance = coin;
+                        document.getElementById("walletBadge").innerHTML = `👤 ${user.displayName} <span style="color:#fff; margin-left:10px;">💰 ${coin.toLocaleString()} BOK</span>`;
+                    } else {
+                        // 신규 유저 초기화
+                        setDoc(doc(db, "users", user.uid), {
+                            name: user.displayName, email: user.email, coin: 500
+                        });
+                        currentBalance = 500;
+                        document.getElementById("walletBadge").innerHTML = `👤 ${user.displayName} <span style="color:#fff; margin-left:10px;">💰 500 BOK</span>`;
+                    }
                 });
             } else {
-                authSection.style.display = "block";
-                mainDashboard.style.display = "none";
+                document.getElementById("authSection").style.display = "block";
+                document.getElementById("mainDashboard").style.display = "none";
             }
         });
 
-        // 통계 모니터링
+        // 5. 채굴 (보안 규칙 적용)
         const statsRef = doc(db, "system", "miningStats");
         onSnapshot(statsRef, (docSnap) => {
-            let totalMined = 0;
-            let currentBlockHeight = 0;
-
-            if (docSnap.exists()) {
+            if(docSnap.exists()) {
                 const data = docSnap.data();
-                totalMined = data.totalMined || 0;
-                currentBlockHeight = data.totalBlocks || 0;
+                const totalMined = data.totalMined || 0;
+                const halvingCount = Math.floor((data.totalBlocks || 0) / HALVING_INTERVAL);
+                let currentReward = Math.floor(INITIAL_REWARD / Math.pow(2, halvingCount));
+                if(currentReward < 1) currentReward = 1;
+
+                document.getElementById("currentReward").innerText = currentReward;
+                document.getElementById("blocksToHalving").innerText = (halvingCount+1)*HALVING_INTERVAL - (data.totalBlocks || 0);
+                document.getElementById("totalMined").innerText = totalMined.toLocaleString();
+                
+                if(!mineBtn.disabled) mineBtn.innerText = `MINING START (+${currentReward} BOK)`;
             }
+        });
 
-            const halvingCount = Math.floor(currentBlockHeight / HALVING_INTERVAL);
-            let currentReward = Math.floor(INITIAL_REWARD / Math.pow(2, halvingCount));
-            if (currentReward < 1) currentReward = 1;
+        mineBtn.addEventListener("click", async () => {
+            const title = document.getElementById("title").value.trim();
+            const content = document.getElementById("content").value.trim();
+            if (content.length < 10) return alert("⚠️ 품질 규칙: 내용은 10자 이상이어야 합니다.");
+            if (!title) return alert("제목을 입력해주세요.");
 
-            const nextHalvingBlock = (halvingCount + 1) * HALVING_INTERVAL;
-            const blocksLeft = nextHalvingBlock - currentBlockHeight;
+            mineBtn.disabled = true;
+            mineBtn.innerText = "⏳ VALIDATING...";
 
-            document.getElementById("currentReward").innerText = currentReward;
-            document.getElementById("blocksToHalving").innerText = blocksLeft;
-            document.getElementById("totalMined").innerText = totalMined.toLocaleString();
-            
-            const percent = (totalMined / MAX_SUPPLY) * 100;
-            document.getElementById("miningProgress").style.width = percent
+            try {
+                await runTransaction(db, async (transaction) => {
+                    const statsDoc = await transaction.get(statsRef);
+                    let currentStats = { totalBlocks: 0, totalMined: 0, lastMinerUid: "", consecutiveCount: 0 };
+                    if (statsDoc.exists()) currentStats = statsDoc.data();
+
+                    if (currentStats.lastMinerUid === currentUser.uid && currentStats.consecutiveCount >= 5) {
+                        throw "⛔ 독점 방지: 연속 5회 채굴 제한! 다른 유저를 기다리세요.";
+                    }
+
+                    const halvingCount = Math.floor(currentStats.totalBlocks / HALVING_INTERVAL);
+                    let reward = Math.floor(INITIAL_REWARD / Math.pow(2, halvingCount));
+                    if(reward < 1) reward = 1;
+                    if (currentStats.totalMined + reward > MAX_SUPPLY) throw "채굴 종료 (완판)";
+
+                    const newPostRef = doc(collection(db, "posts"));
+                    transaction.set(newPostRef, {
+                        title: title, content: content, author: currentUser.displayName,
+                        reward: reward, date: new Date().toISOString()
+                    });
+
+                    const userRef = doc(db, "users", currentUser.uid);
+                    transaction.set(userRef, { coin: increment(reward), name: currentUser.displayName }, { merge: true });
+
+                    let newConsecutive = (currentStats.lastMinerUid === currentUser.uid) ? currentStats.consecutiveCount + 1 : 1;
+                    transaction.set(statsRef, {
+                        totalBlocks: increment(1), totalMined: increment(reward),
+                        lastMinerUid: currentUser.uid, consecutiveCount: newConsecutive
+                    }, { merge: true });
+                });
+                alert("✅ 블록 생성 완료! 보상이 지급되었습니다.");
+                document.getElementById("title").value = "";
+                document.getElementById("content").value = "";
+            } catch (e) {
+                alert(typeof e === "string" ? e : "Error: " + e.message);
+            } finally {
+                mineBtn.disabled = false;
+            }
+        });
+
+        // 블록 리스트
+        const q = query(collection(db, "posts"), orderBy("date", "desc"));
+        onSnapshot(q, (snapshot) => {
+            const list = document.getElementById("blockList");
+            list.innerHTML = "";
+            snapshot.forEach((doc) => {
+                const data = doc.data();
+                list.innerHTML += `<div class="block-item">
+                        <div class="block-header"><span>HASH: ${doc.id.substring(0,8)}...</span><span>${new Date(data.date).toLocaleTimeString()}</span></div>
+                        <div style="font-weight:bold; margin-bottom:5px;">${data.title}</div>
+                        <div style="font-size:12px; color:#8892b0;">BY: ${data.author} <span style="color:#00f3ff; float:right;">+${data.reward} BOK</span></div>
+                    </div>`;
+            });
+        });
+    </script>
+</body>
+</html>
