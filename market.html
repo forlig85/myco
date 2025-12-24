@@ -9,12 +9,34 @@
         * { box-sizing: border-box; margin: 0; padding: 0; }
         :root { --primary: #ec4899; --primary-light: #f472b6; --secondary: #8b5cf6; --accent: #f59e0b; --success: #10b981; --danger: #ef4444; --bg-dark: #0a0a0f; --bg-card: #12121a; --bg-card-hover: #1a1a25; --border: #2a2a3a; --text: #f0f0f5; --text-muted: #8888a0; --gradient-primary: linear-gradient(135deg, #ec4899 0%, #8b5cf6 100%); --gradient-gold: linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%); }
         body { background-color: var(--bg-dark); background-image: radial-gradient(ellipse at top, rgba(236,72,153,0.1) 0%, transparent 50%); color: var(--text); font-family: 'Noto Sans KR', sans-serif; min-height: 100vh; }
+        
         .navbar { background: var(--bg-card); border-bottom: 1px solid var(--border); padding: 12px 20px; position: sticky; top: 0; z-index: 100; }
         .nav-container { max-width: 900px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; }
         .logo { font-size: 24px; font-weight: 900; background: var(--gradient-primary); -webkit-background-clip: text; -webkit-text-fill-color: transparent; cursor: pointer; text-decoration: none; }
+        
+        .hamburger { display: none; flex-direction: column; gap: 5px; cursor: pointer; padding: 8px; }
+        .hamburger span { width: 24px; height: 2px; background: var(--text); transition: all 0.3s; }
+        .hamburger.active span:nth-child(1) { transform: rotate(45deg) translate(5px, 5px); }
+        .hamburger.active span:nth-child(2) { opacity: 0; }
+        .hamburger.active span:nth-child(3) { transform: rotate(-45deg) translate(5px, -5px); }
+        
+        .mobile-menu { display: none; position: fixed; top: 60px; left: 0; right: 0; bottom: 0; background: var(--bg-dark); z-index: 99; padding: 20px; flex-direction: column; gap: 8px; }
+        .mobile-menu.active { display: flex; }
+        .mobile-menu .nav-link { padding: 16px; font-size: 16px; border-radius: 12px; background: var(--bg-card); text-decoration: none; color: var(--text); }
+        
+        .nav-links { display: flex; gap: 8px; }
+        .nav-link { padding: 8px 16px; border-radius: 8px; color: var(--text-muted); text-decoration: none; font-size: 14px; font-weight: 500; transition: all 0.2s; }
+        .nav-link:hover, .nav-link.active { background: var(--bg-card-hover); color: var(--text); }
+        
+        .nav-right { display: flex; align-items: center; gap: 12px; }
         .wallet-badge { background: var(--bg-dark); padding: 8px 16px; border-radius: 50px; border: 1px solid var(--border); color: var(--primary); font-weight: 700; font-size: 14px; }
+        
+        .notification-bell { position: relative; cursor: pointer; padding: 8px; font-size: 18px; }
+        .notification-bell .badge { position: absolute; top: 2px; right: 2px; background: var(--danger); color: white; font-size: 10px; font-weight: 700; min-width: 18px; height: 18px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+        
         .container { max-width: 900px; margin: 0 auto; padding: 24px 20px; }
         .card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 16px; padding: 24px; margin-bottom: 20px; }
+        
         button { cursor: pointer; border: none; border-radius: 10px; font-weight: 600; padding: 12px 20px; transition: all 0.2s; font-family: 'Noto Sans KR', sans-serif; font-size: 14px; }
         button:hover { transform: translateY(-1px); }
         button:disabled { opacity: 0.5; cursor: not-allowed; }
@@ -22,6 +44,7 @@
         .btn-gold { background: var(--gradient-gold); color: #1a1a2e; }
         .btn-outline { background: transparent; border: 1px solid var(--border); color: var(--text); }
         .btn-block { width: 100%; }
+        
         input, select { width: 100%; background: var(--bg-dark); border: 1px solid var(--border); color: var(--text); padding: 14px 16px; border-radius: 10px; font-size: 15px; font-family: 'Noto Sans KR', sans-serif; margin-bottom: 12px; }
         input:focus, select:focus { outline: none; border-color: var(--primary); }
         label { display: block; font-size: 13px; color: var(--text-muted); margin-bottom: 6px; }
@@ -58,6 +81,8 @@
         .land-text { font-size: 12px; text-align: center; line-height: 1.3; word-break: break-all; padding: 4px; font-weight: 800; text-shadow: 0 2px 4px rgba(0,0,0,0.8); z-index: 2; }
         .land-sub { font-size: 10px; margin-top: 4px; color: rgba(255,255,255,0.85); font-weight: 600; z-index: 2; text-shadow: 0 1px 3px rgba(0,0,0,0.8); }
         .land-owner-badge { position: absolute; top: 4px; right: 4px; font-size: 12px; }
+        .land-for-sale { border: 2px solid var(--accent) !important; animation: salePulse 2s infinite; }
+        @keyframes salePulse { 0%, 100% { box-shadow: 0 0 0 0 rgba(245,158,11,0.4); } 50% { box-shadow: 0 0 15px 5px rgba(245,158,11,0.2); } }
 
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); display: none; justify-content: center; align-items: center; z-index: 100; backdrop-filter: blur(8px); }
         .modal-content { background: var(--bg-card); padding: 32px; border-radius: 24px; width: 90%; max-width: 380px; border: 1px solid var(--border); position: relative; }
@@ -69,11 +94,6 @@
         .modal-btn { width: 100%; padding: 16px; border-radius: 12px; font-weight: 700; cursor: pointer; border: none; margin-top: 8px; font-size: 16px; font-family: 'Noto Sans KR', sans-serif; }
         .btn-confirm { background: var(--gradient-primary); color: white; }
         .btn-cancel { background: var(--bg-card-hover); color: var(--text); border: 1px solid var(--border); }
-
-        footer { margin-top: 60px; padding: 30px 0; border-top: 1px solid var(--border); text-align: center; color: var(--text-muted); font-size: 13px; }
-        footer a { color: var(--text-muted); text-decoration: none; margin: 0 12px; }
-
-        @media (max-width: 600px) { .guide-steps { grid-template-columns: repeat(2, 1fr); } .map-container { gap: 6px; padding: 12px; } .land-text { font-size: 10px; } .region-stats { grid-template-columns: 1fr; } .select-group { flex-direction: column; } }
 
         .land-detail-card { background: var(--bg-dark); border-radius: 16px; padding: 20px; margin-bottom: 20px; }
         .land-detail-header { display: flex; align-items: center; gap: 16px; margin-bottom: 16px; }
@@ -95,19 +115,49 @@
         .offer-item-price { color: var(--accent); font-weight: 700; }
         .offer-item-actions { display: flex; gap: 8px; }
         .offer-item-actions button { padding: 8px 12px; font-size: 12px; }
-        .land-for-sale { border: 2px solid var(--accent) !important; animation: salePulse 2s infinite; }
-        @keyframes salePulse { 0%, 100% { box-shadow: 0 0 0 0 rgba(245,158,11,0.4); } 50% { box-shadow: 0 0 15px 5px rgba(245,158,11,0.2); } }
         .offers-badge { position: absolute; top: -5px; right: -5px; background: var(--danger); color: white; width: 20px; height: 20px; border-radius: 50%; font-size: 11px; font-weight: 700; display: flex; align-items: center; justify-content: center; }
         .view-offers-btn { position: fixed; bottom: 20px; right: 20px; background: var(--gradient-primary); color: white; padding: 16px 24px; border-radius: 50px; font-weight: 700; cursor: pointer; box-shadow: 0 4px 20px rgba(236,72,153,0.4); z-index: 50; display: none; }
+
+        footer { margin-top: 60px; padding: 30px 0; border-top: 1px solid var(--border); text-align: center; color: var(--text-muted); font-size: 13px; }
+        footer a { color: var(--text-muted); text-decoration: none; margin: 0 12px; }
+
+        @media (max-width: 768px) { 
+            .guide-steps { grid-template-columns: repeat(2, 1fr); } 
+            .map-container { gap: 6px; padding: 12px; } 
+            .land-text { font-size: 10px; } 
+            .region-stats { grid-template-columns: 1fr; } 
+            .select-group { flex-direction: column; }
+            .nav-links { display: none; }
+            .hamburger { display: flex; }
+        }
     </style>
 </head>
 <body>
     <nav class="navbar">
         <div class="nav-container">
             <a href="index.html" class="logo">BOKLUCK MARKET</a>
-            <div class="wallet-badge" id="walletBadge">💰 연결 필요</div>
+            <div class="nav-links">
+                <a href="index.html" class="nav-link">🏠 홈</a>
+                <a href="index.html#boards" class="nav-link">📂 게시판</a>
+                <a href="market.html" class="nav-link active">🗺️ 부동산</a>
+                <a href="board-market.html" class="nav-link">🏪 마켓</a>
+            </div>
+            <div class="nav-right">
+                <div class="notification-bell" id="notificationBell">🔔<span class="badge hidden" id="notifBadge">0</span></div>
+                <div class="wallet-badge" id="walletBadge">💰 연결 필요</div>
+                <div class="hamburger" id="hamburger" onclick="toggleMobileMenu()">
+                    <span></span><span></span><span></span>
+                </div>
+            </div>
         </div>
     </nav>
+    
+    <div class="mobile-menu" id="mobileMenu">
+        <a href="index.html" class="nav-link">🏠 홈</a>
+        <a href="index.html" class="nav-link">📂 게시판</a>
+        <a href="market.html" class="nav-link">🗺️ 부동산</a>
+        <a href="board-market.html" class="nav-link">🏪 마켓</a>
+    </div>
 
     <div class="container">
         <a href="index.html" class="back-btn">← 메인으로</a>
@@ -167,11 +217,9 @@
         </div>
     </div>
 
-    <!-- 소유된 땅 상세/거래 모달 -->
     <div id="landDetailModal" class="modal-overlay">
         <div class="modal-content">
             <div class="modal-title">🏠 땅 정보</div>
-            
             <div class="land-detail-card">
                 <div class="land-detail-header">
                     <div class="land-detail-icon" id="detailIcon">🏠</div>
@@ -192,7 +240,6 @@
                 </div>
             </div>
 
-            <!-- 판매 중인 경우 -->
             <div id="forSaleSection" style="display: none;">
                 <div class="sale-badge">🏷️ 판매 중</div>
                 <div class="sale-price">
@@ -202,7 +249,6 @@
                 <button class="modal-btn btn-confirm" onclick="buyOwnedLand()">💰 구매하기</button>
             </div>
 
-            <!-- 판매 중이 아닌 경우 (구매 제안) -->
             <div id="offerSection" style="display: none;">
                 <div class="offer-info">💬 이 땅은 현재 판매 중이 아닙니다.<br>소유자에게 구매 제안을 보내보세요!</div>
                 <label>제안 가격</label>
@@ -210,7 +256,6 @@
                 <button class="modal-btn btn-confirm" onclick="sendOffer()">📨 구매 제안 보내기</button>
             </div>
 
-            <!-- 내 땅인 경우 (판매 설정) -->
             <div id="myLandSection" style="display: none;">
                 <div class="my-land-info">⭐ 내 소유 땅입니다</div>
                 <label>판매 가격 설정 (0 = 판매 안함)</label>
@@ -223,7 +268,6 @@
         </div>
     </div>
 
-    <!-- 받은 제안 목록 모달 -->
     <div id="offersModal" class="modal-overlay">
         <div class="modal-content">
             <div class="modal-title">📬 받은 구매 제안</div>
@@ -244,7 +288,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
         import { getFirestore, collection, onSnapshot, doc, runTransaction, increment, query, where, updateDoc, getDocs, addDoc, deleteDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-        import { getAuth, onAuthStateChanged, signInWithPopup, GoogleAuthProvider } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
         const firebaseConfig = { apiKey: "AIzaSyBwQjuqgWM4YKnqu_gzNbeCg5alrC-jVcQ", authDomain: "myco-737a0.firebaseapp.com", projectId: "myco-737a0", storageBucket: "myco-737a0.firebasestorage.app", messagingSenderId: "942571332540", appId: "1:942571332540:web:be0bb6fbdd32655501c1b9" };
         const app = initializeApp(firebaseConfig);
@@ -270,13 +314,17 @@
         const grid = document.getElementById("landGrid");
         let selectedBlockIndex = null, selectedRegionKey = null;
 
+        window.toggleMobileMenu = function() {
+            document.getElementById("hamburger").classList.toggle("active");
+            document.getElementById("mobileMenu").classList.toggle("active");
+        };
+
         function updateRegionStats(soldCount, myCount) {
             document.getElementById("statSold").textContent = soldCount;
             document.getElementById("statAvailable").textContent = TOTAL_LANDS - soldCount;
             document.getElementById("statMyLands").textContent = myCount;
         }
 
-        // 빈 땅 구매 모달
         function openBuyModal(index, regionKey) {
             if(!currentUser) return alert("로그인이 필요합니다.");
             if(currentBalance < LAND_PRICE) return alert(`BOK이 부족합니다!\n현재: ${currentBalance.toLocaleString()} BOK\n필요: ${LAND_PRICE} BOK`);
@@ -288,13 +336,11 @@
             document.getElementById("inputName").focus();
         }
 
-        // 소유된 땅 상세 모달
         window.openLandDetail = function(landId, data) {
             if(!currentUser) return alert("로그인이 필요합니다.");
             selectedLandId = landId;
             selectedLandData = data;
             
-            // 기본 정보 표시
             document.getElementById("detailIcon").style.background = data.color || "#ec4899";
             document.getElementById("detailIcon").textContent = "🏠";
             document.getElementById("detailName").textContent = data.customName;
@@ -302,7 +348,6 @@
             document.getElementById("detailValue").textContent = `${data.randomValue || 0} BOK`;
             document.getElementById("detailDate").textContent = data.purchasedAt ? new Date(data.purchasedAt).toLocaleDateString() : '-';
             
-            // 섹션 초기화
             document.getElementById("forSaleSection").style.display = "none";
             document.getElementById("offerSection").style.display = "none";
             document.getElementById("myLandSection").style.display = "none";
@@ -310,15 +355,12 @@
             const isMine = data.ownerUid === currentUser.uid;
             
             if(isMine) {
-                // 내 땅
                 document.getElementById("myLandSection").style.display = "block";
                 document.getElementById("myLandPrice").value = data.salePrice || "";
             } else if(data.forSale && data.salePrice > 0) {
-                // 판매 중인 땅
                 document.getElementById("forSaleSection").style.display = "block";
                 document.getElementById("salePrice").textContent = `${data.salePrice.toLocaleString()} BOK`;
             } else {
-                // 판매 중이 아닌 남의 땅
                 document.getElementById("offerSection").style.display = "block";
                 document.getElementById("offerPrice").value = "";
             }
@@ -330,7 +372,6 @@
             document.getElementById("landDetailModal").style.display = "none";
         };
 
-        // 판매 중인 땅 구매
         window.buyOwnedLand = async function() {
             if(!selectedLandData || !selectedLandId) return;
             const price = selectedLandData.salePrice;
@@ -346,19 +387,8 @@
                     
                     if(!land.forSale) throw "이 땅은 더 이상 판매 중이 아닙니다.";
                     
-                    // 구매자 차감
-                    t.update(doc(db, "users", currentUser.uid), { 
-                        coin: increment(-price), 
-                        totalSpent: increment(price),
-                        landCount: increment(1)
-                    });
-                    // 판매자 지급
-                    t.update(doc(db, "users", land.ownerUid), { 
-                        coin: increment(price), 
-                        totalEarned: increment(price),
-                        landCount: increment(-1)
-                    });
-                    // 소유권 이전
+                    t.update(doc(db, "users", currentUser.uid), { coin: increment(-price), totalSpent: increment(price), landCount: increment(1) });
+                    t.update(doc(db, "users", land.ownerUid), { coin: increment(price), totalEarned: increment(price), landCount: increment(-1) });
                     t.update(landRef, {
                         ownerUid: currentUser.uid,
                         ownerName: currentUser.displayName,
@@ -369,12 +399,21 @@
                     });
                 });
                 
+                // 알림
+                await addDoc(collection(db, "notifications"), {
+                    userId: selectedLandData.ownerUid,
+                    type: 'land',
+                    title: '땅 판매 완료',
+                    message: `${selectedLandData.customName}이(가) ${price.toLocaleString()} BOK에 판매되었습니다!`,
+                    read: false,
+                    createdAt: new Date().toISOString()
+                });
+                
                 alert(`🎉 구매 완료! ${selectedLandData.customName}의 새 주인이 되었습니다.`);
                 closeLandDetail();
             } catch(e) { alert("오류: " + e); }
         };
 
-        // 구매 제안 보내기
         window.sendOffer = async function() {
             if(!selectedLandData || !selectedLandId) return;
             const price = parseInt(document.getElementById("offerPrice").value);
@@ -397,12 +436,20 @@
                     createdAt: new Date().toISOString()
                 });
                 
+                await addDoc(collection(db, "notifications"), {
+                    userId: selectedLandData.ownerUid,
+                    type: 'land',
+                    title: '구매 제안 도착',
+                    message: `${currentUser.displayName}님이 ${selectedLandData.customName}에 ${price.toLocaleString()} BOK 제안!`,
+                    read: false,
+                    createdAt: new Date().toISOString()
+                });
+                
                 alert(`📨 ${price.toLocaleString()} BOK 구매 제안을 보냈습니다!`);
                 closeLandDetail();
             } catch(e) { alert("오류: " + e); }
         };
 
-        // 내 땅 판매 설정
         window.setLandForSale = async function() {
             if(!selectedLandId) return;
             const price = parseInt(document.getElementById("myLandPrice").value);
@@ -424,15 +471,11 @@
 
         window.cancelSale = async function() {
             if(!selectedLandId) return;
-            await updateDoc(doc(db, "lands", selectedLandId), {
-                forSale: false,
-                salePrice: null
-            });
+            await updateDoc(doc(db, "lands", selectedLandId), { forSale: false, salePrice: null });
             alert("판매가 취소되었습니다.");
             closeLandDetail();
         };
 
-        // 제안 수락
         window.acceptOffer = async function(offerId, offerData) {
             if(!confirm(`${offerData.buyerName}의 ${offerData.offerPrice.toLocaleString()} BOK 제안을 수락하시겠습니까?`)) return;
             
@@ -443,19 +486,8 @@
                     
                     if(buyerDoc.data().coin < offerData.offerPrice) throw "구매자의 BOK이 부족합니다.";
                     
-                    // 구매자 차감
-                    t.update(buyerRef, { 
-                        coin: increment(-offerData.offerPrice), 
-                        totalSpent: increment(offerData.offerPrice),
-                        landCount: increment(1)
-                    });
-                    // 판매자 지급
-                    t.update(doc(db, "users", currentUser.uid), { 
-                        coin: increment(offerData.offerPrice), 
-                        totalEarned: increment(offerData.offerPrice),
-                        landCount: increment(-1)
-                    });
-                    // 소유권 이전
+                    t.update(buyerRef, { coin: increment(-offerData.offerPrice), totalSpent: increment(offerData.offerPrice), landCount: increment(1) });
+                    t.update(doc(db, "users", currentUser.uid), { coin: increment(offerData.offerPrice), totalEarned: increment(offerData.offerPrice), landCount: increment(-1) });
                     t.update(doc(db, "lands", offerData.landId), {
                         ownerUid: offerData.buyerUid,
                         ownerName: offerData.buyerName,
@@ -464,8 +496,16 @@
                         salePrice: null,
                         purchasedAt: new Date().toISOString()
                     });
-                    // 제안 삭제
                     t.delete(doc(db, "landOffers", offerId));
+                });
+                
+                await addDoc(collection(db, "notifications"), {
+                    userId: offerData.buyerUid,
+                    type: 'land',
+                    title: '제안 수락됨',
+                    message: `${offerData.landName} 구매 제안이 수락되었습니다!`,
+                    read: false,
+                    createdAt: new Date().toISOString()
                 });
                 
                 alert("🎉 거래 완료!");
@@ -473,7 +513,6 @@
             } catch(e) { alert("오류: " + e); }
         };
 
-        // 제안 거절
         window.rejectOffer = async function(offerId) {
             if(!confirm("이 제안을 거절하시겠습니까?")) return;
             await deleteDoc(doc(db, "landOffers", offerId));
@@ -481,7 +520,6 @@
             loadOffers();
         };
 
-        // 받은 제안 로드
         async function loadOffers() {
             if(!currentUser) return;
             const q = query(collection(db, "landOffers"), where("sellerUid", "==", currentUser.uid), where("status", "==", "pending"));
@@ -555,7 +593,6 @@
                     el.style.borderStyle = "solid";
                     el.classList.remove("land-empty");
                     
-                    // 판매 중 표시
                     if(data.forSale && data.salePrice > 0) {
                         el.classList.add("land-for-sale");
                     } else {
@@ -658,18 +695,22 @@
                 // 첫 땅 구매 시 초대 3단계 보상
                 if(isFirstLand && userData?.invitedBy) {
                     try {
-                        // 초대자에게 3단계 보상 (400 BOK)
                         await updateDoc(doc(db, "users", userData.invitedBy), { 
-                            coin: increment(400), 
-                            totalEarned: increment(400),
-                            inviteRewards: increment(400)
+                            coin: increment(400), totalEarned: increment(400), inviteRewards: increment(400)
                         });
-                        // 초대 기록 업데이트
                         const inviteQuery = query(collection(db, "invites"), where("inviteeUid", "==", currentUser.uid));
                         const inviteSnap = await getDocs(inviteQuery);
                         if(!inviteSnap.empty) {
                             await updateDoc(inviteSnap.docs[0].ref, { stage3: true, stage3At: new Date().toISOString() });
                         }
+                        await addDoc(collection(db, "notifications"), {
+                            userId: userData.invitedBy,
+                            type: 'invite',
+                            title: '초대 보상',
+                            message: `${currentUser.displayName}님이 첫 땅을 구매했습니다! +400 BOK`,
+                            read: false,
+                            createdAt: new Date().toISOString()
+                        });
                     } catch(e) { console.log("초대 보상 오류:", e); }
                 }
                 
