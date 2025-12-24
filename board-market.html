@@ -4,74 +4,60 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>BOKLUCK 게시판 마켓</title>
+    <meta name="description" content="BOKLUCK 게시판 마켓 - 운영 중인 게시판을 사고팔고 커뮤니티를 인수하세요!">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏪</text></svg>">
+    <meta name="theme-color" content="#8b5cf6">
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        :root { --primary: #8b5cf6; --primary-light: #a78bfa; --secondary: #06b6d4; --accent: #f59e0b; --success: #10b981; --danger: #ef4444; --pink: #ec4899; --bg-dark: #0a0a0f; --bg-card: #12121a; --bg-card-hover: #1a1a25; --border: #2a2a3a; --text: #f0f0f5; --text-muted: #8888a0; --gradient-primary: linear-gradient(135deg, #8b5cf6 0%, #ec4899 100%); --gradient-gold: linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%); }
-        body { background-color: var(--bg-dark); background-image: radial-gradient(ellipse at top, rgba(139,92,246,0.1) 0%, transparent 50%); color: var(--text); font-family: 'Noto Sans KR', sans-serif; min-height: 100vh; }
-        
+        :root { --primary: #8b5cf6; --primary-light: #a78bfa; --secondary: #06b6d4; --accent: #f59e0b; --success: #10b981; --danger: #ef4444; --bg-dark: #0a0a0f; --bg-card: #12121a; --bg-card-hover: #1a1a25; --border: #2a2a3a; --text: #f0f0f5; --text-muted: #8888a0; --gradient-primary: linear-gradient(135deg, #8b5cf6 0%, #ec4899 100%); --gradient-gold: linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%); }
+        [data-theme="light"] { --bg-dark: #f5f5f7; --bg-card: #ffffff; --bg-card-hover: #f0f0f2; --border: #e0e0e5; --text: #1a1a2e; --text-muted: #6b7280; }
+        body { background-color: var(--bg-dark); color: var(--text); font-family: 'Noto Sans KR', sans-serif; min-height: 100vh; }
+        .loading-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: var(--bg-dark); display: flex; justify-content: center; align-items: center; z-index: 9999; transition: opacity 0.5s; }
+        .loading-overlay.fade-out { opacity: 0; pointer-events: none; }
+        .spinner { width: 50px; height: 50px; border: 4px solid var(--border); border-top-color: var(--primary); border-radius: 50%; animation: spin 1s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
         .navbar { background: var(--bg-card); border-bottom: 1px solid var(--border); padding: 12px 20px; position: sticky; top: 0; z-index: 100; }
         .nav-container { max-width: 1000px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; }
-        .logo { font-size: 24px; font-weight: 900; background: var(--gradient-primary); -webkit-background-clip: text; -webkit-text-fill-color: transparent; cursor: pointer; text-decoration: none; }
+        .logo { font-size: 24px; font-weight: 900; background: var(--gradient-primary); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-decoration: none; }
         .nav-links { display: flex; gap: 8px; }
-        .nav-link { padding: 8px 16px; border-radius: 8px; color: var(--text-muted); text-decoration: none; font-size: 14px; font-weight: 500; transition: all 0.2s; }
+        .nav-link { padding: 8px 16px; border-radius: 8px; color: var(--text-muted); text-decoration: none; font-size: 14px; }
         .nav-link:hover, .nav-link.active { background: var(--bg-card-hover); color: var(--text); }
-        
         .hamburger { display: none; flex-direction: column; gap: 5px; cursor: pointer; padding: 8px; }
-        .hamburger span { width: 24px; height: 2px; background: var(--text); transition: all 0.3s; }
-        .hamburger.active span:nth-child(1) { transform: rotate(45deg) translate(5px, 5px); }
-        .hamburger.active span:nth-child(2) { opacity: 0; }
-        .hamburger.active span:nth-child(3) { transform: rotate(-45deg) translate(5px, -5px); }
-        
+        .hamburger span { width: 24px; height: 2px; background: var(--text); }
         .mobile-menu { display: none; position: fixed; top: 60px; left: 0; right: 0; bottom: 0; background: var(--bg-dark); z-index: 99; padding: 20px; flex-direction: column; gap: 8px; }
         .mobile-menu.active { display: flex; }
-        .mobile-menu .nav-link { padding: 16px; font-size: 16px; border-radius: 12px; background: var(--bg-card); }
-        
+        .mobile-menu .nav-link { padding: 16px; border-radius: 12px; background: var(--bg-card); }
         .nav-right { display: flex; align-items: center; gap: 12px; }
         .wallet-badge { background: var(--bg-dark); padding: 8px 16px; border-radius: 50px; border: 1px solid var(--border); color: var(--primary); font-weight: 700; font-size: 14px; }
-        
+        .theme-toggle { width: 40px; height: 40px; border-radius: 50%; background: var(--bg-dark); border: 1px solid var(--border); cursor: pointer; font-size: 18px; }
         .container { max-width: 1000px; margin: 0 auto; padding: 24px 20px; }
         .back-btn { display: inline-flex; align-items: center; gap: 8px; color: var(--text-muted); text-decoration: none; font-size: 14px; margin-bottom: 20px; }
-        .back-btn:hover { color: var(--text); }
-        
-        button { cursor: pointer; border: none; border-radius: 10px; font-weight: 600; padding: 12px 20px; transition: all 0.2s; font-family: 'Noto Sans KR', sans-serif; font-size: 14px; }
-        button:hover { transform: translateY(-1px); }
-        button:disabled { opacity: 0.5; cursor: not-allowed; }
+        button { cursor: pointer; border: none; border-radius: 10px; font-weight: 600; padding: 12px 20px; font-family: 'Noto Sans KR', sans-serif; font-size: 14px; }
         .btn-primary { background: var(--gradient-primary); color: white; }
         .btn-gold { background: var(--gradient-gold); color: #1a1a2e; }
         .btn-outline { background: transparent; border: 1px solid var(--border); color: var(--text); }
         .btn-sm { padding: 8px 14px; font-size: 13px; }
         .btn-block { width: 100%; }
-        
-        input, textarea, select { width: 100%; background: var(--bg-dark); border: 1px solid var(--border); color: var(--text); padding: 14px 16px; border-radius: 10px; font-size: 15px; font-family: 'Noto Sans KR', sans-serif; margin-bottom: 12px; }
+        input, select { width: 100%; background: var(--bg-dark); border: 1px solid var(--border); color: var(--text); padding: 14px 16px; border-radius: 10px; font-size: 15px; font-family: 'Noto Sans KR', sans-serif; margin-bottom: 12px; }
         input:focus, select:focus { outline: none; border-color: var(--primary); }
         label { display: block; font-size: 13px; color: var(--text-muted); margin-bottom: 6px; }
-
-        /* 헤더 */
         .page-header { background: var(--bg-card); border: 1px solid var(--border); border-radius: 20px; padding: 32px; margin-bottom: 24px; position: relative; overflow: hidden; }
         .page-header::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: var(--gradient-primary); }
-        .page-title { font-size: 28px; font-weight: 900; margin-bottom: 8px; display: flex; align-items: center; gap: 12px; }
+        .page-title { font-size: 28px; font-weight: 900; margin-bottom: 8px; }
         .page-subtitle { color: var(--text-muted); font-size: 15px; }
-
-        /* 통계 */
         .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
         .stat-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 16px; padding: 20px; text-align: center; }
         .stat-value { font-size: 28px; font-weight: 900; background: var(--gradient-primary); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
         .stat-label { font-size: 13px; color: var(--text-muted); margin-top: 4px; }
-
-        /* 필터 & 검색 */
         .filter-bar { display: flex; gap: 12px; margin-bottom: 24px; flex-wrap: wrap; }
         .filter-bar input { flex: 1; min-width: 200px; margin: 0; }
         .filter-bar select { width: auto; min-width: 120px; margin: 0; }
-
-        /* 탭 */
         .tabs { display: flex; gap: 4px; background: var(--bg-dark); padding: 4px; border-radius: 12px; margin-bottom: 24px; }
-        .tab { flex: 1; padding: 12px; text-align: center; border-radius: 8px; font-weight: 600; font-size: 14px; cursor: pointer; transition: all 0.2s; color: var(--text-muted); }
+        .tab { flex: 1; padding: 12px; text-align: center; border-radius: 8px; font-weight: 600; font-size: 14px; cursor: pointer; color: var(--text-muted); }
         .tab.active { background: var(--bg-card); color: var(--text); }
-
-        /* 게시판 카드 */
         .board-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; }
-        .board-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 20px; padding: 24px; transition: all 0.3s; position: relative; overflow: hidden; }
+        .board-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 20px; padding: 24px; transition: all 0.3s; position: relative; overflow: hidden; cursor: pointer; }
         .board-card:hover { border-color: var(--primary); transform: translateY(-4px); box-shadow: 0 10px 30px rgba(139,92,246,0.2); }
         .board-card.for-sale::before { content: '🏷️ 판매중'; position: absolute; top: 16px; right: 16px; background: var(--gradient-gold); color: #1a1a2e; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 700; }
         .board-card-header { display: flex; align-items: center; gap: 16px; margin-bottom: 16px; }
@@ -80,79 +66,41 @@
         .board-card-owner { font-size: 13px; color: var(--text-muted); }
         .board-card-desc { font-size: 14px; color: var(--text-muted); margin-bottom: 16px; line-height: 1.5; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
         .board-card-stats { display: flex; gap: 16px; margin-bottom: 16px; font-size: 13px; color: var(--text-muted); }
-        .board-card-stats span { display: flex; align-items: center; gap: 4px; }
         .board-card-price { display: flex; justify-content: space-between; align-items: center; padding-top: 16px; border-top: 1px solid var(--border); }
         .price-tag { font-size: 20px; font-weight: 900; color: var(--accent); }
-        .monthly-revenue { font-size: 12px; color: var(--success); background: rgba(16,185,129,0.1); padding: 4px 10px; border-radius: 20px; }
-
-        /* 내 게시판 관리 */
         .my-boards-section { background: var(--bg-card); border: 1px solid var(--border); border-radius: 20px; padding: 24px; margin-bottom: 24px; }
         .my-boards-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
         .my-board-item { display: flex; align-items: center; gap: 16px; padding: 16px; background: var(--bg-dark); border-radius: 14px; margin-bottom: 12px; }
-        .my-board-item:last-child { margin-bottom: 0; }
         .my-board-icon { width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 24px; }
         .my-board-info { flex: 1; }
         .my-board-name { font-weight: 700; margin-bottom: 4px; }
         .my-board-meta { font-size: 12px; color: var(--text-muted); }
         .my-board-actions { display: flex; gap: 8px; }
         .sale-badge { background: var(--gradient-gold); color: #1a1a2e; padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; }
-
-        /* 거래 내역 */
-        .history-item { display: flex; align-items: center; gap: 16px; padding: 16px; background: var(--bg-dark); border-radius: 14px; margin-bottom: 10px; }
-        .history-icon { width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 20px; background: var(--bg-card); }
-        .history-info { flex: 1; }
-        .history-title { font-weight: 600; font-size: 14px; margin-bottom: 4px; }
-        .history-meta { font-size: 12px; color: var(--text-muted); }
-        .history-price { font-weight: 700; color: var(--accent); }
-        .history-price.buy { color: var(--danger); }
-        .history-price.sell { color: var(--success); }
-
-        /* 모달 */
+        .empty-state { text-align: center; padding: 60px 20px; grid-column: 1/-1; }
+        .empty-state .empty-icon { font-size: 48px; margin-bottom: 12px; opacity: 0.5; }
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); display: none; justify-content: center; align-items: center; z-index: 1000; backdrop-filter: blur(8px); padding: 20px; }
-        .modal-content { background: var(--bg-card); border-radius: 20px; width: 100%; max-width: 480px; border: 1px solid var(--border); position: relative; max-height: 90vh; overflow-y: auto; }
-        .modal-header { padding: 24px 24px 0; }
-        .modal-title { font-size: 22px; font-weight: 900; margin-bottom: 8px; }
-        .modal-body { padding: 24px; }
+        .modal-content { background: var(--bg-card); border-radius: 20px; width: 100%; max-width: 480px; border: 1px solid var(--border); position: relative; max-height: 90vh; overflow-y: auto; padding: 24px; }
         .modal-close { position: absolute; top: 16px; right: 16px; background: var(--bg-dark); border: none; width: 36px; height: 36px; border-radius: 50%; cursor: pointer; font-size: 18px; color: var(--text-muted); }
-
-        /* 게시판 상세 */
-        .detail-board-header { display: flex; align-items: center; gap: 20px; padding: 24px; border-bottom: 1px solid var(--border); }
+        .modal-title { font-size: 22px; font-weight: 900; margin-bottom: 20px; text-align: center; }
+        .detail-board-header { display: flex; align-items: center; gap: 20px; padding-bottom: 16px; margin-bottom: 16px; border-bottom: 1px solid var(--border); }
         .detail-board-icon { width: 72px; height: 72px; border-radius: 18px; display: flex; align-items: center; justify-content: center; font-size: 36px; }
         .detail-board-name { font-size: 22px; font-weight: 900; margin-bottom: 4px; }
         .detail-board-owner { font-size: 14px; color: var(--text-muted); }
-        .detail-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; padding: 20px 24px; background: var(--bg-dark); }
+        .detail-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; padding: 16px; background: var(--bg-dark); border-radius: 12px; margin-bottom: 16px; }
         .detail-stat { text-align: center; }
         .detail-stat-value { font-size: 20px; font-weight: 700; color: var(--primary-light); }
         .detail-stat-label { font-size: 11px; color: var(--text-muted); }
-        .detail-price-section { padding: 24px; }
-        .detail-price { font-size: 32px; font-weight: 900; color: var(--accent); margin-bottom: 8px; }
-        .detail-revenue { font-size: 14px; color: var(--success); margin-bottom: 20px; }
-
-        /* 구매 제안 */
+        .detail-price { font-size: 32px; font-weight: 900; color: var(--accent); margin-bottom: 16px; text-align: center; }
         .offer-section { background: var(--bg-dark); border-radius: 12px; padding: 16px; margin-bottom: 16px; }
         .offer-input-group { display: flex; gap: 12px; }
         .offer-input-group input { flex: 1; margin: 0; }
-        .pending-offers { margin-top: 16px; }
-        .offer-item { display: flex; justify-content: space-between; align-items: center; padding: 12px; background: var(--bg-card); border-radius: 10px; margin-bottom: 8px; }
-        .offer-item-info { flex: 1; }
-        .offer-item-name { font-weight: 600; font-size: 14px; }
-        .offer-item-price { color: var(--accent); font-weight: 700; }
-        .offer-item-actions { display: flex; gap: 8px; }
-        .offer-item-actions button { padding: 6px 12px; font-size: 12px; }
-
         .hidden { display: none !important; }
-
-        @media (max-width: 768px) {
-            .nav-links { display: none; }
-            .hamburger { display: flex; }
-            .stats-grid { grid-template-columns: repeat(2, 1fr); }
-            .board-grid { grid-template-columns: 1fr; }
-            .filter-bar { flex-direction: column; }
-            .filter-bar input, .filter-bar select { width: 100%; }
-        }
+        @media (max-width: 768px) { .nav-links { display: none; } .hamburger { display: flex; } .stats-grid { grid-template-columns: repeat(2, 1fr); } .board-grid { grid-template-columns: 1fr; } .filter-bar { flex-direction: column; } .filter-bar input, .filter-bar select { width: 100%; } }
     </style>
 </head>
 <body>
+    <div class="loading-overlay" id="loadingOverlay"><div class="spinner"></div></div>
     <nav class="navbar">
         <div class="nav-container">
             <a href="index.html" class="logo">BOKLUCK MARKET</a>
@@ -163,71 +111,35 @@
                 <a href="board-market.html" class="nav-link active">🏪 마켓</a>
             </div>
             <div class="nav-right">
+                <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()">🌙</button>
                 <div class="wallet-badge" id="walletBadge">💰 연결 필요</div>
-                <div class="hamburger" id="hamburger" onclick="toggleMobileMenu()">
-                    <span></span><span></span><span></span>
-                </div>
+                <div class="hamburger" onclick="toggleMobileMenu()"><span></span><span></span><span></span></div>
             </div>
         </div>
     </nav>
-    
     <div class="mobile-menu" id="mobileMenu">
         <a href="index.html" class="nav-link">🏠 홈</a>
-        <a href="index.html" class="nav-link">📂 게시판</a>
         <a href="market.html" class="nav-link">🗺️ 부동산</a>
         <a href="board-market.html" class="nav-link">🏪 마켓</a>
     </div>
-
     <div class="container">
         <a href="index.html" class="back-btn">← 메인으로</a>
-
         <div class="page-header">
             <h1 class="page-title">🏪 게시판 마켓</h1>
             <p class="page-subtitle">운영 중인 게시판을 사고팔고, 새로운 커뮤니티를 인수하세요!</p>
         </div>
-
-        <!-- 통계 -->
         <div class="stats-grid">
-            <div class="stat-card">
-                <div class="stat-value" id="statTotal">0</div>
-                <div class="stat-label">전체 게시판</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-value" id="statForSale">0</div>
-                <div class="stat-label">판매중</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-value" id="statTrades">0</div>
-                <div class="stat-label">총 거래</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-value" id="statVolume">0</div>
-                <div class="stat-label">거래량 (BOK)</div>
-            </div>
+            <div class="stat-card"><div class="stat-value" id="statTotal">0</div><div class="stat-label">전체 게시판</div></div>
+            <div class="stat-card"><div class="stat-value" id="statForSale">0</div><div class="stat-label">판매중</div></div>
+            <div class="stat-card"><div class="stat-value" id="statTrades">0</div><div class="stat-label">총 거래</div></div>
+            <div class="stat-card"><div class="stat-value" id="statVolume">0</div><div class="stat-label">거래량 (BOK)</div></div>
         </div>
-
-        <!-- 내 게시판 관리 -->
         <div class="my-boards-section" id="myBoardsSection">
-            <div class="my-boards-header">
-                <h3>📋 내 게시판</h3>
-                <button class="btn-gold btn-sm" onclick="location.href='index.html'">+ 새 게시판</button>
-            </div>
-            <div id="myBoardsList">
-                <p style="text-align: center; color: var(--text-muted); padding: 20px;">로그인이 필요합니다.</p>
-            </div>
+            <div class="my-boards-header"><h3>📋 내 게시판</h3><button class="btn-gold btn-sm" onclick="location.href='index.html'">+ 새 게시판</button></div>
+            <div id="myBoardsList"><p style="text-align: center; color: var(--text-muted); padding: 20px;">로그인이 필요합니다.</p></div>
         </div>
-
-        <!-- 필터 & 검색 -->
         <div class="filter-bar">
             <input type="text" id="searchInput" placeholder="🔍 게시판 이름으로 검색..." oninput="filterBoards()">
-            <select id="categoryFilter" onchange="filterBoards()">
-                <option value="">전체 카테고리</option>
-                <option value="general">💬 자유</option>
-                <option value="investment">💰 투자</option>
-                <option value="game">🎮 게임</option>
-                <option value="tech">💻 기술</option>
-                <option value="life">🌱 일상</option>
-            </select>
             <select id="sortFilter" onchange="filterBoards()">
                 <option value="latest">최신순</option>
                 <option value="price-low">가격 낮은순</option>
@@ -235,607 +147,72 @@
                 <option value="members">회원 많은순</option>
             </select>
         </div>
-
-        <!-- 탭 -->
         <div class="tabs">
             <div class="tab active" onclick="switchTab('all')">전체</div>
             <div class="tab" onclick="switchTab('sale')">판매중</div>
-            <div class="tab" onclick="switchTab('history')">거래 내역</div>
-            <div class="tab" onclick="switchTab('offers')">받은 제안</div>
         </div>
-
-        <!-- 게시판 목록 -->
         <div id="boardGrid" class="board-grid"></div>
-
-        <!-- 거래 내역 -->
-        <div id="historySection" class="hidden">
-            <div id="historyList"></div>
-        </div>
-
-        <!-- 받은 제안 -->
-        <div id="offersSection" class="hidden">
-            <div id="offersList"></div>
-        </div>
     </div>
-
-    <!-- 게시판 상세 모달 -->
     <div class="modal-overlay" id="boardDetailModal">
         <div class="modal-content">
             <button class="modal-close" onclick="closeModal('boardDetailModal')">✕</button>
-            
             <div class="detail-board-header">
                 <div class="detail-board-icon" id="detailIcon">📝</div>
-                <div>
-                    <div class="detail-board-name" id="detailName">게시판 이름</div>
-                    <div class="detail-board-owner" id="detailOwner">운영자</div>
-                </div>
+                <div><div class="detail-board-name" id="detailName">게시판 이름</div><div class="detail-board-owner" id="detailOwner">운영자</div></div>
             </div>
-            
             <div class="detail-stats">
-                <div class="detail-stat">
-                    <div class="detail-stat-value" id="detailMembers">0</div>
-                    <div class="detail-stat-label">멤버</div>
-                </div>
-                <div class="detail-stat">
-                    <div class="detail-stat-value" id="detailPosts">0</div>
-                    <div class="detail-stat-label">게시글</div>
-                </div>
-                <div class="detail-stat">
-                    <div class="detail-stat-value" id="detailEntry">0</div>
-                    <div class="detail-stat-label">입장료</div>
-                </div>
+                <div class="detail-stat"><div class="detail-stat-value" id="detailMembers">0</div><div class="detail-stat-label">멤버</div></div>
+                <div class="detail-stat"><div class="detail-stat-value" id="detailPosts">0</div><div class="detail-stat-label">게시글</div></div>
+                <div class="detail-stat"><div class="detail-stat-value" id="detailEntry">0</div><div class="detail-stat-label">입장료</div></div>
             </div>
-            
-            <div class="detail-price-section">
-                <div id="forSaleInfo">
-                    <div class="detail-price" id="detailPrice">0 BOK</div>
-                    <div class="detail-revenue">💰 예상 월 수익: <span id="detailRevenue">0 BOK</span></div>
-                    <button class="btn-primary btn-block" onclick="buyBoard()">구매하기</button>
-                </div>
-                
-                <div id="notForSaleInfo" class="hidden">
-                    <p style="color: var(--text-muted); margin-bottom: 16px;">이 게시판은 현재 판매중이 아닙니다.</p>
-                    <div class="offer-section">
-                        <h4 style="margin-bottom: 12px;">💬 구매 제안 보내기</h4>
-                        <div class="offer-input-group">
-                            <input type="number" id="offerPrice" placeholder="제안 가격 (BOK)" min="1000">
-                            <button class="btn-gold" onclick="sendOffer()">제안</button>
-                        </div>
+            <div id="forSaleInfo">
+                <div class="detail-price" id="detailPrice">0 BOK</div>
+                <button class="btn-primary btn-block" onclick="buyBoard()">구매하기</button>
+            </div>
+            <div id="notForSaleInfo" class="hidden">
+                <p style="color: var(--text-muted); margin-bottom: 16px; text-align: center;">이 게시판은 현재 판매중이 아닙니다.</p>
+                <div class="offer-section">
+                    <h4 style="margin-bottom: 12px;">💬 구매 제안 보내기</h4>
+                    <div class="offer-input-group">
+                        <input type="number" id="offerPrice" placeholder="제안 가격 (BOK)" min="1000">
+                        <button class="btn-gold" onclick="sendOffer()">제안</button>
                     </div>
                 </div>
-                
-                <div id="myBoardInfo" class="hidden" style="margin-top: 20px; padding-top: 20px; border-top: 1px solid var(--border);">
-                    <h4 style="margin-bottom: 12px;">⚙️ 내 게시판 관리</h4>
-                    <label>판매 가격 설정 (0 = 비매품)</label>
-                    <input type="number" id="mySalePrice" placeholder="판매 가격" min="0">
-                    <button class="btn-gold btn-block" onclick="setForSale()">판매 설정</button>
-                </div>
+            </div>
+            <div id="myBoardInfo" class="hidden" style="margin-top: 20px; padding-top: 20px; border-top: 1px solid var(--border);">
+                <h4 style="margin-bottom: 12px;">⚙️ 내 게시판 관리</h4>
+                <label>판매 가격 설정 (0 = 비매품)</label>
+                <input type="number" id="mySalePrice" placeholder="판매 가격" min="0">
+                <button class="btn-gold btn-block" onclick="setForSale()">판매 설정</button>
             </div>
         </div>
     </div>
-
-    <!-- 판매 설정 모달 -->
-    <div class="modal-overlay" id="sellModal">
-        <div class="modal-content" style="max-width: 400px;">
-            <button class="modal-close" onclick="closeModal('sellModal')">✕</button>
-            <div class="modal-header">
-                <h2 class="modal-title">🏷️ 판매 설정</h2>
-            </div>
-            <div class="modal-body">
-                <div style="text-align: center; margin-bottom: 20px;">
-                    <div style="font-size: 48px; margin-bottom: 8px;" id="sellBoardIcon">📝</div>
-                    <div style="font-size: 18px; font-weight: 700;" id="sellBoardName">게시판 이름</div>
-                </div>
-                <label>판매 가격</label>
-                <input type="number" id="sellPrice" placeholder="BOK 단위" min="1000">
-                <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 16px;">💡 거래 수수료: 5%</p>
-                <button class="btn-gold btn-block" onclick="confirmSell()">판매 등록</button>
-                <button class="btn-outline btn-block" style="margin-top: 8px;" onclick="cancelSell()">판매 취소</button>
-            </div>
-        </div>
-    </div>
-
+    <script>
+        window.toggleTheme = function() { const t = document.documentElement.getAttribute('data-theme') === 'light' ? 'dark' : 'light'; document.documentElement.setAttribute('data-theme', t); document.getElementById('themeToggle').textContent = t === 'light' ? '☀️' : '🌙'; localStorage.setItem('theme', t); };
+        const st = localStorage.getItem('theme') || 'dark'; document.documentElement.setAttribute('data-theme', st); document.getElementById('themeToggle').textContent = st === 'light' ? '☀️' : '🌙';
+        window.toggleMobileMenu = function() { document.getElementById("mobileMenu").classList.toggle("active"); };
+        window.addEventListener('load', () => { setTimeout(() => document.getElementById("loadingOverlay").classList.add("fade-out"), 500); });
+    </script>
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-        import { getFirestore, collection, doc, getDoc, getDocs, updateDoc, onSnapshot, query, orderBy, where, increment, runTransaction, addDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+        import { getFirestore, collection, doc, getDocs, updateDoc, onSnapshot, query, orderBy, where, increment, runTransaction, addDoc, deleteDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-
         const firebaseConfig = { apiKey: "AIzaSyBwQjuqgWM4YKnqu_gzNbeCg5alrC-jVcQ", authDomain: "myco-737a0.firebaseapp.com", projectId: "myco-737a0", storageBucket: "myco-737a0.firebasestorage.app", messagingSenderId: "942571332540", appId: "1:942571332540:web:be0bb6fbdd32655501c1b9" };
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
-        const auth = getAuth(app);
-
-        let currentUser = null, userData = null;
-        let allBoards = [], selectedBoard = null, selectedBoardId = null;
-        let currentTab = 'all';
-
-        window.toggleMobileMenu = function() {
-            document.getElementById("hamburger").classList.toggle("active");
-            document.getElementById("mobileMenu").classList.toggle("active");
-        };
-
-        // 게시판 로드
-        function loadBoards() {
-            const q = query(collection(db, "boards"), orderBy("createdAt", "desc"));
-            
-            onSnapshot(q, (snapshot) => {
-                allBoards = [];
-                let forSaleCount = 0;
-                
-                snapshot.forEach(docSnap => {
-                    const data = { id: docSnap.id, ...docSnap.data() };
-                    allBoards.push(data);
-                    if(data.forSale && data.salePrice > 0) forSaleCount++;
-                });
-                
-                document.getElementById("statTotal").textContent = allBoards.length;
-                document.getElementById("statForSale").textContent = forSaleCount;
-                
-                renderBoards();
-                loadMyBoards();
-            });
-        }
-
-        // 게시판 렌더링
-        function renderBoards() {
-            const grid = document.getElementById("boardGrid");
-            const search = document.getElementById("searchInput").value.toLowerCase();
-            const category = document.getElementById("categoryFilter").value;
-            const sort = document.getElementById("sortFilter").value;
-            
-            let filtered = allBoards.filter(b => {
-                if(currentTab === 'sale' && (!b.forSale || !b.salePrice)) return false;
-                if(search && !b.name.toLowerCase().includes(search)) return false;
-                if(category && b.category !== category) return false;
-                return true;
-            });
-            
-            // 정렬
-            filtered.sort((a, b) => {
-                if(sort === 'price-low') return (a.salePrice || 0) - (b.salePrice || 0);
-                if(sort === 'price-high') return (b.salePrice || 0) - (a.salePrice || 0);
-                if(sort === 'members') return (b.memberCount || 0) - (a.memberCount || 0);
-                return new Date(b.createdAt) - new Date(a.createdAt);
-            });
-            
-            if(filtered.length === 0) {
-                grid.innerHTML = `<div style="grid-column: 1/-1; text-align: center; color: var(--text-muted); padding: 60px;">
-                    <div style="font-size: 48px; margin-bottom: 16px;">🏪</div>
-                    <p>게시판이 없습니다.</p>
-                </div>`;
-                return;
-            }
-            
-            grid.innerHTML = filtered.map(b => {
-                const isForSale = b.forSale && b.salePrice > 0;
-                const monthlyRevenue = Math.floor((b.memberCount || 0) * (b.entryFee || 0) * 0.3 + (b.postCount || 0) * (b.writeFee || 0) * 0.1);
-                
-                return `
-                    <div class="board-card ${isForSale ? 'for-sale' : ''}" onclick="openBoardDetail('${b.id}')">
-                        <div class="board-card-header">
-                            <div class="board-card-icon" style="background: ${b.color || '#8b5cf6'};">${b.icon || '📝'}</div>
-                            <div>
-                                <div class="board-card-name">${b.name}</div>
-                                <div class="board-card-owner">${b.ownerName}</div>
-                            </div>
-                        </div>
-                        <div class="board-card-desc">${b.description || '설명 없음'}</div>
-                        <div class="board-card-stats">
-                            <span>👤 ${b.memberCount || 0}</span>
-                            <span>📝 ${b.postCount || 0}</span>
-                            <span>💰 입장료 ${b.entryFee || 0}</span>
-                        </div>
-                        <div class="board-card-price">
-                            ${isForSale ? 
-                                `<span class="price-tag">${b.salePrice.toLocaleString()} BOK</span>` : 
-                                `<span style="color: var(--text-muted);">비매품</span>`
-                            }
-                            ${monthlyRevenue > 0 ? `<span class="monthly-revenue">월 ~${monthlyRevenue} BOK</span>` : ''}
-                        </div>
-                    </div>
-                `;
-            }).join('');
-        }
-
-        // 내 게시판 로드
-        function loadMyBoards() {
-            if(!currentUser) {
-                document.getElementById("myBoardsList").innerHTML = '<p style="text-align: center; color: var(--text-muted); padding: 20px;">로그인이 필요합니다.</p>';
-                return;
-            }
-            
-            const myBoards = allBoards.filter(b => b.ownerUid === currentUser.uid);
-            const list = document.getElementById("myBoardsList");
-            
-            if(myBoards.length === 0) {
-                list.innerHTML = '<p style="text-align: center; color: var(--text-muted); padding: 20px;">소유한 게시판이 없습니다.</p>';
-                return;
-            }
-            
-            list.innerHTML = myBoards.map(b => `
-                <div class="my-board-item">
-                    <div class="my-board-icon" style="background: ${b.color || '#8b5cf6'};">${b.icon || '📝'}</div>
-                    <div class="my-board-info">
-                        <div class="my-board-name">${b.name}</div>
-                        <div class="my-board-meta">👤 ${b.memberCount || 0} · 📝 ${b.postCount || 0}</div>
-                    </div>
-                    ${b.forSale && b.salePrice ? `<span class="sale-badge">${b.salePrice.toLocaleString()} BOK</span>` : ''}
-                    <div class="my-board-actions">
-                        <button class="btn-outline btn-sm" onclick="event.stopPropagation(); location.href='board.html?id=${b.id}'">보기</button>
-                        <button class="btn-gold btn-sm" onclick="event.stopPropagation(); openSellModal('${b.id}')">판매</button>
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        // 게시판 상세
-        window.openBoardDetail = function(boardId) {
-            const board = allBoards.find(b => b.id === boardId);
-            if(!board) return;
-            
-            selectedBoard = board;
-            selectedBoardId = boardId;
-            
-            document.getElementById("detailIcon").textContent = board.icon || '📝';
-            document.getElementById("detailIcon").style.background = board.color || '#8b5cf6';
-            document.getElementById("detailName").textContent = board.name;
-            document.getElementById("detailOwner").textContent = board.ownerName;
-            document.getElementById("detailMembers").textContent = board.memberCount || 0;
-            document.getElementById("detailPosts").textContent = board.postCount || 0;
-            document.getElementById("detailEntry").textContent = board.entryFee || 0;
-            
-            const isMine = currentUser && board.ownerUid === currentUser.uid;
-            const isForSale = board.forSale && board.salePrice > 0;
-            
-            document.getElementById("forSaleInfo").classList.toggle("hidden", !isForSale || isMine);
-            document.getElementById("notForSaleInfo").classList.toggle("hidden", isForSale || isMine);
-            document.getElementById("myBoardInfo").classList.toggle("hidden", !isMine);
-            
-            if(isForSale) {
-                document.getElementById("detailPrice").textContent = `${board.salePrice.toLocaleString()} BOK`;
-                const monthlyRevenue = Math.floor((board.memberCount || 0) * (board.entryFee || 0) * 0.3);
-                document.getElementById("detailRevenue").textContent = `${monthlyRevenue.toLocaleString()} BOK`;
-            }
-            
-            if(isMine) {
-                document.getElementById("mySalePrice").value = board.salePrice || '';
-            }
-            
-            openModal('boardDetailModal');
-        };
-
-        // 구매
-        window.buyBoard = async function() {
-            if(!currentUser) return alert("로그인이 필요합니다.");
-            if(!selectedBoard || !selectedBoardId) return;
-            if(selectedBoard.ownerUid === currentUser.uid) return alert("자신의 게시판은 구매할 수 없습니다.");
-            
-            const price = selectedBoard.salePrice;
-            if(userData.coin < price) return alert(`BOK이 부족합니다!\n현재: ${userData.coin.toLocaleString()}\n필요: ${price.toLocaleString()}`);
-            
-            if(!confirm(`"${selectedBoard.name}" 게시판을 ${price.toLocaleString()} BOK에 구매하시겠습니까?`)) return;
-            
-            try {
-                const fee = Math.floor(price * 0.05);
-                const sellerAmount = price - fee;
-                
-                await runTransaction(db, async (t) => {
-                    const boardRef = doc(db, "boards", selectedBoardId);
-                    const boardDoc = await t.get(boardRef);
-                    if(!boardDoc.exists() || !boardDoc.data().forSale) throw "판매중이 아닙니다.";
-                    
-                    t.update(doc(db, "users", currentUser.uid), { 
-                        coin: increment(-price), 
-                        totalSpent: increment(price),
-                        boardCount: increment(1)
-                    });
-                    
-                    t.update(doc(db, "users", selectedBoard.ownerUid), { 
-                        coin: increment(sellerAmount), 
-                        totalEarned: increment(sellerAmount),
-                        boardCount: increment(-1)
-                    });
-                    
-                    t.update(boardRef, {
-                        ownerUid: currentUser.uid,
-                        ownerName: currentUser.displayName,
-                        forSale: false,
-                        salePrice: null
-                    });
-                });
-                
-                // 거래 기록
-                await addDoc(collection(db, "boardTrades"), {
-                    boardId: selectedBoardId,
-                    boardName: selectedBoard.name,
-                    sellerUid: selectedBoard.ownerUid,
-                    sellerName: selectedBoard.ownerName,
-                    buyerUid: currentUser.uid,
-                    buyerName: currentUser.displayName,
-                    price,
-                    fee,
-                    createdAt: new Date().toISOString()
-                });
-                
-                // 알림
-                await addDoc(collection(db, "notifications"), {
-                    userId: selectedBoard.ownerUid,
-                    type: 'bok',
-                    title: '게시판 판매 완료',
-                    message: `"${selectedBoard.name}" 게시판이 ${price.toLocaleString()} BOK에 판매되었습니다! (수수료 제외 ${sellerAmount.toLocaleString()} BOK 획득)`,
-                    read: false,
-                    createdAt: new Date().toISOString()
-                });
-                
-                alert(`🎉 "${selectedBoard.name}" 게시판을 구매했습니다!`);
-                closeModal('boardDetailModal');
-            } catch(e) { alert("오류: " + e); }
-        };
-
-        // 구매 제안
-        window.sendOffer = async function() {
-            if(!currentUser) return alert("로그인이 필요합니다.");
-            if(!selectedBoard || !selectedBoardId) return;
-            
-            const price = parseInt(document.getElementById("offerPrice").value);
-            if(!price || price < 1000) return alert("1,000 BOK 이상으로 제안하세요.");
-            if(userData.coin < price) return alert("BOK이 부족합니다.");
-            
-            try {
-                await addDoc(collection(db, "boardOffers"), {
-                    boardId: selectedBoardId,
-                    boardName: selectedBoard.name,
-                    sellerUid: selectedBoard.ownerUid,
-                    sellerName: selectedBoard.ownerName,
-                    buyerUid: currentUser.uid,
-                    buyerName: currentUser.displayName,
-                    buyerCountry: userData?.country || '',
-                    offerPrice: price,
-                    status: 'pending',
-                    createdAt: new Date().toISOString()
-                });
-                
-                await addDoc(collection(db, "notifications"), {
-                    userId: selectedBoard.ownerUid,
-                    type: 'bok',
-                    title: '게시판 구매 제안',
-                    message: `${currentUser.displayName}님이 "${selectedBoard.name}" 게시판에 ${price.toLocaleString()} BOK 구매 제안을 보냈습니다!`,
-                    read: false,
-                    createdAt: new Date().toISOString()
-                });
-                
-                alert("📨 구매 제안을 보냈습니다!");
-                document.getElementById("offerPrice").value = "";
-                closeModal('boardDetailModal');
-            } catch(e) { alert("오류: " + e); }
-        };
-
-        // 판매 설정 모달
-        window.openSellModal = function(boardId) {
-            const board = allBoards.find(b => b.id === boardId);
-            if(!board) return;
-            
-            selectedBoard = board;
-            selectedBoardId = boardId;
-            
-            document.getElementById("sellBoardIcon").textContent = board.icon || '📝';
-            document.getElementById("sellBoardName").textContent = board.name;
-            document.getElementById("sellPrice").value = board.salePrice || '';
-            
-            openModal('sellModal');
-        };
-
-        window.confirmSell = async function() {
-            const price = parseInt(document.getElementById("sellPrice").value);
-            if(!price || price < 1000) return alert("1,000 BOK 이상으로 설정하세요.");
-            
-            await updateDoc(doc(db, "boards", selectedBoardId), {
-                forSale: true,
-                salePrice: price
-            });
-            
-            alert(`🏷️ ${price.toLocaleString()} BOK에 판매 등록되었습니다!`);
-            closeModal('sellModal');
-        };
-
-        window.cancelSell = async function() {
-            await updateDoc(doc(db, "boards", selectedBoardId), {
-                forSale: false,
-                salePrice: null
-            });
-            
-            alert("판매가 취소되었습니다.");
-            closeModal('sellModal');
-        };
-
-        window.setForSale = async function() {
-            const price = parseInt(document.getElementById("mySalePrice").value);
-            
-            await updateDoc(doc(db, "boards", selectedBoardId), {
-                forSale: price > 0,
-                salePrice: price || null
-            });
-            
-            if(price > 0) {
-                alert(`🏷️ ${price.toLocaleString()} BOK에 판매 등록되었습니다!`);
-            } else {
-                alert("판매가 취소되었습니다.");
-            }
-            closeModal('boardDetailModal');
-        };
-
-        // 탭 전환
-        window.switchTab = function(tab) {
-            currentTab = tab;
-            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-            event.target.classList.add('active');
-            
-            document.getElementById("boardGrid").classList.toggle("hidden", tab === 'history' || tab === 'offers');
-            document.getElementById("historySection").classList.toggle("hidden", tab !== 'history');
-            document.getElementById("offersSection").classList.toggle("hidden", tab !== 'offers');
-            
-            if(tab === 'history') loadHistory();
-            else if(tab === 'offers') loadOffers();
-            else renderBoards();
-        };
-
-        // 거래 내역
-        async function loadHistory() {
-            const q = query(collection(db, "boardTrades"), orderBy("createdAt", "desc"));
-            const snapshot = await getDocs(q);
-            
-            const list = document.getElementById("historyList");
-            if(snapshot.empty) {
-                list.innerHTML = '<p style="text-align: center; color: var(--text-muted); padding: 40px;">거래 내역이 없습니다.</p>';
-                return;
-            }
-            
-            let totalVolume = 0;
-            list.innerHTML = "";
-            
-            snapshot.forEach(docSnap => {
-                const t = docSnap.data();
-                totalVolume += t.price;
-                const isBuy = currentUser && t.buyerUid === currentUser.uid;
-                const isSell = currentUser && t.sellerUid === currentUser.uid;
-                
-                list.innerHTML += `
-                    <div class="history-item">
-                        <div class="history-icon">🏪</div>
-                        <div class="history-info">
-                            <div class="history-title">${t.boardName}</div>
-                            <div class="history-meta">${t.sellerName} → ${t.buyerName} · ${new Date(t.createdAt).toLocaleDateString()}</div>
-                        </div>
-                        <div class="history-price ${isBuy ? 'buy' : ''} ${isSell ? 'sell' : ''}">${t.price.toLocaleString()} BOK</div>
-                    </div>
-                `;
-            });
-            
-            document.getElementById("statTrades").textContent = snapshot.size;
-            document.getElementById("statVolume").textContent = totalVolume.toLocaleString();
-        }
-
-        // 받은 제안
-        async function loadOffers() {
-            if(!currentUser) {
-                document.getElementById("offersList").innerHTML = '<p style="text-align: center; color: var(--text-muted); padding: 40px;">로그인이 필요합니다.</p>';
-                return;
-            }
-            
-            const q = query(collection(db, "boardOffers"), where("sellerUid", "==", currentUser.uid), where("status", "==", "pending"));
-            
-            onSnapshot(q, (snapshot) => {
-                const list = document.getElementById("offersList");
-                if(snapshot.empty) {
-                    list.innerHTML = '<p style="text-align: center; color: var(--text-muted); padding: 40px;">받은 제안이 없습니다.</p>';
-                    return;
-                }
-                
-                list.innerHTML = "";
-                snapshot.forEach(docSnap => {
-                    const o = docSnap.data();
-                    list.innerHTML += `
-                        <div class="offer-item">
-                            <div class="offer-item-info">
-                                <div class="offer-item-name">${o.boardName}</div>
-                                <div style="font-size: 12px; color: var(--text-muted);">${o.buyerCountry || ''} ${o.buyerName}</div>
-                                <div class="offer-item-price">${o.offerPrice.toLocaleString()} BOK</div>
-                            </div>
-                            <div class="offer-item-actions">
-                                <button class="btn-gold btn-sm" onclick="acceptOffer('${docSnap.id}', '${o.boardId}', '${o.buyerUid}', ${o.offerPrice})">수락</button>
-                                <button class="btn-outline btn-sm" onclick="rejectOffer('${docSnap.id}')">거절</button>
-                            </div>
-                        </div>
-                    `;
-                });
-            });
-        }
-
-        // 제안 수락
-        window.acceptOffer = async function(offerId, boardId, buyerUid, price) {
-            if(!confirm(`${price.toLocaleString()} BOK 제안을 수락하시겠습니까?`)) return;
-            
-            try {
-                const fee = Math.floor(price * 0.05);
-                const sellerAmount = price - fee;
-                
-                const buyerRef = doc(db, "users", buyerUid);
-                const buyerSnap = await getDoc(buyerRef);
-                if(buyerSnap.data().coin < price) throw "구매자의 BOK이 부족합니다.";
-                
-                const board = allBoards.find(b => b.id === boardId);
-                
-                await runTransaction(db, async (t) => {
-                    t.update(buyerRef, { coin: increment(-price), totalSpent: increment(price), boardCount: increment(1) });
-                    t.update(doc(db, "users", currentUser.uid), { coin: increment(sellerAmount), totalEarned: increment(sellerAmount), boardCount: increment(-1) });
-                    t.update(doc(db, "boards", boardId), {
-                        ownerUid: buyerUid,
-                        ownerName: buyerSnap.data().name,
-                        forSale: false,
-                        salePrice: null
-                    });
-                    t.delete(doc(db, "boardOffers", offerId));
-                });
-                
-                // 거래 기록
-                await addDoc(collection(db, "boardTrades"), {
-                    boardId,
-                    boardName: board?.name || '게시판',
-                    sellerUid: currentUser.uid,
-                    sellerName: currentUser.displayName,
-                    buyerUid,
-                    buyerName: buyerSnap.data().name,
-                    price,
-                    fee,
-                    createdAt: new Date().toISOString()
-                });
-                
-                await addDoc(collection(db, "notifications"), {
-                    userId: buyerUid,
-                    type: 'bok',
-                    title: '구매 제안 수락됨',
-                    message: `"${board?.name || '게시판'}" 구매 제안이 수락되었습니다!`,
-                    read: false,
-                    createdAt: new Date().toISOString()
-                });
-                
-                alert("🎉 거래가 완료되었습니다!");
-            } catch(e) { alert("오류: " + e); }
-        };
-
-        // 제안 거절
-        window.rejectOffer = async function(offerId) {
-            if(!confirm("이 제안을 거절하시겠습니까?")) return;
-            await deleteDoc(doc(db, "boardOffers", offerId));
-            alert("제안을 거절했습니다.");
-        };
-
-        // 필터
-        window.filterBoards = function() {
-            renderBoards();
-        };
-
-        // 인증 상태
-        onAuthStateChanged(auth, (user) => {
-            if(user) {
-                currentUser = user;
-                onSnapshot(doc(db, "users", user.uid), (d) => {
-                    if(d.exists()) {
-                        userData = d.data();
-                        document.getElementById("walletBadge").innerText = `💰 ${(userData.coin||0).toLocaleString()} BOK`;
-                        loadMyBoards();
-                    }
-                });
-            } else {
-                document.getElementById("walletBadge").innerText = "💰 로그인 필요";
-            }
-        });
-
+        const app = initializeApp(firebaseConfig); const db = getFirestore(app); const auth = getAuth(app);
+        let currentUser = null, userData = null, allBoards = [], selectedBoard = null, selectedBoardId = null, currentTab = 'all';
+        function loadBoards() { const q = query(collection(db, "boards"), orderBy("createdAt", "desc")); onSnapshot(q, (s) => { allBoards = []; let forSaleCount = 0; s.forEach(d => { const data = { id: d.id, ...d.data() }; allBoards.push(data); if(data.forSale && data.salePrice > 0) forSaleCount++; }); document.getElementById("statTotal").textContent = allBoards.length; document.getElementById("statForSale").textContent = forSaleCount; renderBoards(); loadMyBoards(); }); }
+        function renderBoards() { const grid = document.getElementById("boardGrid"); const search = document.getElementById("searchInput").value.toLowerCase(); const sort = document.getElementById("sortFilter").value; let filtered = allBoards.filter(b => { if(currentTab === 'sale' && (!b.forSale || !b.salePrice)) return false; if(search && !b.name.toLowerCase().includes(search)) return false; return true; }); filtered.sort((a, b) => { if(sort === 'price-low') return (a.salePrice || 0) - (b.salePrice || 0); if(sort === 'price-high') return (b.salePrice || 0) - (a.salePrice || 0); if(sort === 'members') return (b.memberCount || 0) - (a.memberCount || 0); return new Date(b.createdAt) - new Date(a.createdAt); }); if(filtered.length === 0) { grid.innerHTML = '<div class="empty-state"><div class="empty-icon">🏪</div><p>게시판이 없습니다.</p></div>'; return; } grid.innerHTML = filtered.map(b => { const isForSale = b.forSale && b.salePrice > 0; return '<div class="board-card ' + (isForSale ? 'for-sale' : '') + '" onclick="openBoardDetail(\'' + b.id + '\')"><div class="board-card-header"><div class="board-card-icon" style="background: ' + (b.color || '#8b5cf6') + ';">' + (b.icon || '📝') + '</div><div><div class="board-card-name">' + b.name + '</div><div class="board-card-owner">' + b.ownerName + '</div></div></div><div class="board-card-desc">' + (b.description || '설명 없음') + '</div><div class="board-card-stats"><span>👤 ' + (b.memberCount || 0) + '</span><span>📝 ' + (b.postCount || 0) + '</span></div><div class="board-card-price">' + (isForSale ? '<span class="price-tag">' + b.salePrice.toLocaleString() + ' BOK</span>' : '<span style="color: var(--text-muted);">비매품</span>') + '</div></div>'; }).join(''); }
+        function loadMyBoards() { if(!currentUser) { document.getElementById("myBoardsList").innerHTML = '<p style="text-align: center; color: var(--text-muted); padding: 20px;">로그인이 필요합니다.</p>'; return; } const my = allBoards.filter(b => b.ownerUid === currentUser.uid); const l = document.getElementById("myBoardsList"); if(my.length === 0) { l.innerHTML = '<p style="text-align: center; color: var(--text-muted); padding: 20px;">소유한 게시판이 없습니다.</p>'; return; } l.innerHTML = my.map(b => '<div class="my-board-item"><div class="my-board-icon" style="background: ' + (b.color || '#8b5cf6') + ';">' + (b.icon || '📝') + '</div><div class="my-board-info"><div class="my-board-name">' + b.name + '</div><div class="my-board-meta">👤 ' + (b.memberCount || 0) + ' · 📝 ' + (b.postCount || 0) + '</div></div>' + (b.forSale && b.salePrice ? '<span class="sale-badge">' + b.salePrice.toLocaleString() + ' BOK</span>' : '') + '<div class="my-board-actions"><button class="btn-outline btn-sm" onclick="event.stopPropagation(); location.href=\'board.html?id=' + b.id + '\'">보기</button><button class="btn-gold btn-sm" onclick="event.stopPropagation(); openBoardDetail(\'' + b.id + '\')">관리</button></div></div>').join(''); }
+        window.openBoardDetail = function(id) { const b = allBoards.find(x => x.id === id); if(!b) return; selectedBoard = b; selectedBoardId = id; document.getElementById("detailIcon").textContent = b.icon || '📝'; document.getElementById("detailIcon").style.background = b.color || '#8b5cf6'; document.getElementById("detailName").textContent = b.name; document.getElementById("detailOwner").textContent = b.ownerName; document.getElementById("detailMembers").textContent = b.memberCount || 0; document.getElementById("detailPosts").textContent = b.postCount || 0; document.getElementById("detailEntry").textContent = b.entryFee || 0; const isMine = currentUser && b.ownerUid === currentUser.uid; const isForSale = b.forSale && b.salePrice > 0; document.getElementById("forSaleInfo").classList.toggle("hidden", !isForSale || isMine); document.getElementById("notForSaleInfo").classList.toggle("hidden", isForSale || isMine); document.getElementById("myBoardInfo").classList.toggle("hidden", !isMine); if(isForSale) document.getElementById("detailPrice").textContent = b.salePrice.toLocaleString() + ' BOK'; if(isMine) document.getElementById("mySalePrice").value = b.salePrice || ''; openModal('boardDetailModal'); };
+        window.buyBoard = async function() { if(!currentUser) return alert("로그인이 필요합니다."); if(!selectedBoard) return; const price = selectedBoard.salePrice; if(userData.coin < price) return alert("BOK이 부족합니다!"); if(!confirm(selectedBoard.name + '을(를) ' + price.toLocaleString() + ' BOK에 구매하시겠습니까?')) return; try { const fee = Math.floor(price * 0.05); const sellerAmount = price - fee; await runTransaction(db, async (t) => { const ref = doc(db, "boards", selectedBoardId); const d = await t.get(ref); if(!d.exists() || !d.data().forSale) throw "판매중이 아닙니다."; t.update(doc(db, "users", currentUser.uid), { coin: increment(-price), totalSpent: increment(price), boardCount: increment(1) }); t.update(doc(db, "users", selectedBoard.ownerUid), { coin: increment(sellerAmount), totalEarned: increment(sellerAmount), boardCount: increment(-1) }); t.update(ref, { ownerUid: currentUser.uid, ownerName: currentUser.displayName, forSale: false, salePrice: null }); }); await addDoc(collection(db, "notifications"), { userId: selectedBoard.ownerUid, type: 'bok', title: '게시판 판매 완료', message: selectedBoard.name + ' 게시판이 ' + price.toLocaleString() + ' BOK에 판매되었습니다!', read: false, createdAt: new Date().toISOString() }); alert('🎉 ' + selectedBoard.name + ' 게시판을 구매했습니다!'); closeModal('boardDetailModal'); } catch(e) { alert("오류: " + e); } };
+        window.sendOffer = async function() { if(!currentUser) return alert("로그인이 필요합니다."); const price = parseInt(document.getElementById("offerPrice").value); if(!price || price < 1000) return alert("1,000 BOK 이상으로 제안하세요."); if(userData.coin < price) return alert("BOK이 부족합니다."); await addDoc(collection(db, "boardOffers"), { boardId: selectedBoardId, boardName: selectedBoard.name, sellerUid: selectedBoard.ownerUid, buyerUid: currentUser.uid, buyerName: currentUser.displayName, offerPrice: price, status: 'pending', createdAt: new Date().toISOString() }); await addDoc(collection(db, "notifications"), { userId: selectedBoard.ownerUid, type: 'bok', title: '게시판 구매 제안', message: currentUser.displayName + '님이 ' + selectedBoard.name + ' 게시판에 ' + price.toLocaleString() + ' BOK 구매 제안!', read: false, createdAt: new Date().toISOString() }); alert("📨 구매 제안을 보냈습니다!"); document.getElementById("offerPrice").value = ""; closeModal('boardDetailModal'); };
+        window.setForSale = async function() { const price = parseInt(document.getElementById("mySalePrice").value); if(price && price < 1000) return alert("1,000 BOK 이상으로 설정하세요."); await updateDoc(doc(db, "boards", selectedBoardId), { forSale: price > 0, salePrice: price || null }); alert(price > 0 ? '🏷️ ' + price.toLocaleString() + ' BOK에 판매 등록!' : "판매 취소되었습니다."); closeModal('boardDetailModal'); };
+        window.switchTab = function(tab) { currentTab = tab; document.querySelectorAll('.tab').forEach(t => t.classList.remove('active')); event.target.classList.add('active'); renderBoards(); };
+        window.filterBoards = function() { renderBoards(); };
+        onAuthStateChanged(auth, (u) => { if(u) { currentUser = u; onSnapshot(doc(db, "users", u.uid), (d) => { if(d.exists()) { userData = d.data(); document.getElementById("walletBadge").innerText = '💰 ' + (userData.coin||0).toLocaleString() + ' BOK'; loadMyBoards(); } }); } else { document.getElementById("walletBadge").innerText = "💰 로그인 필요"; } });
         window.openModal = (id) => document.getElementById(id).style.display = "flex";
         window.closeModal = (id) => document.getElementById(id).style.display = "none";
-
         loadBoards();
-        loadHistory();
     </script>
 </body>
 </html>
