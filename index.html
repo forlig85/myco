@@ -4,7 +4,35 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>BOKLUCK - 글 쓰고 땅 사는 Web3 커뮤니티</title>
-    <meta name="description" content="BOKLUCK에서 콘텐츠를 작성하고 BOK 토큰을 받으세요.">
+    
+    <!-- SEO 메타태그 -->
+    <meta name="description" content="BOKLUCK에서 콘텐츠를 작성하고 BOK 토큰을 받으세요. 가상 부동산에 투자하고 커뮤니티를 운영해보세요!">
+    <meta name="keywords" content="Web3, 커뮤니티, 토큰, 부동산, BOK, 보상, 게시판">
+    <meta name="author" content="BOKLUCK">
+    
+    <!-- Open Graph / 소셜 공유 -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://bokluck.com/">
+    <meta property="og:title" content="BOKLUCK - 글 쓰고 땅 사는 Web3 커뮤니티">
+    <meta property="og:description" content="콘텐츠를 작성하면 BOK 토큰을 받고, 가상 부동산에 투자해서 영토를 확장하세요!">
+    <meta property="og:image" content="https://bokluck.com/og-image.png">
+    
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="BOKLUCK - 글 쓰고 땅 사는 Web3 커뮤니티">
+    <meta name="twitter:description" content="콘텐츠를 작성하면 BOK 토큰을 받고, 가상 부동산에 투자하세요!">
+    <meta name="twitter:image" content="https://bokluck.com/og-image.png">
+    
+    <!-- 파비콘 -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎰</text></svg>">
+    <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎰</text></svg>">
+    
+    <!-- PWA 매니페스트 -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#6366f1">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
     <style>
@@ -18,7 +46,34 @@
             --gradient-gold: linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%);
             --gradient-pink: linear-gradient(135deg, #ec4899 0%, #8b5cf6 100%);
         }
-        body { background-color: var(--bg-dark); background-image: radial-gradient(ellipse at top, rgba(99,102,241,0.1) 0%, transparent 50%); color: var(--text); font-family: 'Noto Sans KR', sans-serif; min-height: 100vh; }
+        
+        /* 라이트 모드 */
+        [data-theme="light"] {
+            --bg-dark: #f5f5f7; --bg-card: #ffffff; --bg-card-hover: #f0f0f2;
+            --border: #e0e0e5; --text: #1a1a2e; --text-muted: #6b7280;
+        }
+        
+        body { background-color: var(--bg-dark); background-image: radial-gradient(ellipse at top, rgba(99,102,241,0.1) 0%, transparent 50%); color: var(--text); font-family: 'Noto Sans KR', sans-serif; min-height: 100vh; transition: background-color 0.3s, color 0.3s; }
+        
+        /* 로딩 스피너 */
+        .loading-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: var(--bg-dark); display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 9999; transition: opacity 0.5s; }
+        .loading-overlay.fade-out { opacity: 0; pointer-events: none; }
+        .spinner { width: 50px; height: 50px; border: 4px solid var(--border); border-top-color: var(--primary); border-radius: 50%; animation: spin 1s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .loading-text { margin-top: 16px; color: var(--text-muted); font-size: 14px; }
+        
+        /* 스켈레톤 로딩 */
+        .skeleton { background: linear-gradient(90deg, var(--bg-card-hover) 25%, var(--border) 50%, var(--bg-card-hover) 75%); background-size: 200% 100%; animation: shimmer 1.5s infinite; border-radius: 8px; }
+        @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+        .skeleton-text { height: 16px; margin-bottom: 8px; }
+        .skeleton-title { height: 24px; width: 60%; margin-bottom: 12px; }
+        .skeleton-circle { width: 40px; height: 40px; border-radius: 50%; }
+        
+        /* 에러 바운더리 */
+        .error-container { text-align: center; padding: 60px 20px; }
+        .error-icon { font-size: 64px; margin-bottom: 16px; }
+        .error-title { font-size: 20px; font-weight: 700; margin-bottom: 8px; }
+        .error-message { color: var(--text-muted); margin-bottom: 20px; }
         
         /* 네비게이션 */
         .navbar { background: var(--bg-card); border-bottom: 1px solid var(--border); padding: 12px 20px; position: sticky; top: 0; z-index: 100; }
@@ -27,6 +82,10 @@
         .nav-links { display: flex; gap: 8px; }
         .nav-link { padding: 8px 16px; border-radius: 8px; color: var(--text-muted); text-decoration: none; font-size: 14px; font-weight: 500; transition: all 0.2s; }
         .nav-link:hover, .nav-link.active { background: var(--bg-card-hover); color: var(--text); }
+        
+        /* 다크/라이트 토글 */
+        .theme-toggle { width: 40px; height: 40px; border-radius: 50%; background: var(--bg-dark); border: 1px solid var(--border); cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 18px; transition: all 0.3s; }
+        .theme-toggle:hover { border-color: var(--primary); }
         
         /* 햄버거 메뉴 */
         .hamburger { display: none; flex-direction: column; gap: 5px; cursor: pointer; padding: 8px; }
@@ -41,7 +100,8 @@
         
         /* 알림 벨 */
         .notification-bell { position: relative; cursor: pointer; padding: 8px; }
-        .notification-bell .badge { position: absolute; top: 2px; right: 2px; background: var(--danger); color: white; font-size: 10px; font-weight: 700; min-width: 18px; height: 18px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+        .notification-bell .badge { position: absolute; top: 2px; right: 2px; background: var(--danger); color: white; font-size: 10px; font-weight: 700; min-width: 18px; height: 18px; border-radius: 50%; display: flex; align-items: center; justify-content: center; animation: pulse 2s infinite; }
+        @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.1); } }
         .notification-dropdown { position: absolute; top: 100%; right: 0; width: 320px; max-height: 400px; overflow-y: auto; background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; display: none; z-index: 200; box-shadow: 0 10px 40px rgba(0,0,0,0.5); }
         .notification-dropdown.active { display: block; }
         .notification-header { padding: 16px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
@@ -84,6 +144,11 @@
         .btn-sm { padding: 8px 14px; font-size: 13px; }
         .btn-block { width: 100%; }
         
+        /* 로그인 필요 오버레이 */
+        .login-required-overlay { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(10,10,15,0.85); backdrop-filter: blur(8px); display: flex; flex-direction: column; align-items: center; justify-content: center; border-radius: 16px; z-index: 10; }
+        .login-required-overlay .lock-icon { font-size: 48px; margin-bottom: 16px; }
+        .login-required-overlay p { color: var(--text-muted); margin-bottom: 16px; text-align: center; }
+        
         /* 히어로 섹션 */
         .hero { text-align: center; padding: 60px 20px; background: var(--bg-card); border-radius: 24px; margin-bottom: 24px; border: 1px solid var(--border); position: relative; overflow: hidden; }
         .hero::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: var(--gradient-primary); }
@@ -124,6 +189,13 @@
         .hot-post-meta { font-size: 12px; color: var(--text-muted); }
         .hot-post-stats { font-size: 12px; color: var(--danger); font-weight: 600; }
         
+        /* 빈 상태 */
+        .empty-state { text-align: center; padding: 40px 20px; }
+        .empty-state .empty-icon { font-size: 48px; margin-bottom: 12px; opacity: 0.5; }
+        .empty-state .empty-title { font-weight: 600; margin-bottom: 8px; }
+        .empty-state .empty-desc { font-size: 13px; color: var(--text-muted); }
+        .empty-state .cta-text { color: var(--primary-light); font-weight: 600; margin-top: 12px; cursor: pointer; }
+        
         /* 랭킹 */
         .ranking-item { display: flex; align-items: center; gap: 12px; padding: 12px; background: var(--bg-dark); border-radius: 10px; margin-bottom: 8px; }
         .ranking-position { width: 28px; height: 28px; background: var(--bg-card-hover); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 13px; }
@@ -151,12 +223,23 @@
         .streak-value { font-size: 24px; font-weight: 900; color: var(--accent); }
         .streak-label { font-size: 12px; color: var(--text-muted); }
         
+        /* 출석 혜택 카드 (로그인 전) */
+        .attendance-benefits { background: linear-gradient(135deg, rgba(99,102,241,0.1), rgba(236,72,153,0.1)); border: 1px solid rgba(99,102,241,0.3); border-radius: 16px; padding: 24px; text-align: center; }
+        .attendance-benefits h4 { margin-bottom: 16px; }
+        .benefit-item { display: flex; align-items: center; gap: 12px; padding: 12px; background: var(--bg-dark); border-radius: 10px; margin-bottom: 8px; text-align: left; }
+        .benefit-icon { font-size: 24px; }
+        .benefit-text { font-size: 13px; }
+        .benefit-text strong { color: var(--accent); }
+        
         /* 룰렛 */
         .roulette-container { text-align: center; padding: 20px; }
         .roulette-wheel { width: 200px; height: 200px; border-radius: 50%; background: conic-gradient(var(--primary) 0deg 45deg, var(--secondary) 45deg 90deg, var(--accent) 90deg 135deg, var(--success) 135deg 180deg, var(--pink) 180deg 225deg, var(--danger) 225deg 270deg, var(--primary-light) 270deg 315deg, #fbbf24 315deg 360deg); margin: 0 auto 20px; position: relative; transition: transform 3s cubic-bezier(0.17,0.67,0.12,0.99); box-shadow: 0 0 30px rgba(99,102,241,0.3); }
         .roulette-wheel::before { content: '🎯'; position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); font-size: 40px; background: var(--bg-dark); width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
         .roulette-pointer { position: absolute; top: -10px; left: 50%; transform: translateX(-50%); font-size: 24px; }
         .streak-bonus { display: inline-block; background: var(--gradient-gold); color: #1a1a2e; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 700; margin-top: 8px; }
+        
+        /* 동기부여 문구 */
+        .motivational-text { background: linear-gradient(135deg, rgba(245,158,11,0.1), rgba(16,185,129,0.1)); border: 1px solid rgba(245,158,11,0.3); color: var(--accent); padding: 12px 16px; border-radius: 10px; font-size: 14px; text-align: center; margin-bottom: 16px; }
         
         /* 프로필 */
         .profile-header { display: flex; align-items: center; gap: 20px; margin-bottom: 24px; }
@@ -186,6 +269,19 @@
         .tabs { display: flex; gap: 4px; background: var(--bg-dark); padding: 4px; border-radius: 12px; margin-bottom: 20px; }
         .tab { flex: 1; padding: 10px; text-align: center; border-radius: 8px; font-weight: 600; font-size: 14px; cursor: pointer; transition: all 0.2s; color: var(--text-muted); }
         .tab.active { background: var(--bg-card); color: var(--text); }
+        
+        /* 온보딩 모달 */
+        .onboarding-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); display: none; justify-content: center; align-items: center; z-index: 2000; backdrop-filter: blur(10px); }
+        .onboarding-content { background: var(--bg-card); border-radius: 24px; width: 90%; max-width: 500px; padding: 40px; text-align: center; border: 1px solid var(--border); position: relative; }
+        .onboarding-step { display: none; }
+        .onboarding-step.active { display: block; }
+        .onboarding-icon { font-size: 72px; margin-bottom: 24px; }
+        .onboarding-title { font-size: 24px; font-weight: 900; margin-bottom: 12px; }
+        .onboarding-desc { color: var(--text-muted); margin-bottom: 32px; line-height: 1.6; }
+        .onboarding-dots { display: flex; justify-content: center; gap: 8px; margin-bottom: 24px; }
+        .onboarding-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--border); transition: all 0.3s; }
+        .onboarding-dot.active { background: var(--primary); width: 24px; border-radius: 5px; }
+        .onboarding-skip { position: absolute; top: 16px; right: 16px; color: var(--text-muted); cursor: pointer; font-size: 14px; }
         
         /* 모달 */
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); display: none; justify-content: center; align-items: center; z-index: 1000; backdrop-filter: blur(8px); }
@@ -249,6 +345,17 @@
         .all-missions-bonus.claimable { animation: glow 2s infinite; }
         @keyframes glow { 0%, 100% { box-shadow: 0 0 10px rgba(245,158,11,0.3); } 50% { box-shadow: 0 0 20px rgba(245,158,11,0.6); } }
         
+        /* 상대적 위치 컨테이너 */
+        .relative { position: relative; }
+        
+        /* PWA 설치 배너 */
+        .pwa-install-banner { position: fixed; bottom: 20px; left: 20px; right: 20px; background: var(--gradient-primary); padding: 16px 20px; border-radius: 16px; display: none; align-items: center; justify-content: space-between; gap: 12px; z-index: 1000; box-shadow: 0 10px 40px rgba(99,102,241,0.4); }
+        .pwa-install-banner.show { display: flex; }
+        .pwa-install-text { color: white; font-size: 14px; }
+        .pwa-install-text strong { display: block; font-size: 16px; margin-bottom: 4px; }
+        .pwa-install-actions { display: flex; gap: 8px; }
+        .pwa-install-actions button { padding: 10px 16px; }
+        
         @media (max-width: 768px) { 
             .grid-2, .grid-3 { grid-template-columns: 1fr; } 
             .nav-links { display: none; } 
@@ -260,10 +367,64 @@
             .search-input { width: 150px; }
             .search-input:focus { width: 200px; }
             .notification-dropdown { width: 280px; right: -50px; }
+            .pwa-install-banner { flex-direction: column; text-align: center; }
         }
     </style>
 </head>
 <body>
+    <!-- 로딩 오버레이 -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="spinner"></div>
+        <div class="loading-text">BOKLUCK 로딩 중...</div>
+    </div>
+
+    <!-- 온보딩 모달 -->
+    <div class="onboarding-overlay" id="onboardingOverlay">
+        <div class="onboarding-content">
+            <span class="onboarding-skip" onclick="skipOnboarding()">건너뛰기</span>
+            
+            <div class="onboarding-step active" data-step="1">
+                <div class="onboarding-icon">✍️</div>
+                <div class="onboarding-title">글쓰기로 돈 벌기</div>
+                <div class="onboarding-desc">게시글을 작성하면 <strong style="color: var(--accent);">100 BOK</strong>을 받아요!<br>댓글과 좋아요로 추가 수익도 얻을 수 있어요.</div>
+            </div>
+            
+            <div class="onboarding-step" data-step="2">
+                <div class="onboarding-icon">🏗️</div>
+                <div class="onboarding-title">게시판 운영하기</div>
+                <div class="onboarding-desc">나만의 게시판을 만들고 운영해보세요!<br>입장료와 수수료로 <strong style="color: var(--accent);">수익</strong>을 창출할 수 있어요.</div>
+            </div>
+            
+            <div class="onboarding-step" data-step="3">
+                <div class="onboarding-icon">🗺️</div>
+                <div class="onboarding-title">부동산 투자</div>
+                <div class="onboarding-desc">가상 땅을 구매하면 <strong style="color: var(--accent);">1~1,000 BOK</strong>의<br>랜덤 가치가 부여돼요. 대박의 기회!</div>
+            </div>
+            
+            <div class="onboarding-dots">
+                <div class="onboarding-dot active" data-dot="1"></div>
+                <div class="onboarding-dot" data-dot="2"></div>
+                <div class="onboarding-dot" data-dot="3"></div>
+            </div>
+            
+            <button class="btn-primary btn-block" onclick="nextOnboardingStep()">
+                <span id="onboardingBtnText">다음</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- PWA 설치 배너 -->
+    <div class="pwa-install-banner" id="pwaInstallBanner">
+        <div class="pwa-install-text">
+            <strong>📱 앱으로 설치하기</strong>
+            홈 화면에 추가하고 더 빠르게 이용하세요!
+        </div>
+        <div class="pwa-install-actions">
+            <button class="btn-outline btn-sm" onclick="dismissPwaBanner()">나중에</button>
+            <button class="btn-gold btn-sm" onclick="installPwa()">설치</button>
+        </div>
+    </div>
+
     <nav class="navbar">
         <div class="nav-container">
             <div class="logo" onclick="showSection('home')">BOKLUCK</div>
@@ -284,6 +445,9 @@
             </div>
             
             <div class="nav-right">
+                <!-- 다크/라이트 토글 -->
+                <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()">🌙</button>
+                
                 <!-- 알림 벨 -->
                 <div class="notification-bell" id="notificationBell" onclick="toggleNotifications()">
                     🔔
@@ -322,6 +486,16 @@
     </div>
 
     <div class="container">
+        <!-- 에러 바운더리 -->
+        <div id="errorContainer" class="hidden">
+            <div class="error-container">
+                <div class="error-icon">😵</div>
+                <div class="error-title">연결에 문제가 발생했습니다</div>
+                <div class="error-message">잠시 후 다시 시도해주세요.</div>
+                <button class="btn-primary" onclick="location.reload()">새로고침</button>
+            </div>
+        </div>
+
         <!-- 로그인 전 -->
         <div id="authSection">
             <div class="hero">
@@ -329,9 +503,24 @@
                 <h1 class="hero-title">글 쓰고, 땅 사고,<br><span class="highlight">부자 되자!</span></h1>
                 <p class="hero-subtitle">콘텐츠를 작성하면 BOK 토큰을 받고,<br>가상 부동산에 투자해서 영토를 확장하세요!</p>
                 <div class="stats-bar">
-                    <div class="stat-item"><div class="stat-number" id="statUsers">0</div><div class="stat-label">활성 유저</div></div>
-                    <div class="stat-item"><div class="stat-number" id="statPosts">0</div><div class="stat-label">작성된 글</div></div>
-                    <div class="stat-item"><div class="stat-number" id="statLands">0</div><div class="stat-label">거래된 땅</div></div>
+                    <div class="stat-item">
+                        <div class="stat-number" id="statUsers">
+                            <span class="skeleton skeleton-text" style="width: 60px; display: inline-block;"></span>
+                        </div>
+                        <div class="stat-label">활성 유저</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number" id="statPosts">
+                            <span class="skeleton skeleton-text" style="width: 60px; display: inline-block;"></span>
+                        </div>
+                        <div class="stat-label">작성된 글</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number" id="statLands">
+                            <span class="skeleton skeleton-text" style="width: 60px; display: inline-block;"></span>
+                        </div>
+                        <div class="stat-label">거래된 땅</div>
+                    </div>
                 </div>
                 <button class="btn-primary" id="loginBtn" style="max-width: 320px;">Google 계정으로 시작하기</button>
                 <div style="margin-top: 20px;"><input type="text" id="inviteCodeInput" placeholder="초대 코드 입력 (선택)" style="max-width: 200px; text-align: center;"></div>
@@ -353,12 +542,16 @@
             
             <div class="grid-2">
                 <!-- 일일 미션 -->
-                <div class="card">
+                <div class="card relative">
                     <div class="card-header">
                         <h3 class="card-title">📋 일일 미션</h3>
                         <span style="color: var(--text-muted); font-size: 13px;">매일 리셋</span>
                     </div>
-                    <div id="missionList"></div>
+                    <div id="missionList">
+                        <!-- 스켈레톤 로딩 -->
+                        <div class="mission-item"><div class="skeleton skeleton-circle"></div><div style="flex:1;margin-left:12px;"><div class="skeleton skeleton-text" style="width:60%;"></div><div class="skeleton skeleton-text" style="width:40%;"></div></div></div>
+                        <div class="mission-item"><div class="skeleton skeleton-circle"></div><div style="flex:1;margin-left:12px;"><div class="skeleton skeleton-text" style="width:60%;"></div><div class="skeleton skeleton-text" style="width:40%;"></div></div></div>
+                    </div>
                     <div class="all-missions-bonus" id="allMissionsBonus">
                         <div style="font-size: 24px; margin-bottom: 8px;">🎁</div>
                         <div style="font-weight: 700; margin-bottom: 4px;">모든 미션 완료 보너스</div>
@@ -368,17 +561,22 @@
                 </div>
                 
                 <!-- 출석 & 룰렛 -->
-                <div class="card">
+                <div class="card relative">
                     <div class="card-header">
                         <h3 class="card-title">📅 출석 체크</h3>
                         <span id="streakBadge" class="streak-bonus">🔥 연속 0일</span>
                     </div>
                     
+                    <!-- 동기부여 문구 -->
+                    <div class="motivational-text" id="motivationalText">
+                        ✨ 오늘 첫 출석하고 보너스 받으세요!
+                    </div>
+                    
                     <!-- 출석 달력 -->
-                    <div class="calendar-container">
+                    <div class="calendar-container" id="calendarContainer">
                         <div class="calendar-header">
                             <button class="btn-sm btn-outline" onclick="changeMonth(-1)">◀</button>
-                            <span class="calendar-month" id="calendarMonth">2024년 1월</span>
+                            <span class="calendar-month" id="calendarMonth">2025년 12월</span>
                             <button class="btn-sm btn-outline" onclick="changeMonth(1)">▶</button>
                         </div>
                         <div class="calendar-grid" id="calendarGrid"></div>
@@ -395,6 +593,23 @@
                                 <div class="streak-value" id="totalAttend">0</div>
                                 <div class="streak-label">총 출석</div>
                             </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 출석 혜택 카드 (로그인 전용) -->
+                    <div class="attendance-benefits hidden" id="attendanceBenefits">
+                        <h4>🎁 출석 체크 혜택</h4>
+                        <div class="benefit-item">
+                            <div class="benefit-icon">🎰</div>
+                            <div class="benefit-text">매일 룰렛 돌려서 <strong>1~500 BOK</strong> 획득!</div>
+                        </div>
+                        <div class="benefit-item">
+                            <div class="benefit-icon">🔥</div>
+                            <div class="benefit-text">7일 연속 출석 시 <strong>보상 2배</strong>!</div>
+                        </div>
+                        <div class="benefit-item">
+                            <div class="benefit-icon">👑</div>
+                            <div class="benefit-text">30일 연속 출석 시 <strong>보상 3배 + 특별 칭호</strong>!</div>
                         </div>
                     </div>
                     
@@ -420,7 +635,12 @@
                         <span style="color: var(--danger); font-size: 13px;">HOT</span>
                     </div>
                     <div id="hotPostList">
-                        <div style="text-align: center; color: var(--text-muted); padding: 20px;">로딩 중...</div>
+                        <div class="empty-state">
+                            <div class="empty-icon">🔥</div>
+                            <div class="empty-title">아직 인기글이 없어요</div>
+                            <div class="empty-desc">첫 인기글의 주인공이 되어보세요!</div>
+                            <div class="cta-text" onclick="showSection('boards')">✍️ 글 쓰러 가기</div>
+                        </div>
                     </div>
                 </div>
                 
@@ -431,7 +651,12 @@
                         <span style="color: var(--accent); font-size: 13px;">TOP 10 보상!</span>
                     </div>
                     <div id="rankingList">
-                        <div class="ranking-item"><div class="ranking-position gold">1</div><div class="ranking-name">불러오는 중...</div><div class="ranking-score">-</div></div>
+                        <div class="empty-state">
+                            <div class="empty-icon">🏆</div>
+                            <div class="empty-title">랭킹 집계 중</div>
+                            <div class="empty-desc">활동하고 랭킹에 이름을 올려보세요!</div>
+                            <div class="cta-text" onclick="showSection('boards')">🚀 활동 시작하기</div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -453,7 +678,14 @@
                         <h3 class="card-title">🔥 인기 게시판</h3>
                         <button class="btn-sm btn-outline" onclick="showSection('boards')">전체보기</button>
                     </div>
-                    <div id="popularBoards"></div>
+                    <div id="popularBoards">
+                        <div class="empty-state">
+                            <div class="empty-icon">📂</div>
+                            <div class="empty-title">게시판이 없어요</div>
+                            <div class="empty-desc">첫 번째 게시판을 만들어보세요!</div>
+                            <div class="cta-text" onclick="openModal('createBoardModal')">🏗️ 게시판 만들기</div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -470,7 +702,13 @@
                 <div class="tab" onclick="filterBoards('free')">무료</div>
                 <div class="tab" onclick="filterBoards('premium')">프리미엄</div>
             </div>
-            <div id="boardsList"></div>
+            <div id="boardsList">
+                <div class="empty-state" style="padding: 60px;">
+                    <div class="empty-icon">📂</div>
+                    <div class="empty-title">아직 게시판이 없어요</div>
+                    <div class="empty-desc">첫 번째 게시판의 주인이 되어보세요!</div>
+                </div>
+            </div>
         </div>
 
         <!-- 프로필 섹션 -->
@@ -750,33 +988,145 @@
         </div>
     </div>
 
+    <!-- PWA 매니페스트 인라인 생성 -->
+    <script>
+        // 매니페스트 동적 생성
+        const manifest = {
+            name: "BOKLUCK",
+            short_name: "BOKLUCK",
+            description: "글 쓰고 땅 사는 Web3 커뮤니티",
+            start_url: "/",
+            display: "standalone",
+            background_color: "#0a0a0f",
+            theme_color: "#6366f1",
+            icons: [
+                { src: "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎰</text></svg>", sizes: "any", type: "image/svg+xml" }
+            ]
+        };
+        const blob = new Blob([JSON.stringify(manifest)], {type: 'application/json'});
+        const manifestURL = URL.createObjectURL(blob);
+        document.querySelector('link[rel="manifest"]')?.setAttribute('href', manifestURL);
+    </script>
+
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
         import { getFirestore, collection, doc, setDoc, getDoc, getDocs, updateDoc, onSnapshot, query, orderBy, where, increment, runTransaction, limit, addDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
         import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
         const firebaseConfig = { apiKey: "AIzaSyBwQjuqgWM4YKnqu_gzNbeCg5alrC-jVcQ", authDomain: "myco-737a0.firebaseapp.com", projectId: "myco-737a0", storageBucket: "myco-737a0.firebasestorage.app", messagingSenderId: "942571332540", appId: "1:942571332540:web:be0bb6fbdd32655501c1b9" };
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
-        const auth = getAuth(app);
+        
+        let app, db, auth;
         let currentUser = null, userData = null;
         let currentCalendarDate = new Date();
         let selectedRecipientUid = null;
+        let currentOnboardingStep = 1;
+        let deferredPrompt = null;
+
+        // 에러 핸들링
+        try {
+            app = initializeApp(firebaseConfig);
+            db = getFirestore(app);
+            auth = getAuth(app);
+        } catch(e) {
+            console.error("Firebase 초기화 실패:", e);
+            document.getElementById("loadingOverlay").classList.add("fade-out");
+            document.getElementById("errorContainer").classList.remove("hidden");
+            document.getElementById("authSection").classList.add("hidden");
+        }
+
+        // 로딩 완료
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                document.getElementById("loadingOverlay").classList.add("fade-out");
+            }, 500);
+        });
+
+        // 다크/라이트 모드
+        window.toggleTheme = function() {
+            const current = document.documentElement.getAttribute('data-theme');
+            const newTheme = current === 'light' ? 'dark' : 'light';
+            document.documentElement.setAttribute('data-theme', newTheme);
+            document.getElementById('themeToggle').textContent = newTheme === 'light' ? '☀️' : '🌙';
+            localStorage.setItem('theme', newTheme);
+        };
+
+        // 저장된 테마 적용
+        const savedTheme = localStorage.getItem('theme') || 'dark';
+        document.documentElement.setAttribute('data-theme', savedTheme);
+        document.getElementById('themeToggle').textContent = savedTheme === 'light' ? '☀️' : '🌙';
+
+        // PWA 설치 프롬프트
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            // 3초 후 배너 표시
+            setTimeout(() => {
+                if(!localStorage.getItem('pwa-dismissed')) {
+                    document.getElementById('pwaInstallBanner').classList.add('show');
+                }
+            }, 3000);
+        });
+
+        window.installPwa = async function() {
+            if(!deferredPrompt) return;
+            deferredPrompt.prompt();
+            const { outcome } = await deferredPrompt.userChoice;
+            deferredPrompt = null;
+            document.getElementById('pwaInstallBanner').classList.remove('show');
+        };
+
+        window.dismissPwaBanner = function() {
+            document.getElementById('pwaInstallBanner').classList.remove('show');
+            localStorage.setItem('pwa-dismissed', 'true');
+        };
+
+        // 온보딩
+        window.nextOnboardingStep = function() {
+            if(currentOnboardingStep >= 3) {
+                skipOnboarding();
+                return;
+            }
+            document.querySelector(`.onboarding-step[data-step="${currentOnboardingStep}"]`).classList.remove('active');
+            document.querySelector(`.onboarding-dot[data-dot="${currentOnboardingStep}"]`).classList.remove('active');
+            currentOnboardingStep++;
+            document.querySelector(`.onboarding-step[data-step="${currentOnboardingStep}"]`).classList.add('active');
+            document.querySelector(`.onboarding-dot[data-dot="${currentOnboardingStep}"]`).classList.add('active');
+            
+            if(currentOnboardingStep === 3) {
+                document.getElementById('onboardingBtnText').textContent = '시작하기!';
+            }
+        };
+
+        window.skipOnboarding = function() {
+            document.getElementById('onboardingOverlay').style.display = 'none';
+            localStorage.setItem('onboarding-done', 'true');
+        };
 
         // 통계 로드
         async function loadStats() {
             try {
                 const [users, posts, lands] = await Promise.all([getDocs(collection(db, "users")), getDocs(collection(db, "posts")), getDocs(collection(db, "lands"))]);
-                document.getElementById("statUsers").textContent = users.size;
-                document.getElementById("statPosts").textContent = posts.size;
-                document.getElementById("statLands").textContent = lands.size;
-            } catch(e) { console.log(e); }
+                document.getElementById("statUsers").textContent = users.size || '0';
+                document.getElementById("statPosts").textContent = posts.size || '0';
+                document.getElementById("statLands").textContent = lands.size || '0';
+            } catch(e) { 
+                console.log(e);
+                document.getElementById("statUsers").textContent = '0';
+                document.getElementById("statPosts").textContent = '0';
+                document.getElementById("statLands").textContent = '0';
+            }
         }
         loadStats();
 
         // 로그인
-        document.getElementById("loginBtn").addEventListener("click", async () => {
-            try { await signInWithPopup(auth, new GoogleAuthProvider()); } catch(e) { console.log(e); }
+        document.getElementById("loginBtn")?.addEventListener("click", async () => {
+            try { 
+                await signInWithPopup(auth, new GoogleAuthProvider()); 
+                // 온보딩 표시
+                if(!localStorage.getItem('onboarding-done')) {
+                    document.getElementById('onboardingOverlay').style.display = 'flex';
+                }
+            } catch(e) { console.log(e); }
         });
 
         // URL에서 초대 코드 확인
@@ -791,6 +1141,8 @@
                 document.getElementById("authSection").classList.add("hidden");
                 document.getElementById("homeSection").classList.remove("hidden");
                 document.getElementById("searchContainer").style.display = "block";
+                document.getElementById("calendarContainer").classList.remove("hidden");
+                document.getElementById("attendanceBenefits").classList.add("hidden");
                 
                 const userRef = doc(db, "users", user.uid);
                 onSnapshot(userRef, async (docSnap) => {
@@ -815,14 +1167,10 @@
                                     stage1: true, stage2: false, stage3: false,
                                     stage1At: new Date().toISOString(), createdAt: new Date().toISOString()
                                 });
-                                // 알림 생성
                                 await addDoc(collection(db, "notifications"), {
-                                    userId: inviterUid,
-                                    type: 'invite',
-                                    title: '친구 가입',
+                                    userId: inviterUid, type: 'invite', title: '친구 가입',
                                     message: `${user.displayName}님이 가입했습니다! +300 BOK`,
-                                    read: false,
-                                    createdAt: new Date().toISOString()
+                                    read: false, createdAt: new Date().toISOString()
                                 });
                             }
                         }
@@ -840,6 +1188,11 @@
                         });
                         
                         if(inviterUid) alert("🎉 초대 코드 적용! +500 BOK 보너스!");
+                        
+                        // 신규 유저 온보딩
+                        if(!localStorage.getItem('onboarding-done')) {
+                            document.getElementById('onboardingOverlay').style.display = 'flex';
+                        }
                     }
                     userData = docSnap.data();
                     updateUI();
@@ -860,6 +1213,9 @@
                 document.getElementById("boardsSection").classList.add("hidden");
                 document.getElementById("profileSection").classList.add("hidden");
                 document.getElementById("searchContainer").style.display = "none";
+                // 로그인 전 출석 혜택 카드 표시
+                document.getElementById("calendarContainer").classList.add("hidden");
+                document.getElementById("attendanceBenefits").classList.remove("hidden");
             }
         });
 
@@ -886,7 +1242,6 @@
             const baseUrl = window.location.origin + window.location.pathname;
             document.getElementById("inviteLinkInput").value = `${baseUrl}?ref=${userData.inviteCode||''}`;
             
-            // 마일스톤
             const count = userData.inviteCount || 0;
             if(count >= 5) document.getElementById("milestone5").classList.add("achieved");
             if(count >= 10) document.getElementById("milestone10").classList.add("achieved");
@@ -897,13 +1252,19 @@
             document.getElementById("profileBadge").textContent = userData.title || "🌱 새싹";
             document.getElementById("countrySelect").value = userData.country || "🌍";
             
-            // 연속 출석
             const streak = userData.streak || 0;
             document.getElementById("currentStreak").textContent = streak;
             document.getElementById("streakBadge").textContent = `🔥 연속 ${streak}일`;
             document.getElementById("totalAttend").textContent = userData.totalAttendance || 0;
             
-            // 연속 출석 보너스 표시
+            // 동기부여 문구 업데이트
+            let motivText = "✨ 오늘 첫 출석하고 보너스 받으세요!";
+            if(streak >= 30) motivText = "🏆 30일 연속 달성! 보상 3배 적용 중!";
+            else if(streak >= 7) motivText = "🔥 7일 연속 달성! 보상 2배 적용 중!";
+            else if(streak >= 3) motivText = `💪 ${streak}일 연속 출석 중! 7일까지 ${7-streak}일!`;
+            else if(streak > 0) motivText = `👍 ${streak}일 연속 출석! 계속 이어가세요!`;
+            document.getElementById("motivationalText").textContent = motivText;
+            
             let bonusText = "";
             if(streak >= 30) bonusText = "🔥 30일 연속! 보상 3배!";
             else if(streak >= 7) bonusText = "🔥 7일 연속! 보상 2배!";
@@ -958,7 +1319,6 @@
                 `;
             });
             
-            // 미션 완료 보너스
             const bonusSection = document.getElementById("allMissionsBonus");
             const bonusClaimed = userData.missionBonusClaimed === today;
             
@@ -974,19 +1334,16 @@
             }
         }
 
-        // 미션 보너스 수령
         window.claimMissionBonus = async function() {
             if(!currentUser) return;
             const today = new Date().toDateString();
             await updateDoc(doc(db, "users", currentUser.uid), {
-                coin: increment(50),
-                totalEarned: increment(50),
-                missionBonusClaimed: today
+                coin: increment(50), totalEarned: increment(50), missionBonusClaimed: today
             });
             alert("🎁 미션 완료 보너스 +50 BOK!");
         };
 
-        // 출석 달력
+        // 출석 달력 - 현재 날짜 기준으로 수정
         function loadCalendar() {
             if(!userData) return;
             const year = currentCalendarDate.getFullYear();
@@ -1002,17 +1359,14 @@
             const grid = document.getElementById("calendarGrid");
             grid.innerHTML = "";
             
-            // 요일 헤더
             ['일','월','화','수','목','금','토'].forEach(d => {
                 grid.innerHTML += `<div class="calendar-day-header">${d}</div>`;
             });
             
-            // 빈 칸
             for(let i = 0; i < firstDay; i++) {
                 grid.innerHTML += `<div class="calendar-day"></div>`;
             }
             
-            // 날짜
             let monthlyCount = 0;
             for(let d = 1; d <= lastDate; d++) {
                 const dateStr = `${year}-${String(month+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
@@ -1048,7 +1402,6 @@
             const wheel = document.getElementById("rouletteWheel");
             wheel.style.transform = `rotate(${1800 + Math.random() * 360}deg)`;
             
-            // 기본 보상
             const rand = Math.random();
             let reward;
             if(rand < 0.5) reward = Math.floor(Math.random() * 50) + 1;
@@ -1056,7 +1409,6 @@
             else if(rand < 0.95) reward = Math.floor(Math.random() * 150) + 150;
             else reward = Math.floor(Math.random() * 200) + 300;
             
-            // 연속 출석 보너스
             const streak = userData.streak || 0;
             let multiplier = 1;
             let bonusInfo = "";
@@ -1065,7 +1417,6 @@
             
             reward *= multiplier;
             
-            // 연속 출석 계산
             const today = new Date().toISOString().split('T')[0];
             const yesterday = new Date(Date.now() - 86400000).toISOString().split('T')[0];
             const attendDates = userData.attendanceDates || [];
@@ -1074,11 +1425,9 @@
             
             setTimeout(async () => {
                 await updateDoc(doc(db, "users", currentUser.uid), { 
-                    coin: increment(reward), 
-                    totalEarned: increment(reward), 
+                    coin: increment(reward), totalEarned: increment(reward), 
                     lastRoulette: new Date().toISOString(),
-                    streak: newStreak,
-                    totalAttendance: increment(1),
+                    streak: newStreak, totalAttendance: increment(1),
                     attendanceDates: [...attendDates.filter(d => d > new Date(Date.now() - 90*86400000).toISOString().split('T')[0]), today]
                 });
                 document.getElementById("rouletteResult").textContent = reward;
@@ -1093,11 +1442,16 @@
             const q = query(collection(db, "posts"), orderBy("likeCount", "desc"), limit(5));
             onSnapshot(q, (snapshot) => {
                 const list = document.getElementById("hotPostList");
-                list.innerHTML = "";
                 if(snapshot.empty) {
-                    list.innerHTML = '<div style="text-align: center; color: var(--text-muted); padding: 20px;">인기글이 없습니다</div>';
+                    list.innerHTML = `<div class="empty-state">
+                        <div class="empty-icon">🔥</div>
+                        <div class="empty-title">아직 인기글이 없어요</div>
+                        <div class="empty-desc">첫 인기글의 주인공이 되어보세요!</div>
+                        <div class="cta-text" onclick="showSection('boards')">✍️ 글 쓰러 가기</div>
+                    </div>`;
                     return;
                 }
+                list.innerHTML = "";
                 let rank = 1;
                 snapshot.forEach(docSnap => {
                     const p = docSnap.data();
@@ -1194,7 +1548,6 @@
             results.innerHTML = '<div style="padding: 20px; text-align: center; color: var(--text-muted);">검색 중...</div>';
             
             try {
-                // 게시판 검색
                 const boardsSnap = await getDocs(collection(db, "boards"));
                 const postsSnap = await getDocs(collection(db, "posts"));
                 const usersSnap = await getDocs(collection(db, "users"));
@@ -1274,14 +1627,10 @@
                     t.update(doc(db, "users", selectedRecipientUid), { coin: increment(amount), totalEarned: increment(amount) });
                 });
                 
-                // 알림 생성
                 await addDoc(collection(db, "notifications"), {
-                    userId: selectedRecipientUid,
-                    type: 'bok',
-                    title: 'BOK 수신',
+                    userId: selectedRecipientUid, type: 'bok', title: 'BOK 수신',
                     message: `${userData.name}님이 ${amount.toLocaleString()} BOK을 보냈습니다!`,
-                    read: false,
-                    createdAt: new Date().toISOString()
+                    read: false, createdAt: new Date().toISOString()
                 });
                 
                 alert(`✅ ${amount.toLocaleString()} BOK 송금 완료!`);
@@ -1499,7 +1848,17 @@
                 list.innerHTML = ""; popular.innerHTML = "";
                 
                 if(snapshot.empty) { 
-                    list.innerHTML = '<p style="text-align:center; color: var(--text-muted); padding: 40px;">아직 게시판이 없습니다.</p>'; 
+                    list.innerHTML = `<div class="empty-state" style="padding: 60px;">
+                        <div class="empty-icon">📂</div>
+                        <div class="empty-title">아직 게시판이 없어요</div>
+                        <div class="empty-desc">첫 번째 게시판의 주인이 되어보세요!</div>
+                    </div>`; 
+                    popular.innerHTML = `<div class="empty-state">
+                        <div class="empty-icon">📂</div>
+                        <div class="empty-title">게시판이 없어요</div>
+                        <div class="empty-desc">첫 번째 게시판을 만들어보세요!</div>
+                        <div class="cta-text" onclick="openModal('createBoardModal')">🏗️ 게시판 만들기</div>
+                    </div>`;
                     return; 
                 }
                 
@@ -1534,6 +1893,17 @@
             const q = query(collection(db, "users"), orderBy("totalEarned", "desc"), limit(10));
             const snapshot = await getDocs(q);
             const list = document.getElementById("rankingList");
+            
+            if(snapshot.empty) {
+                list.innerHTML = `<div class="empty-state">
+                    <div class="empty-icon">🏆</div>
+                    <div class="empty-title">랭킹 집계 중</div>
+                    <div class="empty-desc">활동하고 랭킹에 이름을 올려보세요!</div>
+                    <div class="cta-text" onclick="showSection('boards')">🚀 활동 시작하기</div>
+                </div>`;
+                return;
+            }
+            
             list.innerHTML = "";
             let rank = 1;
             snapshot.forEach(docSnap => {
@@ -1619,6 +1989,12 @@
                 document.getElementById("notificationDropdown").classList.remove("active");
             }
         });
+
+        // 서비스 워커 등록 (PWA)
+        if('serviceWorker' in navigator) {
+            // 간단한 오프라인 지원을 위한 서비스 워커 등록은 별도 파일 필요
+            // 여기서는 생략
+        }
     </script>
 </body>
 </html>
