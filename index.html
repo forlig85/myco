@@ -177,9 +177,7 @@
         color: var(--energy);
     }
     
-    .user-menu {
-        position: relative;
-    }
+    .user-menu { position: relative; }
     
     .user-profile {
         display: flex;
@@ -253,6 +251,7 @@
         font-weight: 600;
         cursor: pointer;
         transition: 0.2s;
+        font-family: inherit;
     }
     
     .btn:hover { transform: translateY(-2px); }
@@ -275,6 +274,31 @@
     .btn-lg { padding: 16px 40px; font-size: 16px; }
     .btn-sm { padding: 8px 16px; font-size: 13px; }
     .btn-block { width: 100%; }
+    
+    /* Input */
+    .input {
+        width: 100%;
+        padding: 12px 16px;
+        background: var(--bg-input);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        color: var(--text);
+        font-size: 14px;
+        font-family: inherit;
+        outline: none;
+        transition: 0.2s;
+    }
+    
+    .input:focus { border-color: var(--primary); }
+    .input::placeholder { color: var(--text-dark); }
+    
+    .input-group { margin-bottom: 16px; }
+    .input-label {
+        display: block;
+        font-size: 13px;
+        color: var(--text-muted);
+        margin-bottom: 8px;
+    }
     
     /* Cards */
     .card {
@@ -339,14 +363,60 @@
     .stage-dot.current { background: var(--gradient-evolution); border-color: var(--accent); }
     .stage-dot.locked { opacity: 0.4; }
     
-    .stage-line {
-        flex: 1;
-        height: 2px;
-        background: var(--border);
-        max-width: 40px;
+    .stage-line { flex: 1; height: 2px; background: var(--border); max-width: 40px; }
+    .stage-line.completed { background: var(--gradient-energy); }
+    
+    /* Modal */
+    .modal-overlay {
+        position: fixed;
+        top: 0; left: 0; right: 0; bottom: 0;
+        background: rgba(0, 0, 0, 0.8);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        z-index: 2000;
+        backdrop-filter: blur(5px);
     }
     
-    .stage-line.completed { background: var(--gradient-energy); }
+    .modal-overlay.active { display: flex; }
+    
+    .modal {
+        background: var(--bg-card-solid);
+        border: 1px solid var(--border);
+        border-radius: 24px;
+        padding: 32px;
+        max-width: 500px;
+        width: 90%;
+        max-height: 90vh;
+        overflow-y: auto;
+    }
+    
+    .modal-title {
+        font-family: 'Orbitron', sans-serif;
+        font-size: 20px;
+        font-weight: 700;
+        margin-bottom: 8px;
+        text-align: center;
+    }
+    
+    .modal-desc {
+        color: var(--text-muted);
+        font-size: 14px;
+        margin-bottom: 24px;
+        text-align: center;
+    }
+    
+    .modal-preview {
+        display: flex;
+        justify-content: center;
+        margin-bottom: 24px;
+    }
+    
+    .modal-actions {
+        display: flex;
+        gap: 12px;
+        justify-content: center;
+    }
     
     /* Toast */
     .toast-container {
@@ -408,16 +478,7 @@
     
     .login-cell {
         width: 150px; height: 150px;
-        background: radial-gradient(circle at 30% 30%, var(--primary), var(--secondary));
-        border-radius: 50%;
         margin-bottom: 40px;
-        box-shadow: 0 0 80px rgba(0, 245, 212, 0.4);
-        animation: pulse 3s ease-in-out infinite;
-    }
-    
-    @keyframes pulse {
-        0%, 100% { transform: scale(1); }
-        50% { transform: scale(1.05); }
     }
     
     .login-story {
@@ -469,7 +530,21 @@
     
     .entity-visual {
         width: 180px; height: 180px;
-        margin: 0 auto 24px;
+        margin: 0 auto 16px;
+        cursor: pointer;
+        position: relative;
+    }
+    
+    .entity-visual:hover::after {
+        content: '✏️ 수정';
+        position: absolute;
+        bottom: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        background: rgba(0,0,0,0.8);
+        padding: 4px 12px;
+        border-radius: 12px;
+        font-size: 12px;
     }
     
     .entity-stage-label {
@@ -485,6 +560,29 @@
         font-family: 'Orbitron', sans-serif;
         font-size: 18px;
         font-weight: 700;
+        text-align: center;
+        margin-bottom: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+    }
+    
+    .entity-name .edit-btn {
+        background: none;
+        border: none;
+        color: var(--text-muted);
+        cursor: pointer;
+        font-size: 14px;
+        padding: 4px;
+        border-radius: 4px;
+    }
+    
+    .entity-name .edit-btn:hover { color: var(--primary); background: var(--bg-hover); }
+    
+    .entity-id {
+        font-size: 12px;
+        color: var(--text-dark);
         text-align: center;
         margin-bottom: 20px;
     }
@@ -542,15 +640,8 @@
         transform: translateY(-4px);
     }
     
-    .quick-action.locked {
-        opacity: 0.4;
-        cursor: not-allowed;
-    }
-    
-    .quick-action.locked:hover {
-        transform: none;
-        border-color: var(--border);
-    }
+    .quick-action.locked { opacity: 0.4; cursor: not-allowed; }
+    .quick-action.locked:hover { transform: none; border-color: var(--border); }
     
     .quick-action-icon { font-size: 28px; margin-bottom: 8px; }
     .quick-action-label { font-size: 12px; color: var(--text-muted); }
@@ -573,15 +664,65 @@
     
     .history-title { font-weight: 700; margin-bottom: 8px; }
     .history-content { font-size: 13px; color: var(--text-muted); line-height: 1.6; }
-    .history-time { font-size: 11px; color: var(--text-dark); margin-top: 8px; }
+    
+    /* Cell Customization */
+    .cell-customizer {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+        margin-bottom: 24px;
+    }
+    
+    .color-picker-group {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+    
+    .color-picker-label {
+        font-size: 12px;
+        color: var(--text-muted);
+    }
+    
+    .color-picker {
+        width: 100%;
+        height: 40px;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        background: var(--bg-input);
+    }
+    
+    .pattern-selector {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 8px;
+    }
+    
+    .pattern-option {
+        padding: 10px;
+        background: var(--bg-input);
+        border: 2px solid var(--border);
+        border-radius: 8px;
+        cursor: pointer;
+        text-align: center;
+        font-size: 12px;
+        transition: 0.2s;
+    }
+    
+    .pattern-option:hover { border-color: var(--primary); }
+    .pattern-option.selected { border-color: var(--primary); background: rgba(0, 245, 212, 0.1); }
+    
+    .randomize-btn {
+        width: 100%;
+        margin-top: 16px;
+    }
     
     /* World Canvas */
     #worldCanvas {
         position: fixed;
-        top: 0;
-        left: 0;
-        width: 100vw;
-        height: 100vh;
+        top: 0; left: 0;
+        width: 100vw; height: 100vh;
         z-index: 500;
         display: none;
     }
@@ -603,11 +744,7 @@
     .world-ui.active { display: flex; }
     .world-ui > * { pointer-events: auto; }
     
-    .world-left {
-        display: flex;
-        flex-direction: column;
-        gap: 12px;
-    }
+    .world-left { display: flex; flex-direction: column; gap: 12px; }
     
     .world-entropy-box {
         background: rgba(10, 10, 26, 0.9);
@@ -633,10 +770,7 @@
         -webkit-text-fill-color: transparent;
     }
     
-    .world-nav-buttons {
-        display: flex;
-        gap: 8px;
-    }
+    .world-nav-buttons { display: flex; gap: 8px; }
     
     .world-nav-btn {
         background: rgba(10, 10, 26, 0.9);
@@ -653,10 +787,7 @@
         transition: 0.2s;
     }
     
-    .world-nav-btn:hover {
-        border-color: var(--primary);
-        color: var(--primary);
-    }
+    .world-nav-btn:hover { border-color: var(--primary); color: var(--primary); }
     
     .world-nav-btn.next-stage {
         background: var(--gradient-energy);
@@ -665,10 +796,7 @@
         font-weight: 700;
     }
     
-    .world-nav-btn.next-stage:disabled {
-        opacity: 0.5;
-        cursor: not-allowed;
-    }
+    .world-nav-btn.next-stage:disabled { opacity: 0.5; cursor: not-allowed; }
     
     .world-evo-panel {
         background: rgba(10, 10, 26, 0.9);
@@ -707,17 +835,14 @@
         font-size: 14px;
     }
     
-    .world-evo-item.unlocked .world-evo-icon {
-        background: var(--gradient-evolution);
-    }
+    .world-evo-item.unlocked .world-evo-icon { background: var(--gradient-evolution); }
     
     .world-evo-name { font-size: 12px; font-weight: 600; }
     .world-evo-req { font-size: 10px; color: var(--text-muted); }
     
     .world-controls {
         position: fixed;
-        bottom: 20px;
-        right: 20px;
+        bottom: 20px; right: 20px;
         background: rgba(10, 10, 26, 0.9);
         border: 1px solid var(--border);
         border-radius: 12px;
@@ -738,25 +863,21 @@
         margin-right: 4px;
     }
     
-    /* Stage 2 - Planet Landing */
+    /* Landing UI */
     .landing-ui {
         position: fixed;
         top: 0; left: 0; right: 0; bottom: 0;
         display: none;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
         z-index: 600;
         pointer-events: none;
     }
     
-    .landing-ui.active { display: flex; }
+    .landing-ui.active { display: block; }
     .landing-ui > * { pointer-events: auto; }
     
     .landing-score {
         position: fixed;
-        top: 20px;
-        left: 50%;
+        top: 20px; left: 50%;
         transform: translateX(-50%);
         background: rgba(10, 10, 26, 0.9);
         border: 1px solid var(--border);
@@ -769,7 +890,6 @@
         font-family: 'Orbitron', sans-serif;
         font-size: 11px;
         color: var(--text-muted);
-        letter-spacing: 2px;
     }
     
     .landing-score-value {
@@ -781,8 +901,7 @@
     
     .landing-health {
         position: fixed;
-        top: 20px;
-        right: 20px;
+        top: 20px; right: 20px;
         background: rgba(10, 10, 26, 0.9);
         border: 1px solid var(--border);
         border-radius: 16px;
@@ -797,8 +916,7 @@
     }
     
     .landing-health-bar {
-        width: 120px;
-        height: 12px;
+        width: 120px; height: 12px;
         background: rgba(255, 77, 109, 0.2);
         border-radius: 6px;
         overflow: hidden;
@@ -812,8 +930,7 @@
     
     .landing-planet-info {
         position: fixed;
-        bottom: 100px;
-        left: 50%;
+        bottom: 100px; left: 50%;
         transform: translateX(-50%);
         background: rgba(10, 10, 26, 0.9);
         border: 1px solid var(--secondary);
@@ -829,20 +946,87 @@
         background: var(--gradient-evolution);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
+    }
+    
+    .landing-planet-desc { font-size: 13px; color: var(--text-muted); }
+    
+    /* Planet Page */
+    .planet-header {
+        display: flex;
+        align-items: center;
+        gap: 24px;
+        margin-bottom: 24px;
+    }
+    
+    .planet-icon { font-size: 64px; }
+    
+    .planet-info h1 {
+        font-family: 'Orbitron', sans-serif;
+        font-size: 28px;
         margin-bottom: 4px;
     }
     
-    .landing-planet-desc {
-        font-size: 13px;
-        color: var(--text-muted);
+    .planet-type { color: var(--text-muted); font-size: 14px; }
+    
+    .planet-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
+        gap: 4px;
+        background: var(--bg-input);
+        padding: 16px;
+        border-radius: 16px;
+        margin-bottom: 24px;
     }
     
-    .landing-start-btn {
-        position: fixed;
-        bottom: 20px;
-        left: 50%;
-        transform: translateX(-50%);
+    .territory-cell {
+        aspect-ratio: 1;
+        background: rgba(0, 245, 212, 0.05);
+        border: 1px solid var(--border);
+        border-radius: 4px;
+        cursor: pointer;
+        transition: 0.2s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 10px;
     }
+    
+    .territory-cell:hover { border-color: var(--primary); background: rgba(0, 245, 212, 0.1); }
+    .territory-cell.owned { background: rgba(0, 245, 212, 0.2); border-color: var(--primary); }
+    .territory-cell.owned-other { background: rgba(247, 37, 133, 0.2); border-color: var(--accent); }
+    
+    .board-section { margin-bottom: 24px; }
+    
+    .board-post {
+        background: var(--bg-input);
+        border-radius: 12px;
+        padding: 16px;
+        margin-bottom: 12px;
+    }
+    
+    .post-header {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 12px;
+    }
+    
+    .post-avatar {
+        width: 32px; height: 32px;
+        border-radius: 50%;
+    }
+    
+    .post-author { font-weight: 600; font-size: 14px; }
+    .post-time { font-size: 11px; color: var(--text-dark); }
+    .post-content { font-size: 14px; line-height: 1.6; }
+    
+    .post-input {
+        display: flex;
+        gap: 12px;
+        margin-bottom: 16px;
+    }
+    
+    .post-input .input { flex: 1; }
     
     /* Evolution Alert */
     .evo-alert {
@@ -859,11 +1043,7 @@
         transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
     }
     
-    .evo-alert.show {
-        transform: translate(-50%, -50%) scale(1);
-        opacity: 1;
-    }
-    
+    .evo-alert.show { transform: translate(-50%, -50%) scale(1); opacity: 1; }
     .evo-alert-icon { font-size: 64px; margin-bottom: 16px; }
     
     .evo-alert-title {
@@ -876,11 +1056,7 @@
         margin-bottom: 8px;
     }
     
-    .evo-alert-desc {
-        font-size: 14px;
-        color: var(--text-muted);
-        margin-bottom: 12px;
-    }
+    .evo-alert-desc { font-size: 14px; color: var(--text-muted); margin-bottom: 12px; }
     
     .evo-alert-effect {
         padding: 10px 20px;
@@ -921,12 +1097,7 @@
         margin-bottom: 12px;
     }
     
-    .result-desc {
-        font-size: 15px;
-        color: var(--text-muted);
-        margin-bottom: 24px;
-        line-height: 1.6;
-    }
+    .result-desc { font-size: 15px; color: var(--text-muted); margin-bottom: 24px; line-height: 1.6; }
     
     .result-planet {
         background: var(--bg-input);
@@ -940,19 +1111,10 @@
         font-size: 20px;
         font-weight: 700;
         color: var(--primary);
-        margin-bottom: 4px;
     }
     
-    .result-planet-type {
-        font-size: 13px;
-        color: var(--text-muted);
-    }
-    
-    .result-buttons {
-        display: flex;
-        gap: 12px;
-        justify-content: center;
-    }
+    .result-planet-type { font-size: 13px; color: var(--text-muted); }
+    .result-buttons { display: flex; gap: 12px; justify-content: center; }
     
     /* Utilities */
     .hidden { display: none !important; }
@@ -961,6 +1123,7 @@
     .mb-8 { margin-bottom: 8px; }
     .mb-16 { margin-bottom: 16px; }
     .mb-24 { margin-bottom: 24px; }
+    .mt-16 { margin-top: 16px; }
     .mt-24 { margin-top: 24px; }
     </style>
 </head>
@@ -974,7 +1137,6 @@
     </div>
     
     <div id="app"></div>
-    
     <canvas id="worldCanvas"></canvas>
     
     <!-- Cell World UI -->
@@ -1011,21 +1173,65 @@
                 <div class="landing-health-fill" id="landingHealthBar" style="width: 100%"></div>
             </div>
         </div>
-        <div class="landing-planet-info" id="landingPlanetInfo">
-            <div class="landing-planet-name" id="landingPlanetName">행성 Q-7</div>
+        <div class="landing-planet-info">
+            <div class="landing-planet-name" id="landingPlanetName">행성</div>
             <div class="landing-planet-desc">목표까지 진입하세요</div>
         </div>
     </div>
     
-    <!-- Result Modal -->
+    <!-- Modals -->
+    <div class="modal-overlay" id="editCellModal">
+        <div class="modal">
+            <h2 class="modal-title">🧬 세포 커스터마이징</h2>
+            <p class="modal-desc">나만의 세포를 만들어보세요</p>
+            
+            <div class="modal-preview">
+                <canvas id="cellPreview" width="150" height="150"></canvas>
+            </div>
+            
+            <div class="input-group">
+                <label class="input-label">세포 이름</label>
+                <input type="text" class="input" id="cellNameInput" placeholder="이름을 입력하세요" maxlength="20">
+            </div>
+            
+            <div class="cell-customizer">
+                <div class="color-picker-group">
+                    <label class="color-picker-label">주 색상</label>
+                    <input type="color" class="color-picker" id="primaryColorPicker" value="#00f5d4">
+                </div>
+                <div class="color-picker-group">
+                    <label class="color-picker-label">보조 색상</label>
+                    <input type="color" class="color-picker" id="secondaryColorPicker" value="#7b2cbf">
+                </div>
+            </div>
+            
+            <div class="input-group">
+                <label class="input-label">패턴</label>
+                <div class="pattern-selector" id="patternSelector">
+                    <div class="pattern-option selected" data-pattern="none">없음</div>
+                    <div class="pattern-option" data-pattern="spots">점박이</div>
+                    <div class="pattern-option" data-pattern="stripes">줄무늬</div>
+                    <div class="pattern-option" data-pattern="glow">발광</div>
+                </div>
+            </div>
+            
+            <button class="btn btn-outline randomize-btn" onclick="window.randomizeCellDesign()">🎲 랜덤 생성</button>
+            
+            <div class="modal-actions mt-24">
+                <button class="btn btn-outline" onclick="window.closeEditModal()">취소</button>
+                <button class="btn btn-primary" onclick="window.saveCellDesign()">저장</button>
+            </div>
+        </div>
+    </div>
+    
     <div class="result-modal" id="resultModal">
         <div class="result-content">
             <div class="result-icon" id="resultIcon">🪐</div>
             <div class="result-title" id="resultTitle">착륙 성공!</div>
             <div class="result-desc" id="resultDesc">새로운 행성에 도착했습니다.</div>
             <div class="result-planet">
-                <div class="result-planet-name" id="resultPlanetName">행성 Q-7</div>
-                <div class="result-planet-type" id="resultPlanetType">생명체 서식 가능 행성</div>
+                <div class="result-planet-name" id="resultPlanetName">행성</div>
+                <div class="result-planet-type" id="resultPlanetType">타입</div>
             </div>
             <div class="result-buttons">
                 <button class="btn btn-primary" onclick="window.explorePlanet()">🌍 행성 탐험</button>
@@ -1044,7 +1250,7 @@
     
     <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-    import { getFirestore, doc, setDoc, getDoc, updateDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+    import { getFirestore, doc, setDoc, getDoc, updateDoc, collection, addDoc, query, where, orderBy, limit, getDocs, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
     import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
     
     const firebaseConfig = {
@@ -1061,6 +1267,63 @@
     const auth = getAuth(fbApp);
     const googleProvider = new GoogleAuthProvider();
     
+    // ========================================
+    // CELL DESIGN GENERATOR
+    // ========================================
+    function generateCellDesign() {
+        const hue1 = Math.floor(Math.random() * 360);
+        const hue2 = (hue1 + 60 + Math.floor(Math.random() * 120)) % 360;
+        
+        const patterns = ['none', 'spots', 'stripes', 'glow'];
+        const adjectives = ['빛나는', '어둠의', '고대의', '신비로운', '영원한', '잊혀진', '깨어난', '떠도는'];
+        const nouns = ['의식', '세포', '존재', '영혼', '파동', '에너지', '생명체', '탐험가'];
+        
+        return {
+            name: adjectives[Math.floor(Math.random() * adjectives.length)] + ' ' + nouns[Math.floor(Math.random() * nouns.length)],
+            primaryColor: `hsl(${hue1}, 80%, 60%)`,
+            secondaryColor: `hsl(${hue2}, 70%, 40%)`,
+            pattern: patterns[Math.floor(Math.random() * patterns.length)],
+            wobblePoints: 8 + Math.floor(Math.random() * 6),
+            wobbleIntensity: 0.5 + Math.random() * 0.5,
+            glowIntensity: 0.3 + Math.random() * 0.5
+        };
+    }
+    
+    function hslToHex(hsl) {
+        const match = hsl.match(/hsl\((\d+),\s*(\d+)%,\s*(\d+)%\)/);
+        if (!match) return hsl;
+        
+        let h = parseInt(match[1]) / 360;
+        let s = parseInt(match[2]) / 100;
+        let l = parseInt(match[3]) / 100;
+        
+        let r, g, b;
+        if (s === 0) {
+            r = g = b = l;
+        } else {
+            const hue2rgb = (p, q, t) => {
+                if (t < 0) t += 1;
+                if (t > 1) t -= 1;
+                if (t < 1/6) return p + (q - p) * 6 * t;
+                if (t < 1/2) return q;
+                if (t < 2/3) return p + (q - p) * (2/3 - t) * 6;
+                return p;
+            };
+            const q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+            const p = 2 * l - q;
+            r = hue2rgb(p, q, h + 1/3);
+            g = hue2rgb(p, q, h);
+            b = hue2rgb(p, q, h - 1/3);
+        }
+        
+        const toHex = x => {
+            const hex = Math.round(x * 255).toString(16);
+            return hex.length === 1 ? '0' + hex : hex;
+        };
+        
+        return `#${toHex(r)}${toHex(g)}${toHex(b)}`;
+    }
+    
     // State
     const State = {
         user: null,
@@ -1072,8 +1335,10 @@
             evolution: { eye: false, arm: false, leg: false, brain: false, wing: false },
             currentPlanet: null,
             territories: [],
-            history: []
+            history: [],
+            cellDesign: null
         },
+        posts: [],
         
         async sync() {
             if (!this.user) return;
@@ -1098,17 +1363,8 @@
         }
     };
     
-    // Planet Names
-    const PLANET_NAMES = [
-        'Kepler-22b', 'Proxima-B', 'Trappist-1e', 'Gliese-581g', 
-        'HD-40307g', 'Tau-Ceti-e', 'Wolf-1061c', 'Ross-128b',
-        'Luyten-B', 'K2-18b', 'TOI-700d', 'Teegarden-B'
-    ];
-    
-    const PLANET_TYPES = [
-        '생명체 서식 가능 행성', '얼음 행성', '사막 행성', '해양 행성',
-        '화산 행성', '가스 거인의 위성', '고대 문명 흔적 행성'
-    ];
+    const PLANET_NAMES = ['Kepler-22b', 'Proxima-B', 'Trappist-1e', 'Gliese-581g', 'HD-40307g', 'Tau-Ceti-e', 'Wolf-1061c', 'Ross-128b', 'Luyten-B', 'K2-18b', 'TOI-700d', 'Teegarden-B'];
+    const PLANET_TYPES = ['생명체 서식 가능 행성', '얼음 행성', '사막 행성', '해양 행성', '화산 행성', '가스 거인의 위성', '고대 문명 흔적 행성'];
     
     // Utils
     function createStars() {
@@ -1142,14 +1398,8 @@
         setTimeout(() => a.classList.remove('show'), 2500);
     }
     
-    function hideLoading() {
-        document.getElementById('loadingScreen').classList.add('hidden');
-    }
-    
-    function navigate(page) {
-        State.currentPage = page;
-        render();
-    }
+    function hideLoading() { document.getElementById('loadingScreen').classList.add('hidden'); }
+    function navigate(page) { State.currentPage = page; render(); }
     
     function render() {
         const p = State.currentPage;
@@ -1160,6 +1410,143 @@
         else if (p === 'history') renderHistory();
         else if (p === 'planet') renderPlanet();
         else renderPlaceholder(p);
+    }
+    
+    // Draw Cell with custom design
+    function drawCell(ctx, x, y, size, design, evolution, time = 0) {
+        const d = design || { primaryColor: '#00f5d4', secondaryColor: '#7b2cbf', pattern: 'none', wobblePoints: 12, wobbleIntensity: 1, glowIntensity: 0.5 };
+        const points = d.wobblePoints || 12;
+        
+        ctx.save();
+        ctx.translate(x, y);
+        
+        // Glow
+        if (d.pattern === 'glow' || d.glowIntensity > 0.5) {
+            ctx.shadowColor = d.primaryColor;
+            ctx.shadowBlur = 20 * (d.glowIntensity || 0.5);
+        }
+        
+        // Body
+        ctx.beginPath();
+        for (let i = 0; i < points; i++) {
+            const angle = (i / points) * Math.PI * 2;
+            const wobble = Math.sin(time * 0.1 + i * 0.5) * 5 * (d.wobbleIntensity || 1);
+            const r = size + wobble;
+            const px = Math.cos(angle) * r;
+            const py = Math.sin(angle) * r;
+            i === 0 ? ctx.moveTo(px, py) : ctx.lineTo(px, py);
+        }
+        ctx.closePath();
+        
+        const g = ctx.createRadialGradient(-size * 0.3, -size * 0.3, 0, 0, 0, size * 1.2);
+        g.addColorStop(0, d.primaryColor);
+        g.addColorStop(0.6, d.secondaryColor);
+        g.addColorStop(1, d.secondaryColor);
+        ctx.fillStyle = g;
+        ctx.fill();
+        
+        ctx.shadowBlur = 0;
+        
+        // Pattern
+        if (d.pattern === 'spots') {
+            ctx.fillStyle = 'rgba(255,255,255,0.3)';
+            for (let i = 0; i < 5; i++) {
+                const angle = (i / 5) * Math.PI * 2 + time * 0.02;
+                const dist = size * 0.5;
+                ctx.beginPath();
+                ctx.arc(Math.cos(angle) * dist, Math.sin(angle) * dist, size * 0.12, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        } else if (d.pattern === 'stripes') {
+            ctx.strokeStyle = 'rgba(255,255,255,0.2)';
+            ctx.lineWidth = 3;
+            for (let i = -2; i <= 2; i++) {
+                ctx.beginPath();
+                ctx.moveTo(i * size * 0.3, -size);
+                ctx.lineTo(i * size * 0.3, size);
+                ctx.stroke();
+            }
+        }
+        
+        // Highlight
+        ctx.beginPath();
+        ctx.arc(-size * 0.25, -size * 0.25, size * 0.2, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(255,255,255,0.25)';
+        ctx.fill();
+        
+        // Evolution parts
+        if (evolution) {
+            // Eye
+            if (evolution.eye) {
+                ctx.beginPath();
+                ctx.arc(size * 0.35, -size * 0.1, size * 0.22, 0, Math.PI * 2);
+                ctx.fillStyle = '#fff';
+                ctx.fill();
+                ctx.beginPath();
+                ctx.arc(size * 0.38, -size * 0.08, size * 0.11, 0, Math.PI * 2);
+                ctx.fillStyle = '#1a1a2e';
+                ctx.fill();
+            }
+            
+            // Arm
+            if (evolution.arm) {
+                ctx.strokeStyle = d.secondaryColor;
+                ctx.lineWidth = size * 0.12;
+                ctx.lineCap = 'round';
+                ctx.beginPath();
+                ctx.moveTo(size * 0.7, size * 0.1);
+                ctx.quadraticCurveTo(size * 1.2, size * 0.3 + Math.sin(time * 0.15) * 8, size * 1.4, size * 0.2);
+                ctx.stroke();
+            }
+            
+            // Leg
+            if (evolution.leg) {
+                const lw = Math.sin(time * 0.2) * 10;
+                ctx.strokeStyle = d.secondaryColor;
+                ctx.lineWidth = size * 0.15;
+                ctx.beginPath();
+                ctx.moveTo(size * 0.2, size * 0.7);
+                ctx.lineTo(size * 0.15 + lw, size * 1.3);
+                ctx.stroke();
+                ctx.beginPath();
+                ctx.moveTo(-size * 0.2, size * 0.7);
+                ctx.lineTo(-size * 0.15 - lw, size * 1.3);
+                ctx.stroke();
+            }
+            
+            // Brain
+            if (evolution.brain) {
+                ctx.beginPath();
+                ctx.arc(0, -size * 0.5, size * 0.2, 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(254, 228, 64, ${Math.sin(time * 0.1) * 0.3 + 0.7})`;
+                ctx.fill();
+            }
+            
+            // Wing
+            if (evolution.wing) {
+                const wf = Math.sin(time * 0.3) * 0.3;
+                ctx.fillStyle = `${d.primaryColor}88`;
+                ctx.save();
+                ctx.rotate(wf - 0.4);
+                ctx.beginPath();
+                ctx.moveTo(size * 0.4, -size * 0.2);
+                ctx.quadraticCurveTo(size * 1.3, -size * 0.7, size * 1.8, -size * 0.15);
+                ctx.quadraticCurveTo(size * 1.3, size * 0.1, size * 0.4, -size * 0.05);
+                ctx.fill();
+                ctx.restore();
+                ctx.save();
+                ctx.scale(-1, 1);
+                ctx.rotate(wf - 0.4);
+                ctx.beginPath();
+                ctx.moveTo(size * 0.4, -size * 0.2);
+                ctx.quadraticCurveTo(size * 1.3, -size * 0.7, size * 1.8, -size * 0.15);
+                ctx.quadraticCurveTo(size * 1.3, size * 0.1, size * 0.4, -size * 0.05);
+                ctx.fill();
+                ctx.restore();
+            }
+        }
+        
+        ctx.restore();
     }
     
     // Navbar
@@ -1186,6 +1573,7 @@
                         </div>
                         <div class="user-dropdown" id="userDropdown">
                             <div class="dropdown-item" onclick="window.nav('history')">📜 내 역사서</div>
+                            <div class="dropdown-item" onclick="window.openEditModal()">🧬 세포 수정</div>
                             <div class="dropdown-item danger" onclick="window.logout()">🚪 로그아웃</div>
                         </div>
                     </div>
@@ -1198,11 +1586,10 @@
         document.getElementById('userDropdown').classList.toggle('show');
     }
     
-    // Close dropdown when clicking outside
     document.addEventListener('click', (e) => {
         if (!e.target.closest('.user-menu')) {
-            const dropdown = document.getElementById('userDropdown');
-            if (dropdown) dropdown.classList.remove('show');
+            const dd = document.getElementById('userDropdown');
+            if (dd) dd.classList.remove('show');
         }
     });
     
@@ -1212,7 +1599,7 @@
             <div class="login-page">
                 <h1 class="login-logo">BOKLUCK</h1>
                 <p class="login-subtitle">Universe</p>
-                <div class="login-cell"></div>
+                <div class="login-cell"><canvas id="loginCellCanvas" width="150" height="150"></canvas></div>
                 <p class="login-story">
                     언제인지, 왜인지 알 수 없다.<br>
                     나는 광활한 우주 어딘가에서<br>
@@ -1226,12 +1613,29 @@
                 <p class="text-muted" style="font-size:13px">계정이 없어도 자동으로 생성됩니다</p>
             </div>
         `;
+        
+        // Animate login cell
+        const canvas = document.getElementById('loginCellCanvas');
+        if (canvas) {
+            const ctx = canvas.getContext('2d');
+            let t = 0;
+            const randomDesign = generateCellDesign();
+            function animate() {
+                if (!document.getElementById('loginCellCanvas')) return;
+                t++;
+                ctx.clearRect(0, 0, 150, 150);
+                drawCell(ctx, 75, 75, 40, randomDesign, null, t);
+                requestAnimationFrame(animate);
+            }
+            animate();
+        }
     }
     
     // Dashboard
     function renderDashboard() {
-        const { stage, entropy, evolution, history } = State.game;
+        const { stage, entropy, evolution, history, cellDesign } = State.game;
         const evoCount = Object.values(evolution).filter(v => v).length;
+        const design = cellDesign || generateCellDesign();
         
         document.getElementById('app').innerHTML = `
             ${navbar()}
@@ -1242,29 +1646,35 @@
                         <div class="stage-line ${stage>1?'completed':''}"></div>
                         <div class="stage-dot ${stage>=2?(stage===2?'current':'completed'):'locked'}">🚀</div>
                         <div class="stage-line ${stage>2?'completed':''}"></div>
-                        <div class="stage-dot ${stage>=3?(stage===3?'current':'completed'):'locked'}">🏕️</div>
+                        <div class="stage-dot ${stage>=3?'current':'locked'}">🏕️</div>
                         <div class="stage-line ${stage>3?'completed':''}"></div>
-                        <div class="stage-dot ${stage>=4?(stage===4?'current':'completed'):'locked'}">🏛️</div>
+                        <div class="stage-dot ${stage>=4?'current':'locked'}">🏛️</div>
                         <div class="stage-line ${stage>4?'completed':''}"></div>
                         <div class="stage-dot ${stage>=5?'current':'locked'}">⚔️</div>
                     </div>
                     
                     <div class="dashboard-grid">
                         <div class="card entity-card">
-                            <div class="entity-visual"><canvas id="entityCanvas" width="180" height="180"></canvas></div>
+                            <div class="entity-visual" onclick="window.openEditModal()">
+                                <canvas id="entityCanvas" width="180" height="180"></canvas>
+                            </div>
                             <div class="entity-stage-label">STAGE ${stage} · ${['','세포','정착','탐험','문명','정복'][stage]}</div>
-                            <div class="entity-name">Entity #${State.user?.uid?.slice(-4)||'0000'}</div>
+                            <div class="entity-name">
+                                ${design.name || 'Entity'}
+                                <button class="edit-btn" onclick="window.openEditModal()">✏️</button>
+                            </div>
+                            <div class="entity-id">#${State.user?.uid?.slice(-6) || '000000'}</div>
                             <div class="progress-bar mb-16"><div class="progress-fill" style="width:${Math.min(entropy/800*100,100)}%"></div></div>
                             <p class="text-muted text-center mb-24" style="font-size:12px">${stage===1?(entropy<800?`다음 단계까지 ${800-entropy} 엔트로피`:'🎉 행성 낙하 준비 완료!'):'행성에 정착했습니다'}</p>
                             <div class="entity-stats">
                                 <div class="stat-box"><div class="stat-value">${evoCount}/5</div><div class="stat-label">진화</div></div>
                                 <div class="stat-box"><div class="stat-value">${State.game.territories?.length||0}</div><div class="stat-label">영토</div></div>
                                 <div class="stat-box"><div class="stat-value">+${(State.game.territories?.length||0)*5}</div><div class="stat-label">세금</div></div>
-                                <div class="stat-box"><div class="stat-value">1</div><div class="stat-label">생존</div></div>
+                                <div class="stat-box"><div class="stat-value">${Math.floor((Date.now() - (State.userData?.createdAt?.toDate?.()?.getTime() || Date.now())) / 86400000) + 1}</div><div class="stat-label">생존</div></div>
                             </div>
                             ${stage===1?`
                                 <button class="btn btn-primary btn-block mt-24" onclick="window.nav('cell-world')">🌌 세포 세계로 진입</button>
-                                ${entropy>=800?`<button class="btn btn-energy btn-block mt-24" onclick="window.nav('planet-landing')">🚀 행성으로 떠나기</button>`:''}
+                                ${entropy>=800?`<button class="btn btn-energy btn-block mt-16" onclick="window.nav('planet-landing')">🚀 행성으로 떠나기</button>`:''}
                             `:''}
                             ${stage>=2?`<button class="btn btn-primary btn-block mt-24" onclick="window.nav('planet')">🪐 행성 탐험</button>`:''}
                         </div>
@@ -1272,7 +1682,7 @@
                         <div>
                             <div class="quick-actions">
                                 <div class="quick-action" onclick="window.nav('cell-world')"><div class="quick-action-icon">🦠</div><div class="quick-action-label">세포 세계</div></div>
-                                <div class="quick-action ${stage<2&&entropy<800?'locked':''}" onclick="${stage>=2||entropy>=800?"window.nav(stage>=2?'planet':'planet-landing')":""}"><div class="quick-action-icon">${stage>=2?'🪐':'🚀'}</div><div class="quick-action-label">${stage>=2?'행성':'행성 낙하'}</div></div>
+                                <div class="quick-action ${stage<2&&entropy<800?'locked':''}" onclick="${stage>=2||entropy>=800?"window.nav(State.game.stage>=2?'planet':'planet-landing')":""}"><div class="quick-action-icon">${stage>=2?'🪐':'🚀'}</div><div class="quick-action-label">${stage>=2?'행성':'행성 낙하'}</div></div>
                                 <div class="quick-action ${stage<3?'locked':''}"><div class="quick-action-icon">🌌</div><div class="quick-action-label">은하</div></div>
                                 <div class="quick-action" onclick="window.nav('history')"><div class="quick-action-icon">📜</div><div class="quick-action-label">역사서</div></div>
                             </div>
@@ -1300,106 +1710,103 @@
             </main>
         `;
         
-        animateEntity();
+        animateEntityCanvas();
     }
     
-    function animateEntity() {
+    function animateEntityCanvas() {
         const canvas = document.getElementById('entityCanvas');
         if (!canvas) return;
         const ctx = canvas.getContext('2d');
-        const evo = State.game.evolution;
         let t = 0;
         
         function draw() {
             if (!document.getElementById('entityCanvas')) return;
-            t += 0.05;
+            t++;
             ctx.clearRect(0, 0, 180, 180);
-            const cx = 90, cy = 90, r = 35;
-            
-            ctx.beginPath();
-            for (let i = 0; i < 12; i++) {
-                const a = (i / 12) * Math.PI * 2;
-                const w = Math.sin(t * 2 + i) * 5;
-                const x = cx + Math.cos(a) * (r + w);
-                const y = cy + Math.sin(a) * (r + w);
-                i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
-            }
-            ctx.closePath();
-            const g = ctx.createRadialGradient(cx - 15, cy - 15, 0, cx, cy, r + 10);
-            g.addColorStop(0, '#00f5d4');
-            g.addColorStop(0.6, '#7b2cbf');
-            g.addColorStop(1, '#4c1d95');
-            ctx.fillStyle = g;
-            ctx.fill();
-            
-            if (evo.eye) {
-                ctx.beginPath();
-                ctx.arc(cx + 12, cy - 5, 10, 0, Math.PI * 2);
-                ctx.fillStyle = 'white';
-                ctx.fill();
-                ctx.beginPath();
-                ctx.arc(cx + 14, cy - 3, 5, 0, Math.PI * 2);
-                ctx.fillStyle = '#1a1a2e';
-                ctx.fill();
-            }
-            
-            if (evo.arm) {
-                ctx.strokeStyle = '#7b2cbf';
-                ctx.lineWidth = 6;
-                ctx.lineCap = 'round';
-                ctx.beginPath();
-                ctx.moveTo(cx + 35, cy);
-                ctx.quadraticCurveTo(cx + 55, cy + Math.sin(t * 3) * 10, cx + 65, cy + 5);
-                ctx.stroke();
-            }
-            
-            if (evo.leg) {
-                const lw = Math.sin(t * 4) * 8;
-                ctx.strokeStyle = '#5b21b6';
-                ctx.lineWidth = 8;
-                ctx.beginPath();
-                ctx.moveTo(cx - 10, cy + 35);
-                ctx.lineTo(cx - 15 + lw, cy + 60);
-                ctx.stroke();
-                ctx.beginPath();
-                ctx.moveTo(cx + 10, cy + 35);
-                ctx.lineTo(cx + 15 - lw, cy + 60);
-                ctx.stroke();
-            }
-            
-            if (evo.brain) {
-                ctx.beginPath();
-                ctx.arc(cx, cy - 30, 12, 0, Math.PI * 2);
-                ctx.fillStyle = `rgba(254, 228, 64, ${Math.sin(t * 2) * 0.3 + 0.7})`;
-                ctx.fill();
-            }
-            
-            if (evo.wing) {
-                const wf = Math.sin(t * 5) * 0.3;
-                ctx.fillStyle = 'rgba(139, 92, 246, 0.6)';
-                ctx.save();
-                ctx.translate(cx, cy - 10);
-                ctx.rotate(wf);
-                ctx.beginPath();
-                ctx.moveTo(5, 0);
-                ctx.quadraticCurveTo(40, -30, 60, -10);
-                ctx.quadraticCurveTo(40, 10, 5, 0);
-                ctx.fill();
-                ctx.restore();
-                ctx.save();
-                ctx.translate(cx, cy - 10);
-                ctx.rotate(-wf);
-                ctx.beginPath();
-                ctx.moveTo(-5, 0);
-                ctx.quadraticCurveTo(-40, -30, -60, -10);
-                ctx.quadraticCurveTo(-40, 10, -5, 0);
-                ctx.fill();
-                ctx.restore();
-            }
-            
+            drawCell(ctx, 90, 90, 40, State.game.cellDesign, State.game.evolution, t);
             requestAnimationFrame(draw);
         }
         draw();
+    }
+    
+    // Edit Cell Modal
+    let previewAnimationId = null;
+    let tempDesign = null;
+    
+    function openEditModal() {
+        const modal = document.getElementById('editCellModal');
+        modal.classList.add('active');
+        
+        tempDesign = { ...(State.game.cellDesign || generateCellDesign()) };
+        
+        document.getElementById('cellNameInput').value = tempDesign.name || '';
+        document.getElementById('primaryColorPicker').value = hslToHex(tempDesign.primaryColor);
+        document.getElementById('secondaryColorPicker').value = hslToHex(tempDesign.secondaryColor);
+        
+        document.querySelectorAll('.pattern-option').forEach(opt => {
+            opt.classList.toggle('selected', opt.dataset.pattern === tempDesign.pattern);
+        });
+        
+        startPreviewAnimation();
+    }
+    
+    function closeEditModal() {
+        document.getElementById('editCellModal').classList.remove('active');
+        if (previewAnimationId) cancelAnimationFrame(previewAnimationId);
+    }
+    
+    function startPreviewAnimation() {
+        const canvas = document.getElementById('cellPreview');
+        if (!canvas) return;
+        const ctx = canvas.getContext('2d');
+        let t = 0;
+        
+        function animate() {
+            t++;
+            ctx.clearRect(0, 0, 150, 150);
+            drawCell(ctx, 75, 75, 35, tempDesign, State.game.evolution, t);
+            previewAnimationId = requestAnimationFrame(animate);
+        }
+        animate();
+    }
+    
+    function updatePreviewDesign() {
+        tempDesign.name = document.getElementById('cellNameInput').value;
+        tempDesign.primaryColor = document.getElementById('primaryColorPicker').value;
+        tempDesign.secondaryColor = document.getElementById('secondaryColorPicker').value;
+    }
+    
+    document.addEventListener('input', (e) => {
+        if (e.target.id === 'cellNameInput' || e.target.id === 'primaryColorPicker' || e.target.id === 'secondaryColorPicker') {
+            updatePreviewDesign();
+        }
+    });
+    
+    document.addEventListener('click', (e) => {
+        if (e.target.classList.contains('pattern-option')) {
+            document.querySelectorAll('.pattern-option').forEach(opt => opt.classList.remove('selected'));
+            e.target.classList.add('selected');
+            tempDesign.pattern = e.target.dataset.pattern;
+        }
+    });
+    
+    function randomizeCellDesign() {
+        tempDesign = generateCellDesign();
+        document.getElementById('cellNameInput').value = tempDesign.name;
+        document.getElementById('primaryColorPicker').value = hslToHex(tempDesign.primaryColor);
+        document.getElementById('secondaryColorPicker').value = hslToHex(tempDesign.secondaryColor);
+        document.querySelectorAll('.pattern-option').forEach(opt => {
+            opt.classList.toggle('selected', opt.dataset.pattern === tempDesign.pattern);
+        });
+    }
+    
+    async function saveCellDesign() {
+        updatePreviewDesign();
+        State.game.cellDesign = { ...tempDesign };
+        await State.sync();
+        closeEditModal();
+        showToast('✨ 세포가 업데이트되었습니다!', 'success');
+        render();
     }
     
     // History
@@ -1410,7 +1817,7 @@
             <main class="main-content">
                 <div class="page-container" style="max-width:800px">
                     <h1 class="font-display text-center mb-8" style="font-size:32px">📜 나의 역사서</h1>
-                    <p class="text-muted text-center mb-24">Entity #${State.user?.uid?.slice(-4)||'0000'}의 여정</p>
+                    <p class="text-muted text-center mb-24">${State.game.cellDesign?.name || 'Entity'}의 여정</p>
                     ${h.length===0?`
                         <div class="card text-center" style="padding:60px">
                             <p style="font-size:48px;margin-bottom:16px">📜</p>
@@ -1431,27 +1838,173 @@
     
     // Planet Page
     function renderPlanet() {
-        const planet = State.game.currentPlanet;
+        const planet = State.game.currentPlanet || { name: '미지의 행성', type: '탐험 필요' };
+        const territories = State.game.territories || [];
+        
         document.getElementById('app').innerHTML = `
             ${navbar()}
             <main class="main-content">
                 <div class="page-container">
-                    <div class="card text-center" style="padding:60px;max-width:600px;margin:0 auto;">
-                        <h1 style="font-size:64px;margin-bottom:24px">🪐</h1>
-                        <h2 class="font-display mb-16" style="font-size:28px">${planet?.name || '행성'}</h2>
-                        <p class="text-muted mb-24">${planet?.type || '미지의 행성'}</p>
-                        <div class="card mb-24" style="background:var(--bg-input)">
-                            <p style="font-size:14px;line-height:1.8">
-                                당신은 이 행성의 첫 번째 정착자입니다.<br>
-                                영토를 확장하고 문명을 건설하세요.
-                            </p>
+                    <div class="planet-header">
+                        <div class="planet-icon">🪐</div>
+                        <div class="planet-info">
+                            <h1>${planet.name}</h1>
+                            <p class="planet-type">${planet.type}</p>
                         </div>
-                        <p class="text-muted" style="font-size:13px">🚧 행성 시스템 개발 중...</p>
-                        <button class="btn btn-outline mt-24" onclick="window.nav('dashboard')">대시보드로</button>
+                    </div>
+                    
+                    <div class="dashboard-grid">
+                        <div>
+                            <div class="card mb-24">
+                                <div class="card-header">
+                                    <span class="card-title">🗺️ 영토 지도</span>
+                                    <span class="text-muted" style="font-size:12px">${territories.length}/100 보유</span>
+                                </div>
+                                <div class="planet-grid" id="planetGrid"></div>
+                                <p class="text-muted text-center" style="font-size:12px">빈 칸을 클릭하여 영토를 구매하세요 (10 엔트로피)</p>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <div class="card board-section">
+                                <div class="card-header">
+                                    <span class="card-title">💬 행성 게시판</span>
+                                </div>
+                                <div class="post-input">
+                                    <input type="text" class="input" id="postInput" placeholder="무슨 생각을 하고 있나요? (+100 엔트로피)">
+                                    <button class="btn btn-primary" onclick="window.createPost()">작성</button>
+                                </div>
+                                <div id="postsContainer">
+                                    <p class="text-muted text-center" style="padding:20px">아직 게시글이 없습니다</p>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </main>
         `;
+        
+        renderPlanetGrid();
+        loadPosts();
+    }
+    
+    function renderPlanetGrid() {
+        const grid = document.getElementById('planetGrid');
+        if (!grid) return;
+        
+        const territories = State.game.territories || [];
+        const ownedSet = new Set(territories.map(t => `${t.x},${t.y}`));
+        
+        let html = '';
+        for (let y = 0; y < 10; y++) {
+            for (let x = 0; x < 10; x++) {
+                const key = `${x},${y}`;
+                const isOwned = ownedSet.has(key);
+                html += `<div class="territory-cell ${isOwned ? 'owned' : ''}" data-x="${x}" data-y="${y}" onclick="window.clickTerritory(${x}, ${y})">${isOwned ? '🏠' : ''}</div>`;
+            }
+        }
+        grid.innerHTML = html;
+    }
+    
+    async function clickTerritory(x, y) {
+        const territories = State.game.territories || [];
+        const key = `${x},${y}`;
+        const isOwned = territories.some(t => t.x === x && t.y === y);
+        
+        if (isOwned) {
+            showToast('이미 소유한 영토입니다', 'info');
+            return;
+        }
+        
+        if (State.game.entropy < 10) {
+            showToast('엔트로피가 부족합니다 (10 필요)', 'error');
+            return;
+        }
+        
+        State.game.entropy -= 10;
+        State.game.territories.push({ x, y, taxRate: 5 });
+        await State.sync();
+        
+        showToast(`🏠 영토 (${x}, ${y}) 구매 완료!`, 'success');
+        renderPlanetGrid();
+        render();
+    }
+    
+    async function loadPosts() {
+        const container = document.getElementById('postsContainer');
+        if (!container) return;
+        
+        try {
+            const planet = State.game.currentPlanet;
+            if (!planet) return;
+            
+            const q = query(
+                collection(db, 'posts'),
+                where('planetName', '==', planet.name),
+                orderBy('createdAt', 'desc'),
+                limit(20)
+            );
+            
+            const snap = await getDocs(q);
+            
+            if (snap.empty) {
+                container.innerHTML = '<p class="text-muted text-center" style="padding:20px">아직 게시글이 없습니다</p>';
+                return;
+            }
+            
+            container.innerHTML = snap.docs.map(doc => {
+                const p = doc.data();
+                return `
+                    <div class="board-post">
+                        <div class="post-header">
+                            <img class="post-avatar" src="${p.authorPhoto || 'https://via.placeholder.com/32'}">
+                            <div>
+                                <div class="post-author">${p.authorName || 'Unknown'}</div>
+                                <div class="post-time">${p.createdAt?.toDate?.()?.toLocaleString() || ''}</div>
+                            </div>
+                        </div>
+                        <div class="post-content">${p.content}</div>
+                    </div>
+                `;
+            }).join('');
+        } catch (e) {
+            console.error('Load posts error:', e);
+        }
+    }
+    
+    async function createPost() {
+        const input = document.getElementById('postInput');
+        const content = input.value.trim();
+        
+        if (!content) {
+            showToast('내용을 입력하세요', 'error');
+            return;
+        }
+        
+        try {
+            const planet = State.game.currentPlanet;
+            
+            await addDoc(collection(db, 'posts'), {
+                planetName: planet.name,
+                content,
+                authorId: State.user.uid,
+                authorName: State.game.cellDesign?.name || State.user.displayName,
+                authorPhoto: State.user.photoURL,
+                createdAt: serverTimestamp()
+            });
+            
+            // Reward entropy
+            State.game.entropy += 100;
+            await State.sync();
+            
+            input.value = '';
+            showToast('📝 게시글 작성 완료! +100 엔트로피', 'success');
+            loadPosts();
+            render();
+        } catch (e) {
+            console.error('Create post error:', e);
+            showToast('게시글 작성 실패', 'error');
+        }
     }
     
     // Placeholder
@@ -1493,8 +2046,6 @@
     }
     
     function startCellWorld() {
-        console.log('Starting Cell World');
-        
         document.getElementById('app').innerHTML = '';
         
         const canvas = document.getElementById('worldCanvas');
@@ -1509,6 +2060,8 @@
         
         worldRunning = true;
         
+        const design = State.game.cellDesign || generateCellDesign();
+        
         const player = {
             x: 0, y: 0,
             vx: 0, vy: 0,
@@ -1518,19 +2071,9 @@
             visionRange: State.game.evolution.eye ? 500 : 300,
             collectRange: State.game.evolution.arm ? 100 : 50,
             multiplier: State.game.evolution.brain ? 2 : 1,
-            wobblePoints: [],
-            wobblePhase: 0,
             dashing: false,
             dashCD: 0
         };
-        
-        for (let i = 0; i < 12; i++) {
-            player.wobblePoints.push({
-                angle: (i / 12) * Math.PI * 2,
-                offset: 0,
-                speed: 0.5 + Math.random() * 0.5
-            });
-        }
         
         let particles = [];
         const camera = { x: 0, y: 0 };
@@ -1572,17 +2115,12 @@
             document.getElementById('cellEvoPanel').innerHTML = `
                 <div class="world-evo-title">🧬 진화 단계</div>
                 <div class="world-evo-item ${evo.eye?'unlocked':(e>=80?'next':'')}"><div class="world-evo-icon">👁️</div><div><div class="world-evo-name">시각</div><div class="world-evo-req">${evo.eye?'✓':'100'}</div></div></div>
-                <div class="world-evo-item ${evo.arm?'unlocked':(e>=180&&evo.eye?'next':'')}"><div class="world-evo-icon">🦾</div><div><div class="world-evo-name">팔</div><div class="world-evo-req">${evo.arm?'✓':'200'}</div></div></div>
-                <div class="world-evo-item ${evo.leg?'unlocked':(e>=280&&evo.arm?'next':'')}"><div class="world-evo-icon">🦵</div><div><div class="world-evo-name">다리</div><div class="world-evo-req">${evo.leg?'✓':'300'}</div></div></div>
-                <div class="world-evo-item ${evo.brain?'unlocked':(e>=480&&evo.leg?'next':'')}"><div class="world-evo-icon">🧠</div><div><div class="world-evo-name">두뇌</div><div class="world-evo-req">${evo.brain?'✓':'500'}</div></div></div>
-                <div class="world-evo-item ${evo.wing?'unlocked':(e>=780&&evo.brain?'next':'')}"><div class="world-evo-icon">🪽</div><div><div class="world-evo-name">날개</div><div class="world-evo-req">${evo.wing?'✓':'800'}</div></div></div>
+                <div class="world-evo-item ${evo.arm?'unlocked':(e>=180?'next':'')}"><div class="world-evo-icon">🦾</div><div><div class="world-evo-name">팔</div><div class="world-evo-req">${evo.arm?'✓':'200'}</div></div></div>
+                <div class="world-evo-item ${evo.leg?'unlocked':(e>=280?'next':'')}"><div class="world-evo-icon">🦵</div><div><div class="world-evo-name">다리</div><div class="world-evo-req">${evo.leg?'✓':'300'}</div></div></div>
+                <div class="world-evo-item ${evo.brain?'unlocked':(e>=480?'next':'')}"><div class="world-evo-icon">🧠</div><div><div class="world-evo-name">두뇌</div><div class="world-evo-req">${evo.brain?'✓':'500'}</div></div></div>
+                <div class="world-evo-item ${evo.wing?'unlocked':(e>=780?'next':'')}"><div class="world-evo-icon">🪽</div><div><div class="world-evo-name">날개</div><div class="world-evo-req">${evo.wing?'✓':'800'}</div></div></div>
             `;
-            
-            // Update next stage button
-            const btn = document.getElementById('nextStageBtn');
-            if (State.game.entropy >= 800) {
-                btn.disabled = false;
-            }
+            document.getElementById('nextStageBtn').disabled = State.game.entropy < 800;
         }
         updateEvoPanel();
         
@@ -1638,9 +2176,9 @@
             if (!evo.wing && e >= 800) {
                 State.game.evolution.wing = true;
                 showEvoAlert('🪽', '날개 진화!', '날개가 생겨났습니다', 'SPACE 대시');
-                State.game.history.push({ chapter: 5, title: '우주를 향해', content: '800 엔트로피의 정점에서 날개가 펼쳐졌다. 이제 새로운 세계로 떠날 준비가 되었다.', timestamp: new Date().toISOString() });
+                State.game.history.push({ chapter: 5, title: '우주를 향해', content: '800 엔트로피의 정점에서 날개가 펼쳐졌다.', timestamp: new Date().toISOString() });
                 updateEvoPanel();
-                showToast('🎉 모든 진화 완료! 행성으로 떠날 수 있습니다.', 'success');
+                showToast('🎉 모든 진화 완료!', 'success');
             }
             
             player.size = player.baseSize + e * 0.03;
@@ -1677,12 +2215,6 @@
             
             camera.x += (player.x - camera.x) * 0.1;
             camera.y += (player.y - camera.y) * 0.1;
-            
-            player.wobblePhase += 0.1;
-            player.wobblePoints.forEach((p, i) => {
-                const mf = Math.sqrt(player.vx * player.vx + player.vy * player.vy) * 0.5;
-                p.offset = Math.sin(player.wobblePhase * p.speed + i) * (5 + mf);
-            });
         }
         
         function collect() {
@@ -1753,98 +2285,14 @@
             const sx = canvas.width / 2;
             const sy = canvas.height / 2;
             
-            ctx.save();
-            ctx.translate(sx, sy);
-            
-            if (player.dashing) { ctx.shadowColor = '#00f5d4'; ctx.shadowBlur = 50; }
-            
-            ctx.beginPath();
-            player.wobblePoints.forEach((p, i) => {
-                const r = player.size + p.offset;
-                const x = Math.cos(p.angle) * r;
-                const y = Math.sin(p.angle) * r;
-                i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
-            });
-            ctx.closePath();
-            
-            const g = ctx.createRadialGradient(-player.size * 0.3, -player.size * 0.3, 0, 0, 0, player.size * 1.2);
-            g.addColorStop(0, '#00f5d4');
-            g.addColorStop(0.5, '#7b2cbf');
-            g.addColorStop(1, '#4c1d95');
-            ctx.fillStyle = g;
-            ctx.fill();
-            
-            ctx.beginPath();
-            ctx.arc(-player.size * 0.2, -player.size * 0.2, player.size * 0.2, 0, Math.PI * 2);
-            ctx.fillStyle = 'rgba(255,255,255,0.2)';
-            ctx.fill();
-            
-            if (State.game.evolution.eye) {
-                const ex = player.size * 0.3, ey = -player.size * 0.1, es = player.size * 0.22;
-                ctx.beginPath();
-                ctx.arc(ex, ey, es, 0, Math.PI * 2);
-                ctx.fillStyle = '#fff';
-                ctx.fill();
-                ctx.beginPath();
-                ctx.arc(ex + player.vx * 2, ey + player.vy * 2, es * 0.5, 0, Math.PI * 2);
-                ctx.fillStyle = '#1a1a2e';
-                ctx.fill();
+            if (player.dashing) {
+                ctx.shadowColor = design.primaryColor;
+                ctx.shadowBlur = 50;
             }
             
-            if (State.game.evolution.arm) {
-                ctx.strokeStyle = '#7b2cbf';
-                ctx.lineWidth = player.size * 0.12;
-                ctx.lineCap = 'round';
-                ctx.beginPath();
-                ctx.moveTo(player.size * 0.7, player.size * 0.1);
-                ctx.quadraticCurveTo(player.size * 1.2, player.size * 0.3 + Math.sin(time * 0.15) * 8, player.size * 1.4, player.size * 0.2);
-                ctx.stroke();
-            }
+            drawCell(ctx, sx, sy, player.size, design, State.game.evolution, time);
             
-            if (State.game.evolution.leg) {
-                const lw = Math.sin(time * 0.2) * 10;
-                ctx.strokeStyle = '#5b21b6';
-                ctx.lineWidth = player.size * 0.15;
-                ctx.beginPath();
-                ctx.moveTo(player.size * 0.2, player.size * 0.7);
-                ctx.lineTo(player.size * 0.15 + lw, player.size * 1.3);
-                ctx.stroke();
-                ctx.beginPath();
-                ctx.moveTo(-player.size * 0.2, player.size * 0.7);
-                ctx.lineTo(-player.size * 0.15 - lw, player.size * 1.3);
-                ctx.stroke();
-            }
-            
-            if (State.game.evolution.brain) {
-                ctx.beginPath();
-                ctx.arc(0, -player.size * 0.45, player.size * 0.2, 0, Math.PI * 2);
-                ctx.fillStyle = `rgba(254, 228, 64, ${Math.sin(time * 0.1) * 0.3 + 0.7})`;
-                ctx.fill();
-            }
-            
-            if (State.game.evolution.wing) {
-                const wf = Math.sin(time * 0.3) * 0.3;
-                ctx.fillStyle = 'rgba(139, 92, 246, 0.5)';
-                ctx.save();
-                ctx.rotate(wf - 0.4);
-                ctx.beginPath();
-                ctx.moveTo(player.size * 0.4, -player.size * 0.2);
-                ctx.quadraticCurveTo(player.size * 1.3, -player.size * 0.7, player.size * 1.8, -player.size * 0.15);
-                ctx.quadraticCurveTo(player.size * 1.3, player.size * 0.1, player.size * 0.4, -player.size * 0.05);
-                ctx.fill();
-                ctx.restore();
-                ctx.save();
-                ctx.scale(-1, 1);
-                ctx.rotate(wf - 0.4);
-                ctx.beginPath();
-                ctx.moveTo(player.size * 0.4, -player.size * 0.2);
-                ctx.quadraticCurveTo(player.size * 1.3, -player.size * 0.7, player.size * 1.8, -player.size * 0.15);
-                ctx.quadraticCurveTo(player.size * 1.3, player.size * 0.1, player.size * 0.4, -player.size * 0.05);
-                ctx.fill();
-                ctx.restore();
-            }
-            
-            ctx.restore();
+            ctx.shadowBlur = 0;
         }
         
         function loop() {
@@ -1859,7 +2307,6 @@
             requestAnimationFrame(loop);
         }
         
-        // Initial particles
         for (let i = 0; i < 60; i++) {
             const a = Math.random() * Math.PI * 2;
             const d = 50 + Math.random() * 300;
@@ -1878,11 +2325,9 @@
     }
     
     // ========================================
-    // PLANET LANDING (Stage 2)
+    // PLANET LANDING
     // ========================================
     function startPlanetLanding() {
-        console.log('Starting Planet Landing');
-        
         document.getElementById('app').innerHTML = '';
         
         const canvas = document.getElementById('worldCanvas');
@@ -1891,12 +2336,10 @@
         canvas.width = window.innerWidth;
         canvas.height = window.innerHeight;
         canvas.classList.add('active');
-        
         document.getElementById('landingUI').classList.add('active');
         
         worldRunning = true;
         
-        // Generate random planet
         const targetPlanet = {
             name: PLANET_NAMES[Math.floor(Math.random() * PLANET_NAMES.length)],
             type: PLANET_TYPES[Math.floor(Math.random() * PLANET_TYPES.length)]
@@ -1904,40 +2347,24 @@
         
         document.getElementById('landingPlanetName').textContent = targetPlanet.name;
         
-        // Player
-        const player = {
-            x: canvas.width / 2,
-            y: 100,
-            size: 30,
-            health: 100,
-            speed: 8
-        };
+        const design = State.game.cellDesign || generateCellDesign();
         
-        // Obstacles
+        const player = { x: canvas.width / 2, y: 100, size: 30, health: 100, speed: 8 };
         let obstacles = [];
         let distance = 0;
         let targetDistance = 3000;
         let gameOver = false;
-        let success = false;
         let time = 0;
         
         const keys = {};
         
         function onKeyDown(e) {
             keys[e.key.toLowerCase()] = true;
-            if (e.key === 'Escape') {
-                worldRunning = false;
-                exitLanding();
-            }
+            if (e.key === 'Escape') { worldRunning = false; exitLanding(); }
         }
         
         function onKeyUp(e) { keys[e.key.toLowerCase()] = false; }
-        
-        function onResize() {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-            player.x = Math.min(player.x, canvas.width - 50);
-        }
+        function onResize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
         
         window.addEventListener('keydown', onKeyDown);
         window.addEventListener('keyup', onKeyUp);
@@ -1959,11 +2386,8 @@
         
         function spawnObstacle() {
             const type = Math.random();
-            let obstacle;
-            
             if (type < 0.4) {
-                // Asteroid
-                obstacle = {
+                obstacles.push({
                     type: 'asteroid',
                     x: Math.random() * (canvas.width - 60) + 30,
                     y: canvas.height + 50,
@@ -1971,21 +2395,19 @@
                     speed: 3 + Math.random() * 3,
                     rotation: 0,
                     rotSpeed: (Math.random() - 0.5) * 0.1
-                };
+                });
             } else if (type < 0.7) {
-                // Energy barrier
                 const width = 100 + Math.random() * 200;
-                obstacle = {
+                obstacles.push({
                     type: 'barrier',
                     x: Math.random() * (canvas.width - width),
                     y: canvas.height + 30,
-                    width: width,
+                    width,
                     height: 20,
                     speed: 4 + Math.random() * 2
-                };
+                });
             } else {
-                // Debris field
-                obstacle = {
+                obstacles.push({
                     type: 'debris',
                     x: Math.random() * canvas.width,
                     y: canvas.height + 50,
@@ -1995,100 +2417,59 @@
                         size: 5 + Math.random() * 10
                     })),
                     speed: 5 + Math.random() * 3
-                };
+                });
             }
-            
-            obstacles.push(obstacle);
         }
         
         function update() {
             if (gameOver) return;
             
-            // Player movement
-            if (keys['a'] || keys['arrowleft']) {
-                player.x -= player.speed;
-            }
-            if (keys['d'] || keys['arrowright']) {
-                player.x += player.speed;
-            }
-            
+            if (keys['a'] || keys['arrowleft']) player.x -= player.speed;
+            if (keys['d'] || keys['arrowright']) player.x += player.speed;
             player.x = Math.max(player.size, Math.min(canvas.width - player.size, player.x));
             
-            // Update distance
             distance += 5;
             document.getElementById('landingDistance').textContent = `${Math.floor(distance)}m / ${targetDistance}m`;
             
-            // Spawn obstacles
-            if (Math.random() < 0.03 + (distance / targetDistance) * 0.02) {
-                spawnObstacle();
-            }
+            if (Math.random() < 0.03 + (distance / targetDistance) * 0.02) spawnObstacle();
             
-            // Update obstacles
             obstacles = obstacles.filter(o => {
                 o.y -= o.speed;
                 if (o.rotation !== undefined) o.rotation += o.rotSpeed;
                 
-                // Collision check
                 let hit = false;
-                
                 if (o.type === 'asteroid') {
-                    const dx = player.x - o.x;
-                    const dy = player.y - o.y;
-                    if (Math.sqrt(dx*dx + dy*dy) < player.size + o.size) {
-                        hit = true;
-                    }
+                    if (Math.sqrt((player.x - o.x)**2 + (player.y - o.y)**2) < player.size + o.size) hit = true;
                 } else if (o.type === 'barrier') {
-                    if (player.x > o.x - player.size && 
-                        player.x < o.x + o.width + player.size &&
-                        player.y > o.y - player.size &&
-                        player.y < o.y + o.height + player.size) {
-                        hit = true;
-                    }
+                    if (player.x > o.x - player.size && player.x < o.x + o.width + player.size && player.y > o.y - player.size && player.y < o.y + o.height + player.size) hit = true;
                 } else if (o.type === 'debris') {
                     o.particles.forEach(p => {
-                        const dx = player.x - (o.x + p.ox);
-                        const dy = player.y - (o.y + p.oy);
-                        if (Math.sqrt(dx*dx + dy*dy) < player.size + p.size) {
-                            hit = true;
-                        }
+                        if (Math.sqrt((player.x - (o.x + p.ox))**2 + (player.y - (o.y + p.oy))**2) < player.size + p.size) hit = true;
                     });
                 }
                 
                 if (hit) {
                     player.health -= 20;
                     document.getElementById('landingHealthBar').style.width = player.health + '%';
-                    
-                    if (player.health <= 0) {
-                        gameOver = true;
-                        success = false;
-                        showResult(false, targetPlanet);
-                    }
+                    if (player.health <= 0) { gameOver = true; showResult(false, targetPlanet); }
                     return false;
                 }
-                
                 return o.y > -100;
             });
             
-            // Check success
-            if (distance >= targetDistance) {
-                gameOver = true;
-                success = true;
-                showResult(true, targetPlanet);
-            }
+            if (distance >= targetDistance) { gameOver = true; showResult(true, targetPlanet); }
         }
         
-        function showResult(isSuccess, planet) {
+        function showResult(success, planet) {
             setTimeout(() => {
                 const modal = document.getElementById('resultModal');
-                
-                if (isSuccess) {
+                if (success) {
                     document.getElementById('resultIcon').textContent = '🪐';
                     document.getElementById('resultTitle').textContent = '착륙 성공!';
-                    document.getElementById('resultDesc').textContent = '새로운 행성에 무사히 도착했습니다. 이제 이 행성을 탐험하고 정착할 수 있습니다.';
+                    document.getElementById('resultDesc').textContent = '새로운 행성에 무사히 도착했습니다.';
                     document.getElementById('resultPlanetName').textContent = planet.name;
                     document.getElementById('resultPlanetType').textContent = planet.type;
                     
-                    // Save planet
                     State.game.currentPlanet = planet;
                     State.game.stage = 2;
                     State.game.history.push({
@@ -2101,17 +2482,15 @@
                 } else {
                     document.getElementById('resultIcon').textContent = '💥';
                     document.getElementById('resultTitle').textContent = '착륙 실패';
-                    document.getElementById('resultDesc').textContent = '장애물에 부딪혀 추락했습니다. 다시 시도하세요.';
+                    document.getElementById('resultDesc').textContent = '장애물에 부딪혀 추락했습니다.';
                     document.getElementById('resultPlanetName').textContent = '???';
                     document.getElementById('resultPlanetType').textContent = '다시 도전하세요';
                 }
-                
                 modal.classList.add('active');
             }, 500);
         }
         
-        function drawBackground() {
-            // Space gradient
+        function drawBg() {
             const g = ctx.createLinearGradient(0, 0, 0, canvas.height);
             g.addColorStop(0, '#050510');
             g.addColorStop(0.7, '#0a0a2a');
@@ -2119,7 +2498,6 @@
             ctx.fillStyle = g;
             ctx.fillRect(0, 0, canvas.width, canvas.height);
             
-            // Stars (moving down)
             ctx.fillStyle = 'rgba(255,255,255,0.6)';
             for (let i = 0; i < 50; i++) {
                 const x = (i * 137.5) % canvas.width;
@@ -2129,35 +2507,17 @@
                 ctx.fill();
             }
             
-            // Planet at bottom
-            const planetProgress = Math.min(distance / targetDistance, 1);
-            const planetSize = 200 + planetProgress * 300;
-            const planetY = canvas.height + 200 - planetProgress * 300;
+            const progress = Math.min(distance / targetDistance, 1);
+            const planetSize = 200 + progress * 300;
+            const planetY = canvas.height + 200 - progress * 300;
             
-            const pg = ctx.createRadialGradient(
-                canvas.width/2 - planetSize * 0.2, planetY - planetSize * 0.2, 0,
-                canvas.width/2, planetY, planetSize
-            );
+            const pg = ctx.createRadialGradient(canvas.width/2 - planetSize * 0.2, planetY - planetSize * 0.2, 0, canvas.width/2, planetY, planetSize);
             pg.addColorStop(0, '#4ade80');
             pg.addColorStop(0.5, '#22c55e');
-            pg.addColorStop(0.8, '#15803d');
             pg.addColorStop(1, '#14532d');
-            
             ctx.beginPath();
             ctx.arc(canvas.width/2, planetY, planetSize, 0, Math.PI * 2);
             ctx.fillStyle = pg;
-            ctx.fill();
-            
-            // Atmosphere glow
-            ctx.beginPath();
-            ctx.arc(canvas.width/2, planetY, planetSize + 30, 0, Math.PI * 2);
-            const ag = ctx.createRadialGradient(
-                canvas.width/2, planetY, planetSize,
-                canvas.width/2, planetY, planetSize + 30
-            );
-            ag.addColorStop(0, 'rgba(74, 222, 128, 0.3)');
-            ag.addColorStop(1, 'rgba(74, 222, 128, 0)');
-            ctx.fillStyle = ag;
             ctx.fill();
         }
         
@@ -2167,40 +2527,22 @@
                     ctx.save();
                     ctx.translate(o.x, o.y);
                     ctx.rotate(o.rotation);
-                    
-                    const ag = ctx.createRadialGradient(0, 0, 0, 0, 0, o.size);
-                    ag.addColorStop(0, '#6b7280');
-                    ag.addColorStop(0.7, '#4b5563');
-                    ag.addColorStop(1, '#374151');
-                    
                     ctx.beginPath();
                     for (let i = 0; i < 8; i++) {
                         const angle = (i / 8) * Math.PI * 2;
                         const r = o.size * (0.8 + Math.sin(i * 2.5) * 0.2);
-                        const x = Math.cos(angle) * r;
-                        const y = Math.sin(angle) * r;
-                        i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+                        i === 0 ? ctx.moveTo(Math.cos(angle) * r, Math.sin(angle) * r) : ctx.lineTo(Math.cos(angle) * r, Math.sin(angle) * r);
                     }
                     ctx.closePath();
-                    ctx.fillStyle = ag;
+                    ctx.fillStyle = '#4b5563';
                     ctx.fill();
                     ctx.restore();
-                    
                 } else if (o.type === 'barrier') {
-                    const bg = ctx.createLinearGradient(o.x, o.y, o.x + o.width, o.y);
-                    bg.addColorStop(0, 'rgba(239, 68, 68, 0.8)');
-                    bg.addColorStop(0.5, 'rgba(248, 113, 113, 0.9)');
-                    bg.addColorStop(1, 'rgba(239, 68, 68, 0.8)');
-                    
-                    ctx.fillStyle = bg;
-                    ctx.fillRect(o.x, o.y, o.width, o.height);
-                    
-                    // Glow
+                    ctx.fillStyle = 'rgba(239, 68, 68, 0.8)';
                     ctx.shadowColor = '#ef4444';
                     ctx.shadowBlur = 20;
                     ctx.fillRect(o.x, o.y, o.width, o.height);
                     ctx.shadowBlur = 0;
-                    
                 } else if (o.type === 'debris') {
                     o.particles.forEach(p => {
                         ctx.beginPath();
@@ -2213,94 +2555,16 @@
         }
         
         function drawPlayer() {
-            const wobble = Math.sin(time * 0.2) * 2;
-            
-            ctx.save();
-            ctx.translate(player.x, player.y);
-            
-            // Glow
-            ctx.shadowColor = '#00f5d4';
-            ctx.shadowBlur = 30;
-            
-            // Body
-            ctx.beginPath();
-            for (let i = 0; i < 12; i++) {
-                const angle = (i / 12) * Math.PI * 2;
-                const r = player.size + Math.sin(time * 0.3 + i) * 3;
-                const x = Math.cos(angle) * r;
-                const y = Math.sin(angle) * r;
-                i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
-            }
-            ctx.closePath();
-            
-            const g = ctx.createRadialGradient(-10, -10, 0, 0, 0, player.size);
-            g.addColorStop(0, '#00f5d4');
-            g.addColorStop(0.6, '#7b2cbf');
-            g.addColorStop(1, '#4c1d95');
-            ctx.fillStyle = g;
-            ctx.fill();
-            
-            ctx.shadowBlur = 0;
-            
-            // Eye
-            ctx.beginPath();
-            ctx.arc(8, -3, 8, 0, Math.PI * 2);
-            ctx.fillStyle = 'white';
-            ctx.fill();
-            ctx.beginPath();
-            ctx.arc(10, -2, 4, 0, Math.PI * 2);
-            ctx.fillStyle = '#1a1a2e';
-            ctx.fill();
-            
-            // Wings (flapping)
-            const wingFlap = Math.sin(time * 0.5) * 0.4;
-            ctx.fillStyle = 'rgba(139, 92, 246, 0.6)';
-            
-            ctx.save();
-            ctx.rotate(wingFlap - 0.5);
-            ctx.beginPath();
-            ctx.moveTo(10, -5);
-            ctx.quadraticCurveTo(40, -25, 55, -5);
-            ctx.quadraticCurveTo(40, 5, 10, 0);
-            ctx.fill();
-            ctx.restore();
-            
-            ctx.save();
-            ctx.scale(-1, 1);
-            ctx.rotate(wingFlap - 0.5);
-            ctx.beginPath();
-            ctx.moveTo(10, -5);
-            ctx.quadraticCurveTo(40, -25, 55, -5);
-            ctx.quadraticCurveTo(40, 5, 10, 0);
-            ctx.fill();
-            ctx.restore();
-            
-            ctx.restore();
-            
-            // Trail effect
-            ctx.globalAlpha = 0.3;
-            for (let i = 1; i <= 3; i++) {
-                ctx.beginPath();
-                ctx.arc(player.x, player.y + i * 20, player.size - i * 5, 0, Math.PI * 2);
-                ctx.fillStyle = `rgba(0, 245, 212, ${0.3 - i * 0.1})`;
-                ctx.fill();
-            }
-            ctx.globalAlpha = 1;
+            drawCell(ctx, player.x, player.y, player.size, design, State.game.evolution, time);
         }
         
         function loop() {
             if (!worldRunning) { cleanup(); return; }
-            
             time++;
-            
-            if (!gameOver) {
-                update();
-            }
-            
-            drawBackground();
+            if (!gameOver) update();
+            drawBg();
             drawObstacles();
             drawPlayer();
-            
             requestAnimationFrame(loop);
         }
         
@@ -2324,11 +2588,20 @@
             
             const snap = await getDoc(doc(db, 'users', user.uid));
             if (!snap.exists()) {
+                const newDesign = generateCellDesign();
                 await setDoc(doc(db, 'users', user.uid), {
                     displayName: user.displayName,
                     email: user.email,
                     photoURL: user.photoURL,
-                    game: { entropy: 0, stage: 1, evolution: { eye: false, arm: false, leg: false, brain: false, wing: false }, currentPlanet: null, territories: [], history: [] },
+                    game: { 
+                        entropy: 0, 
+                        stage: 1, 
+                        evolution: { eye: false, arm: false, leg: false, brain: false, wing: false }, 
+                        currentPlanet: null, 
+                        territories: [], 
+                        history: [],
+                        cellDesign: newDesign
+                    },
                     createdAt: serverTimestamp(),
                     updatedAt: serverTimestamp()
                 });
@@ -2355,6 +2628,13 @@
             if (user) {
                 State.user = user;
                 await State.load();
+                
+                // Generate cell design if missing
+                if (!State.game.cellDesign) {
+                    State.game.cellDesign = generateCellDesign();
+                    await State.sync();
+                }
+                
                 hideLoading();
                 navigate('dashboard');
             } else {
@@ -2371,6 +2651,12 @@
         window.goToStage2 = goToStage2;
         window.explorePlanet = explorePlanet;
         window.toggleUserMenu = toggleUserMenu;
+        window.openEditModal = openEditModal;
+        window.closeEditModal = closeEditModal;
+        window.randomizeCellDesign = randomizeCellDesign;
+        window.saveCellDesign = saveCellDesign;
+        window.clickTerritory = clickTerritory;
+        window.createPost = createPost;
     }
     
     init();
