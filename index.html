@@ -47,971 +47,399 @@
     #space-bg {
         position: fixed;
         top: 0; left: 0; right: 0; bottom: 0;
-        background: 
-            radial-gradient(ellipse at 20% 80%, rgba(123, 44, 191, 0.15) 0%, transparent 50%),
+        background: radial-gradient(ellipse at 20% 80%, rgba(123, 44, 191, 0.15) 0%, transparent 50%),
             radial-gradient(ellipse at 80% 20%, rgba(247, 37, 133, 0.1) 0%, transparent 50%),
             var(--bg-space);
         z-index: -2;
     }
     
-    #stars {
-        position: fixed;
-        top: 0; left: 0; right: 0; bottom: 0;
-        z-index: -1;
-        pointer-events: none;
-    }
-    
-    .star {
-        position: absolute;
-        background: white;
-        border-radius: 50%;
-        animation: twinkle 3s infinite;
-    }
-    
-    @keyframes twinkle {
-        0%, 100% { opacity: 0.3; }
-        50% { opacity: 1; }
-    }
+    #stars { position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: -1; pointer-events: none; }
+    .star { position: absolute; background: white; border-radius: 50%; animation: twinkle 3s infinite; }
+    @keyframes twinkle { 0%, 100% { opacity: 0.3; } 50% { opacity: 1; } }
     
     .loading-screen {
-        position: fixed;
-        top: 0; left: 0; right: 0; bottom: 0;
+        position: fixed; top: 0; left: 0; right: 0; bottom: 0;
         background: var(--bg-space);
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
+        display: flex; flex-direction: column; align-items: center; justify-content: center;
         z-index: 3000;
     }
-    
     .loading-screen.hidden { display: none; }
-    
     .loading-spinner {
         width: 60px; height: 60px;
-        border: 3px solid var(--border);
-        border-top-color: var(--primary);
-        border-radius: 50%;
-        animation: spin 1s linear infinite;
-        margin-bottom: 20px;
+        border: 3px solid var(--border); border-top-color: var(--primary);
+        border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 20px;
     }
-    
     @keyframes spin { to { transform: rotate(360deg); } }
-    
-    .loading-text {
-        font-family: 'Orbitron', sans-serif;
-        font-size: 14px;
-        color: var(--text-muted);
-        letter-spacing: 2px;
-    }
+    .loading-text { font-family: 'Orbitron', sans-serif; font-size: 14px; color: var(--text-muted); letter-spacing: 2px; }
     
     /* Navbar */
     .navbar {
-        position: fixed;
-        top: 0; left: 0; right: 0;
-        height: var(--nav-height);
-        background: rgba(10, 10, 26, 0.95);
-        backdrop-filter: blur(20px);
-        border-bottom: 1px solid var(--border);
-        z-index: 1000;
-        display: flex;
-        align-items: center;
-        padding: 0 24px;
+        position: fixed; top: 0; left: 0; right: 0; height: var(--nav-height);
+        background: rgba(10, 10, 26, 0.95); backdrop-filter: blur(20px);
+        border-bottom: 1px solid var(--border); z-index: 1000;
+        display: flex; align-items: center; padding: 0 24px;
     }
-    
     .nav-logo {
-        font-family: 'Orbitron', sans-serif;
-        font-size: 22px;
-        font-weight: 900;
-        background: var(--gradient-energy);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        cursor: pointer;
-        margin-right: 40px;
+        font-family: 'Orbitron', sans-serif; font-size: 22px; font-weight: 900;
+        background: var(--gradient-energy); -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        cursor: pointer; margin-right: 40px;
     }
-    
     .nav-links { display: flex; gap: 8px; flex: 1; }
-    
     .nav-link {
-        padding: 10px 18px;
-        border-radius: 10px;
-        color: var(--text-muted);
-        font-size: 14px;
-        font-weight: 500;
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        transition: 0.2s;
+        padding: 10px 18px; border-radius: 10px; color: var(--text-muted);
+        font-size: 14px; font-weight: 500; cursor: pointer;
+        display: flex; align-items: center; gap: 8px; transition: 0.2s;
     }
-    
     .nav-link:hover { color: var(--text); background: var(--bg-hover); }
     .nav-link.active { color: var(--primary); background: rgba(0, 245, 212, 0.1); }
     .nav-link.locked { opacity: 0.4; cursor: not-allowed; }
-    
     .nav-right { display: flex; align-items: center; gap: 16px; }
-    
     .entropy-badge {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        background: var(--bg-card);
-        border: 1px solid var(--border);
-        padding: 8px 16px;
-        border-radius: 25px;
+        display: flex; align-items: center; gap: 10px;
+        background: var(--bg-card); border: 1px solid var(--border);
+        padding: 8px 16px; border-radius: 25px;
     }
-    
     .entropy-icon {
-        width: 24px; height: 24px;
-        background: var(--gradient-energy);
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 12px;
+        width: 24px; height: 24px; background: var(--gradient-energy);
+        border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px;
     }
-    
-    .entropy-value {
-        font-family: 'Orbitron', sans-serif;
-        font-size: 16px;
-        font-weight: 700;
-        color: var(--energy);
-    }
-    
+    .entropy-value { font-family: 'Orbitron', sans-serif; font-size: 16px; font-weight: 700; color: var(--energy); }
     .user-menu { position: relative; }
-    
     .user-profile {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        cursor: pointer;
-        padding: 6px 12px;
-        border-radius: 25px;
+        display: flex; align-items: center; gap: 12px;
+        cursor: pointer; padding: 6px 12px; border-radius: 25px;
     }
-    
     .user-profile:hover { background: var(--bg-hover); }
-    
-    .user-avatar {
-        width: 36px; height: 36px;
-        border-radius: 50%;
-        border: 2px solid var(--primary);
-    }
-    
+    .user-avatar { width: 36px; height: 36px; border-radius: 50%; border: 2px solid var(--primary); }
     .user-name { font-size: 14px; font-weight: 600; }
-    
     .user-dropdown {
-        position: absolute;
-        top: 100%;
-        right: 0;
-        margin-top: 8px;
-        background: var(--bg-card-solid);
-        border: 1px solid var(--border);
-        border-radius: 12px;
-        padding: 8px;
-        min-width: 160px;
-        display: none;
-        z-index: 1001;
+        position: absolute; top: 100%; right: 0; margin-top: 8px;
+        background: var(--bg-card-solid); border: 1px solid var(--border);
+        border-radius: 12px; padding: 8px; min-width: 160px; display: none; z-index: 1001;
     }
-    
     .user-dropdown.show { display: block; }
-    
     .dropdown-item {
-        padding: 10px 16px;
-        border-radius: 8px;
-        cursor: pointer;
-        font-size: 14px;
-        display: flex;
-        align-items: center;
-        gap: 10px;
+        padding: 10px 16px; border-radius: 8px; cursor: pointer;
+        font-size: 14px; display: flex; align-items: center; gap: 10px;
     }
-    
     .dropdown-item:hover { background: var(--bg-hover); }
     .dropdown-item.danger { color: var(--danger); }
     
-    .main-content {
-        padding-top: var(--nav-height);
-        min-height: 100vh;
-    }
-    
-    .page-container {
-        max-width: 1400px;
-        margin: 0 auto;
-        padding: 24px;
-    }
+    .main-content { padding-top: var(--nav-height); min-height: 100vh; }
+    .page-container { max-width: 1400px; margin: 0 auto; padding: 24px; }
     
     /* Buttons */
     .btn {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        gap: 8px;
-        padding: 12px 24px;
-        border: none;
-        border-radius: 12px;
-        font-size: 14px;
-        font-weight: 600;
-        cursor: pointer;
-        transition: 0.2s;
-        font-family: inherit;
+        display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+        padding: 12px 24px; border: none; border-radius: 12px;
+        font-size: 14px; font-weight: 600; cursor: pointer; transition: 0.2s; font-family: inherit;
     }
-    
     .btn:hover { transform: translateY(-2px); }
     .btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
-    
     .btn-primary { background: var(--gradient-cosmic); color: white; }
     .btn-energy { background: var(--gradient-energy); color: #1a1a2e; }
     .btn-outline { background: transparent; border: 1px solid var(--border); color: var(--text); }
     .btn-outline:hover { border-color: var(--primary); color: var(--primary); }
     .btn-danger { background: var(--danger); color: white; }
     .btn-success { background: var(--success); color: white; }
-    
-    .btn-google {
-        background: white;
-        color: #333;
-        padding: 14px 32px;
-        font-size: 15px;
-    }
+    .btn-google { background: white; color: #333; padding: 14px 32px; font-size: 15px; }
     .btn-google img { width: 20px; height: 20px; }
-    
     .btn-lg { padding: 16px 40px; font-size: 16px; }
     .btn-sm { padding: 8px 16px; font-size: 13px; }
     .btn-block { width: 100%; }
     
-    /* Input */
     .input {
-        width: 100%;
-        padding: 12px 16px;
-        background: var(--bg-input);
-        border: 1px solid var(--border);
-        border-radius: 12px;
-        color: var(--text);
-        font-size: 14px;
-        font-family: inherit;
-        outline: none;
-        transition: 0.2s;
+        width: 100%; padding: 12px 16px; background: var(--bg-input);
+        border: 1px solid var(--border); border-radius: 12px;
+        color: var(--text); font-size: 14px; font-family: inherit; outline: none; transition: 0.2s;
     }
-    
     .input:focus { border-color: var(--primary); }
     .input::placeholder { color: var(--text-dark); }
-    
     .input-group { margin-bottom: 16px; }
     .input-label { display: block; font-size: 13px; color: var(--text-muted); margin-bottom: 8px; }
     
-    /* Cards */
     .card {
-        background: var(--bg-card);
-        border: 1px solid var(--border);
-        border-radius: 20px;
-        padding: 24px;
+        background: var(--bg-card); border: 1px solid var(--border);
+        border-radius: 20px; padding: 24px;
     }
-    
     .card-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 20px;
-        padding-bottom: 16px;
-        border-bottom: 1px solid var(--border);
+        display: flex; justify-content: space-between; align-items: center;
+        margin-bottom: 20px; padding-bottom: 16px; border-bottom: 1px solid var(--border);
     }
+    .card-title { font-family: 'Orbitron', sans-serif; font-size: 16px; font-weight: 700; }
     
-    .card-title {
-        font-family: 'Orbitron', sans-serif;
-        font-size: 16px;
-        font-weight: 700;
-    }
-    
-    /* Progress */
-    .progress-bar {
-        height: 8px;
-        background: rgba(123, 44, 191, 0.2);
-        border-radius: 4px;
-        overflow: hidden;
-    }
-    
-    .progress-fill {
-        height: 100%;
-        background: var(--gradient-evolution);
-        border-radius: 4px;
-        transition: width 0.3s;
-    }
+    .progress-bar { height: 8px; background: rgba(123, 44, 191, 0.2); border-radius: 4px; overflow: hidden; }
+    .progress-fill { height: 100%; background: var(--gradient-evolution); border-radius: 4px; transition: width 0.3s; }
     
     .stage-progress {
-        display: flex;
-        align-items: center;
-        gap: 6px;
-        padding: 16px 20px;
-        background: var(--bg-card);
-        border: 1px solid var(--border);
-        border-radius: 30px;
-        overflow-x: auto;
+        display: flex; align-items: center; gap: 6px;
+        padding: 16px 20px; background: var(--bg-card);
+        border: 1px solid var(--border); border-radius: 30px; overflow-x: auto;
     }
-    
     .stage-dot {
-        width: 32px; height: 32px;
-        min-width: 32px;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 12px;
-        background: var(--bg-input);
-        border: 2px solid var(--border);
+        width: 32px; height: 32px; min-width: 32px; border-radius: 50%;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 12px; background: var(--bg-input); border: 2px solid var(--border);
     }
-    
     .stage-dot.completed { background: var(--gradient-energy); border-color: var(--energy); }
     .stage-dot.current { background: var(--gradient-evolution); border-color: var(--accent); }
     .stage-dot.locked { opacity: 0.4; }
-    
     .stage-line { flex: 1; height: 2px; background: var(--border); min-width: 20px; max-width: 30px; }
     .stage-line.completed { background: var(--gradient-energy); }
     
-    /* Modal */
     .modal-overlay {
-        position: fixed;
-        top: 0; left: 0; right: 0; bottom: 0;
-        background: rgba(0, 0, 0, 0.85);
-        display: none;
-        align-items: center;
-        justify-content: center;
-        z-index: 2000;
-        backdrop-filter: blur(5px);
+        position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+        background: rgba(0, 0, 0, 0.85); display: none;
+        align-items: center; justify-content: center; z-index: 2000; backdrop-filter: blur(5px);
     }
-    
     .modal-overlay.active { display: flex; }
-    
     .modal {
-        background: var(--bg-card-solid);
-        border: 1px solid var(--border);
-        border-radius: 24px;
-        padding: 32px;
-        max-width: 500px;
-        width: 90%;
-        max-height: 90vh;
-        overflow-y: auto;
+        background: var(--bg-card-solid); border: 1px solid var(--border);
+        border-radius: 24px; padding: 32px; max-width: 600px; width: 90%; max-height: 90vh; overflow-y: auto;
     }
-    
-    .modal-title {
-        font-family: 'Orbitron', sans-serif;
-        font-size: 20px;
-        font-weight: 700;
-        margin-bottom: 8px;
-        text-align: center;
-    }
-    
-    .modal-desc {
-        color: var(--text-muted);
-        font-size: 14px;
-        margin-bottom: 24px;
-        text-align: center;
-        line-height: 1.6;
-    }
-    
+    .modal-title { font-family: 'Orbitron', sans-serif; font-size: 20px; font-weight: 700; margin-bottom: 8px; text-align: center; }
+    .modal-desc { color: var(--text-muted); font-size: 14px; margin-bottom: 24px; text-align: center; line-height: 1.6; }
     .modal-preview { display: flex; justify-content: center; margin-bottom: 24px; }
     .modal-actions { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
     
-    /* Toast */
-    .toast-container {
-        position: fixed;
-        top: 80px;
-        right: 24px;
-        z-index: 2000;
-        display: flex;
-        flex-direction: column;
-        gap: 12px;
-    }
-    
+    .toast-container { position: fixed; top: 80px; right: 24px; z-index: 2000; display: flex; flex-direction: column; gap: 12px; }
     .toast {
-        background: var(--bg-card-solid);
-        border: 1px solid var(--border);
-        border-radius: 12px;
-        padding: 16px 20px;
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        min-width: 300px;
-        animation: slideIn 0.3s ease;
+        background: var(--bg-card-solid); border: 1px solid var(--border);
+        border-radius: 12px; padding: 16px 20px;
+        display: flex; align-items: center; gap: 12px; min-width: 300px; animation: slideIn 0.3s ease;
     }
-    
     .toast.success { border-color: var(--success); }
     .toast.error { border-color: var(--danger); }
-    
-    @keyframes slideIn {
-        from { transform: translateX(100%); opacity: 0; }
-        to { transform: translateX(0); opacity: 1; }
-    }
+    @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
     
     /* Login */
     .login-page {
-        min-height: 100vh;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        padding: 40px 20px;
-        text-align: center;
+        min-height: 100vh; display: flex; flex-direction: column;
+        align-items: center; justify-content: center; padding: 40px 20px; text-align: center;
     }
-    
     .login-logo {
-        font-family: 'Orbitron', sans-serif;
-        font-size: 56px;
-        font-weight: 900;
-        background: var(--gradient-energy);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
+        font-family: 'Orbitron', sans-serif; font-size: 56px; font-weight: 900;
+        background: var(--gradient-energy); -webkit-background-clip: text; -webkit-text-fill-color: transparent;
         margin-bottom: 8px;
     }
-    
     .login-subtitle { font-size: 18px; color: var(--text-muted); margin-bottom: 40px; }
     .login-cell { width: 150px; height: 150px; margin-bottom: 40px; }
-    
-    .login-story {
-        max-width: 400px;
-        font-size: 15px;
-        color: var(--text-muted);
-        line-height: 1.8;
-        margin-bottom: 40px;
-    }
-    
+    .login-story { max-width: 400px; font-size: 15px; color: var(--text-muted); line-height: 1.8; margin-bottom: 40px; }
     .login-story strong { color: var(--primary); }
     
-    .login-divider {
-        display: flex;
-        align-items: center;
-        gap: 16px;
-        margin: 24px 0;
-        color: var(--text-dark);
-        font-size: 13px;
-    }
-    
-    .login-divider::before, .login-divider::after {
-        content: '';
-        flex: 1;
-        height: 1px;
-        background: var(--border);
-    }
-    
     /* Dashboard */
-    .dashboard-grid {
-        display: grid;
-        grid-template-columns: 320px 1fr;
-        gap: 24px;
-    }
-    
+    .dashboard-grid { display: grid; grid-template-columns: 320px 1fr; gap: 24px; }
     @media (max-width: 1024px) { .dashboard-grid { grid-template-columns: 1fr; } }
     
     .entity-card { position: relative; overflow: hidden; }
     .entity-card::before {
-        content: '';
-        position: absolute;
-        top: 0; left: 0; right: 0;
-        height: 3px;
-        background: var(--gradient-evolution);
+        content: ''; position: absolute; top: 0; left: 0; right: 0;
+        height: 3px; background: var(--gradient-evolution);
     }
-    
-    .entity-visual {
-        width: 180px; height: 180px;
-        margin: 0 auto 16px;
-        cursor: pointer;
-        position: relative;
-    }
-    
-    .entity-visual:hover::after {
-        content: '✏️ 수정';
-        position: absolute;
-        bottom: 0;
-        left: 50%;
-        transform: translateX(-50%);
-        background: rgba(0,0,0,0.8);
-        padding: 4px 12px;
-        border-radius: 12px;
-        font-size: 12px;
-    }
-    
+    .entity-visual { width: 180px; height: 180px; margin: 0 auto 16px; cursor: pointer; position: relative; }
     .entity-stage-label {
-        font-family: 'Orbitron', sans-serif;
-        font-size: 11px;
-        color: var(--accent);
-        letter-spacing: 2px;
-        text-align: center;
-        margin-bottom: 8px;
+        font-family: 'Orbitron', sans-serif; font-size: 11px; color: var(--accent);
+        letter-spacing: 2px; text-align: center; margin-bottom: 8px;
     }
-    
     .entity-name {
-        font-family: 'Orbitron', sans-serif;
-        font-size: 18px;
-        font-weight: 700;
-        text-align: center;
-        margin-bottom: 8px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 8px;
+        font-family: 'Orbitron', sans-serif; font-size: 18px; font-weight: 700;
+        text-align: center; margin-bottom: 8px; display: flex; align-items: center; justify-content: center; gap: 8px;
     }
-    
     .entity-name .edit-btn {
-        background: none;
-        border: none;
-        color: var(--text-muted);
-        cursor: pointer;
-        font-size: 14px;
-        padding: 4px;
-        border-radius: 4px;
+        background: none; border: none; color: var(--text-muted);
+        cursor: pointer; font-size: 14px; padding: 4px; border-radius: 4px;
     }
-    
     .entity-name .edit-btn:hover { color: var(--primary); background: var(--bg-hover); }
-    
-    .entity-id {
-        font-size: 12px;
-        color: var(--text-dark);
-        text-align: center;
-        margin-bottom: 20px;
-    }
-    
-    .entity-stats {
-        display: grid;
-        grid-template-columns: repeat(2, 1fr);
-        gap: 12px;
-    }
-    
+    .entity-id { font-size: 12px; color: var(--text-dark); text-align: center; margin-bottom: 20px; }
+    .entity-stats { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
     .stat-box {
-        background: rgba(0, 245, 212, 0.05);
-        border: 1px solid rgba(0, 245, 212, 0.1);
-        border-radius: 12px;
-        padding: 12px;
-        text-align: center;
+        background: rgba(0, 245, 212, 0.05); border: 1px solid rgba(0, 245, 212, 0.1);
+        border-radius: 12px; padding: 12px; text-align: center;
     }
-    
-    .stat-value {
-        font-family: 'Orbitron', sans-serif;
-        font-size: 20px;
-        font-weight: 700;
-        color: var(--primary);
-    }
-    
+    .stat-value { font-family: 'Orbitron', sans-serif; font-size: 20px; font-weight: 700; color: var(--primary); }
     .stat-label { font-size: 11px; color: var(--text-muted); margin-top: 4px; }
     
-    .quick-actions {
-        display: grid;
-        grid-template-columns: repeat(4, 1fr);
-        gap: 12px;
-        margin-bottom: 24px;
-    }
-    
+    .quick-actions { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 24px; }
     @media (max-width: 768px) { .quick-actions { grid-template-columns: repeat(2, 1fr); } }
-    
     .quick-action {
-        background: var(--bg-card);
-        border: 1px solid var(--border);
-        border-radius: 16px;
-        padding: 20px;
-        text-align: center;
-        cursor: pointer;
-        transition: 0.2s;
+        background: var(--bg-card); border: 1px solid var(--border);
+        border-radius: 16px; padding: 20px; text-align: center; cursor: pointer; transition: 0.2s;
     }
-    
     .quick-action:hover { border-color: var(--primary); transform: translateY(-4px); }
     .quick-action.locked { opacity: 0.4; cursor: not-allowed; }
     .quick-action.locked:hover { transform: none; border-color: var(--border); }
-    
     .quick-action-icon { font-size: 28px; margin-bottom: 8px; }
     .quick-action-label { font-size: 12px; color: var(--text-muted); }
     
-    /* History */
     .history-entry {
-        background: var(--bg-input);
-        border-radius: 12px;
-        padding: 16px;
-        margin-bottom: 12px;
-        border-left: 3px solid var(--secondary);
+        background: var(--bg-input); border-radius: 12px; padding: 16px;
+        margin-bottom: 12px; border-left: 3px solid var(--secondary);
     }
-    
-    .history-chapter {
-        font-family: 'Orbitron', sans-serif;
-        font-size: 11px;
-        color: var(--accent);
-        margin-bottom: 6px;
-    }
-    
+    .history-chapter { font-family: 'Orbitron', sans-serif; font-size: 11px; color: var(--accent); margin-bottom: 6px; }
     .history-title { font-weight: 700; margin-bottom: 8px; }
     .history-content { font-size: 13px; color: var(--text-muted); line-height: 1.6; }
     
-    /* Cell Customization */
-    .cell-customizer {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 16px;
-        margin-bottom: 24px;
+    /* Parts Customizer */
+    .parts-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; margin-bottom: 24px; }
+    .part-item {
+        background: var(--bg-input); border: 2px solid var(--border);
+        border-radius: 12px; padding: 16px; text-align: center; cursor: pointer; transition: 0.2s;
     }
+    .part-item:hover { border-color: var(--primary); }
+    .part-item.selected { border-color: var(--primary); background: rgba(0, 245, 212, 0.1); }
+    .part-item.locked { opacity: 0.5; }
+    .part-icon { font-size: 24px; margin-bottom: 8px; }
+    .part-name { font-size: 11px; color: var(--text-muted); }
+    .part-cost { font-size: 10px; color: var(--energy); margin-top: 4px; }
     
-    .color-picker-group { display: flex; flex-direction: column; gap: 8px; }
-    .color-picker-label { font-size: 12px; color: var(--text-muted); }
-    
-    .color-picker {
-        width: 100%;
-        height: 40px;
-        border: none;
-        border-radius: 8px;
-        cursor: pointer;
-        background: var(--bg-input);
+    /* Tech Tree */
+    .tech-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 12px; }
+    .tech-item {
+        background: var(--bg-input); border: 2px solid var(--border);
+        border-radius: 12px; padding: 16px; text-align: center; cursor: pointer; transition: 0.2s;
     }
+    .tech-item:hover { border-color: var(--secondary); }
+    .tech-item.unlocked { border-color: var(--success); background: rgba(16, 185, 129, 0.1); }
+    .tech-item.available { border-color: var(--energy); }
+    .tech-item.locked { opacity: 0.4; cursor: not-allowed; }
+    .tech-icon { font-size: 28px; margin-bottom: 8px; }
+    .tech-name { font-size: 12px; font-weight: 600; margin-bottom: 4px; }
+    .tech-cost { font-size: 11px; color: var(--energy); }
+    .tech-desc { font-size: 10px; color: var(--text-dark); margin-top: 4px; }
     
-    .pattern-selector {
-        display: grid;
-        grid-template-columns: repeat(4, 1fr);
-        gap: 8px;
+    /* Territory Grid */
+    .territory-grid {
+        display: grid; grid-template-columns: repeat(10, 1fr); gap: 4px;
+        background: var(--bg-input); padding: 16px; border-radius: 16px; margin-bottom: 16px;
     }
-    
-    .pattern-option {
-        padding: 10px;
-        background: var(--bg-input);
-        border: 2px solid var(--border);
-        border-radius: 8px;
-        cursor: pointer;
-        text-align: center;
-        font-size: 12px;
-        transition: 0.2s;
+    .territory-cell {
+        aspect-ratio: 1; background: rgba(255,255,255,0.02);
+        border: 1px solid var(--border); border-radius: 4px;
+        cursor: pointer; transition: 0.2s; display: flex;
+        align-items: center; justify-content: center; font-size: 12px; position: relative;
     }
-    
-    .pattern-option:hover { border-color: var(--primary); }
-    .pattern-option.selected { border-color: var(--primary); background: rgba(0, 245, 212, 0.1); }
-    
-    .randomize-btn { width: 100%; margin-top: 16px; }
+    .territory-cell:hover { border-color: var(--primary); background: rgba(0, 245, 212, 0.1); }
+    .territory-cell.explored { background: rgba(0, 245, 212, 0.15); border-color: var(--primary); }
+    .territory-cell.other-owner { background: rgba(247, 37, 133, 0.15); border-color: var(--accent); }
+    .territory-cell.has-life { background: rgba(16, 185, 129, 0.2); }
+    .territory-cell .owner-tag {
+        position: absolute; bottom: 2px; right: 2px;
+        font-size: 6px; background: var(--accent); padding: 1px 3px; border-radius: 2px;
+    }
     
     /* World Canvas */
-    #worldCanvas {
-        position: fixed;
-        top: 0; left: 0;
-        width: 100vw; height: 100vh;
-        z-index: 500;
-        display: none;
-    }
-    
+    #worldCanvas { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 500; display: none; }
     #worldCanvas.active { display: block; }
     
-    /* World UI */
     .world-ui {
-        position: fixed;
-        top: 0; left: 0; right: 0;
-        padding: 20px;
-        display: none;
-        justify-content: space-between;
-        align-items: flex-start;
-        z-index: 600;
-        pointer-events: none;
+        position: fixed; top: 0; left: 0; right: 0; padding: 20px;
+        display: none; justify-content: space-between; align-items: flex-start;
+        z-index: 600; pointer-events: none;
     }
-    
     .world-ui.active { display: flex; }
     .world-ui > * { pointer-events: auto; }
-    
     .world-left { display: flex; flex-direction: column; gap: 12px; }
-    
     .world-entropy-box {
-        background: rgba(10, 10, 26, 0.9);
-        border: 1px solid var(--border);
-        border-radius: 16px;
-        padding: 16px 24px;
-        backdrop-filter: blur(10px);
+        background: rgba(10, 10, 26, 0.9); border: 1px solid var(--border);
+        border-radius: 16px; padding: 16px 24px; backdrop-filter: blur(10px);
     }
-    
-    .world-entropy-label {
-        font-family: 'Orbitron', sans-serif;
-        font-size: 11px;
-        color: var(--text-muted);
-        letter-spacing: 2px;
-    }
-    
+    .world-entropy-label { font-family: 'Orbitron', sans-serif; font-size: 11px; color: var(--text-muted); letter-spacing: 2px; }
     .world-entropy-value {
-        font-family: 'Orbitron', sans-serif;
-        font-size: 32px;
-        font-weight: 900;
-        background: var(--gradient-energy);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
+        font-family: 'Orbitron', sans-serif; font-size: 32px; font-weight: 900;
+        background: var(--gradient-energy); -webkit-background-clip: text; -webkit-text-fill-color: transparent;
     }
-    
     .world-nav-buttons { display: flex; gap: 8px; flex-wrap: wrap; }
-    
     .world-nav-btn {
-        background: rgba(10, 10, 26, 0.9);
-        border: 1px solid var(--border);
-        border-radius: 12px;
-        padding: 10px 16px;
-        color: var(--text);
-        font-size: 13px;
-        cursor: pointer;
-        backdrop-filter: blur(10px);
-        display: flex;
-        align-items: center;
-        gap: 6px;
-        transition: 0.2s;
+        background: rgba(10, 10, 26, 0.9); border: 1px solid var(--border);
+        border-radius: 12px; padding: 10px 16px; color: var(--text);
+        font-size: 13px; cursor: pointer; backdrop-filter: blur(10px);
+        display: flex; align-items: center; gap: 6px; transition: 0.2s;
     }
-    
     .world-nav-btn:hover { border-color: var(--primary); color: var(--primary); }
-    
-    .world-nav-btn.next-stage {
-        background: var(--gradient-energy);
-        color: #1a1a2e;
-        border: none;
-        font-weight: 700;
-    }
-    
+    .world-nav-btn.next-stage { background: var(--gradient-energy); color: #1a1a2e; border: none; font-weight: 700; }
     .world-nav-btn.next-stage:disabled { opacity: 0.5; cursor: not-allowed; }
-    
     .world-info-panel {
-        background: rgba(10, 10, 26, 0.9);
-        border: 1px solid var(--border);
-        border-radius: 16px;
-        padding: 16px 20px;
-        backdrop-filter: blur(10px);
-        min-width: 200px;
+        background: rgba(10, 10, 26, 0.9); border: 1px solid var(--border);
+        border-radius: 16px; padding: 16px 20px; backdrop-filter: blur(10px); min-width: 200px;
     }
-    
-    .world-info-title {
-        font-family: 'Orbitron', sans-serif;
-        font-size: 12px;
-        color: var(--secondary);
-        margin-bottom: 12px;
-    }
-    
+    .world-info-title { font-family: 'Orbitron', sans-serif; font-size: 12px; color: var(--secondary); margin-bottom: 12px; }
     .world-controls {
-        position: fixed;
-        bottom: 20px; right: 20px;
-        background: rgba(10, 10, 26, 0.9);
-        border: 1px solid var(--border);
-        border-radius: 12px;
-        padding: 12px 16px;
-        font-size: 11px;
-        color: var(--text-dark);
-        z-index: 600;
-        display: none;
+        position: fixed; bottom: 20px; right: 20px;
+        background: rgba(10, 10, 26, 0.9); border: 1px solid var(--border);
+        border-radius: 12px; padding: 12px 16px; font-size: 11px;
+        color: var(--text-dark); z-index: 600; display: none;
     }
-    
     .world-controls.active { display: block; }
     .world-controls div { margin-bottom: 4px; }
-    .world-controls .key {
-        display: inline-block;
-        padding: 2px 8px;
-        background: var(--bg-input);
-        border-radius: 4px;
-        margin-right: 4px;
-    }
+    .world-controls .key { display: inline-block; padding: 2px 8px; background: var(--bg-input); border-radius: 4px; margin-right: 4px; }
     
-    /* Encounter Dialog */
     .encounter-dialog {
-        position: fixed;
-        bottom: 100px;
-        left: 50%;
-        transform: translateX(-50%);
-        background: rgba(10, 10, 26, 0.95);
-        border: 2px solid var(--secondary);
-        border-radius: 20px;
-        padding: 24px 32px;
-        text-align: center;
-        z-index: 700;
-        min-width: 400px;
-        display: none;
+        position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%);
+        background: rgba(10, 10, 26, 0.95); border: 2px solid var(--secondary);
+        border-radius: 20px; padding: 24px 32px; text-align: center;
+        z-index: 700; min-width: 400px; max-width: 90%; display: none;
     }
-    
     .encounter-dialog.active { display: block; }
-    
-    .encounter-title {
-        font-family: 'Orbitron', sans-serif;
-        font-size: 16px;
-        margin-bottom: 8px;
-    }
-    
-    .encounter-desc {
-        font-size: 14px;
-        color: var(--text-muted);
-        margin-bottom: 16px;
-        line-height: 1.6;
-    }
-    
-    .encounter-choices {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 8px;
-    }
-    
+    .encounter-title { font-family: 'Orbitron', sans-serif; font-size: 16px; margin-bottom: 8px; }
+    .encounter-desc { font-size: 14px; color: var(--text-muted); margin-bottom: 16px; line-height: 1.6; }
+    .encounter-choices { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
     .encounter-choice {
-        padding: 12px 16px;
-        background: var(--bg-input);
-        border: 1px solid var(--border);
-        border-radius: 10px;
-        cursor: pointer;
-        transition: 0.2s;
-        font-size: 13px;
+        padding: 12px 16px; background: var(--bg-input);
+        border: 1px solid var(--border); border-radius: 10px; cursor: pointer; transition: 0.2s; font-size: 13px;
     }
-    
-    .encounter-choice:hover {
-        border-color: var(--primary);
-        background: rgba(0, 245, 212, 0.1);
-    }
-    
+    .encounter-choice:hover { border-color: var(--primary); background: rgba(0, 245, 212, 0.1); }
     .encounter-choice .choice-title { font-weight: 700; margin-bottom: 4px; }
     .encounter-choice .choice-effect { font-size: 11px; color: var(--text-muted); }
     
-    /* Signal Puzzle */
-    .puzzle-container {
-        display: grid;
-        grid-template-columns: repeat(4, 1fr);
-        gap: 8px;
-        margin: 24px 0;
-    }
-    
-    .puzzle-cell {
-        aspect-ratio: 1;
-        background: var(--bg-input);
-        border: 2px solid var(--border);
-        border-radius: 8px;
-        cursor: pointer;
-        transition: 0.2s;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 20px;
-    }
-    
-    .puzzle-cell:hover { border-color: var(--primary); }
-    .puzzle-cell.active { background: var(--primary); border-color: var(--primary); }
-    .puzzle-cell.correct { background: var(--success); border-color: var(--success); }
-    .puzzle-cell.wrong { background: var(--danger); border-color: var(--danger); }
-    
-    /* Resource Bar */
-    .resource-bar {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        margin-bottom: 12px;
-    }
-    
-    .resource-icon { font-size: 20px; }
-    .resource-name { font-size: 13px; flex: 1; }
-    .resource-value {
-        font-family: 'Orbitron', sans-serif;
-        font-size: 14px;
-        color: var(--primary);
-    }
-    
-    .resource-progress {
-        width: 100px;
-        height: 8px;
-        background: var(--bg-input);
-        border-radius: 4px;
-        overflow: hidden;
-    }
-    
-    .resource-progress-fill {
-        height: 100%;
-        background: var(--gradient-energy);
-        transition: width 0.3s;
-    }
-    
-    /* Planet Grid */
-    .planet-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
-        gap: 4px;
-        background: var(--bg-input);
-        padding: 16px;
-        border-radius: 16px;
-        margin-bottom: 24px;
-    }
-    
-    .territory-cell {
-        aspect-ratio: 1;
-        background: rgba(0, 245, 212, 0.05);
-        border: 1px solid var(--border);
-        border-radius: 4px;
-        cursor: pointer;
-        transition: 0.2s;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 10px;
-    }
-    
-    .territory-cell:hover { border-color: var(--primary); background: rgba(0, 245, 212, 0.1); }
-    .territory-cell.owned { background: rgba(0, 245, 212, 0.2); border-color: var(--primary); }
-    
-    /* Evolution Alert */
-    .evo-alert {
-        position: fixed;
-        top: 50%; left: 50%;
-        transform: translate(-50%, -50%) scale(0);
-        background: rgba(10, 10, 26, 0.95);
-        border: 2px solid var(--secondary);
-        border-radius: 24px;
-        padding: 40px 60px;
-        text-align: center;
-        z-index: 700;
-        opacity: 0;
-        transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
-    }
-    
-    .evo-alert.show { transform: translate(-50%, -50%) scale(1); opacity: 1; }
-    .evo-alert-icon { font-size: 64px; margin-bottom: 16px; }
-    
-    .evo-alert-title {
-        font-family: 'Orbitron', sans-serif;
-        font-size: 24px;
-        font-weight: 900;
-        background: var(--gradient-energy);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        margin-bottom: 8px;
-    }
-    
-    .evo-alert-desc { font-size: 14px; color: var(--text-muted); margin-bottom: 12px; }
-    
-    .evo-alert-effect {
-        padding: 10px 20px;
-        background: rgba(0, 245, 212, 0.1);
-        border-radius: 20px;
-        font-size: 13px;
-        color: var(--primary);
-    }
-    
-    /* Story Overlay */
     .story-overlay {
-        position: fixed;
-        top: 0; left: 0; right: 0; bottom: 0;
-        background: rgba(0, 0, 0, 0.9);
-        display: none;
-        align-items: center;
-        justify-content: center;
-        z-index: 800;
+        position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+        background: rgba(0, 0, 0, 0.9); display: none;
+        align-items: center; justify-content: center; z-index: 800;
     }
-    
     .story-overlay.active { display: flex; }
-    
-    .story-content {
-        max-width: 600px;
-        text-align: center;
-        padding: 40px;
-    }
-    
+    .story-content { max-width: 600px; text-align: center; padding: 40px; }
     .story-icon { font-size: 80px; margin-bottom: 24px; }
-    
     .story-title {
-        font-family: 'Orbitron', sans-serif;
-        font-size: 32px;
-        font-weight: 900;
-        margin-bottom: 16px;
-        background: var(--gradient-energy);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
+        font-family: 'Orbitron', sans-serif; font-size: 32px; font-weight: 900; margin-bottom: 16px;
+        background: var(--gradient-energy); -webkit-background-clip: text; -webkit-text-fill-color: transparent;
     }
-    
-    .story-text {
-        font-size: 16px;
-        line-height: 1.8;
-        color: var(--text-muted);
-        margin-bottom: 32px;
-    }
-    
+    .story-text { font-size: 16px; line-height: 1.8; color: var(--text-muted); margin-bottom: 32px; }
     .story-text strong { color: var(--primary); }
     
-    /* Utilities */
+    .evo-alert {
+        position: fixed; top: 50%; left: 50%;
+        transform: translate(-50%, -50%) scale(0);
+        background: rgba(10, 10, 26, 0.95); border: 2px solid var(--secondary);
+        border-radius: 24px; padding: 40px 60px; text-align: center;
+        z-index: 700; opacity: 0; transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    .evo-alert.show { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+    .evo-alert-icon { font-size: 64px; margin-bottom: 16px; }
+    .evo-alert-title {
+        font-family: 'Orbitron', sans-serif; font-size: 24px; font-weight: 900;
+        background: var(--gradient-energy); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 8px;
+    }
+    .evo-alert-desc { font-size: 14px; color: var(--text-muted); margin-bottom: 12px; }
+    .evo-alert-effect { padding: 10px 20px; background: rgba(0, 245, 212, 0.1); border-radius: 20px; font-size: 13px; color: var(--primary); }
+    
+    .tax-banner {
+        background: linear-gradient(90deg, rgba(247, 37, 133, 0.2), rgba(123, 44, 191, 0.2));
+        border: 1px solid var(--accent); border-radius: 12px;
+        padding: 12px 20px; margin-bottom: 16px;
+        display: flex; justify-content: space-between; align-items: center;
+    }
+    .tax-info { font-size: 13px; }
+    .tax-amount { font-family: 'Orbitron', sans-serif; font-size: 16px; color: var(--accent); }
+    
+    .invite-section {
+        background: var(--bg-input); border-radius: 12px; padding: 16px; margin-top: 16px;
+    }
+    .invite-code {
+        font-family: 'Orbitron', sans-serif; font-size: 18px; color: var(--primary);
+        background: var(--bg-card); padding: 12px 20px; border-radius: 8px;
+        text-align: center; margin: 12px 0; letter-spacing: 2px;
+    }
+    
     .hidden { display: none !important; }
     .text-center { text-align: center; }
     .text-muted { color: var(--text-muted); }
@@ -1025,16 +453,13 @@
 <body>
     <div id="space-bg"></div>
     <div id="stars"></div>
-    
     <div class="loading-screen" id="loadingScreen">
         <div class="loading-spinner"></div>
         <div class="loading-text">INITIALIZING...</div>
     </div>
-    
     <div id="app"></div>
     <canvas id="worldCanvas"></canvas>
     
-    <!-- World UI Panels -->
     <div class="world-ui" id="worldUI">
         <div class="world-left">
             <div class="world-entropy-box">
@@ -1045,17 +470,13 @@
         </div>
         <div class="world-info-panel" id="worldInfoPanel"></div>
     </div>
-    
     <div class="world-controls" id="worldControls"></div>
-    
-    <!-- Encounter Dialog -->
     <div class="encounter-dialog" id="encounterDialog">
         <div class="encounter-title" id="encounterTitle">조우</div>
         <div class="encounter-desc" id="encounterDesc">설명</div>
         <div class="encounter-choices" id="encounterChoices"></div>
     </div>
     
-    <!-- Story Overlay -->
     <div class="story-overlay" id="storyOverlay">
         <div class="story-content">
             <div class="story-icon" id="storyIcon">🌌</div>
@@ -1065,36 +486,16 @@
         </div>
     </div>
     
-    <!-- Modals -->
     <div class="modal-overlay" id="editCellModal">
         <div class="modal">
             <h2 class="modal-title">🧬 세포 커스터마이징</h2>
-            <p class="modal-desc">나만의 세포를 만들어보세요</p>
+            <p class="modal-desc">파츠 변경 시 1,000 엔트로피가 소모됩니다</p>
             <div class="modal-preview"><canvas id="cellPreview" width="150" height="150"></canvas></div>
             <div class="input-group">
-                <label class="input-label">세포 이름</label>
+                <label class="input-label">세포 이름 (무료)</label>
                 <input type="text" class="input" id="cellNameInput" placeholder="이름을 입력하세요" maxlength="20">
             </div>
-            <div class="cell-customizer">
-                <div class="color-picker-group">
-                    <label class="color-picker-label">주 색상</label>
-                    <input type="color" class="color-picker" id="primaryColorPicker" value="#00f5d4">
-                </div>
-                <div class="color-picker-group">
-                    <label class="color-picker-label">보조 색상</label>
-                    <input type="color" class="color-picker" id="secondaryColorPicker" value="#7b2cbf">
-                </div>
-            </div>
-            <div class="input-group">
-                <label class="input-label">패턴</label>
-                <div class="pattern-selector" id="patternSelector">
-                    <div class="pattern-option selected" data-pattern="none">없음</div>
-                    <div class="pattern-option" data-pattern="spots">점박이</div>
-                    <div class="pattern-option" data-pattern="stripes">줄무늬</div>
-                    <div class="pattern-option" data-pattern="glow">발광</div>
-                </div>
-            </div>
-            <button class="btn btn-outline randomize-btn" onclick="window.randomizeCellDesign()">🎲 랜덤 생성</button>
+            <div id="partsCustomizer"></div>
             <div class="modal-actions mt-24">
                 <button class="btn btn-outline" onclick="window.closeEditModal()">취소</button>
                 <button class="btn btn-primary" onclick="window.saveCellDesign()">저장</button>
@@ -1102,14 +503,14 @@
         </div>
     </div>
     
-    <div class="modal-overlay" id="puzzleModal">
+    <div class="modal-overlay" id="exploreModal">
         <div class="modal">
-            <h2 class="modal-title">📡 신호 해독</h2>
-            <p class="modal-desc" id="puzzleDesc">패턴을 따라 순서대로 클릭하세요</p>
-            <div class="puzzle-container" id="puzzleContainer"></div>
-            <p class="text-muted text-center" id="puzzleStatus">패턴을 기억하세요...</p>
+            <h2 class="modal-title" id="exploreTitle">🔍 탐험 결과</h2>
+            <p class="modal-desc" id="exploreDesc">설명</p>
+            <div class="modal-preview"><span style="font-size:80px" id="exploreIcon">🌿</span></div>
+            <div id="exploreReward"></div>
             <div class="modal-actions mt-24">
-                <button class="btn btn-outline" onclick="window.closePuzzleModal()">나중에</button>
+                <button class="btn btn-primary" onclick="window.closeExploreModal()">확인</button>
             </div>
         </div>
     </div>
@@ -1123,8 +524,23 @@
         </div>
     </div>
     
-    <div class="toast-container" id="toastContainer"></div>
+    <div class="modal-overlay" id="inviteModal">
+        <div class="modal">
+            <h2 class="modal-title">📡 초대 코드</h2>
+            <p class="modal-desc">이 코드를 공유하여 다른 사용자를 초대하세요</p>
+            <div class="invite-code" id="inviteCode">XXXX-XXXX</div>
+            <div class="input-group mt-24">
+                <label class="input-label">초대 코드 입력</label>
+                <input type="text" class="input" id="joinCodeInput" placeholder="코드를 입력하세요">
+            </div>
+            <div class="modal-actions mt-16">
+                <button class="btn btn-outline" onclick="window.closeInviteModal()">닫기</button>
+                <button class="btn btn-primary" onclick="window.joinPlanet()">방문하기</button>
+            </div>
+        </div>
+    </div>
     
+    <div class="toast-container" id="toastContainer"></div>
     <div class="evo-alert" id="evoAlert">
         <div class="evo-alert-icon" id="evoAlertIcon">👁️</div>
         <div class="evo-alert-title" id="evoAlertTitle">진화!</div>
@@ -1134,7 +550,7 @@
     
     <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-    import { getFirestore, doc, setDoc, getDoc, updateDoc, collection, addDoc, query, where, orderBy, limit, getDocs, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+    import { getFirestore, doc, setDoc, getDoc, updateDoc, collection, query, where, getDocs, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
     import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
     
     const firebaseConfig = {
@@ -1152,36 +568,45 @@
     const googleProvider = new GoogleAuthProvider();
     
     // ========================================
-    // CONSTANTS
+    // CONSTANTS & GENERATORS
     // ========================================
-    const STAGES = {
-        CELL: 1,
-        DRIFT: 1.5,
-        LANDING: 2,
-        PLANET: 3,
-        SIGNAL: 3.5,
-        GALAXY: 4,
-        CONQUEST: 5
-    };
+    const EYE_TYPES = ['round', 'oval', 'slit', 'compound', 'glowing', 'hidden'];
+    const ARM_TYPES = ['tentacle', 'claw', 'feeler', 'pseudopod', 'branching', 'none'];
+    const LEG_TYPES = ['bipod', 'tripod', 'multipod', 'tail', 'floating', 'none'];
+    const WING_TYPES = ['membrane', 'feathered', 'energy', 'fin', 'none'];
+    const BRAIN_TYPES = ['internal', 'crown', 'halo', 'antenna', 'distributed', 'none'];
+    const PATTERNS = ['none', 'spots', 'stripes', 'glow', 'camo', 'geometric'];
     
-    const STAGE_NAMES = {
-        1: '세포',
-        1.5: '표류',
-        2: '낙하',
-        3: '정착',
-        3.5: '신호',
-        4: '은하',
-        5: '정복'
-    };
+    const TECH_TREE = [
+        { id: 'fire', name: '불', icon: '🔥', cost: 100, requires: [], desc: '문명의 시작' },
+        { id: 'tools', name: '도구', icon: '🔨', cost: 200, requires: ['fire'], desc: '생산성 향상' },
+        { id: 'agriculture', name: '농업', icon: '🌾', cost: 300, requires: ['tools'], desc: '자원 생산' },
+        { id: 'writing', name: '문자', icon: '📜', cost: 400, requires: ['agriculture'], desc: '기록의 시작' },
+        { id: 'wheel', name: '바퀴', icon: '⚙️', cost: 500, requires: ['tools'], desc: '이동성 향상' },
+        { id: 'metal', name: '금속', icon: '⚒️', cost: 600, requires: ['fire', 'tools'], desc: '자원 채굴' },
+        { id: 'electricity', name: '전기', icon: '⚡', cost: 1000, requires: ['metal'], desc: '에너지 혁명' },
+        { id: 'radio', name: '무선 전파', icon: '📡', cost: 1500, requires: ['electricity', 'writing'], desc: '초대 가능' },
+        { id: 'computer', name: '컴퓨터', icon: '💻', cost: 2000, requires: ['electricity'], desc: '자동화' },
+        { id: 'rocket', name: '로켓', icon: '🚀', cost: 3000, requires: ['metal', 'computer'], desc: '다른 행성 방문' },
+        { id: 'fusion', name: '핵융합', icon: '☀️', cost: 5000, requires: ['rocket'], desc: '무한 에너지' },
+    ];
+    
+    const EXPLORE_EVENTS = [
+        { type: 'empty', weight: 30, icon: '🏜️', title: '빈 땅', desc: '아무것도 없는 황무지입니다.', entropy: 0 },
+        { type: 'resource', weight: 25, icon: '💎', title: '자원 발견!', desc: '귀중한 자원을 발견했습니다!', entropy: 50 },
+        { type: 'life', weight: 15, icon: '🦠', title: '생명체 발견!', desc: '원시적인 생명체를 발견했습니다!', entropy: 100, life: true },
+        { type: 'ruins', weight: 10, icon: '🏛️', title: '고대 유적', desc: '오래된 문명의 흔적을 발견했습니다!', entropy: 150 },
+        { type: 'danger', weight: 10, icon: '☠️', title: '위험 지역', desc: '위험한 환경입니다! 에너지를 잃었습니다.', entropy: -50 },
+        { type: 'artifact', weight: 5, icon: '🔮', title: '고대 유물!', desc: '신비로운 유물을 발견했습니다!', entropy: 300 },
+        { type: 'portal', weight: 5, icon: '🌀', title: '차원 균열', desc: '이상한 에너지가 흐르고 있습니다...', entropy: 200 },
+    ];
     
     const PLANET_NAMES = ['Kepler-22b', 'Proxima-B', 'Trappist-1e', 'Gliese-581g', 'HD-40307g', 'Tau-Ceti-e', 'Wolf-1061c', 'Ross-128b'];
     const PLANET_TYPES = ['생명체 서식 가능 행성', '얼음 행성', '사막 행성', '해양 행성', '화산 행성', '고대 문명 흔적 행성'];
     
-    // Cell Design Generator
     function generateCellDesign() {
         const hue1 = Math.floor(Math.random() * 360);
         const hue2 = (hue1 + 60 + Math.floor(Math.random() * 120)) % 360;
-        const patterns = ['none', 'spots', 'stripes', 'glow'];
         const adjectives = ['빛나는', '어둠의', '고대의', '신비로운', '영원한', '잊혀진', '깨어난', '떠도는'];
         const nouns = ['의식', '세포', '존재', '영혼', '파동', '에너지', '생명체', '탐험가'];
         
@@ -1189,7 +614,12 @@
             name: adjectives[Math.floor(Math.random() * adjectives.length)] + ' ' + nouns[Math.floor(Math.random() * nouns.length)],
             primaryColor: `hsl(${hue1}, 80%, 60%)`,
             secondaryColor: `hsl(${hue2}, 70%, 40%)`,
-            pattern: patterns[Math.floor(Math.random() * patterns.length)],
+            pattern: PATTERNS[Math.floor(Math.random() * PATTERNS.length)],
+            eyeType: EYE_TYPES[Math.floor(Math.random() * EYE_TYPES.length)],
+            armType: ARM_TYPES[Math.floor(Math.random() * ARM_TYPES.length)],
+            legType: LEG_TYPES[Math.floor(Math.random() * LEG_TYPES.length)],
+            wingType: WING_TYPES[Math.floor(Math.random() * WING_TYPES.length)],
+            brainType: BRAIN_TYPES[Math.floor(Math.random() * BRAIN_TYPES.length)],
             wobblePoints: 8 + Math.floor(Math.random() * 6),
             wobbleIntensity: 0.5 + Math.random() * 0.5,
             glowIntensity: 0.3 + Math.random() * 0.5
@@ -1197,8 +627,8 @@
     }
     
     function hslToHex(hsl) {
-        const match = hsl.match(/hsl\((\d+),\s*(\d+)%,\s*(\d+)%\)/);
-        if (!match) return hsl;
+        const match = hsl?.match?.(/hsl\((\d+),\s*(\d+)%,\s*(\d+)%\)/);
+        if (!match) return hsl || '#00f5d4';
         let h = parseInt(match[1]) / 360, s = parseInt(match[2]) / 100, l = parseInt(match[3]) / 100;
         let r, g, b;
         if (s === 0) { r = g = b = l; }
@@ -1212,11 +642,22 @@
         return `#${toHex(r)}${toHex(g)}${toHex(b)}`;
     }
     
+    function generateInviteCode(uid) {
+        const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+        let code = '';
+        for (let i = 0; i < 8; i++) {
+            if (i === 4) code += '-';
+            code += chars[Math.floor(Math.random() * chars.length)];
+        }
+        return code;
+    }
+    
     // State
     const State = {
         user: null,
         userData: null,
         currentPage: 'login',
+        visitingPlanet: null,
         game: {
             entropy: 0,
             stage: 1,
@@ -1227,10 +668,10 @@
             cellDesign: null,
             driftProgress: 0,
             mergedCells: 0,
-            resources: { metal: 0, energy: 0, fuel: 0 },
-            signalDecoded: false,
-            shipBuilt: false,
-            firstContact: null
+            tech: [],
+            inviteCode: null,
+            occupiedTerritories: [],
+            lastTaxTime: null
         },
         
         async sync() {
@@ -1250,6 +691,11 @@
                     if (data.game) this.game = { ...this.game, ...data.game };
                 }
             } catch (e) { console.error('Load error:', e); }
+        },
+        
+        calculateTax() {
+            const occupied = this.game.occupiedTerritories?.length || 0;
+            return occupied * 5;
         }
     };
     
@@ -1310,14 +756,14 @@
         else if (p === 'drift') startCosmicDrift();
         else if (p === 'landing') startPlanetLanding();
         else if (p === 'planet') renderPlanet();
-        else if (p === 'signal') renderSignal();
+        else if (p === 'tech') renderTech();
         else if (p === 'history') renderHistory();
         else renderPlaceholder(p);
     }
     
-    // Draw Cell
+    // Draw Cell with parts
     function drawCell(ctx, x, y, size, design, evolution, time = 0) {
-        const d = design || { primaryColor: '#00f5d4', secondaryColor: '#7b2cbf', pattern: 'none', wobblePoints: 12, wobbleIntensity: 1, glowIntensity: 0.5 };
+        const d = design || generateCellDesign();
         const points = d.wobblePoints || 12;
         
         ctx.save();
@@ -1325,6 +771,7 @@
         
         if (d.pattern === 'glow' || d.glowIntensity > 0.5) { ctx.shadowColor = d.primaryColor; ctx.shadowBlur = 20 * (d.glowIntensity || 0.5); }
         
+        // Body
         ctx.beginPath();
         for (let i = 0; i < points; i++) {
             const angle = (i / points) * Math.PI * 2;
@@ -1344,6 +791,7 @@
         ctx.fill();
         ctx.shadowBlur = 0;
         
+        // Pattern
         if (d.pattern === 'spots') {
             ctx.fillStyle = 'rgba(255,255,255,0.3)';
             for (let i = 0; i < 5; i++) {
@@ -1361,57 +809,232 @@
                 ctx.lineTo(i * size * 0.3, size);
                 ctx.stroke();
             }
+        } else if (d.pattern === 'geometric') {
+            ctx.strokeStyle = 'rgba(255,255,255,0.2)';
+            ctx.lineWidth = 2;
+            for (let i = 0; i < 6; i++) {
+                const a = (i / 6) * Math.PI * 2;
+                ctx.beginPath();
+                ctx.moveTo(0, 0);
+                ctx.lineTo(Math.cos(a) * size, Math.sin(a) * size);
+                ctx.stroke();
+            }
         }
         
+        // Highlight
         ctx.beginPath();
         ctx.arc(-size * 0.25, -size * 0.25, size * 0.2, 0, Math.PI * 2);
         ctx.fillStyle = 'rgba(255,255,255,0.25)';
         ctx.fill();
         
+        // Parts (only if evolved)
         if (evolution) {
-            if (evolution.eye) {
-                ctx.beginPath();
-                ctx.arc(size * 0.35, -size * 0.1, size * 0.22, 0, Math.PI * 2);
-                ctx.fillStyle = '#fff';
-                ctx.fill();
-                ctx.beginPath();
-                ctx.arc(size * 0.38, -size * 0.08, size * 0.11, 0, Math.PI * 2);
-                ctx.fillStyle = '#1a1a2e';
-                ctx.fill();
+            // Eye
+            if (evolution.eye && d.eyeType !== 'hidden') {
+                const eyeX = size * 0.35, eyeY = -size * 0.1;
+                if (d.eyeType === 'round' || d.eyeType === 'oval') {
+                    ctx.beginPath();
+                    ctx.save();
+                    if (d.eyeType === 'oval') ctx.scale(1, 0.7);
+                    ctx.arc(eyeX, eyeY / (d.eyeType === 'oval' ? 0.7 : 1), size * 0.22, 0, Math.PI * 2);
+                    ctx.restore();
+                    ctx.fillStyle = '#fff';
+                    ctx.fill();
+                    ctx.beginPath();
+                    ctx.arc(eyeX + 2, eyeY, size * 0.11, 0, Math.PI * 2);
+                    ctx.fillStyle = '#1a1a2e';
+                    ctx.fill();
+                } else if (d.eyeType === 'slit') {
+                    ctx.fillStyle = '#fff';
+                    ctx.fillRect(eyeX - size * 0.15, eyeY - size * 0.05, size * 0.3, size * 0.1);
+                    ctx.fillStyle = '#1a1a2e';
+                    ctx.fillRect(eyeX - size * 0.02, eyeY - size * 0.04, size * 0.04, size * 0.08);
+                } else if (d.eyeType === 'compound') {
+                    for (let i = 0; i < 7; i++) {
+                        const a = (i / 7) * Math.PI * 2;
+                        ctx.beginPath();
+                        ctx.arc(eyeX + Math.cos(a) * size * 0.1, eyeY + Math.sin(a) * size * 0.1, size * 0.06, 0, Math.PI * 2);
+                        ctx.fillStyle = '#fff';
+                        ctx.fill();
+                    }
+                } else if (d.eyeType === 'glowing') {
+                    ctx.shadowColor = '#fff';
+                    ctx.shadowBlur = 15;
+                    ctx.beginPath();
+                    ctx.arc(eyeX, eyeY, size * 0.15, 0, Math.PI * 2);
+                    ctx.fillStyle = `rgba(255,255,255,${0.5 + Math.sin(time * 0.1) * 0.3})`;
+                    ctx.fill();
+                    ctx.shadowBlur = 0;
+                }
             }
-            if (evolution.arm) {
+            
+            // Arm
+            if (evolution.arm && d.armType !== 'none') {
                 ctx.strokeStyle = d.secondaryColor;
-                ctx.lineWidth = size * 0.12;
+                ctx.lineWidth = size * 0.1;
                 ctx.lineCap = 'round';
-                ctx.beginPath();
-                ctx.moveTo(size * 0.7, size * 0.1);
-                ctx.quadraticCurveTo(size * 1.2, size * 0.3 + Math.sin(time * 0.15) * 8, size * 1.4, size * 0.2);
-                ctx.stroke();
+                
+                if (d.armType === 'tentacle') {
+                    ctx.beginPath();
+                    ctx.moveTo(size * 0.7, size * 0.1);
+                    ctx.quadraticCurveTo(size * 1.2, size * 0.3 + Math.sin(time * 0.15) * 8, size * 1.4, size * 0.2);
+                    ctx.stroke();
+                } else if (d.armType === 'claw') {
+                    ctx.beginPath();
+                    ctx.moveTo(size * 0.7, 0);
+                    ctx.lineTo(size * 1.2, -size * 0.2);
+                    ctx.lineTo(size * 1.1, 0);
+                    ctx.lineTo(size * 1.2, size * 0.2);
+                    ctx.stroke();
+                } else if (d.armType === 'branching') {
+                    ctx.beginPath();
+                    ctx.moveTo(size * 0.7, 0);
+                    ctx.lineTo(size * 1.1, 0);
+                    ctx.moveTo(size * 0.9, 0);
+                    ctx.lineTo(size * 1.1, -size * 0.2);
+                    ctx.moveTo(size * 0.9, 0);
+                    ctx.lineTo(size * 1.1, size * 0.2);
+                    ctx.stroke();
+                } else if (d.armType === 'pseudopod') {
+                    ctx.fillStyle = d.secondaryColor;
+                    ctx.beginPath();
+                    ctx.ellipse(size * 1.1, 0, size * 0.3, size * 0.15, Math.sin(time * 0.1) * 0.2, 0, Math.PI * 2);
+                    ctx.fill();
+                }
             }
-            if (evolution.leg) {
+            
+            // Leg
+            if (evolution.leg && d.legType !== 'none' && d.legType !== 'floating') {
                 const lw = Math.sin(time * 0.2) * 10;
                 ctx.strokeStyle = d.secondaryColor;
-                ctx.lineWidth = size * 0.15;
-                ctx.beginPath(); ctx.moveTo(size * 0.2, size * 0.7); ctx.lineTo(size * 0.15 + lw, size * 1.3); ctx.stroke();
-                ctx.beginPath(); ctx.moveTo(-size * 0.2, size * 0.7); ctx.lineTo(-size * 0.15 - lw, size * 1.3); ctx.stroke();
+                ctx.lineWidth = size * 0.12;
+                
+                if (d.legType === 'bipod') {
+                    ctx.beginPath(); ctx.moveTo(size * 0.15, size * 0.7); ctx.lineTo(size * 0.1 + lw, size * 1.3); ctx.stroke();
+                    ctx.beginPath(); ctx.moveTo(-size * 0.15, size * 0.7); ctx.lineTo(-size * 0.1 - lw, size * 1.3); ctx.stroke();
+                } else if (d.legType === 'tripod') {
+                    for (let i = 0; i < 3; i++) {
+                        const a = (i / 3) * Math.PI - Math.PI / 2 + Math.PI;
+                        ctx.beginPath();
+                        ctx.moveTo(Math.cos(a) * size * 0.3, size * 0.5);
+                        ctx.lineTo(Math.cos(a) * size * 0.5 + Math.sin(time * 0.2 + i) * 5, size * 1.2);
+                        ctx.stroke();
+                    }
+                } else if (d.legType === 'multipod') {
+                    for (let i = 0; i < 6; i++) {
+                        const ox = (i - 2.5) * size * 0.15;
+                        ctx.beginPath();
+                        ctx.moveTo(ox, size * 0.6);
+                        ctx.lineTo(ox + Math.sin(time * 0.2 + i) * 5, size * 1.1);
+                        ctx.stroke();
+                    }
+                } else if (d.legType === 'tail') {
+                    ctx.lineWidth = size * 0.15;
+                    ctx.beginPath();
+                    ctx.moveTo(0, size * 0.7);
+                    ctx.quadraticCurveTo(Math.sin(time * 0.15) * size * 0.5, size * 1.2, Math.sin(time * 0.1) * size * 0.3, size * 1.5);
+                    ctx.stroke();
+                }
             }
-            if (evolution.brain) {
-                ctx.beginPath();
-                ctx.arc(0, -size * 0.5, size * 0.2, 0, Math.PI * 2);
-                ctx.fillStyle = `rgba(254, 228, 64, ${Math.sin(time * 0.1) * 0.3 + 0.7})`;
-                ctx.fill();
+            
+            // Brain
+            if (evolution.brain && d.brainType !== 'none') {
+                if (d.brainType === 'crown') {
+                    ctx.fillStyle = `rgba(254, 228, 64, ${0.7 + Math.sin(time * 0.1) * 0.3})`;
+                    for (let i = 0; i < 5; i++) {
+                        const a = (i / 5) * Math.PI - Math.PI / 2;
+                        ctx.beginPath();
+                        ctx.moveTo(Math.cos(a - 0.15) * size * 0.4, -size * 0.5 + Math.sin(a - 0.15) * size * 0.2);
+                        ctx.lineTo(Math.cos(a) * size * 0.5, -size * 0.8);
+                        ctx.lineTo(Math.cos(a + 0.15) * size * 0.4, -size * 0.5 + Math.sin(a + 0.15) * size * 0.2);
+                        ctx.fill();
+                    }
+                } else if (d.brainType === 'halo') {
+                    ctx.strokeStyle = `rgba(254, 228, 64, ${0.5 + Math.sin(time * 0.1) * 0.3})`;
+                    ctx.lineWidth = 3;
+                    ctx.beginPath();
+                    ctx.ellipse(0, -size * 0.6, size * 0.4, size * 0.15, 0, 0, Math.PI * 2);
+                    ctx.stroke();
+                } else if (d.brainType === 'antenna') {
+                    ctx.strokeStyle = d.secondaryColor;
+                    ctx.lineWidth = 3;
+                    ctx.beginPath();
+                    ctx.moveTo(-size * 0.2, -size * 0.4);
+                    ctx.quadraticCurveTo(-size * 0.3, -size * 0.8, -size * 0.15, -size * 0.9);
+                    ctx.stroke();
+                    ctx.beginPath();
+                    ctx.moveTo(size * 0.2, -size * 0.4);
+                    ctx.quadraticCurveTo(size * 0.3, -size * 0.8, size * 0.15, -size * 0.9);
+                    ctx.stroke();
+                    ctx.fillStyle = `rgba(254, 228, 64, ${0.7 + Math.sin(time * 0.1) * 0.3})`;
+                    ctx.beginPath(); ctx.arc(-size * 0.15, -size * 0.9, size * 0.08, 0, Math.PI * 2); ctx.fill();
+                    ctx.beginPath(); ctx.arc(size * 0.15, -size * 0.9, size * 0.08, 0, Math.PI * 2); ctx.fill();
+                } else {
+                    ctx.beginPath();
+                    ctx.arc(0, -size * 0.5, size * 0.2, 0, Math.PI * 2);
+                    ctx.fillStyle = `rgba(254, 228, 64, ${0.7 + Math.sin(time * 0.1) * 0.3})`;
+                    ctx.fill();
+                }
             }
-            if (evolution.wing) {
+            
+            // Wing
+            if (evolution.wing && d.wingType !== 'none') {
                 const wf = Math.sin(time * 0.3) * 0.3;
-                ctx.fillStyle = `${d.primaryColor}88`;
-                ctx.save(); ctx.rotate(wf - 0.4);
-                ctx.beginPath(); ctx.moveTo(size * 0.4, -size * 0.2); ctx.quadraticCurveTo(size * 1.3, -size * 0.7, size * 1.8, -size * 0.15); ctx.quadraticCurveTo(size * 1.3, size * 0.1, size * 0.4, -size * 0.05); ctx.fill();
-                ctx.restore();
-                ctx.save(); ctx.scale(-1, 1); ctx.rotate(wf - 0.4);
-                ctx.beginPath(); ctx.moveTo(size * 0.4, -size * 0.2); ctx.quadraticCurveTo(size * 1.3, -size * 0.7, size * 1.8, -size * 0.15); ctx.quadraticCurveTo(size * 1.3, size * 0.1, size * 0.4, -size * 0.05); ctx.fill();
-                ctx.restore();
+                
+                if (d.wingType === 'membrane') {
+                    ctx.fillStyle = `${d.primaryColor}66`;
+                    ctx.save(); ctx.rotate(wf - 0.4);
+                    ctx.beginPath();
+                    ctx.moveTo(size * 0.3, -size * 0.2);
+                    ctx.quadraticCurveTo(size * 1.2, -size * 0.6, size * 1.6, -size * 0.1);
+                    ctx.quadraticCurveTo(size * 1.2, size * 0.1, size * 0.3, 0);
+                    ctx.fill();
+                    ctx.restore();
+                    ctx.save(); ctx.scale(-1, 1); ctx.rotate(wf - 0.4);
+                    ctx.beginPath();
+                    ctx.moveTo(size * 0.3, -size * 0.2);
+                    ctx.quadraticCurveTo(size * 1.2, -size * 0.6, size * 1.6, -size * 0.1);
+                    ctx.quadraticCurveTo(size * 1.2, size * 0.1, size * 0.3, 0);
+                    ctx.fill();
+                    ctx.restore();
+                } else if (d.wingType === 'feathered') {
+                    ctx.fillStyle = `${d.primaryColor}88`;
+                    for (let side = -1; side <= 1; side += 2) {
+                        ctx.save();
+                        ctx.scale(side, 1);
+                        ctx.rotate(wf * side - 0.3);
+                        for (let i = 0; i < 5; i++) {
+                            ctx.beginPath();
+                            ctx.ellipse(size * 0.6 + i * size * 0.15, -size * 0.2 + i * size * 0.05, size * 0.3, size * 0.08, -0.3, 0, Math.PI * 2);
+                            ctx.fill();
+                        }
+                        ctx.restore();
+                    }
+                } else if (d.wingType === 'energy') {
+                    ctx.strokeStyle = `rgba(0, 245, 212, ${0.5 + Math.sin(time * 0.2) * 0.3})`;
+                    ctx.lineWidth = 3;
+                    ctx.shadowColor = '#00f5d4';
+                    ctx.shadowBlur = 10;
+                    for (let side = -1; side <= 1; side += 2) {
+                        ctx.beginPath();
+                        ctx.moveTo(side * size * 0.3, -size * 0.1);
+                        ctx.lineTo(side * size * 1.2, -size * 0.5 + Math.sin(time * 0.2) * size * 0.1);
+                        ctx.lineTo(side * size * 1.0, -size * 0.1);
+                        ctx.lineTo(side * size * 1.3, size * 0.2 + Math.sin(time * 0.2 + 1) * size * 0.1);
+                        ctx.stroke();
+                    }
+                    ctx.shadowBlur = 0;
+                } else if (d.wingType === 'fin') {
+                    ctx.fillStyle = `${d.secondaryColor}88`;
+                    ctx.beginPath();
+                    ctx.moveTo(0, -size * 0.3);
+                    ctx.quadraticCurveTo(size * 0.3, -size * 0.8, 0, -size * 1.2);
+                    ctx.quadraticCurveTo(-size * 0.3, -size * 0.8, 0, -size * 0.3);
+                    ctx.fill();
+                }
             }
         }
+        
         ctx.restore();
     }
     
@@ -1424,7 +1047,7 @@
                 <div class="nav-links">
                     <div class="nav-link ${State.currentPage==='dashboard'?'active':''}" onclick="window.nav('dashboard')">🏠 대시보드</div>
                     <div class="nav-link ${s<3?'locked':''}" onclick="${s>=3?"window.nav('planet')":""}">🪐 행성 ${s<3?'🔒':''}</div>
-                    <div class="nav-link ${s<4?'locked':''}">🌌 은하 ${s<4?'🔒':''}</div>
+                    <div class="nav-link ${s<3?'locked':''}" onclick="${s>=3?"window.nav('tech')":""}">🔬 기술 ${s<3?'🔒':''}</div>
                     <div class="nav-link ${State.currentPage==='history'?'active':''}" onclick="window.nav('history')">📜 역사서</div>
                 </div>
                 <div class="nav-right">
@@ -1473,11 +1096,12 @@
             const ctx = canvas.getContext('2d');
             let t = 0;
             const randomDesign = generateCellDesign();
+            const fakeEvo = { eye: true, arm: true, leg: true, brain: true, wing: true };
             function animate() {
                 if (!document.getElementById('loginCellCanvas')) return;
                 t++;
                 ctx.clearRect(0, 0, 150, 150);
-                drawCell(ctx, 75, 75, 40, randomDesign, null, t);
+                drawCell(ctx, 75, 75, 35, randomDesign, fakeEvo, t);
                 requestAnimationFrame(animate);
             }
             animate();
@@ -1489,6 +1113,7 @@
         const { stage, entropy, evolution, history, cellDesign } = State.game;
         const evoCount = Object.values(evolution).filter(v => v).length;
         const design = cellDesign || generateCellDesign();
+        const tax = State.calculateTax();
         
         const stageNum = Math.floor(stage);
         const stageLabels = { 1: '세포', 2: '낙하', 3: '정착', 4: '은하', 5: '정복' };
@@ -1498,14 +1123,17 @@
         else if (stage === 1 && entropy >= 800) nextAction = `<button class="btn btn-energy btn-block mt-24" onclick="window.nav('drift')">🌠 우주로 표류하기</button>`;
         else if (stage === 1.5) nextAction = `<button class="btn btn-energy btn-block mt-24" onclick="window.nav('drift')">🌠 우주 표류 계속</button>`;
         else if (stage === 2) nextAction = `<button class="btn btn-energy btn-block mt-24" onclick="window.nav('landing')">🚀 행성 착륙</button>`;
-        else if (stage >= 3 && stage < 3.5) nextAction = `<button class="btn btn-primary btn-block mt-24" onclick="window.nav('planet')">🪐 행성 탐험</button>${!State.game.signalDecoded ? '<button class="btn btn-outline btn-block mt-16" onclick="window.nav(\'signal\')">📡 신호 탐지</button>' : ''}`;
-        else if (stage === 3.5) nextAction = `<button class="btn btn-energy btn-block mt-24" onclick="window.nav('signal')">📡 첫 번째 신호</button>`;
-        else if (stage >= 4) nextAction = `<button class="btn btn-primary btn-block mt-24">🌌 은하 탐험 (준비중)</button>`;
+        else if (stage >= 3) nextAction = `<button class="btn btn-primary btn-block mt-24" onclick="window.nav('planet')">🪐 행성 탐험</button>`;
         
         document.getElementById('app').innerHTML = `
             ${navbar()}
             <main class="main-content">
                 <div class="page-container">
+                    ${tax > 0 ? `<div class="tax-banner">
+                        <div class="tax-info">⚠️ 점령 영토 세금 (${State.game.occupiedTerritories?.length || 0}칸 × 5)</div>
+                        <div class="tax-amount">-${tax} / 일</div>
+                    </div>` : ''}
+                    
                     <div class="stage-progress mb-24">
                         <div class="stage-dot ${stage>=1?'completed':'locked'}">🦠</div>
                         <div class="stage-line ${stage>1?'completed':''}"></div>
@@ -1513,13 +1141,9 @@
                         <div class="stage-line ${stage>1.5?'completed':''}"></div>
                         <div class="stage-dot ${stage>=2?(stage===2?'current':'completed'):'locked'}">🚀</div>
                         <div class="stage-line ${stage>2?'completed':''}"></div>
-                        <div class="stage-dot ${stage>=3?(stage<3.5?'current':'completed'):'locked'}">🏕️</div>
+                        <div class="stage-dot ${stage>=3?(stage<4?'current':'completed'):'locked'}">🏕️</div>
                         <div class="stage-line ${stage>3?'completed':''}"></div>
-                        <div class="stage-dot ${stage>=3.5?(stage===3.5?'current':'completed'):'locked'}">📡</div>
-                        <div class="stage-line ${stage>3.5?'completed':''}"></div>
-                        <div class="stage-dot ${stage>=4?(stage===4?'current':'completed'):'locked'}">🌌</div>
-                        <div class="stage-line ${stage>4?'completed':''}"></div>
-                        <div class="stage-dot ${stage>=5?'current':'locked'}">👑</div>
+                        <div class="stage-dot ${stage>=4?'current':'locked'}">🌌</div>
                     </div>
                     
                     <div class="dashboard-grid">
@@ -1536,9 +1160,9 @@
                             <div class="progress-bar mb-16"><div class="progress-fill" style="width:${Math.min(entropy/800*100,100)}%"></div></div>
                             <div class="entity-stats">
                                 <div class="stat-box"><div class="stat-value">${evoCount}/5</div><div class="stat-label">진화</div></div>
-                                <div class="stat-box"><div class="stat-value">${State.game.mergedCells||0}</div><div class="stat-label">합체</div></div>
-                                <div class="stat-box"><div class="stat-value">${State.game.territories?.length||0}</div><div class="stat-label">영토</div></div>
-                                <div class="stat-box"><div class="stat-value">${Math.floor(State.game.driftProgress||0)}</div><div class="stat-label">표류</div></div>
+                                <div class="stat-box"><div class="stat-value">${State.game.territories?.length||0}</div><div class="stat-label">탐험</div></div>
+                                <div class="stat-box"><div class="stat-value">${State.game.occupiedTerritories?.length||0}</div><div class="stat-label">점령</div></div>
+                                <div class="stat-box"><div class="stat-value">${State.game.tech?.length||0}</div><div class="stat-label">기술</div></div>
                             </div>
                             ${nextAction}
                         </div>
@@ -1548,7 +1172,7 @@
                                 <div class="quick-action" onclick="window.nav('cell-world')"><div class="quick-action-icon">🦠</div><div class="quick-action-label">세포 세계</div></div>
                                 <div class="quick-action ${stage<1.5&&entropy<800?'locked':''}" onclick="${stage>=1.5||entropy>=800?"window.nav('drift')":""}"><div class="quick-action-icon">🌠</div><div class="quick-action-label">우주 표류</div></div>
                                 <div class="quick-action ${stage<3?'locked':''}" onclick="${stage>=3?"window.nav('planet')":""}"><div class="quick-action-icon">🪐</div><div class="quick-action-label">행성</div></div>
-                                <div class="quick-action" onclick="window.nav('history')"><div class="quick-action-icon">📜</div><div class="quick-action-label">역사서</div></div>
+                                <div class="quick-action ${stage<3?'locked':''}" onclick="${stage>=3?"window.nav('tech')":""}"><div class="quick-action-icon">🔬</div><div class="quick-action-label">기술</div></div>
                             </div>
                             <div class="card">
                                 <div class="card-header">
@@ -1603,8 +1227,7 @@
                     ${h.length===0?`
                         <div class="card text-center" style="padding:60px">
                             <p style="font-size:48px;margin-bottom:16px">📜</p>
-                            <p class="mb-8">아직 기록된 역사가 없습니다</p>
-                            <button class="btn btn-primary mt-24" onclick="window.nav('cell-world')">세포 세계 진입</button>
+                            <p>아직 기록된 역사가 없습니다</p>
                         </div>
                     `:h.map(e=>`
                         <div class="card mb-16">
@@ -1622,20 +1245,22 @@
     function renderPlanet() {
         const planet = State.game.currentPlanet || { name: '미지의 행성', type: '탐험 필요' };
         const territories = State.game.territories || [];
-        const res = State.game.resources || { metal: 0, energy: 0, fuel: 0 };
+        const hasRadio = State.game.tech?.includes('radio');
+        const hasRocket = State.game.tech?.includes('rocket');
         
         document.getElementById('app').innerHTML = `
             ${navbar()}
             <main class="main-content">
                 <div class="page-container">
-                    <div class="card mb-24" style="display:flex;align-items:center;gap:24px;padding:24px">
+                    <div class="card mb-24" style="display:flex;align-items:center;gap:24px;padding:24px;flex-wrap:wrap">
                         <span style="font-size:64px">🪐</span>
-                        <div>
+                        <div style="flex:1;min-width:200px">
                             <h1 class="font-display" style="font-size:28px">${planet.name}</h1>
                             <p class="text-muted">${planet.type}</p>
                         </div>
-                        <div style="margin-left:auto">
-                            ${!State.game.signalDecoded ? '<button class="btn btn-outline" onclick="window.nav(\'signal\')">📡 이상한 신호 탐지됨</button>' : State.game.firstContact ? '<span class="text-muted">📡 첫 접촉 완료</span>' : ''}
+                        <div style="display:flex;gap:12px;flex-wrap:wrap">
+                            ${hasRadio ? `<button class="btn btn-outline" onclick="window.openInviteModal()">📡 초대</button>` : `<button class="btn btn-outline" disabled title="무선 전파 기술 필요">📡 초대 🔒</button>`}
+                            ${hasRocket ? `<button class="btn btn-primary" onclick="window.visitOtherPlanet()">🚀 다른 행성</button>` : `<button class="btn btn-outline" disabled title="로켓 기술 필요">🚀 다른 행성 🔒</button>`}
                         </div>
                     </div>
                     
@@ -1644,331 +1269,337 @@
                             <div class="card mb-24">
                                 <div class="card-header">
                                     <span class="card-title">🗺️ 영토 지도</span>
-                                    <span class="text-muted" style="font-size:12px">${territories.length}/100</span>
+                                    <span class="text-muted" style="font-size:12px">${territories.length}/100 탐험</span>
                                 </div>
-                                <div class="planet-grid" id="planetGrid"></div>
-                                <p class="text-muted text-center" style="font-size:12px">클릭하여 영토 구매 (10 엔트로피)</p>
-                            </div>
-                            
-                            <div class="card">
-                                <div class="card-header"><span class="card-title">📦 자원</span></div>
-                                <div class="resource-bar">
-                                    <span class="resource-icon">🔩</span>
-                                    <span class="resource-name">금속</span>
-                                    <span class="resource-value">${res.metal}</span>
-                                </div>
-                                <div class="resource-bar">
-                                    <span class="resource-icon">⚡</span>
-                                    <span class="resource-name">에너지</span>
-                                    <span class="resource-value">${res.energy}</span>
-                                </div>
-                                <div class="resource-bar">
-                                    <span class="resource-icon">🛢️</span>
-                                    <span class="resource-name">연료</span>
-                                    <span class="resource-value">${res.fuel}</span>
-                                </div>
-                                <button class="btn btn-outline btn-block mt-16" onclick="window.gatherResources()">🔨 자원 수집 (+10 각)</button>
+                                <div class="territory-grid" id="planetGrid"></div>
+                                <button class="btn btn-energy btn-block" onclick="window.exploreRandomTerritory()">🔍 탐험하기 (-20 엔트로피)</button>
                             </div>
                         </div>
                         
-                        <div class="card">
-                            <div class="card-header"><span class="card-title">💬 행성 게시판</span></div>
-                            <div style="display:flex;gap:12px;margin-bottom:16px">
-                                <input type="text" class="input" id="postInput" placeholder="무슨 생각을 하고 있나요? (+100 엔트로피)">
-                                <button class="btn btn-primary" onclick="window.createPost()">작성</button>
+                        <div>
+                            <div class="card mb-24">
+                                <div class="card-header"><span class="card-title">📊 행성 통계</span></div>
+                                <div class="entity-stats">
+                                    <div class="stat-box"><div class="stat-value">${territories.length}</div><div class="stat-label">탐험 영토</div></div>
+                                    <div class="stat-box"><div class="stat-value">${territories.filter(t => t.hasLife).length}</div><div class="stat-label">생명체 발견</div></div>
+                                    <div class="stat-box"><div class="stat-value">${State.game.occupiedTerritories?.length || 0}</div><div class="stat-label">점령 영토</div></div>
+                                    <div class="stat-box"><div class="stat-value">${State.game.tech?.length || 0}</div><div class="stat-label">기술</div></div>
+                                </div>
                             </div>
-                            <div id="postsContainer"><p class="text-muted text-center" style="padding:20px">아직 게시글이 없습니다</p></div>
+                            
+                            <div class="card">
+                                <div class="card-header"><span class="card-title">🔬 기술 트리</span></div>
+                                <p class="text-muted mb-16">기술을 연구하여 문명을 발전시키세요</p>
+                                <button class="btn btn-primary btn-block" onclick="window.nav('tech')">기술 연구하기</button>
+                            </div>
                         </div>
                     </div>
                 </div>
             </main>
         `;
         renderPlanetGrid();
-        loadPosts();
     }
     
     function renderPlanetGrid() {
         const grid = document.getElementById('planetGrid');
         if (!grid) return;
         const territories = State.game.territories || [];
-        const ownedSet = new Set(territories.map(t => `${t.x},${t.y}`));
+        const occupied = State.game.occupiedTerritories || [];
+        const exploredSet = new Set(territories.map(t => `${t.x},${t.y}`));
+        const occupiedSet = new Set(occupied.map(t => `${t.x},${t.y}`));
+        
         let html = '';
         for (let y = 0; y < 10; y++) {
             for (let x = 0; x < 10; x++) {
-                const isOwned = ownedSet.has(`${x},${y}`);
-                html += `<div class="territory-cell ${isOwned ? 'owned' : ''}" onclick="window.clickTerritory(${x}, ${y})">${isOwned ? '🏠' : ''}</div>`;
+                const key = `${x},${y}`;
+                const isExplored = exploredSet.has(key);
+                const isOccupied = occupiedSet.has(key);
+                const territory = territories.find(t => t.x === x && t.y === y);
+                const hasLife = territory?.hasLife;
+                
+                let icon = '';
+                if (isExplored) {
+                    if (hasLife) icon = '🦠';
+                    else if (territory?.type === 'ruins') icon = '🏛️';
+                    else if (territory?.type === 'artifact') icon = '🔮';
+                    else icon = '✓';
+                }
+                
+                html += `<div class="territory-cell ${isExplored ? 'explored' : ''} ${hasLife ? 'has-life' : ''}" onclick="window.clickTerritory(${x}, ${y})">${icon}</div>`;
             }
         }
         grid.innerHTML = html;
     }
     
-    async function clickTerritory(x, y) {
+    async function exploreRandomTerritory() {
+        if (State.game.entropy < 20) {
+            showToast('엔트로피가 부족합니다 (20 필요)', 'error');
+            return;
+        }
+        
         const territories = State.game.territories || [];
-        if (territories.some(t => t.x === x && t.y === y)) { showToast('이미 소유한 영토입니다', 'info'); return; }
-        if (State.game.entropy < 10) { showToast('엔트로피가 부족합니다 (10 필요)', 'error'); return; }
-        State.game.entropy -= 10;
-        State.game.territories.push({ x, y });
+        const exploredSet = new Set(territories.map(t => `${t.x},${t.y}`));
+        
+        // Find unexplored
+        const unexplored = [];
+        for (let y = 0; y < 10; y++) {
+            for (let x = 0; x < 10; x++) {
+                if (!exploredSet.has(`${x},${y}`)) unexplored.push({ x, y });
+            }
+        }
+        
+        if (unexplored.length === 0) {
+            showToast('모든 영토를 탐험했습니다!', 'info');
+            return;
+        }
+        
+        State.game.entropy -= 20;
+        
+        const target = unexplored[Math.floor(Math.random() * unexplored.length)];
+        
+        // Random event
+        const totalWeight = EXPLORE_EVENTS.reduce((sum, e) => sum + e.weight, 0);
+        let rand = Math.random() * totalWeight;
+        let event = EXPLORE_EVENTS[0];
+        for (const e of EXPLORE_EVENTS) {
+            rand -= e.weight;
+            if (rand <= 0) { event = e; break; }
+        }
+        
+        const territory = { x: target.x, y: target.y, type: event.type, hasLife: event.life || false };
+        State.game.territories = [...territories, territory];
+        State.game.entropy += event.entropy;
+        
+        if (event.entropy > 0) {
+            State.game.history.push({
+                chapter: State.game.history.length + 1,
+                title: event.title,
+                content: `좌표 (${target.x}, ${target.y})에서 ${event.desc}`,
+                timestamp: new Date().toISOString()
+            });
+        }
+        
         await State.sync();
-        showToast(`🏠 영토 (${x}, ${y}) 구매 완료!`, 'success');
+        
+        document.getElementById('exploreIcon').textContent = event.icon;
+        document.getElementById('exploreTitle').textContent = event.title;
+        document.getElementById('exploreDesc').textContent = event.desc;
+        document.getElementById('exploreReward').innerHTML = event.entropy !== 0 ? `<p style="font-size:24px;font-weight:700;color:${event.entropy > 0 ? 'var(--success)' : 'var(--danger)'}">${event.entropy > 0 ? '+' : ''}${event.entropy} 엔트로피</p>` : '';
+        document.getElementById('exploreModal').classList.add('active');
+        
         renderPlanetGrid();
     }
     
-    async function gatherResources() {
-        State.game.resources = State.game.resources || { metal: 0, energy: 0, fuel: 0 };
-        State.game.resources.metal += 10;
-        State.game.resources.energy += 10;
-        State.game.resources.fuel += 10;
-        await State.sync();
-        showToast('📦 자원을 수집했습니다!', 'success');
+    function closeExploreModal() {
+        document.getElementById('exploreModal').classList.remove('active');
         render();
     }
     
-    async function loadPosts() {
-        const container = document.getElementById('postsContainer');
-        if (!container || !State.game.currentPlanet) return;
-        try {
-            const q = query(collection(db, 'posts'), where('planetName', '==', State.game.currentPlanet.name), orderBy('createdAt', 'desc'), limit(20));
-            const snap = await getDocs(q);
-            if (snap.empty) { container.innerHTML = '<p class="text-muted text-center" style="padding:20px">아직 게시글이 없습니다</p>'; return; }
-            container.innerHTML = snap.docs.map(doc => {
-                const p = doc.data();
-                return `<div style="background:var(--bg-input);border-radius:12px;padding:16px;margin-bottom:12px">
-                    <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px">
-                        <img style="width:32px;height:32px;border-radius:50%" src="${p.authorPhoto || 'https://via.placeholder.com/32'}">
-                        <div><div style="font-weight:600;font-size:14px">${p.authorName || 'Unknown'}</div></div>
-                    </div>
-                    <div style="font-size:14px;line-height:1.6">${p.content}</div>
-                </div>`;
-            }).join('');
-        } catch (e) { console.error(e); }
+    function clickTerritory(x, y) {
+        const territories = State.game.territories || [];
+        const territory = territories.find(t => t.x === x && t.y === y);
+        
+        if (!territory) {
+            showToast('먼저 탐험 버튼으로 탐험하세요', 'info');
+            return;
+        }
+        
+        showToast(`좌표 (${x}, ${y}): ${territory.type || '탐험됨'}${territory.hasLife ? ' - 생명체 서식' : ''}`, 'info');
     }
     
-    async function createPost() {
-        const input = document.getElementById('postInput');
-        const content = input.value.trim();
-        if (!content) { showToast('내용을 입력하세요', 'error'); return; }
-        try {
-            await addDoc(collection(db, 'posts'), {
-                planetName: State.game.currentPlanet.name,
-                content,
-                authorId: State.user.uid,
-                authorName: State.game.cellDesign?.name || State.user.displayName,
-                authorPhoto: State.user.photoURL,
-                createdAt: serverTimestamp()
-            });
-            State.game.entropy += 100;
-            await State.sync();
-            input.value = '';
-            showToast('📝 게시글 작성 완료! +100 엔트로피', 'success');
-            loadPosts();
-        } catch (e) { console.error(e); showToast('게시글 작성 실패', 'error'); }
-    }
-    
-    // Signal Page (Stage 3.5)
-    function renderSignal() {
-        const res = State.game.resources || { metal: 0, energy: 0, fuel: 0 };
-        const shipReady = res.metal >= 100 && res.energy >= 100 && res.fuel >= 100;
+    // Tech Tree
+    function renderTech() {
+        const unlockedTech = State.game.tech || [];
         
         document.getElementById('app').innerHTML = `
             ${navbar()}
             <main class="main-content">
-                <div class="page-container" style="max-width:800px">
-                    <h1 class="font-display text-center mb-8" style="font-size:32px">📡 첫 번째 신호</h1>
-                    <p class="text-muted text-center mb-24">하늘에서 이상한 신호가 들려왔다...</p>
+                <div class="page-container">
+                    <h1 class="font-display text-center mb-8" style="font-size:32px">🔬 기술 트리</h1>
+                    <p class="text-muted text-center mb-24">문명을 발전시켜 새로운 능력을 해금하세요</p>
                     
-                    <div class="card mb-24">
-                        <div class="card-header"><span class="card-title">1️⃣ 신호 해독</span></div>
-                        ${State.game.signalDecoded ? `
-                            <p class="text-center" style="color:var(--success)">✅ 신호 해독 완료!</p>
-                            <p class="text-muted text-center mt-16">좌표: X-742, Y-891, Z-0.3</p>
-                        ` : `
-                            <p class="text-muted text-center mb-16">신호를 해독하려면 퍼즐을 풀어야 합니다</p>
-                            <div class="text-center">
-                                <button class="btn btn-primary" onclick="window.startPuzzle()">🧩 퍼즐 시작</button>
-                            </div>
-                        `}
+                    <div class="card">
+                        <div class="tech-grid">
+                            ${TECH_TREE.map(tech => {
+                                const isUnlocked = unlockedTech.includes(tech.id);
+                                const canUnlock = !isUnlocked && tech.requires.every(r => unlockedTech.includes(r));
+                                const isLocked = !isUnlocked && !canUnlock;
+                                
+                                return `
+                                    <div class="tech-item ${isUnlocked ? 'unlocked' : canUnlock ? 'available' : 'locked'}" 
+                                         onclick="${canUnlock ? `window.unlockTech('${tech.id}')` : ''}">
+                                        <div class="tech-icon">${tech.icon}</div>
+                                        <div class="tech-name">${tech.name}</div>
+                                        <div class="tech-cost">${isUnlocked ? '✓ 완료' : tech.cost + ' ⚡'}</div>
+                                        <div class="tech-desc">${tech.desc}</div>
+                                    </div>
+                                `;
+                            }).join('')}
+                        </div>
                     </div>
                     
-                    <div class="card mb-24 ${!State.game.signalDecoded ? 'locked' : ''}" style="${!State.game.signalDecoded ? 'opacity:0.5' : ''}">
-                        <div class="card-header"><span class="card-title">2️⃣ 우주선 건조</span></div>
-                        <p class="text-muted mb-16">신호의 출처로 가려면 우주선이 필요합니다</p>
-                        <div class="resource-bar">
-                            <span class="resource-icon">🔩</span>
-                            <span class="resource-name">금속</span>
-                            <div class="resource-progress"><div class="resource-progress-fill" style="width:${Math.min(res.metal, 100)}%"></div></div>
-                            <span class="resource-value">${res.metal}/100</span>
-                        </div>
-                        <div class="resource-bar">
-                            <span class="resource-icon">⚡</span>
-                            <span class="resource-name">에너지</span>
-                            <div class="resource-progress"><div class="resource-progress-fill" style="width:${Math.min(res.energy, 100)}%"></div></div>
-                            <span class="resource-value">${res.energy}/100</span>
-                        </div>
-                        <div class="resource-bar">
-                            <span class="resource-icon">🛢️</span>
-                            <span class="resource-name">연료</span>
-                            <div class="resource-progress"><div class="resource-progress-fill" style="width:${Math.min(res.fuel, 100)}%"></div></div>
-                            <span class="resource-value">${res.fuel}/100</span>
-                        </div>
-                        ${shipReady && State.game.signalDecoded ? `<button class="btn btn-energy btn-block mt-16" onclick="window.buildShip()">🚀 우주선 건조</button>` : `<p class="text-muted text-center mt-16">자원이 부족합니다 (행성에서 수집)</p>`}
-                    </div>
-                    
-                    <div class="card ${!State.game.shipBuilt ? 'locked' : ''}" style="${!State.game.shipBuilt ? 'opacity:0.5' : ''}">
-                        <div class="card-header"><span class="card-title">3️⃣ 첫 접촉</span></div>
-                        ${State.game.firstContact ? `
-                            <p class="text-center" style="color:var(--success)">✅ ${State.game.firstContact === 'ally' ? '동맹을 맺었습니다!' : State.game.firstContact === 'battle' ? '전투에서 승리했습니다!' : '관찰을 완료했습니다!'}</p>
-                            <button class="btn btn-primary btn-block mt-16" onclick="window.enterGalaxy()">🌌 은하로 진출</button>
-                        ` : State.game.shipBuilt ? `
-                            <p class="text-muted text-center mb-16">신호의 출처에 도착했습니다. 고대 우주정거장이 보입니다.</p>
-                            <div class="modal-actions">
-                                <button class="btn btn-success" onclick="window.firstContact('ally')">🤝 동맹</button>
-                                <button class="btn btn-danger" onclick="window.firstContact('battle')">⚔️ 전투</button>
-                                <button class="btn btn-outline" onclick="window.firstContact('observe')">👁️ 관찰</button>
-                            </div>
-                        ` : `<p class="text-muted text-center">우주선을 먼저 건조하세요</p>`}
-                    </div>
-                    
-                    <button class="btn btn-outline btn-block mt-24" onclick="window.nav('planet')">← 행성으로 돌아가기</button>
+                    <button class="btn btn-outline btn-block mt-24" onclick="window.nav('planet')">← 행성으로</button>
                 </div>
             </main>
         `;
     }
     
-    let puzzlePattern = [];
-    let playerPattern = [];
-    let puzzlePhase = 'watch';
-    
-    function startPuzzle() {
-        document.getElementById('puzzleModal').classList.add('active');
-        puzzlePattern = [];
-        playerPattern = [];
-        for (let i = 0; i < 4; i++) puzzlePattern.push(Math.floor(Math.random() * 16));
+    async function unlockTech(techId) {
+        const tech = TECH_TREE.find(t => t.id === techId);
+        if (!tech) return;
         
-        let html = '';
-        for (let i = 0; i < 16; i++) {
-            html += `<div class="puzzle-cell" data-idx="${i}" onclick="window.clickPuzzleCell(${i})"></div>`;
-        }
-        document.getElementById('puzzleContainer').innerHTML = html;
-        document.getElementById('puzzleStatus').textContent = '패턴을 기억하세요...';
-        puzzlePhase = 'watch';
-        
-        showPattern(0);
-    }
-    
-    function showPattern(idx) {
-        if (idx >= puzzlePattern.length) {
-            puzzlePhase = 'input';
-            document.getElementById('puzzleStatus').textContent = '이제 따라하세요!';
+        if (State.game.entropy < tech.cost) {
+            showToast(`엔트로피가 부족합니다 (${tech.cost} 필요)`, 'error');
             return;
         }
         
-        setTimeout(() => {
-            const cells = document.querySelectorAll('.puzzle-cell');
-            cells[puzzlePattern[idx]].classList.add('active');
-            setTimeout(() => {
-                cells[puzzlePattern[idx]].classList.remove('active');
-                showPattern(idx + 1);
-            }, 500);
-        }, 600);
-    }
-    
-    function clickPuzzleCell(idx) {
-        if (puzzlePhase !== 'input') return;
-        
-        const cells = document.querySelectorAll('.puzzle-cell');
-        playerPattern.push(idx);
-        
-        const currentIdx = playerPattern.length - 1;
-        if (playerPattern[currentIdx] === puzzlePattern[currentIdx]) {
-            cells[idx].classList.add('correct');
-            setTimeout(() => cells[idx].classList.remove('correct'), 300);
-            
-            if (playerPattern.length === puzzlePattern.length) {
-                document.getElementById('puzzleStatus').textContent = '🎉 성공!';
-                State.game.signalDecoded = true;
-                State.game.stage = 3.5;
-                State.game.history.push({
-                    chapter: State.game.history.length + 1,
-                    title: '신호의 비밀',
-                    content: '오랜 시간 끝에 신호를 해독했다. 좌표가 나타났다... 누군가 우리를 부르고 있다.',
-                    timestamp: new Date().toISOString()
-                });
-                State.sync();
-                setTimeout(() => {
-                    closePuzzleModal();
-                    render();
-                }, 1000);
-            }
-        } else {
-            cells[idx].classList.add('wrong');
-            document.getElementById('puzzleStatus').textContent = '❌ 다시 시도하세요';
-            setTimeout(() => {
-                cells[idx].classList.remove('wrong');
-                playerPattern = [];
-                puzzlePhase = 'watch';
-                document.getElementById('puzzleStatus').textContent = '패턴을 기억하세요...';
-                showPattern(0);
-            }, 1000);
-        }
-    }
-    
-    function closePuzzleModal() {
-        document.getElementById('puzzleModal').classList.remove('active');
-    }
-    
-    async function buildShip() {
-        const res = State.game.resources;
-        if (res.metal < 100 || res.energy < 100 || res.fuel < 100) return;
-        
-        res.metal -= 100;
-        res.energy -= 100;
-        res.fuel -= 100;
-        State.game.shipBuilt = true;
+        State.game.entropy -= tech.cost;
+        State.game.tech = [...(State.game.tech || []), techId];
         State.game.history.push({
             chapter: State.game.history.length + 1,
-            title: '우주선 완성',
-            content: '드디어 우주선이 완성되었다. 신호의 출처를 향해 떠날 준비가 되었다.',
+            title: `${tech.name} 발명`,
+            content: `${tech.desc} - 문명이 한 단계 발전했다.`,
             timestamp: new Date().toISOString()
         });
+        
         await State.sync();
-        showToast('🚀 우주선 건조 완료!', 'success');
+        showToast(`🎉 ${tech.name} 기술 해금!`, 'success');
         render();
     }
     
-    async function firstContact(choice) {
-        State.game.firstContact = choice;
-        
-        let title, content;
-        if (choice === 'ally') {
-            title = '새로운 동맹';
-            content = '고대 우주정거장에서 오래된 문명의 후손들을 만났다. 그들은 우리를 환영했고, 은하 항해의 지식을 나누어주었다.';
-            State.game.entropy += 500;
-        } else if (choice === 'battle') {
-            title = '승리의 대가';
-            content = '정거장의 방어 시스템과 치열한 전투 끝에 승리했다. 고대 기술을 획득했지만, 그들의 문명은 사라졌다.';
-            State.game.entropy += 300;
-        } else {
-            title = '조용한 관찰자';
-            content = '멀리서 지켜보기만 했다. 그들은 우리의 존재를 알아채지 못했고, 많은 것을 배울 수 있었다.';
-            State.game.entropy += 200;
+    // Invite System
+    function openInviteModal() {
+        if (!State.game.inviteCode) {
+            State.game.inviteCode = generateInviteCode(State.user.uid);
+            State.sync();
         }
-        
-        State.game.history.push({ chapter: State.game.history.length + 1, title, content, timestamp: new Date().toISOString() });
-        await State.sync();
-        showToast(`✨ 첫 접촉 완료! +${choice === 'ally' ? 500 : choice === 'battle' ? 300 : 200} 엔트로피`, 'success');
-        render();
+        document.getElementById('inviteCode').textContent = State.game.inviteCode;
+        document.getElementById('inviteModal').classList.add('active');
     }
     
-    async function enterGalaxy() {
-        State.game.stage = 4;
-        State.game.history.push({
-            chapter: State.game.history.length + 1,
-            title: '은하를 향해',
-            content: '첫 접촉을 마치고, 드디어 은하로 나아갈 준비가 되었다. 새로운 별들이 기다리고 있다.',
-            timestamp: new Date().toISOString()
-        });
+    function closeInviteModal() {
+        document.getElementById('inviteModal').classList.remove('active');
+    }
+    
+    async function joinPlanet() {
+        const code = document.getElementById('joinCodeInput').value.trim().toUpperCase();
+        if (!code) {
+            showToast('초대 코드를 입력하세요', 'error');
+            return;
+        }
+        
+        // Find user with this invite code
+        const q = query(collection(db, 'users'), where('game.inviteCode', '==', code));
+        const snap = await getDocs(q);
+        
+        if (snap.empty) {
+            showToast('유효하지 않은 초대 코드입니다', 'error');
+            return;
+        }
+        
+        const hostData = snap.docs[0].data();
+        showToast(`🚀 ${hostData.game?.cellDesign?.name || 'Unknown'}의 행성으로 이동!`, 'success');
+        closeInviteModal();
+        
+        // TODO: Implement visiting other planets
+        State.visitingPlanet = hostData;
+    }
+    
+    function visitOtherPlanet() {
+        openInviteModal();
+    }
+    
+    // Edit Cell Modal
+    let previewAnimationId = null;
+    let tempDesign = null;
+    let pendingChanges = {};
+    
+    function openEditModal() {
+        const modal = document.getElementById('editCellModal');
+        modal.classList.add('active');
+        tempDesign = { ...(State.game.cellDesign || generateCellDesign()) };
+        pendingChanges = {};
+        document.getElementById('cellNameInput').value = tempDesign.name || '';
+        renderPartsCustomizer();
+        startPreviewAnimation();
+    }
+    
+    function renderPartsCustomizer() {
+        const container = document.getElementById('partsCustomizer');
+        
+        const parts = [
+            { key: 'eyeType', name: '눈', options: EYE_TYPES, icons: ['👁️', '👀', '🔲', '🪲', '✨', '❌'] },
+            { key: 'armType', name: '팔', options: ARM_TYPES, icons: ['🦑', '🦀', '🦗', '💧', '🌿', '❌'] },
+            { key: 'legType', name: '다리', options: LEG_TYPES, icons: ['🦵', '🔱', '🐙', '🐍', '🎈', '❌'] },
+            { key: 'wingType', name: '날개', options: WING_TYPES, icons: ['🦇', '🪶', '⚡', '🐟', '❌'] },
+            { key: 'brainType', name: '뇌', options: BRAIN_TYPES, icons: ['🧠', '👑', '😇', '📡', '🌐', '❌'] },
+        ];
+        
+        container.innerHTML = parts.map(part => `
+            <div class="input-group">
+                <label class="input-label">${part.name} (1,000 엔트로피)</label>
+                <div class="parts-grid" style="grid-template-columns: repeat(${part.options.length}, 1fr)">
+                    ${part.options.map((opt, i) => `
+                        <div class="part-item ${tempDesign[part.key] === opt ? 'selected' : ''}" 
+                             onclick="window.selectPart('${part.key}', '${opt}')">
+                            <div class="part-icon">${part.icons[i]}</div>
+                            <div class="part-name">${opt}</div>
+                        </div>
+                    `).join('')}
+                </div>
+            </div>
+        `).join('');
+    }
+    
+    function selectPart(key, value) {
+        if (tempDesign[key] !== value) {
+            pendingChanges[key] = value;
+            tempDesign[key] = value;
+            renderPartsCustomizer();
+        }
+    }
+    
+    function closeEditModal() {
+        document.getElementById('editCellModal').classList.remove('active');
+        if (previewAnimationId) cancelAnimationFrame(previewAnimationId);
+    }
+    
+    function startPreviewAnimation() {
+        const canvas = document.getElementById('cellPreview');
+        if (!canvas) return;
+        const ctx = canvas.getContext('2d');
+        let t = 0;
+        function animate() {
+            t++;
+            ctx.clearRect(0, 0, 150, 150);
+            drawCell(ctx, 75, 75, 35, tempDesign, State.game.evolution, t);
+            previewAnimationId = requestAnimationFrame(animate);
+        }
+        animate();
+    }
+    
+    async function saveCellDesign() {
+        const changedPartsCount = Object.keys(pendingChanges).length;
+        const cost = changedPartsCount * 1000;
+        
+        if (cost > 0 && State.game.entropy < cost) {
+            showToast(`엔트로피가 부족합니다 (${cost} 필요)`, 'error');
+            return;
+        }
+        
+        tempDesign.name = document.getElementById('cellNameInput').value || tempDesign.name;
+        
+        if (cost > 0) {
+            State.game.entropy -= cost;
+            showToast(`✨ 세포 변형 완료! -${cost} 엔트로피`, 'success');
+        } else {
+            showToast('✨ 이름이 변경되었습니다!', 'success');
+        }
+        
+        State.game.cellDesign = { ...tempDesign };
         await State.sync();
-        showStory('🌌', '은하 진출', '당신은 이제 <strong>은하</strong>를 탐험할 수 있습니다.<br><br>새로운 행성들, 새로운 문명들, 그리고 새로운 도전이 기다립니다.', '시작하기', () => navigate('dashboard'));
+        closeEditModal();
+        render();
     }
     
     // Placeholder
@@ -1987,7 +1618,7 @@
     }
     
     // ========================================
-    // CELL WORLD (Stage 1)
+    // CELL WORLD
     // ========================================
     let worldRunning = false;
     
@@ -2012,7 +1643,6 @@
         document.getElementById('worldControls').classList.add('active');
         document.getElementById('worldControls').innerHTML = `
             <div><span class="key">W A S D</span> 이동</div>
-            <div><span class="key">마우스</span> 방향</div>
             <div><span class="key">SPACE</span> 대시</div>
             <div><span class="key">ESC</span> 홈으로</div>
         `;
@@ -2230,7 +1860,7 @@
     }
     
     // ========================================
-    // COSMIC DRIFT (Stage 1.5)
+    // COSMIC DRIFT
     // ========================================
     function startCosmicDrift() {
         document.getElementById('app').innerHTML = '';
@@ -2242,15 +1872,10 @@
         
         document.getElementById('worldUI').classList.add('active');
         document.getElementById('worldControls').classList.add('active');
-        document.getElementById('worldControls').innerHTML = `
-            <div><span class="key">W A S D</span> 이동</div>
-            <div><span class="key">ESC</span> 홈으로</div>
-        `;
+        document.getElementById('worldControls').innerHTML = `<div><span class="key">W A S D</span> 이동</div><div><span class="key">ESC</span> 홈</div>`;
         
         document.getElementById('worldStatLabel').textContent = 'DISTANCE';
-        document.getElementById('worldNavButtons').innerHTML = `
-            <button class="world-nav-btn" onclick="window.exitWorld()">🏠 홈</button>
-        `;
+        document.getElementById('worldNavButtons').innerHTML = `<button class="world-nav-btn" onclick="window.exitWorld()">🏠 홈</button>`;
         
         worldRunning = true;
         const design = State.game.cellDesign || generateCellDesign();
@@ -2288,7 +1913,7 @@
                     <div class="progress-bar"><div class="progress-fill" style="width:${progress}%"></div></div>
                     <div style="font-size:11px;color:var(--text-dark);margin-top:4px">${Math.floor(driftProgress)} / ${targetDistance}</div>
                 </div>
-                <div style="font-size:12px;color:var(--text-muted)">합체한 세포: ${State.game.mergedCells || 0}</div>
+                <div style="font-size:12px;color:var(--text-muted)">합체: ${State.game.mergedCells || 0}</div>
             `;
         }
         updateInfoPanel();
@@ -2303,14 +1928,12 @@
             else { x = Math.random() * canvas.width; y = canvas.height + 50; }
             
             const types = ['friendly', 'hostile', 'neutral', 'mysterious'];
-            const type = types[Math.floor(Math.random() * types.length)];
-            
             driftingCells.push({
                 x, y,
                 vx: (Math.random() - 0.5) * 2,
                 vy: (Math.random() - 0.5) * 2,
                 size: 20 + Math.random() * 20,
-                type,
+                type: types[Math.floor(Math.random() * types.length)],
                 design: generateCellDesign()
             });
         }
@@ -2320,61 +1943,40 @@
             currentEncounter = cell;
             
             const titles = { friendly: '우호적인 의식', hostile: '적대적인 의식', neutral: '중립적인 의식', mysterious: '신비로운 의식' };
-            const descs = {
-                friendly: '이 의식은 당신에게 호의를 보이고 있습니다.',
-                hostile: '이 의식은 당신을 경계하고 있습니다.',
-                neutral: '이 의식은 당신에게 관심이 없어 보입니다.',
-                mysterious: '이 의식에서 이상한 에너지가 느껴집니다.'
-            };
+            const descs = { friendly: '호의를 보이고 있습니다.', hostile: '경계하고 있습니다.', neutral: '무관심해 보입니다.', mysterious: '이상한 에너지가 느껴집니다.' };
             
             document.getElementById('encounterTitle').textContent = titles[cell.type];
             document.getElementById('encounterDesc').textContent = descs[cell.type];
-            
-            const choices = [
-                { id: 'absorb', title: '흡수한다', effect: '+50 엔트로피, 공격성↑' },
-                { id: 'merge', title: '합체한다', effect: '능력치 증가 가능' },
-                { id: 'ignore', title: '무시한다', effect: '안전하게 통과' },
-                { id: 'talk', title: '대화한다', effect: '랜덤 이벤트' }
-            ];
-            
-            document.getElementById('encounterChoices').innerHTML = choices.map(c => `
-                <div class="encounter-choice" onclick="window.makeChoice('${c.id}')">
-                    <div class="choice-title">${c.title}</div>
-                    <div class="choice-effect">${c.effect}</div>
-                </div>
-            `).join('');
+            document.getElementById('encounterChoices').innerHTML = [
+                { id: 'absorb', title: '흡수', effect: '+50 엔트로피' },
+                { id: 'merge', title: '합체', effect: '능력치↑' },
+                { id: 'ignore', title: '무시', effect: '안전' },
+                { id: 'talk', title: '대화', effect: '랜덤' }
+            ].map(c => `<div class="encounter-choice" onclick="window.makeChoice('${c.id}')"><div class="choice-title">${c.title}</div><div class="choice-effect">${c.effect}</div></div>`).join('');
             
             document.getElementById('encounterDialog').classList.add('active');
         }
         
         async function makeChoice(choice) {
             document.getElementById('encounterDialog').classList.remove('active');
-            const cell = currentEncounter;
             
-            if (choice === 'absorb') {
-                State.game.entropy += 50;
-                showToast('⚡ +50 엔트로피 흡수!', 'success');
-            } else if (choice === 'merge') {
+            if (choice === 'absorb') { State.game.entropy += 50; showToast('⚡ +50 엔트로피!', 'success'); }
+            else if (choice === 'merge') {
                 State.game.mergedCells = (State.game.mergedCells || 0) + 1;
                 const bonus = Math.random();
-                if (bonus < 0.3) { State.game.entropy += 100; showToast('🧬 합체 성공! +100 엔트로피', 'success'); }
-                else if (bonus < 0.6) { showToast('🧬 합체 성공! 이동 속도 증가', 'success'); player.speed += 0.5; }
-                else { showToast('🧬 합체... 효과 없음', 'info'); }
-            } else if (choice === 'ignore') {
-                showToast('무사히 지나갔습니다', 'info');
-            } else if (choice === 'talk') {
-                const events = [
-                    { msg: '💬 "먼 곳에서 왔구나... 조심해라."', entropy: 30 },
-                    { msg: '💬 "행성을 찾고 있구나? 계속 가면 있다."', entropy: 20 },
-                    { msg: '💬 "..."  (아무 말이 없다)', entropy: 0 },
-                    { msg: '⚠️ 함정이었다! 에너지를 빼앗겼다.', entropy: -30 }
-                ];
+                if (bonus < 0.3) { State.game.entropy += 100; showToast('🧬 +100 엔트로피', 'success'); }
+                else if (bonus < 0.6) { player.speed += 0.5; showToast('🧬 속도↑', 'success'); }
+                else { showToast('🧬 효과 없음', 'info'); }
+            }
+            else if (choice === 'ignore') { showToast('무사히 통과', 'info'); }
+            else if (choice === 'talk') {
+                const events = [{ msg: '💬 정보를 얻었다', entropy: 30 }, { msg: '💬 침묵...', entropy: 0 }, { msg: '⚠️ 함정!', entropy: -30 }];
                 const event = events[Math.floor(Math.random() * events.length)];
                 State.game.entropy = Math.max(0, State.game.entropy + event.entropy);
                 showToast(event.msg, event.entropy >= 0 ? 'info' : 'error');
             }
             
-            driftingCells = driftingCells.filter(c => c !== cell);
+            driftingCells = driftingCells.filter(c => c !== currentEncounter);
             encounterActive = false;
             currentEncounter = null;
             await State.sync();
@@ -2411,68 +2013,43 @@
                 document.getElementById('worldControls').classList.remove('active');
                 
                 State.game.stage = 2;
-                State.game.history.push({ chapter: State.game.history.length + 1, title: '행성 발견', content: '오랜 표류 끝에 드디어 행성이 레이더에 잡혔다. 저 푸른 별에서 새로운 삶을 시작할 수 있을 것이다.', timestamp: new Date().toISOString() });
+                State.game.history.push({ chapter: State.game.history.length + 1, title: '행성 발견', content: '오랜 표류 끝에 드디어 행성이 레이더에 잡혔다.', timestamp: new Date().toISOString() });
                 State.sync();
                 
-                showStory('🌍', '행성 발견!', '오랜 <strong>우주 표류</strong> 끝에<br>드디어 <strong>행성</strong>이 감지되었습니다!<br><br>착륙을 시도해야 합니다.', '착륙 시작', () => navigate('landing'));
+                showStory('🌍', '행성 발견!', '드디어 <strong>행성</strong>이 감지되었습니다!<br>착륙을 시도해야 합니다.', '착륙 시작', () => navigate('landing'));
                 return;
             }
             
-            // Drifting cells
             if (Math.random() < 0.01) spawnDriftingCell();
             
             driftingCells.forEach(cell => {
                 cell.x += cell.vx;
                 cell.y += cell.vy;
-                
-                const dx = player.x - cell.x, dy = player.y - cell.y;
-                const d = Math.sqrt(dx * dx + dy * dy);
-                
-                if (d < 60 && !encounterActive) {
-                    showEncounter(cell);
-                }
+                const d = Math.sqrt((player.x - cell.x) ** 2 + (player.y - cell.y) ** 2);
+                if (d < 60 && !encounterActive) showEncounter(cell);
             });
             
             driftingCells = driftingCells.filter(c => c.x > -100 && c.x < canvas.width + 100 && c.y > -100 && c.y < canvas.height + 100);
         }
         
-        function drawBg() {
+        function draw() {
             ctx.fillStyle = '#030308';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
-            
-            // Stars moving
             ctx.fillStyle = 'rgba(255,255,255,0.6)';
             for (let i = 0; i < 200; i++) {
                 const x = (i * 137.5 + time * 0.5) % canvas.width;
                 const y = (i * 73.7) % canvas.height;
-                const s = ((i % 3) + 1) * 0.8;
-                ctx.beginPath();
-                ctx.arc(x, y, s, 0, Math.PI * 2);
-                ctx.fill();
+                ctx.beginPath(); ctx.arc(x, y, ((i % 3) + 1) * 0.8, 0, Math.PI * 2); ctx.fill();
             }
             
-            // Nebula
-            ctx.globalAlpha = 0.1;
-            const nebula = ctx.createRadialGradient(canvas.width * 0.3, canvas.height * 0.7, 0, canvas.width * 0.3, canvas.height * 0.7, 400);
-            nebula.addColorStop(0, '#7b2cbf');
-            nebula.addColorStop(1, 'transparent');
-            ctx.fillStyle = nebula;
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-            ctx.globalAlpha = 1;
-        }
-        
-        function drawDriftingCells() {
             driftingCells.forEach(cell => {
                 const colors = { friendly: '#4ade80', hostile: '#f87171', neutral: '#a3a3a3', mysterious: '#c084fc' };
-                ctx.save();
                 ctx.globalAlpha = 0.8;
                 const tempDesign = { ...cell.design, primaryColor: colors[cell.type] };
-                drawCell(ctx, cell.x, cell.y, cell.size, tempDesign, null, time);
-                ctx.restore();
+                drawCell(ctx, cell.x, cell.y, cell.size, tempDesign, { eye: true }, time);
+                ctx.globalAlpha = 1;
             });
-        }
-        
-        function drawPlayer() {
+            
             drawCell(ctx, player.x, player.y, 35, design, State.game.evolution, time);
         }
         
@@ -2480,9 +2057,7 @@
             if (!worldRunning) { cleanup(); return; }
             time++;
             update();
-            drawBg();
-            drawDriftingCells();
-            drawPlayer();
+            draw();
             requestAnimationFrame(loop);
         }
         
@@ -2493,7 +2068,7 @@
     window.makeChoice = makeChoice;
     
     // ========================================
-    // PLANET LANDING (Stage 2)
+    // PLANET LANDING
     // ========================================
     function startPlanetLanding() {
         document.getElementById('app').innerHTML = '';
@@ -2547,8 +2122,7 @@
         }
         
         function spawnObstacle() {
-            const type = Math.random();
-            if (type < 0.5) {
+            if (Math.random() < 0.5) {
                 obstacles.push({ type: 'asteroid', x: Math.random() * (canvas.width - 60) + 30, y: canvas.height + 50, size: 20 + Math.random() * 30, speed: 3 + Math.random() * 3, rotation: 0, rotSpeed: (Math.random() - 0.5) * 0.1 });
             } else {
                 const width = 100 + Math.random() * 200;
@@ -2591,12 +2165,12 @@
             setTimeout(async () => {
                 document.getElementById('resultIcon').textContent = success ? '🪐' : '💥';
                 document.getElementById('resultTitle').textContent = success ? '착륙 성공!' : '착륙 실패';
-                document.getElementById('resultDesc').textContent = success ? `${planet.name}에 무사히 도착했습니다!` : '장애물에 부딪혀 추락했습니다.';
+                document.getElementById('resultDesc').textContent = success ? `${planet.name}에 무사히 도착!` : '장애물에 부딪혀 추락했습니다.';
                 
                 if (success) {
                     State.game.currentPlanet = planet;
                     State.game.stage = 3;
-                    State.game.history.push({ chapter: State.game.history.length + 1, title: '새로운 세계', content: `오랜 여정 끝에 ${planet.name}에 착륙했다. ${planet.type}... 이곳에서 새로운 삶이 시작된다.`, timestamp: new Date().toISOString() });
+                    State.game.history.push({ chapter: State.game.history.length + 1, title: '새로운 세계', content: `${planet.name}에 착륙했다. ${planet.type}... 새로운 삶이 시작된다.`, timestamp: new Date().toISOString() });
                     await State.sync();
                     document.getElementById('resultActions').innerHTML = '<button class="btn btn-primary" onclick="window.explorePlanet()">🌍 행성 탐험</button>';
                 } else {
@@ -2607,7 +2181,7 @@
             }, 500);
         }
         
-        function drawBg() {
+        function draw() {
             const g = ctx.createLinearGradient(0, 0, 0, canvas.height);
             g.addColorStop(0, '#050510'); g.addColorStop(0.7, '#0a0a2a'); g.addColorStop(1, '#1a1a4a');
             ctx.fillStyle = g;
@@ -2627,9 +2201,7 @@
             pg.addColorStop(0, '#4ade80'); pg.addColorStop(0.5, '#22c55e'); pg.addColorStop(1, '#14532d');
             ctx.beginPath(); ctx.arc(canvas.width/2, planetY, planetSize, 0, Math.PI * 2);
             ctx.fillStyle = pg; ctx.fill();
-        }
-        
-        function drawObstacles() {
+            
             obstacles.forEach(o => {
                 if (o.type === 'asteroid') {
                     ctx.save(); ctx.translate(o.x, o.y); ctx.rotate(o.rotation);
@@ -2648,15 +2220,15 @@
                     ctx.shadowBlur = 0;
                 }
             });
+            
+            drawCell(ctx, player.x, player.y, player.size, design, State.game.evolution, time);
         }
-        
-        function drawPlayer() { drawCell(ctx, player.x, player.y, player.size, design, State.game.evolution, time); }
         
         function loop() {
             if (!worldRunning) { cleanup(); return; }
             time++;
             if (!gameOver) update();
-            drawBg(); drawObstacles(); drawPlayer();
+            draw();
             requestAnimationFrame(loop);
         }
         
@@ -2671,87 +2243,8 @@
         navigate('planet');
     }
     
-    function retryLanding() {
-        document.getElementById('resultModal').classList.remove('active');
-        startPlanetLanding();
-    }
-    
-    function goHome() {
-        document.getElementById('resultModal').classList.remove('active');
-        worldRunning = false;
-        document.getElementById('worldCanvas').classList.remove('active');
-        document.getElementById('worldUI').classList.remove('active');
-        navigate('dashboard');
-    }
-    
-    // Edit Cell Modal
-    let previewAnimationId = null;
-    let tempDesign = null;
-    
-    function openEditModal() {
-        const modal = document.getElementById('editCellModal');
-        modal.classList.add('active');
-        tempDesign = { ...(State.game.cellDesign || generateCellDesign()) };
-        document.getElementById('cellNameInput').value = tempDesign.name || '';
-        document.getElementById('primaryColorPicker').value = hslToHex(tempDesign.primaryColor);
-        document.getElementById('secondaryColorPicker').value = hslToHex(tempDesign.secondaryColor);
-        document.querySelectorAll('.pattern-option').forEach(opt => opt.classList.toggle('selected', opt.dataset.pattern === tempDesign.pattern));
-        startPreviewAnimation();
-    }
-    
-    function closeEditModal() {
-        document.getElementById('editCellModal').classList.remove('active');
-        if (previewAnimationId) cancelAnimationFrame(previewAnimationId);
-    }
-    
-    function startPreviewAnimation() {
-        const canvas = document.getElementById('cellPreview');
-        if (!canvas) return;
-        const ctx = canvas.getContext('2d');
-        let t = 0;
-        function animate() {
-            t++;
-            ctx.clearRect(0, 0, 150, 150);
-            drawCell(ctx, 75, 75, 35, tempDesign, State.game.evolution, t);
-            previewAnimationId = requestAnimationFrame(animate);
-        }
-        animate();
-    }
-    
-    function updatePreviewDesign() {
-        tempDesign.name = document.getElementById('cellNameInput').value;
-        tempDesign.primaryColor = document.getElementById('primaryColorPicker').value;
-        tempDesign.secondaryColor = document.getElementById('secondaryColorPicker').value;
-    }
-    
-    document.addEventListener('input', (e) => {
-        if (e.target.id === 'cellNameInput' || e.target.id === 'primaryColorPicker' || e.target.id === 'secondaryColorPicker') updatePreviewDesign();
-    });
-    
-    document.addEventListener('click', (e) => {
-        if (e.target.classList.contains('pattern-option')) {
-            document.querySelectorAll('.pattern-option').forEach(opt => opt.classList.remove('selected'));
-            e.target.classList.add('selected');
-            tempDesign.pattern = e.target.dataset.pattern;
-        }
-    });
-    
-    function randomizeCellDesign() {
-        tempDesign = generateCellDesign();
-        document.getElementById('cellNameInput').value = tempDesign.name;
-        document.getElementById('primaryColorPicker').value = hslToHex(tempDesign.primaryColor);
-        document.getElementById('secondaryColorPicker').value = hslToHex(tempDesign.secondaryColor);
-        document.querySelectorAll('.pattern-option').forEach(opt => opt.classList.toggle('selected', opt.dataset.pattern === tempDesign.pattern));
-    }
-    
-    async function saveCellDesign() {
-        updatePreviewDesign();
-        State.game.cellDesign = { ...tempDesign };
-        await State.sync();
-        closeEditModal();
-        showToast('✨ 세포가 업데이트되었습니다!', 'success');
-        render();
-    }
+    function retryLanding() { document.getElementById('resultModal').classList.remove('active'); startPlanetLanding(); }
+    function goHome() { document.getElementById('resultModal').classList.remove('active'); worldRunning = false; document.getElementById('worldCanvas').classList.remove('active'); document.getElementById('worldUI').classList.remove('active'); navigate('dashboard'); }
     
     // Auth
     async function googleLogin() {
@@ -2764,12 +2257,12 @@
                 const newDesign = generateCellDesign();
                 await setDoc(doc(db, 'users', user.uid), {
                     displayName: user.displayName, email: user.email, photoURL: user.photoURL,
-                    game: { entropy: 0, stage: 1, evolution: { eye: false, arm: false, leg: false, brain: false, wing: false }, currentPlanet: null, territories: [], history: [], cellDesign: newDesign, driftProgress: 0, mergedCells: 0, resources: { metal: 0, energy: 0, fuel: 0 }, signalDecoded: false, shipBuilt: false, firstContact: null },
+                    game: { entropy: 0, stage: 1, evolution: { eye: false, arm: false, leg: false, brain: false, wing: false }, currentPlanet: null, territories: [], history: [], cellDesign: newDesign, driftProgress: 0, mergedCells: 0, tech: [], inviteCode: null, occupiedTerritories: [], lastTaxTime: null },
                     createdAt: serverTimestamp(), updatedAt: serverTimestamp()
                 });
                 showToast('🎉 우주에 오신 것을 환영합니다!', 'success');
             }
-        } catch (e) { console.error('Login error:', e); showToast('로그인 실패: ' + e.message, 'error'); hideLoading(); }
+        } catch (e) { console.error('Login error:', e); showToast('로그인 실패', 'error'); hideLoading(); }
     }
     
     async function logout() { await signOut(auth); State.user = null; navigate('login'); }
@@ -2799,17 +2292,16 @@
         window.goToDrift = goToDrift;
         window.openEditModal = openEditModal;
         window.closeEditModal = closeEditModal;
-        window.randomizeCellDesign = randomizeCellDesign;
+        window.selectPart = selectPart;
         window.saveCellDesign = saveCellDesign;
+        window.exploreRandomTerritory = exploreRandomTerritory;
+        window.closeExploreModal = closeExploreModal;
         window.clickTerritory = clickTerritory;
-        window.gatherResources = gatherResources;
-        window.createPost = createPost;
-        window.startPuzzle = startPuzzle;
-        window.clickPuzzleCell = clickPuzzleCell;
-        window.closePuzzleModal = closePuzzleModal;
-        window.buildShip = buildShip;
-        window.firstContact = firstContact;
-        window.enterGalaxy = enterGalaxy;
+        window.unlockTech = unlockTech;
+        window.openInviteModal = openInviteModal;
+        window.closeInviteModal = closeInviteModal;
+        window.joinPlanet = joinPlanet;
+        window.visitOtherPlanet = visitOtherPlanet;
         window.explorePlanet = explorePlanet;
         window.retryLanding = retryLanding;
         window.goHome = goHome;
