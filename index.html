@@ -4,30 +4,20 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>BOKLUCK Universe</title>
-    <meta name="description" content="우주에서 깨어난 의식, 살아남아 진화하라">
-    <meta name="theme-color" content="#0a0a1a">
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌌</text></svg>">
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
-    
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Noto+Sans+KR:wght@400;700&display=swap" rel="stylesheet">
     <style>
-    /* 기본 터치 동작 방지 (스크롤/줌 방지) */
     * { box-sizing: border-box; margin: 0; padding: 0; touch-action: none; user-select: none; -webkit-user-select: none; }
-    
     :root {
         --primary: #00f5d4; --secondary: #7b2cbf; --accent: #f72585; --energy: #fee440;
-        --success: #10b981; --danger: #ff4d6d; --warning: #f59e0b;
-        --bg-space: #0a0a1a; --bg-card: rgba(20, 20, 40, 0.9); --bg-card-solid: #14142a;
-        --bg-hover: rgba(30, 30, 60, 0.9); --bg-input: rgba(10, 10, 30, 0.8);
+        --success: #10b981; --danger: #ff4d6d; --bg-space: #0a0a1a;
+        --bg-card: rgba(20, 20, 40, 0.9); --bg-card-solid: #14142a;
         --border: rgba(0, 245, 212, 0.2); --text: #e0e0ff; --text-muted: #8080a0;
-        --gradient-cosmic: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f72585 100%);
         --gradient-energy: linear-gradient(135deg, #00f5d4 0%, #fee440 100%);
         --gradient-evolution: linear-gradient(135deg, #7b2cbf 0%, #f72585 100%);
-        --nav-height: 60px;
     }
-    
     body { background: var(--bg-space); color: var(--text); font-family: 'Noto Sans KR', sans-serif; min-height: 100vh; overflow: hidden; }
-    .font-display { font-family: 'Orbitron', sans-serif; }
-    #stars { position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: -1; }
+    #stars { position: fixed; inset: 0; z-index: -1; }
     .star { position: absolute; background: white; border-radius: 50%; animation: twinkle 3s infinite; }
     @keyframes twinkle { 0%, 100% { opacity: 0.3; } 50% { opacity: 1; } }
     
@@ -36,317 +26,82 @@
     .loading-spinner { width: 60px; height: 60px; border: 3px solid var(--border); border-top-color: var(--primary); border-radius: 50%; animation: spin 1s linear infinite; }
     @keyframes spin { to { transform: rotate(360deg); } }
     
-    /* Navbar 스타일 (기존 유지) */
-    .navbar { position: fixed; top: 0; left: 0; right: 0; height: var(--nav-height); background: rgba(10,10,26,0.95); backdrop-filter: blur(20px); border-bottom: 1px solid var(--border); z-index: 1000; display: flex; align-items: center; padding: 0 24px; }
-    .nav-logo { font-family: 'Orbitron', sans-serif; font-size: 22px; font-weight: 900; background: var(--gradient-energy); -webkit-background-clip: text; -webkit-text-fill-color: transparent; cursor: pointer; margin-right: 40px; }
-    .nav-links { display: flex; gap: 8px; flex: 1; }
-    .nav-link { padding: 10px 18px; border-radius: 10px; color: var(--text-muted); font-size: 14px; font-weight: 500; cursor: pointer; transition: 0.2s; display: flex; align-items: center; gap: 8px; }
-    .nav-link:hover { color: var(--text); background: var(--bg-hover); }
-    .nav-link.active { color: var(--primary); background: rgba(0,245,212,0.1); }
-    .nav-link.locked { opacity: 0.4; cursor: not-allowed; }
-    .nav-right { display: flex; align-items: center; gap: 16px; }
-    
-    /* 모바일에서 네비게이션 숨김 처리 (게임 중 방해 방지) */
-    @media (max-width: 768px) {
-        .nav-links { display: none; } 
-        .navbar { padding: 0 16px; }
-    }
-
+    .navbar { position: fixed; top: 0; left: 0; right: 0; height: 60px; background: rgba(10,10,26,0.95); backdrop-filter: blur(20px); border-bottom: 1px solid var(--border); z-index: 1000; display: flex; align-items: center; padding: 0 24px; }
+    .nav-logo { font-family: 'Orbitron'; font-size: 22px; font-weight: 900; background: var(--gradient-energy); -webkit-background-clip: text; -webkit-text-fill-color: transparent; cursor: pointer; }
+    .nav-right { margin-left: auto; display: flex; align-items: center; gap: 16px; }
     .entropy-badge { display: flex; align-items: center; gap: 10px; background: var(--bg-card); border: 1px solid var(--border); padding: 8px 16px; border-radius: 25px; }
-    .entropy-icon { width: 24px; height: 24px; background: var(--gradient-energy); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; }
-    .entropy-value { font-family: 'Orbitron', sans-serif; font-size: 16px; font-weight: 700; color: var(--energy); }
-    .user-menu { position: relative; }
-    .user-profile { display: flex; align-items: center; gap: 12px; cursor: pointer; padding: 6px 12px; border-radius: 25px; }
-    .user-profile:hover { background: var(--bg-hover); }
-    .user-avatar { width: 36px; height: 36px; border-radius: 50%; border: 2px solid var(--primary); }
-    .user-name { font-size: 14px; font-weight: 600; }
-    @media (max-width: 768px) { .user-name { display: none; } }
-    .user-dropdown { position: absolute; top: 100%; right: 0; margin-top: 8px; background: var(--bg-card-solid); border: 1px solid var(--border); border-radius: 12px; padding: 8px; min-width: 160px; display: none; z-index: 1001; }
-    .user-dropdown.show { display: block; }
-    .dropdown-item { padding: 10px 16px; border-radius: 8px; cursor: pointer; font-size: 14px; display: flex; align-items: center; gap: 10px; }
-    .dropdown-item:hover { background: var(--bg-hover); }
-    .dropdown-item.danger { color: var(--danger); }
+    .entropy-value { font-family: 'Orbitron'; font-size: 16px; font-weight: 700; color: var(--energy); }
+    .user-avatar { width: 36px; height: 36px; border-radius: 50%; border: 2px solid var(--primary); cursor: pointer; }
     
-    .main-content { padding-top: var(--nav-height); min-height: 100vh; overflow-y: auto; }
-    .page-container { max-width: 1400px; margin: 0 auto; padding: 24px; }
+    .main-content { padding-top: 80px; min-height: 100vh; overflow-y: auto; }
+    .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
     
-    /* 버튼 및 UI 요소 */
-    .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 12px 24px; border: none; border-radius: 12px; font-size: 14px; font-weight: 600; cursor: pointer; transition: 0.2s; font-family: inherit; }
-    .btn:hover { transform: translateY(-2px); }
-    .btn:active { transform: scale(0.95); }
-    .btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
-    .btn-primary { background: var(--gradient-cosmic); color: white; }
+    .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 12px 24px; border: none; border-radius: 12px; font-size: 14px; font-weight: 600; cursor: pointer; transition: 0.2s; }
+    .btn-primary { background: var(--gradient-evolution); color: white; }
     .btn-energy { background: var(--gradient-energy); color: #1a1a2e; }
     .btn-outline { background: transparent; border: 1px solid var(--border); color: var(--text); }
-    .btn-danger { background: var(--danger); color: white; }
-    .btn-google { background: white; color: #333; padding: 14px 32px; font-size: 15px; }
-    .btn-lg { padding: 16px 40px; font-size: 16px; }
-    .btn-sm { padding: 8px 16px; font-size: 13px; }
     .btn-block { width: 100%; }
-    .input { width: 100%; padding: 12px 16px; background: var(--bg-input); border: 1px solid var(--border); border-radius: 12px; color: var(--text); font-size: 14px; outline: none; }
+
+    .card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 20px; padding: 24px; margin-bottom: 20px; }
+    .entity-visual { width: 180px; height: 180px; margin: 0 auto 16px; }
+    .entity-name { font-family: 'Orbitron'; font-size: 18px; font-weight: 700; text-align: center; margin-bottom: 20px; }
     
-    .card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 20px; padding: 24px; }
-    .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-bottom: 16px; border-bottom: 1px solid var(--border); }
-    .card-title { font-family: 'Orbitron', sans-serif; font-size: 16px; font-weight: 700; }
-    
-    .progress-bar { height: 8px; background: rgba(123,44,191,0.2); border-radius: 4px; overflow: hidden; }
-    .progress-fill { height: 100%; background: var(--gradient-evolution); border-radius: 4px; transition: width 0.3s; }
-    
-    .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.85); display: none; align-items: center; justify-content: center; z-index: 2000; }
-    .modal-overlay.active { display: flex; }
-    .modal { background: var(--bg-card-solid); border: 1px solid var(--border); border-radius: 24px; padding: 32px; max-width: 600px; width: 90%; max-height: 90vh; overflow-y: auto; }
-    .modal-title { font-family: 'Orbitron', sans-serif; font-size: 20px; font-weight: 700; margin-bottom: 8px; text-align: center; }
-    .modal-desc { color: var(--text-muted); font-size: 14px; margin-bottom: 24px; text-align: center; line-height: 1.6; }
-    .modal-actions { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
-    
-    .toast-container { position: fixed; top: 80px; right: 24px; z-index: 2000; display: flex; flex-direction: column; gap: 12px; }
-    .toast { background: var(--bg-card-solid); border: 1px solid var(--border); border-radius: 12px; padding: 16px 20px; display: flex; align-items: center; gap: 12px; min-width: 300px; animation: slideIn 0.3s ease; }
-    .toast.success { border-color: var(--success); }
-    .toast.error { border-color: var(--danger); }
-    @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
-    
-    .login-page { min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 40px 20px; text-align: center; }
-    .login-logo { font-family: 'Orbitron', sans-serif; font-size: 56px; font-weight: 900; background: var(--gradient-energy); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 8px; }
-    .login-subtitle { font-size: 18px; color: var(--text-muted); margin-bottom: 40px; }
-    .login-cell { width: 150px; height: 150px; background: radial-gradient(circle at 30% 30%, var(--primary), var(--secondary)); border-radius: 50%; margin-bottom: 40px; box-shadow: 0 0 80px rgba(0, 245, 212, 0.4); animation: pulse 3s ease-in-out infinite; }
-    @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
-    
-    .dashboard-grid { display: grid; grid-template-columns: 320px 1fr; gap: 24px; }
-    @media (max-width: 1024px) { .dashboard-grid { grid-template-columns: 1fr; } }
-    
-    .entity-card { position: relative; overflow: hidden; }
-    .entity-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: var(--gradient-evolution); }
-    .entity-visual { width: 180px; height: 180px; margin: 0 auto 24px; cursor: pointer; }
-    .entity-stage-label { font-family: 'Orbitron', sans-serif; font-size: 11px; color: var(--accent); letter-spacing: 2px; text-align: center; margin-bottom: 8px; }
-    .entity-name { font-family: 'Orbitron', sans-serif; font-size: 18px; font-weight: 700; text-align: center; margin-bottom: 20px; }
-    .entity-stats { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
-    .stat-box { background: rgba(0, 245, 212, 0.05); border: 1px solid rgba(0, 245, 212, 0.1); border-radius: 12px; padding: 12px; text-align: center; }
-    .stat-value { font-family: 'Orbitron', sans-serif; font-size: 20px; font-weight: 700; color: var(--primary); }
-    .stat-label { font-size: 11px; color: var(--text-muted); margin-top: 4px; }
-    
-    .quick-actions { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 24px; }
-    @media (max-width: 768px) { .quick-actions { grid-template-columns: repeat(2, 1fr); } }
-    .quick-action { background: var(--bg-card); border: 1px solid var(--border); border-radius: 16px; padding: 20px; text-align: center; cursor: pointer; transition: 0.2s; }
-    .quick-action:hover { border-color: var(--primary); transform: translateY(-4px); }
-    .quick-action.locked { opacity: 0.4; cursor: not-allowed; }
-    .quick-action-icon { font-size: 28px; margin-bottom: 8px; }
-    .quick-action-label { font-size: 12px; color: var(--text-muted); }
-    
-    .history-entry { background: var(--bg-input); border-radius: 12px; padding: 16px; margin-bottom: 12px; border-left: 3px solid var(--secondary); }
-    .history-chapter { font-family: 'Orbitron', sans-serif; font-size: 11px; color: var(--accent); margin-bottom: 6px; }
-    .history-title { font-weight: 700; margin-bottom: 8px; }
-    .history-content { font-size: 13px; color: var(--text-muted); line-height: 1.6; }
-    
-    /* Parts Grid & Tech Tree */
-    .parts-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(60px, 1fr)); gap: 12px; margin-bottom: 24px; }
-    .part-item { background: var(--bg-input); border: 2px solid var(--border); border-radius: 12px; padding: 16px; text-align: center; cursor: pointer; transition: 0.2s; }
-    .part-item.selected { border-color: var(--primary); background: rgba(0,245,212,0.1); }
-    .part-item.locked { opacity: 0.5; cursor: not-allowed; }
-    .style-options { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 16px; }
-    .style-option { padding: 12px; background: var(--bg-input); border: 2px solid var(--border); border-radius: 8px; cursor: pointer; text-align: center; }
-    .style-option.selected { border-color: var(--primary); background: rgba(0,245,212,0.1); }
-    .tech-tree { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 16px; }
-    .tech-item { background: var(--bg-input); border: 2px solid var(--border); border-radius: 16px; padding: 20px; text-align: center; }
-    .tech-item.unlocked { border-color: var(--success); background: rgba(16,185,129,0.1); }
-    .tech-item.available { border-color: var(--primary); cursor: pointer; }
-    .tech-item.locked { opacity: 0.5; }
-    
-    .planet-map { display: grid; grid-template-columns: repeat(10, 1fr); gap: 2px; background: var(--bg-input); padding: 10px; border-radius: 16px; margin-bottom: 16px; aspect-ratio: 1; }
-    .map-cell { background: rgba(0,245,212,0.05); border: 1px solid var(--border); border-radius: 4px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 10px; }
-    .map-cell.explored { background: rgba(0,245,212,0.2); }
-    .map-cell.home { background: rgba(254,228,64,0.3); border-color: var(--energy); }
-    
-    /* === GAME & MOBILE CONTROLS === */
-    #worldCanvas { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 500; display: none; }
+    /* 게임 UI */
+    #worldCanvas { position: fixed; inset: 0; z-index: 500; display: none; }
     #worldCanvas.active { display: block; }
     
-    /* Mobile Controls Overlay */
-    .mobile-controls {
-        position: fixed; inset: 0; z-index: 600; pointer-events: none; display: none;
-        flex-direction: column; justify-content: space-between; padding: 20px;
-    }
+    .mobile-controls { position: fixed; inset: 0; z-index: 600; pointer-events: none; display: none; flex-direction: column; justify-content: space-between; padding: 20px; }
     .mobile-controls.active { display: flex; }
     
-    /* Top HUD */
     .hud-top { display: flex; justify-content: space-between; align-items: flex-start; pointer-events: auto; }
-    .world-entropy-box { background: rgba(10,10,26,0.8); border: 1px solid var(--border); border-radius: 16px; padding: 12px 20px; backdrop-filter: blur(5px); }
-    .world-entropy-value { font-family: 'Orbitron'; font-size: 24px; font-weight: 900; color: var(--energy); }
-    .world-nav-btn { background: rgba(10,10,26,0.8); border: 1px solid var(--border); border-radius: 12px; padding: 8px 16px; color: var(--text); cursor: pointer; }
-    
-    /* Bottom Controls (Joystick + Button) */
     .hud-bottom { display: flex; justify-content: space-between; align-items: flex-end; padding-bottom: 30px; pointer-events: none; }
     
-    /* Joystick */
-    .joystick-zone {
-        width: 140px; height: 140px;
-        background: rgba(255, 255, 255, 0.05);
-        border: 2px solid rgba(255, 255, 255, 0.1);
-        border-radius: 50%;
-        position: relative;
-        pointer-events: auto; /* Enable touch */
-        backdrop-filter: blur(2px);
-    }
-    .joystick-knob {
-        width: 60px; height: 60px;
-        background: rgba(0, 245, 212, 0.5);
-        border-radius: 50%;
-        position: absolute;
-        top: 50%; left: 50%;
-        transform: translate(-50%, -50%);
-        box-shadow: 0 0 15px var(--primary);
-        pointer-events: none; /* Let clicks pass through to zone */
-        transition: transform 0.05s linear;
-    }
+    .joystick-zone { width: 120px; height: 120px; background: rgba(255, 255, 255, 0.05); border-radius: 50%; position: relative; pointer-events: auto; border: 1px solid var(--border); }
+    .joystick-knob { width: 50px; height: 50px; background: var(--primary); border-radius: 50%; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); opacity: 0.6; }
     
-    /* Action Button */
-    .action-btn-zone { pointer-events: auto; }
-    .action-btn {
-        width: 80px; height: 80px;
-        border-radius: 50%;
-        background: rgba(247, 37, 133, 0.2);
-        border: 2px solid var(--accent);
-        color: white; font-size: 32px;
-        display: flex; align-items: center; justify-content: center;
-        backdrop-filter: blur(2px);
-        transition: transform 0.1s;
-    }
-    .action-btn:active { background: var(--accent); transform: scale(0.9); }
-    
-    /* Stage Info Panel */
-    .world-info-panel {
-        position: absolute; top: 80px; left: 20px;
-        background: rgba(10,10,26,0.8); padding: 12px; border-radius: 12px; pointer-events: auto;
-        border: 1px solid var(--border); max-width: 200px;
-    }
-    .world-info-title { font-size: 12px; color: var(--secondary); margin-bottom: 8px; font-weight: bold; }
-    .world-evo-item { display: flex; gap: 8px; margin-bottom: 4px; font-size: 11px; opacity: 0.5; }
-    .world-evo-item.unlocked { opacity: 1; color: var(--primary); }
+    .action-btn { width: 70px; height: 70px; border-radius: 50%; background: var(--accent); color: white; font-size: 24px; display: flex; align-items: center; justify-content: center; pointer-events: auto; border: none; opacity: 0.8; }
 
-    /* Desktop Controls Hint */
-    .desktop-hint {
-        position: absolute; bottom: 20px; right: 20px;
-        color: var(--text-muted); font-size: 11px;
-        background: rgba(0,0,0,0.5); padding: 8px; border-radius: 8px;
-        display: none; /* Hidden on mobile via JS logic if needed, but CSS media query better */
-    }
-    @media (min-width: 1024px) { .desktop-hint { display: block; } }
-
-    /* Alerts */
     .evo-alert { position: fixed; top: 40%; left: 50%; transform: translate(-50%, -50%) scale(0); background: rgba(10,10,26,0.95); border: 2px solid var(--secondary); border-radius: 24px; padding: 40px; text-align: center; z-index: 2000; opacity: 0; transition: 0.4s; pointer-events: none; }
     .evo-alert.show { transform: translate(-50%, -50%) scale(1); opacity: 1; }
     .evo-alert-icon { font-size: 60px; margin-bottom: 16px; display: block; }
-    .evo-alert-title { font-family: 'Orbitron'; font-size: 24px; color: var(--primary); margin-bottom: 8px; }
-    
-    /* Other Overlays */
-    .encounter-dialog, .story-overlay, .result-modal { display: none; z-index: 1500; }
-    .encounter-dialog.active, .story-overlay.active, .result-modal.active { display: flex; position: fixed; inset: 0; align-items: center; justify-content: center; background: rgba(0,0,0,0.8); }
-    .encounter-content, .story-content, .result-content { background: var(--bg-card-solid); padding: 30px; border-radius: 20px; border: 1px solid var(--border); max-width: 90%; width: 400px; text-align: center; }
-    
-    .encounter-choices { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 20px; }
-    .encounter-choice { background: var(--bg-input); padding: 15px; border-radius: 10px; cursor: pointer; border: 1px solid var(--border); }
-    .encounter-choice:active { background: var(--bg-hover); border-color: var(--primary); }
-    
-    /* Utility */
+    .evo-alert-title { font-family: 'Orbitron'; font-size: 24px; color: var(--primary); }
+
     .hidden { display: none !important; }
     </style>
 </head>
 <body>
     <div id="stars"></div>
-    <div class="loading-screen" id="loadingScreen"><div class="loading-spinner"></div><div class="loading-text" style="margin-top:20px;font-family:'Orbitron'">INITIALIZING...</div></div>
+    <div class="loading-screen" id="loadingScreen"><div class="loading-spinner"></div></div>
     
     <div id="app"></div>
     <canvas id="worldCanvas"></canvas>
     
     <div class="mobile-controls" id="mobileControls">
         <div class="hud-top">
-            <div class="world-entropy-box">
-                <div style="font-size:10px;color:var(--text-muted)">ENTROPY</div>
-                <div class="world-entropy-value" id="gameEntropyDisplay">0</div>
-            </div>
-            <div style="display:flex;gap:8px">
-                <button class="world-nav-btn" onclick="window.exitWorld()">🏠</button>
-                <button class="world-nav-btn next-stage" id="nextStageBtn" onclick="window.nextStageAction()" style="background:var(--gradient-energy);color:black;font-weight:bold;display:none">🚀</button>
+            <div class="entropy-badge">⚡ <span id="hudEntropy">0</span></div>
+            <div style="display:flex; gap:8px">
+                <button class="btn btn-outline btn-sm" onclick="window.exitWorld()">🏠</button>
+                <button class="btn btn-energy btn-sm" id="nextStageBtn" onclick="window.nextStageAction()" style="display:none">🚀</button>
             </div>
         </div>
         
-        <div class="world-info-panel" id="worldInfoPanel">
-            </div>
-
         <div class="hud-bottom">
             <div class="joystick-zone" id="joystickZone">
                 <div class="joystick-knob" id="joystickKnob"></div>
             </div>
-            <div class="action-btn-zone">
-                <button class="action-btn" id="actionBtn" ontouchstart="window.triggerAction()">🚀</button>
-            </div>
-        </div>
-        
-        <div class="desktop-hint">
-            W A S D : Move &nbsp;|&nbsp; SPACE : Dash &nbsp;|&nbsp; ESC : Home
+            <button class="action-btn" id="actionBtn" ontouchstart="window.triggerDash()">🚀</button>
         </div>
     </div>
-    
-    <div class="encounter-dialog" id="encounterDialog">
-        <div class="encounter-content">
-            <h3 id="encounterTitle" class="font-display" style="margin-bottom:10px;font-size:20px">Encounter</h3>
-            <p id="encounterDesc" style="color:var(--text-muted)">Description</p>
-            <div class="encounter-choices" id="encounterChoices"></div>
-        </div>
-    </div>
-    
-    <div class="story-overlay" id="storyOverlay">
-        <div class="story-content">
-            <div style="font-size:60px;margin-bottom:20px" id="storyIcon">🌌</div>
-            <h2 id="storyTitle" class="font-display" style="color:var(--primary);margin-bottom:15px">Title</h2>
-            <p id="storyText" style="line-height:1.6;margin-bottom:30px">Text</p>
-            <button class="btn btn-primary btn-lg" onclick="window.closeStory()">CONTINUE</button>
-        </div>
-    </div>
-    
-    <div class="modal-overlay" id="editCellModal">
-        <div class="modal" style="max-width:500px">
-            <h2 class="modal-title">🧬 세포 커스터마이징</h2>
-            <div style="display:flex;justify-content:center;margin:20px 0"><canvas id="cellPreview" width="180" height="180"></canvas></div>
-            <input type="text" class="input" id="cellNameInput" placeholder="이름 입력" style="text-align:center;margin-bottom:20px">
-            <div class="parts-grid" id="partsGrid"></div>
-            <div id="styleSelector" style="display:none;margin-top:15px">
-                <div class="style-options" id="styleOptions"></div>
-            </div>
-            <div class="modal-actions mt-24" style="margin-top:20px">
-                <button class="btn btn-outline" onclick="window.closeEditModal()">취소</button>
-                <button class="btn btn-outline" onclick="window.randomizeCellDesign()">🎲 랜덤</button>
-                <button class="btn btn-primary" onclick="window.saveCellDesign()">저장</button>
-            </div>
-        </div>
-    </div>
-    
-    <div class="modal-overlay" id="exploreModal">
-        <div class="modal">
-            <h2 class="modal-title" id="exploreTitle"></h2>
-            <div id="exploreDesc" style="margin:20px 0"></div>
-            <button class="btn btn-primary btn-block" onclick="window.closeExploreModal()">확인</button>
-        </div>
-    </div>
-    
-    <div class="modal-overlay" id="resultModal"> <div class="result-content">
-            <div style="font-size:60px;margin-bottom:20px" id="resultIcon"></div>
-            <h2 id="resultTitle" class="font-display"></h2>
-            <p id="resultDesc" style="margin:15px 0;color:var(--text-muted)"></p>
-            <div id="resultActions" style="display:flex;gap:10px;justify-content:center"></div>
-        </div>
-    </div>
-    
-    <div class="toast-container" id="toastContainer"></div>
+
     <div class="evo-alert" id="evoAlert">
-        <span class="evo-alert-icon" id="evoAlertIcon"></span>
-        <div class="evo-alert-title" id="evoAlertTitle"></div>
-        <div class="evo-alert-desc" id="evoAlertDesc"></div>
-        <div class="evo-alert-effect" id="evoAlertEffect"></div>
+        <span class="evo-alert-icon" id="evoAlertIcon">🧬</span>
+        <div class="evo-alert-title" id="evoAlertTitle">EVOLUTION</div>
+        <div id="evoAlertDesc" style="color:var(--text-muted); margin:10px 0;">능력 획득</div>
     </div>
 
     <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-    import { getFirestore, doc, setDoc, getDoc, updateDoc, collection, addDoc, query, where, getDocs, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+    import { getFirestore, doc, setDoc, getDoc, updateDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
     import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
     
     const firebaseConfig = { apiKey: "AIzaSyBwQjuqgWM4YKnqu_gzNbeCg5alrC-jVcQ", authDomain: "myco-737a0.firebaseapp.com", projectId: "myco-737a0", storageBucket: "myco-737a0.firebasestorage.app", messagingSenderId: "942571332540", appId: "1:942571332540:web:be0bb6fbdd32655501c1b9" };
@@ -355,530 +110,144 @@
     const auth = getAuth(fbApp);
     const googleProvider = new GoogleAuthProvider();
     
-    // --- JOYSTICK LOGIC ---
-    const Joystick = {
-        active: false,
-        x: 0, // -1 to 1
-        y: 0, // -1 to 1
-        originX: 0,
-        originY: 0,
-        touchId: null
-    };
-
-    function initJoystick() {
-        const zone = document.getElementById('joystickZone');
-        const knob = document.getElementById('joystickKnob');
-        
-        zone.addEventListener('touchstart', (e) => {
-            e.preventDefault();
-            const touch = e.changedTouches[0];
-            Joystick.touchId = touch.identifier;
-            Joystick.active = true;
-            const rect = zone.getBoundingClientRect();
-            Joystick.originX = rect.left + rect.width / 2;
-            Joystick.originY = rect.top + rect.height / 2;
-            updateKnob(touch.clientX, touch.clientY);
-        }, { passive: false });
-
-        zone.addEventListener('touchmove', (e) => {
-            e.preventDefault();
-            if (!Joystick.active) return;
-            for (let i = 0; i < e.changedTouches.length; i++) {
-                if (e.changedTouches[i].identifier === Joystick.touchId) {
-                    updateKnob(e.changedTouches[i].clientX, e.changedTouches[i].clientY);
-                    break;
-                }
-            }
-        }, { passive: false });
-
-        const endTouch = (e) => {
-            e.preventDefault();
-            for (let i = 0; i < e.changedTouches.length; i++) {
-                if (e.changedTouches[i].identifier === Joystick.touchId) {
-                    Joystick.active = false;
-                    Joystick.x = 0;
-                    Joystick.y = 0;
-                    knob.style.transform = `translate(-50%, -50%)`;
-                    break;
-                }
-            }
-        };
-        zone.addEventListener('touchend', endTouch);
-        zone.addEventListener('touchcancel', endTouch);
-
-        function updateKnob(cx, cy) {
-            const maxDist = 35; // Max drag radius
-            let dx = cx - Joystick.originX;
-            let dy = cy - Joystick.originY;
-            const dist = Math.sqrt(dx*dx + dy*dy);
-            
-            if (dist > maxDist) {
-                dx = (dx / dist) * maxDist;
-                dy = (dy / dist) * maxDist;
-            }
-            
-            Joystick.x = dx / maxDist;
-            Joystick.y = dy / maxDist;
-            knob.style.transform = `translate(calc(-50% + ${dx}px), calc(-50% + ${dy}px))`;
-        }
-    }
-
-    // --- GAME CONSTANTS & UTILS ---
-    const PART_STYLES = {
-        eye: [{ id: 'normal', name: '기본', icon: '👁️' }, { id: 'big', name: '큰 눈', icon: '👀' }, { id: 'glow', name: '발광', icon: '✨' }],
-        arm: [{ id: 'tentacle', name: '촉수', icon: '🦑' }, { id: 'claw', name: '집게', icon: '🦀' }, { id: 'long', name: '긴 팔', icon: '🦎' }],
-        leg: [{ id: 'normal', name: '기본', icon: '🦵' }, { id: 'tentacle', name: '촉수', icon: '🦑' }, { id: 'fin', name: '지느러미', icon: '🐠' }],
-        brain: [{ id: 'normal', name: '기본', icon: '🧠' }, { id: 'large', name: '대형', icon: '🔮' }, { id: 'antenna', name: '안테나', icon: '📡' }],
-        wing: [{ id: 'normal', name: '기본', icon: '🪽' }, { id: 'butterfly', name: '나비', icon: '🦋' }, { id: 'energy', name: '에너지', icon: '⚡' }]
-    };
-    
-    const PLANET_NAMES = ['Kepler-22b', 'Proxima-B', 'Trappist-1e', 'Gliese-581g', 'HD-40307g'];
-    const PLANET_TYPES = ['생명체 서식 가능', '얼음 행성', '사막 행성', '해양 행성', '화산 행성'];
-    const TECH_TREE = [
-        { id: 'fire', name: '불', icon: '🔥', cost: 500, requires: [] },
-        { id: 'tools', name: '도구', icon: '🔧', cost: 800, requires: ['fire'] },
-        { id: 'wheel', name: '바퀴', icon: '⚙️', cost: 1000, requires: ['tools'] }
-    ];
-
-    function randomPartStyle(part) { const s = PART_STYLES[part]; return s[Math.floor(Math.random() * s.length)].id; }
-    
-    function generateCellDesign() {
-        return {
-            name: 'Unknown Entity',
-            primaryColor: `hsl(${Math.floor(Math.random()*360)}, 80%, 60%)`,
-            secondaryColor: `hsl(${Math.floor(Math.random()*360)}, 70%, 40%)`,
-            pattern: 'spots',
-            wobblePoints: 10, wobbleIntensity: 1, glowIntensity: 0.5,
-            parts: { eye: 'normal', arm: 'tentacle', leg: 'normal', brain: 'normal', wing: 'normal' }
-        };
-    }
-
+    // --- State ---
     const State = {
-        user: null, userData: null, currentPage: 'login',
+        user: null,
         game: {
             entropy: 0, stage: 1,
             evolution: { eye: false, arm: false, leg: false, brain: false, wing: false },
-            currentPlanet: null, explored: [], ownedTerritories: [], history: [], cellDesign: null,
-            driftProgress: 0, mergedCells: 0, tech: []
+            history: [], cellDesign: null
         },
-        async sync() { if (this.user) updateDoc(doc(db, 'users', this.user.uid), { game: this.game, updatedAt: serverTimestamp() }).catch(console.error); },
-        async load() { if (!this.user) return; const snap = await getDoc(doc(db, 'users', this.user.uid)); if (snap.exists()) { this.userData = snap.data(); if (this.userData.game) this.game = { ...this.game, ...this.userData.game }; } }
+        async sync() { if(this.user) await updateDoc(doc(db, 'users', this.user.uid), { game: this.game }); },
+        async load() { 
+            if(!this.user) return; 
+            const snap = await getDoc(doc(db, 'users', this.user.uid)); 
+            if(snap.exists()) { const d = snap.data(); if(d.game) this.game = { ...this.game, ...d.game }; }
+        }
     };
 
-    function createStars() { const c = document.getElementById('stars'); c.innerHTML = ''; for (let i=0; i<100; i++) { const s = document.createElement('div'); s.className = 'star'; s.style.cssText = `left:${Math.random()*100}%;top:${Math.random()*100}%;width:${Math.random()*2+1}px;height:${s.style.width};animation-delay:${Math.random()*3}s`; c.appendChild(s); } }
-    function showToast(msg, type='info') { const c = document.getElementById('toastContainer'); const t = document.createElement('div'); t.className = `toast ${type}`; t.innerHTML = `<span>${type==='success'?'✅':type==='error'?'❌':'ℹ️'}</span><span style="flex:1">${msg}</span>`; c.appendChild(t); setTimeout(()=>t.remove(), 4000); }
-    function showEvoAlert(icon, title, desc, effect) { const a = document.getElementById('evoAlert'); document.getElementById('evoAlertIcon').textContent = icon; document.getElementById('evoAlertTitle').textContent = title; document.getElementById('evoAlertDesc').textContent = desc; document.getElementById('evoAlertEffect').textContent = effect; a.classList.add('show'); setTimeout(()=>a.classList.remove('show'), 2500); }
-    function showStory(icon, title, text, callback) { document.getElementById('storyIcon').textContent = icon; document.getElementById('storyTitle').textContent = title; document.getElementById('storyText').innerHTML = text; document.getElementById('storyOverlay').classList.add('active'); window.storyCallback = callback; }
-    function closeStory() { document.getElementById('storyOverlay').classList.remove('active'); if(window.storyCallback) window.storyCallback(); }
-    
-    // --- DRAWING ---
-    function drawCell(ctx, x, y, size, design, evolution, time=0) {
-        const d = design || generateCellDesign();
-        ctx.save(); ctx.translate(x, y);
-        if(d.glowIntensity > 0.5) { ctx.shadowColor = d.primaryColor; ctx.shadowBlur = 20; }
-        
-        // Body
-        ctx.beginPath();
-        for(let i=0; i<12; i++) {
-            const angle = (i/12)*Math.PI*2;
-            const r = size + Math.sin(time*0.1 + i*0.5)*5;
-            const px = Math.cos(angle)*r; const py = Math.sin(angle)*r;
-            i===0 ? ctx.moveTo(px,py) : ctx.lineTo(px,py);
+    // --- Joystick Logic ---
+    const Joystick = { active: false, x: 0, y: 0 };
+    function initJoystick() {
+        const zone = document.getElementById('joystickZone');
+        const knob = document.getElementById('joystickKnob');
+        zone.addEventListener('touchstart', (e) => { Joystick.active = true; handleMove(e); });
+        zone.addEventListener('touchmove', handleMove);
+        zone.addEventListener('touchend', () => { Joystick.active = false; Joystick.x = 0; Joystick.y = 0; knob.style.transform = 'translate(-50%, -50%)'; });
+        function handleMove(e) {
+            e.preventDefault();
+            const touch = e.touches[0];
+            const rect = zone.getBoundingClientRect();
+            const cx = rect.left + rect.width/2;
+            const cy = rect.top + rect.height/2;
+            let dx = touch.clientX - cx;
+            let dy = touch.clientY - cy;
+            const dist = Math.min(Math.hypot(dx, dy), 40);
+            const angle = Math.atan2(dy, dx);
+            Joystick.x = Math.cos(angle) * (dist / 40);
+            Joystick.y = Math.sin(angle) * (dist / 40);
+            knob.style.transform = `translate(calc(-50% + ${Math.cos(angle)*dist}px), calc(-50% + ${Math.sin(angle)*dist}px))`;
         }
-        ctx.closePath();
-        const g = ctx.createRadialGradient(-size*0.3, -size*0.3, 0, 0, 0, size*1.2);
-        g.addColorStop(0, d.primaryColor); g.addColorStop(1, d.secondaryColor);
-        ctx.fillStyle = g; ctx.fill(); ctx.shadowBlur = 0;
+    }
 
-        // Parts
-        if(evolution?.eye) {
-            ctx.fillStyle = 'white'; ctx.beginPath(); ctx.arc(size*0.3, -size*0.1, size*0.25, 0, Math.PI*2); ctx.fill();
-            ctx.fillStyle = 'black'; ctx.beginPath(); ctx.arc(size*0.35, -size*0.1, size*0.1, 0, Math.PI*2); ctx.fill();
+    // --- Renderers ---
+    function render() {
+        const app = document.getElementById('app');
+        if(State.currentPage === 'login') {
+            app.innerHTML = `<div class="login-page"><h1 class="login-logo">BOKLUCK</h1><div class="login-cell"></div><button class="btn btn-google btn-lg" onclick="window.googleLogin()">Google 계정으로 시작</button></div>`;
+        } else {
+            const g = State.game;
+            app.innerHTML = `
+                <div class="navbar"><div class="nav-logo">BOKLUCK</div><div class="nav-right"><div class="entropy-badge">⚡ ${Math.floor(g.entropy)}</div><img class="user-avatar" src="${State.user.photoURL}" onclick="window.logout()"></div></div>
+                <div class="main-content container"><div class="card">
+                    <div class="entity-visual"><canvas id="dashCanvas" width="180" height="180"></canvas></div>
+                    <div class="entity-name">STAGE ${g.stage} ENTITY</div>
+                    <button class="btn btn-primary btn-block" onclick="window.startCellWorld()">🌌 세포 세계 진입</button>
+                </div></div>`;
+            setTimeout(drawDash, 100);
         }
-        if(evolution?.wing) {
-            ctx.fillStyle = 'rgba(255,255,255,0.3)';
-            ctx.save(); ctx.rotate(Math.sin(time*0.2)*0.3);
-            ctx.beginPath(); ctx.ellipse(-size*0.5, -size*0.2, size*0.6, size*0.3, -0.5, 0, Math.PI*2); ctx.fill();
-            ctx.restore();
-        }
+    }
+
+    function drawDash() {
+        const cvs = document.getElementById('dashCanvas'); if(!cvs) return;
+        const ctx = cvs.getContext('2d'); let t = 0;
+        function loop() { if(!document.getElementById('dashCanvas')) return; t+=0.05; ctx.clearRect(0,0,180,180); drawEntity(ctx, 90, 90, 40, State.game.evolution, t); requestAnimationFrame(loop); }
+        loop();
+    }
+
+    function drawEntity(ctx, x, y, r, evo, t) {
+        ctx.save(); ctx.translate(x,y); ctx.beginPath();
+        for(let i=0; i<12; i++){ const a = (i/12)*Math.PI*2; const rad = r + Math.sin(t + i)*3; ctx.lineTo(Math.cos(a)*rad, Math.sin(a)*rad); }
+        ctx.closePath(); const g = ctx.createRadialGradient(-10,-10,0,0,0,r); g.addColorStop(0, '#00f5d4'); g.addColorStop(1, '#7b2cbf'); ctx.fillStyle = g; ctx.fill();
+        if(evo.eye) { ctx.fillStyle='white'; ctx.beginPath(); ctx.arc(10,-5,10,0,Math.PI*2); ctx.fill(); ctx.fillStyle='black'; ctx.beginPath(); ctx.arc(12,-5,4,0,Math.PI*2); ctx.fill(); }
         ctx.restore();
     }
 
-    // --- RENDERERS ---
-    function render() {
-        const p = State.currentPage;
-        if(p==='login') renderLogin();
-        else if(p==='dashboard') renderDashboard();
-        else if(p==='cell-world') startCellWorld();
-        else if(p==='drift') startCosmicDrift();
-        else if(p==='landing') startPlanetLanding();
-        else if(p==='planet') renderPlanet();
-        else if(p==='history') renderHistory();
-    }
-
-    function renderLogin() {
-        document.getElementById('app').innerHTML = `<div class="login-page">
-            <h1 class="login-logo">BOKLUCK</h1>
-            <p class="login-subtitle">Universe</p>
-            <div class="login-cell"></div>
-            <p class="login-story">광활한 우주 어딘가에서<br>하나의 <strong>세포</strong>로 태어났다.<br>살아남으려면 <strong>엔트로피</strong>를 모아야 한다.</p>
-            <button class="btn btn-google btn-lg" onclick="window.googleLogin()">Google로 시작하기</button>
-        </div>`;
-    }
-
-    function renderDashboard() {
-        const { stage, entropy, evolution } = State.game;
-        const d = State.game.cellDesign || generateCellDesign();
-        
-        let actionBtn = '';
-        if(stage===1) actionBtn = `<button class="btn btn-primary btn-block mt-24" onclick="window.nav('cell-world')">🌌 세포 세계 진입</button>`;
-        else if(stage===2) actionBtn = `<button class="btn btn-energy btn-block mt-24" onclick="window.nav('landing')">🚀 행성 착륙</button>`;
-        else if(stage>=3) actionBtn = `<button class="btn btn-primary btn-block mt-24" onclick="window.nav('planet')">🪐 행성 탐험</button>`;
-
-        document.getElementById('app').innerHTML = `
-            <div class="navbar">
-                <div class="nav-logo">BOKLUCK</div>
-                <div class="nav-right">
-                    <div class="entropy-badge">⚡ ${Math.floor(entropy)}</div>
-                    <div class="user-menu"><img class="user-avatar" src="${State.user?.photoURL}" onclick="window.openEditModal()"></div>
-                </div>
-            </div>
-            <div class="main-content container">
-                <div class="dashboard-grid">
-                    <div class="card entity-card">
-                        <div class="entity-visual" onclick="window.openEditModal()"><canvas id="dashCanvas" width="200" height="200"></canvas></div>
-                        <div class="entity-name">${d.name}</div>
-                        <div style="text-align:center;color:var(--accent);font-size:12px;margin-bottom:15px">STAGE ${stage}</div>
-                        <div class="entity-stats">
-                            <div class="stat-box"><div class="stat-value">${Object.values(evolution).filter(x=>x).length}/5</div><div class="stat-label">진화</div></div>
-                            <div class="stat-box"><div class="stat-value">${State.game.explored.length}</div><div class="stat-label">탐험</div></div>
-                        </div>
-                        ${actionBtn}
-                    </div>
-                    <div>
-                        <div class="quick-actions">
-                            <div class="quick-action" onclick="window.nav('cell-world')"><div class="quick-action-icon">🦠</div><div class="quick-action-label">세포</div></div>
-                            <div class="quick-action ${stage<1.5&&entropy<800?'locked':''}" onclick="${stage>=1.5||entropy>=800?"window.nav('drift')":""}"><div class="quick-action-icon">🌠</div><div class="quick-action-label">표류</div></div>
-                            <div class="quick-action ${stage<3?'locked':''}" onclick="${stage>=3?"window.nav('planet')":""}"><div class="quick-action-icon">🪐</div><div class="quick-action-label">행성</div></div>
-                            <div class="quick-action" onclick="window.nav('history')"><div class="quick-action-icon">📜</div><div class="quick-action-label">역사</div></div>
-                        </div>
-                        <div class="card">
-                            <div class="card-header"><span class="card-title">📜 역사</span></div>
-                            ${State.game.history.length===0 ? '<p class="text-center text-muted">기록 없음</p>' : State.game.history.slice(-3).reverse().map(e=>`<div class="history-entry"><div class="history-chapter">Ch.${e.chapter}</div><div class="history-title">${e.title}</div><div style="font-size:12px;color:#aaa">${e.content}</div></div>`).join('')}
-                        </div>
-                    </div>
-                </div>
-            </div>`;
-        
-        // Render Dashboard Canvas
-        const cvs = document.getElementById('dashCanvas');
-        if(cvs) {
-            const ctx = cvs.getContext('2d');
-            let t = 0;
-            const loop = () => {
-                if(!document.getElementById('dashCanvas')) return;
-                t+=0.05; ctx.clearRect(0,0,200,200);
-                drawCell(ctx, 100, 100, 50, d, evolution, t);
-                requestAnimationFrame(loop);
-            };
-            loop();
-        }
-    }
-
-    function renderHistory() {
-        document.getElementById('app').innerHTML = `
-            <div class="navbar"><div class="nav-logo" onclick="window.nav('dashboard')">BACK</div></div>
-            <div class="main-content container">
-                <h2 class="font-display text-center mb-24">HISTORY</h2>
-                ${State.game.history.map(e=>`<div class="card mb-16"><div class="history-chapter">Ch.${e.chapter}</div><h3>${e.title}</h3><p>${e.content}</p></div>`).join('')}
-            </div>`;
-    }
-
-    function renderPlanet() {
-        const p = State.game.currentPlanet;
-        const explored = State.game.explored;
-        document.getElementById('app').innerHTML = `
-            <div class="navbar"><div class="nav-logo" onclick="window.nav('dashboard')">BACK</div><div class="nav-right"><div class="entropy-badge">⚡ ${Math.floor(State.game.entropy)}</div></div></div>
-            <div class="main-content container">
-                <div class="card mb-24 text-center">
-                    <div style="font-size:60px">🪐</div>
-                    <h1 class="font-display">${p.name}</h1>
-                    <p class="text-muted">${p.type}</p>
-                </div>
-                <div class="card">
-                    <div class="card-header"><span class="card-title">PLANET MAP</span><span style="font-size:12px">Explored: ${explored.length}</span></div>
-                    <div class="planet-map" id="planetMap" style="display:grid;grid-template-columns:repeat(10,1fr);gap:4px"></div>
-                    <p class="text-center text-muted" style="font-size:11px;margin-top:10px">Tap tile to explore (50⚡)</p>
-                </div>
-            </div>`;
-        
-        const map = document.getElementById('planetMap');
-        const exploredSet = new Set(explored.map(e=>`${e.x},${e.y}`));
-        for(let y=0;y<10;y++) {
-            for(let x=0;x<10;x++) {
-                const isExp = exploredSet.has(`${x},${y}`);
-                const d = document.createElement('div');
-                d.className = `map-cell ${isExp?'explored':''}`;
-                d.innerHTML = isExp ? '✓' : '';
-                d.onclick = () => exploreCell(x,y);
-                map.appendChild(d);
-            }
-        }
-    }
-
-    async function exploreCell(x,y) {
-        const cost = 50;
-        if(State.game.entropy < cost) return showToast('Not enough Entropy', 'error');
-        if(State.game.explored.some(e=>e.x===x&&e.y===y)) return;
-        
-        State.game.entropy -= cost;
-        const reward = Math.floor(Math.random()*150);
-        State.game.entropy += reward;
-        State.game.explored.push({x,y,timestamp:new Date().toISOString()});
-        await State.sync();
-        
-        document.getElementById('exploreTitle').textContent = "Exploration Result";
-        document.getElementById('exploreDesc').innerHTML = `Found resource!<br><span style="color:var(--success)">+${reward} Entropy</span>`;
-        document.getElementById('exploreModal').classList.add('active');
-        renderPlanet();
-    }
-
-    // --- GAME LOOPS ---
+    // --- Game World ---
     let worldRunning = false;
-    let particles = [];
-    let player = { x:0, y:0, vx:0, vy:0, size:30 };
-    const keys = {};
-
-    function startCellWorld() {
+    window.startCellWorld = () => {
         document.getElementById('app').innerHTML = '';
-        const cvs = document.getElementById('worldCanvas');
-        const ctx = cvs.getContext('2d');
+        const cvs = document.getElementById('worldCanvas'); const ctx = cvs.getContext('2d');
         cvs.width = window.innerWidth; cvs.height = window.innerHeight;
-        cvs.classList.add('active');
-        document.getElementById('mobileControls').classList.add('active');
-        
-        // Setup HUD
-        document.getElementById('gameEntropyDisplay').textContent = Math.floor(State.game.entropy);
-        updateEvoPanel();
-        if(State.game.entropy>=800) document.getElementById('nextStageBtn').style.display = 'block';
-
+        cvs.classList.add('active'); document.getElementById('mobileControls').classList.add('active');
         worldRunning = true;
-        particles = [];
-        for(let i=0; i<60; i++) particles.push({ x:Math.random()*cvs.width, y:Math.random()*cvs.height, size:3+Math.random()*5, val:1+Math.floor(Math.random()*3) });
+        let particles = []; for(let i=0; i<50; i++) particles.push({ x: Math.random()*cvs.width, y: Math.random()*cvs.height, val: 5 });
+        let player = { x: cvs.width/2, y: cvs.height/2, size: 30 };
         
-        player.x = cvs.width/2; player.y = cvs.height/2;
-        player.size = 30 + State.game.entropy * 0.02;
-
-        window.onkeydown = e => keys[e.key.toLowerCase()] = true;
-        window.onkeyup = e => keys[e.key.toLowerCase()] = false;
-
-        let time = 0;
-        const loop = () => {
+        function loop() {
             if(!worldRunning) return;
-            time += 0.05;
             ctx.fillStyle = '#0a0a1a'; ctx.fillRect(0,0,cvs.width, cvs.height);
-
-            // Movement: Joystick + Keyboard
-            let mx = Joystick.active ? Joystick.x : 0;
-            let my = Joystick.active ? Joystick.y : 0;
-            if(!Joystick.active) {
-                if(keys['w']) my=-1; if(keys['s']) my=1; if(keys['a']) mx=-1; if(keys['d']) mx=1;
-            }
-            const speed = (State.game.evolution.leg ? 5 : 3) * (player.dashing ? 2 : 1);
-            player.x += mx * speed; player.y += my * speed;
-            if(player.dashing) player.dashCount--;
-            if(player.dashCount<=0) player.dashing=false;
-
-            // Particles
-            particles.forEach((p,i) => {
-                // Collect
-                const dist = Math.hypot(p.x-player.x, p.y-player.y);
-                const range = State.game.evolution.arm ? 100 : 50;
-                if(dist < player.size + range) {
-                    // Pull
-                    p.x += (player.x - p.x)*0.1; p.y += (player.y - p.y)*0.1;
-                    if(dist < player.size) {
-                        State.game.entropy += p.val * (State.game.evolution.brain?2:1);
-                        particles[i] = { x:Math.random()*cvs.width, y:Math.random()*cvs.height, size:3+Math.random()*5, val:1 };
-                        document.getElementById('gameEntropyDisplay').textContent = Math.floor(State.game.entropy);
-                        checkEvo();
-                    }
-                }
-                
-                // Draw
-                ctx.fillStyle = `hsl(${time*10 + i*10}, 70%, 60%)`;
-                ctx.beginPath(); ctx.arc(p.x, p.y, p.size, 0, Math.PI*2); ctx.fill();
-            });
-
-            // Player
-            drawCell(ctx, player.x, player.y, player.size, State.game.cellDesign, State.game.evolution, time);
             
+            let mx = Joystick.x, my = Joystick.y;
+            player.x += mx * 5; player.y += my * 5;
+            player.x = Math.max(0, Math.min(cvs.width, player.x));
+            player.y = Math.max(0, Math.min(cvs.height, player.y));
+            
+            particles.forEach((p, i) => {
+                const d = Math.hypot(p.x-player.x, p.y-player.y);
+                if(d < player.size + 10) {
+                    State.game.entropy += p.val;
+                    document.getElementById('hudEntropy').textContent = Math.floor(State.game.entropy);
+                    particles[i] = { x: Math.random()*cvs.width, y: Math.random()*cvs.height, val: 5 };
+                    checkEvolution();
+                }
+                ctx.fillStyle = '#00f5d4'; ctx.beginPath(); ctx.arc(p.x, p.y, 4, 0, Math.PI*2); ctx.fill();
+            });
+            
+            drawEntity(ctx, player.x, player.y, player.size, State.game.evolution, Date.now()*0.005);
             requestAnimationFrame(loop);
-        };
-        loop();
-    }
-
-    function startCosmicDrift() {
-        // Simple reuse of canvas for drift stage
-        // In real impl, would be different mechanics. For now, let's keep cell world but change bg
-        startCellWorld();
-        // Add specific drift logic here if needed
-    }
-
-    function startPlanetLanding() {
-        document.getElementById('app').innerHTML = '';
-        const cvs = document.getElementById('worldCanvas');
-        const ctx = cvs.getContext('2d');
-        cvs.width = window.innerWidth; cvs.height = window.innerHeight;
-        cvs.classList.add('active');
-        document.getElementById('mobileControls').classList.add('active');
-        document.getElementById('joystickZone').style.display = 'none'; // Auto-run style? Or keep control? Let's keep control.
-        
-        worldRunning = true;
-        let dist = 0;
-        const targetDist = 2000;
-        let obstacles = [];
-        
-        const loop = () => {
-            if(!worldRunning) return;
-            ctx.fillStyle = '#050510'; ctx.fillRect(0,0,cvs.width, cvs.height);
-            
-            // Auto scroll
-            dist += 5;
-            document.getElementById('gameEntropyDisplay').textContent = `${dist}/${targetDist}m`;
-
-            // Player move (Left/Right only for landing usually, but let's allow X/Y)
-            let mx = Joystick.active ? Joystick.x : 0;
-            player.x += mx * 8;
-            player.x = Math.max(20, Math.min(cvs.width-20, player.x));
-            
-            // Draw Player
-            drawCell(ctx, player.x, cvs.height-100, 30, State.game.cellDesign, State.game.evolution, 0);
-
-            // Obstacles
-            if(Math.random()<0.05) obstacles.push({x:Math.random()*cvs.width, y:-50, size:20});
-            obstacles.forEach((o,i) => {
-                o.y += 5;
-                ctx.fillStyle = '#666'; ctx.beginPath(); ctx.arc(o.x, o.y, o.size, 0, Math.PI*2); ctx.fill();
-                
-                if(Math.hypot(player.x-o.x, (cvs.height-100)-o.y) < 30+o.size) {
-                    // Hit
-                    obstacles.splice(i,1);
-                    // Handle damage
-                }
-            });
-
-            if(dist >= targetDist) {
-                worldRunning = false;
-                State.game.stage = 3;
-                State.game.currentPlanet = { name:PLANET_NAMES[0], type:PLANET_TYPES[0] };
-                State.sync();
-                document.getElementById('resultTitle').textContent = "LANDING SUCCESS";
-                document.getElementById('resultDesc').textContent = "Welcome to your new home.";
-                document.getElementById('resultActions').innerHTML = `<button class="btn btn-primary" onclick="window.nav('planet')">Explore</button>`;
-                document.getElementById('resultModal').classList.add('active');
-                document.getElementById('mobileControls').classList.remove('active');
-                cvs.classList.remove('active');
-            } else {
-                requestAnimationFrame(loop);
-            }
-        };
-        loop();
-    }
-
-    // --- LOGIC ---
-    window.nextStageAction = function() {
-        if(State.game.stage === 1) window.nav('drift');
-        else if(State.game.stage === 1.5) window.nav('landing');
-    }
-
-    window.triggerAction = function() {
-        // Dash
-        if(State.game.evolution.wing) {
-            player.dashing = true;
-            player.dashCount = 20;
         }
-    }
+        loop();
+    };
 
-    window.exitWorld = function() {
-        worldRunning = false;
-        document.getElementById('worldCanvas').classList.remove('active');
-        document.getElementById('mobileControls').classList.remove('active');
-        State.sync();
-        navigate('dashboard');
-    }
-
-    function checkEvo() {
-        const e = State.game.entropy;
-        const ev = State.game.evolution;
+    function checkEvolution() {
+        const e = State.game.entropy; const ev = State.game.evolution;
         let type = null;
-        if(!ev.eye && e>=100) type='eye';
-        else if(!ev.arm && e>=300) type='arm';
-        else if(!ev.leg && e>=600) type='leg';
-        else if(!ev.brain && e>=1000) type='brain';
-        else if(!ev.wing && e>=1500) type='wing';
-
+        if(!ev.eye && e >= 100) { ev.eye = true; type = "시각(Eye)"; }
+        else if(!ev.arm && e >= 300) { ev.arm = true; type = "촉수(Arm)"; }
+        
         if(type) {
-            ev[type] = true;
-            showEvoAlert('🧬', 'EVOLUTION', `${type.toUpperCase()} Acquired!`, 'Ability Unlocked');
-            updateEvoPanel();
+            const alert = document.getElementById('evoAlert');
+            document.getElementById('evoAlertDesc').textContent = `${type} 진화 완료!`;
+            alert.classList.add('show');
+            setTimeout(() => alert.classList.remove('show'), 3000);
             State.sync();
         }
-        
-        if(e >= 800 && State.game.stage === 1) {
-            document.getElementById('nextStageBtn').style.display = 'block';
-        }
+        if(e >= 800) document.getElementById('nextStageBtn').style.display = 'block';
     }
 
-    function updateEvoPanel() {
-        const ev = State.game.evolution;
-        const e = State.game.entropy;
-        let html = '';
-        if(ev.eye) html += `<div class="world-evo-item unlocked">👁️ Vision</div>`; else html += `<div class="world-evo-item">👁️ 100</div>`;
-        if(ev.arm) html += `<div class="world-evo-item unlocked">🦾 Arm</div>`; else html += `<div class="world-evo-item">🦾 300</div>`;
-        if(ev.leg) html += `<div class="world-evo-item unlocked">🦵 Leg</div>`; else html += `<div class="world-evo-item">🦵 600</div>`;
-        document.getElementById('worldInfoPanel').innerHTML = `<div class="world-info-title">EVOLUTION</div>` + html;
-    }
+    window.exitWorld = () => { worldRunning = false; document.getElementById('worldCanvas').classList.remove('active'); document.getElementById('mobileControls').classList.remove('active'); State.sync(); render(); };
+    window.googleLogin = async () => { await signInWithPopup(auth, googleProvider); };
+    window.logout = () => signOut(auth);
 
-    // --- GLOBAL HELPERS ---
-    window.nav = navigate;
-    window.googleLogin = async () => {
-        try {
-            const res = await signInWithPopup(auth, googleProvider);
-            const user = res.user;
-            const snap = await getDoc(doc(db,'users',user.uid));
-            if(!snap.exists()) await setDoc(doc(db,'users',user.uid), { game: State.game, createdAt: serverTimestamp() });
-        } catch(e) { showToast(e.message, 'error'); }
-    };
-    window.logout = () => signOut(auth).then(()=>navigate('login'));
-    window.openEditModal = () => {
-        document.getElementById('editCellModal').classList.add('active');
-        document.getElementById('cellNameInput').value = State.game.cellDesign?.name || '';
-        const cvs = document.getElementById('cellPreview');
-        const ctx = cvs.getContext('2d');
-        let t=0;
-        const loop = ()=>{ if(!document.getElementById('editCellModal').classList.contains('active')) return; t+=0.05; ctx.clearRect(0,0,180,180); drawCell(ctx,90,90,40,State.game.cellDesign||generateCellDesign(),State.game.evolution,t); requestAnimationFrame(loop); };
-        loop();
-    };
-    window.closeEditModal = () => document.getElementById('editCellModal').classList.remove('active');
-    window.randomizeCellDesign = () => { State.game.cellDesign = generateCellDesign(); window.openEditModal(); };
-    window.saveCellDesign = async () => {
-        if(!State.game.cellDesign) State.game.cellDesign = generateCellDesign();
-        State.game.cellDesign.name = document.getElementById('cellNameInput').value;
-        await State.sync();
-        window.closeEditModal();
-        navigate('dashboard');
-    };
-    window.closeExploreModal = () => document.getElementById('exploreModal').classList.remove('active');
-
-    // --- BOOTSTRAP ---
-    initJoystick();
-    createStars();
-    onAuthStateChanged(auth, u => {
-        if(u) { State.user=u; State.load().then(()=>{ document.getElementById('loadingScreen').classList.add('hidden'); navigate('dashboard'); }); }
-        else { document.getElementById('loadingScreen').classList.add('hidden'); navigate('login'); }
+    onAuthStateChanged(auth, async (u) => {
+        if(u) { State.user = u; await State.load(); State.currentPage = 'dashboard'; }
+        else { State.user = null; State.currentPage = 'login'; }
+        document.getElementById('loadingScreen').classList.add('hidden'); render();
     });
 
+    initJoystick();
+    createStars();
     </script>
 </body>
 </html>
