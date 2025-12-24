@@ -44,7 +44,6 @@
     
     .font-display { font-family: 'Orbitron', sans-serif; }
     
-    /* Space Background */
     #space-bg {
         position: fixed;
         top: 0; left: 0; right: 0; bottom: 0;
@@ -74,7 +73,6 @@
         50% { opacity: 1; }
     }
     
-    /* Loading */
     .loading-screen {
         position: fixed;
         top: 0; left: 0; right: 0; bottom: 0;
@@ -179,6 +177,10 @@
         color: var(--energy);
     }
     
+    .user-menu {
+        position: relative;
+    }
+    
     .user-profile {
         display: flex;
         align-items: center;
@@ -197,6 +199,35 @@
     }
     
     .user-name { font-size: 14px; font-weight: 600; }
+    
+    .user-dropdown {
+        position: absolute;
+        top: 100%;
+        right: 0;
+        margin-top: 8px;
+        background: var(--bg-card-solid);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 8px;
+        min-width: 160px;
+        display: none;
+        z-index: 1001;
+    }
+    
+    .user-dropdown.show { display: block; }
+    
+    .dropdown-item {
+        padding: 10px 16px;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 14px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    
+    .dropdown-item:hover { background: var(--bg-hover); }
+    .dropdown-item.danger { color: var(--danger); }
     
     .main-content {
         padding-top: var(--nav-height);
@@ -225,17 +256,13 @@
     }
     
     .btn:hover { transform: translateY(-2px); }
+    .btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
     
-    .btn-primary {
-        background: var(--gradient-cosmic);
-        color: white;
-    }
-    
-    .btn-outline {
-        background: transparent;
-        border: 1px solid var(--border);
-        color: var(--text);
-    }
+    .btn-primary { background: var(--gradient-cosmic); color: white; }
+    .btn-energy { background: var(--gradient-energy); color: #1a1a2e; }
+    .btn-outline { background: transparent; border: 1px solid var(--border); color: var(--text); }
+    .btn-outline:hover { border-color: var(--primary); color: var(--primary); }
+    .btn-danger { background: var(--danger); color: white; }
     
     .btn-google {
         background: white;
@@ -246,6 +273,7 @@
     .btn-google img { width: 20px; height: 20px; }
     
     .btn-lg { padding: 16px 40px; font-size: 16px; }
+    .btn-sm { padding: 8px 16px; font-size: 13px; }
     .btn-block { width: 100%; }
     
     /* Cards */
@@ -283,6 +311,7 @@
         height: 100%;
         background: var(--gradient-evolution);
         border-radius: 4px;
+        transition: width 0.3s;
     }
     
     .stage-progress {
@@ -546,8 +575,8 @@
     .history-content { font-size: 13px; color: var(--text-muted); line-height: 1.6; }
     .history-time { font-size: 11px; color: var(--text-dark); margin-top: 8px; }
     
-    /* Cell World */
-    #cellWorldCanvas {
+    /* World Canvas */
+    #worldCanvas {
         position: fixed;
         top: 0;
         left: 0;
@@ -555,16 +584,15 @@
         height: 100vh;
         z-index: 500;
         display: none;
-        cursor: none;
     }
     
-    #cellWorldCanvas.active { display: block; }
+    #worldCanvas.active { display: block; }
     
-    .cell-ui {
+    /* World UI */
+    .world-ui {
         position: fixed;
-        top: 20px;
-        left: 20px;
-        right: 20px;
+        top: 0; left: 0; right: 0;
+        padding: 20px;
         display: none;
         justify-content: space-between;
         align-items: flex-start;
@@ -572,10 +600,16 @@
         pointer-events: none;
     }
     
-    .cell-ui.active { display: flex; }
-    .cell-ui > * { pointer-events: auto; }
+    .world-ui.active { display: flex; }
+    .world-ui > * { pointer-events: auto; }
     
-    .cell-entropy-box {
+    .world-left {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }
+    
+    .world-entropy-box {
         background: rgba(10, 10, 26, 0.9);
         border: 1px solid var(--border);
         border-radius: 16px;
@@ -583,14 +617,14 @@
         backdrop-filter: blur(10px);
     }
     
-    .cell-entropy-label {
+    .world-entropy-label {
         font-family: 'Orbitron', sans-serif;
         font-size: 11px;
         color: var(--text-muted);
         letter-spacing: 2px;
     }
     
-    .cell-entropy-value {
+    .world-entropy-value {
         font-family: 'Orbitron', sans-serif;
         font-size: 32px;
         font-weight: 900;
@@ -599,7 +633,44 @@
         -webkit-text-fill-color: transparent;
     }
     
-    .cell-evo-panel {
+    .world-nav-buttons {
+        display: flex;
+        gap: 8px;
+    }
+    
+    .world-nav-btn {
+        background: rgba(10, 10, 26, 0.9);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 10px 16px;
+        color: var(--text);
+        font-size: 13px;
+        cursor: pointer;
+        backdrop-filter: blur(10px);
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        transition: 0.2s;
+    }
+    
+    .world-nav-btn:hover {
+        border-color: var(--primary);
+        color: var(--primary);
+    }
+    
+    .world-nav-btn.next-stage {
+        background: var(--gradient-energy);
+        color: #1a1a2e;
+        border: none;
+        font-weight: 700;
+    }
+    
+    .world-nav-btn.next-stage:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+    
+    .world-evo-panel {
         background: rgba(10, 10, 26, 0.9);
         border: 1px solid rgba(123, 44, 191, 0.3);
         border-radius: 16px;
@@ -608,14 +679,14 @@
         min-width: 200px;
     }
     
-    .cell-evo-title {
+    .world-evo-title {
         font-family: 'Orbitron', sans-serif;
         font-size: 12px;
         color: var(--secondary);
         margin-bottom: 12px;
     }
     
-    .cell-evo-item {
+    .world-evo-item {
         display: flex;
         align-items: center;
         gap: 10px;
@@ -623,10 +694,10 @@
         opacity: 0.4;
     }
     
-    .cell-evo-item.unlocked { opacity: 1; }
-    .cell-evo-item.next { opacity: 0.7; }
+    .world-evo-item.unlocked { opacity: 1; }
+    .world-evo-item.next { opacity: 0.7; }
     
-    .cell-evo-icon {
+    .world-evo-icon {
         width: 28px; height: 28px;
         background: rgba(123, 44, 191, 0.2);
         border-radius: 8px;
@@ -636,14 +707,14 @@
         font-size: 14px;
     }
     
-    .cell-evo-item.unlocked .cell-evo-icon {
+    .world-evo-item.unlocked .world-evo-icon {
         background: var(--gradient-evolution);
     }
     
-    .cell-evo-name { font-size: 12px; font-weight: 600; }
-    .cell-evo-req { font-size: 10px; color: var(--text-muted); }
+    .world-evo-name { font-size: 12px; font-weight: 600; }
+    .world-evo-req { font-size: 10px; color: var(--text-muted); }
     
-    .cell-controls {
+    .world-controls {
         position: fixed;
         bottom: 20px;
         right: 20px;
@@ -657,14 +728,120 @@
         display: none;
     }
     
-    .cell-controls.active { display: block; }
-    .cell-controls div { margin-bottom: 4px; }
-    .cell-controls .key {
+    .world-controls.active { display: block; }
+    .world-controls div { margin-bottom: 4px; }
+    .world-controls .key {
         display: inline-block;
         padding: 2px 8px;
         background: var(--bg-input);
         border-radius: 4px;
         margin-right: 4px;
+    }
+    
+    /* Stage 2 - Planet Landing */
+    .landing-ui {
+        position: fixed;
+        top: 0; left: 0; right: 0; bottom: 0;
+        display: none;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        z-index: 600;
+        pointer-events: none;
+    }
+    
+    .landing-ui.active { display: flex; }
+    .landing-ui > * { pointer-events: auto; }
+    
+    .landing-score {
+        position: fixed;
+        top: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: rgba(10, 10, 26, 0.9);
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        padding: 16px 32px;
+        text-align: center;
+    }
+    
+    .landing-score-label {
+        font-family: 'Orbitron', sans-serif;
+        font-size: 11px;
+        color: var(--text-muted);
+        letter-spacing: 2px;
+    }
+    
+    .landing-score-value {
+        font-family: 'Orbitron', sans-serif;
+        font-size: 28px;
+        font-weight: 900;
+        color: var(--primary);
+    }
+    
+    .landing-health {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: rgba(10, 10, 26, 0.9);
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        padding: 16px 24px;
+    }
+    
+    .landing-health-label {
+        font-family: 'Orbitron', sans-serif;
+        font-size: 11px;
+        color: var(--text-muted);
+        margin-bottom: 8px;
+    }
+    
+    .landing-health-bar {
+        width: 120px;
+        height: 12px;
+        background: rgba(255, 77, 109, 0.2);
+        border-radius: 6px;
+        overflow: hidden;
+    }
+    
+    .landing-health-fill {
+        height: 100%;
+        background: linear-gradient(90deg, var(--danger), var(--accent));
+        transition: width 0.3s;
+    }
+    
+    .landing-planet-info {
+        position: fixed;
+        bottom: 100px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: rgba(10, 10, 26, 0.9);
+        border: 1px solid var(--secondary);
+        border-radius: 16px;
+        padding: 20px 40px;
+        text-align: center;
+    }
+    
+    .landing-planet-name {
+        font-family: 'Orbitron', sans-serif;
+        font-size: 24px;
+        font-weight: 900;
+        background: var(--gradient-evolution);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        margin-bottom: 4px;
+    }
+    
+    .landing-planet-desc {
+        font-size: 13px;
+        color: var(--text-muted);
+    }
+    
+    .landing-start-btn {
+        position: fixed;
+        bottom: 20px;
+        left: 50%;
+        transform: translateX(-50%);
     }
     
     /* Evolution Alert */
@@ -713,6 +890,70 @@
         color: var(--primary);
     }
     
+    /* Result Modal */
+    .result-modal {
+        position: fixed;
+        top: 0; left: 0; right: 0; bottom: 0;
+        background: rgba(0, 0, 0, 0.8);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        z-index: 800;
+    }
+    
+    .result-modal.active { display: flex; }
+    
+    .result-content {
+        background: var(--bg-card-solid);
+        border: 2px solid var(--primary);
+        border-radius: 24px;
+        padding: 40px 60px;
+        text-align: center;
+        max-width: 500px;
+    }
+    
+    .result-icon { font-size: 80px; margin-bottom: 20px; }
+    
+    .result-title {
+        font-family: 'Orbitron', sans-serif;
+        font-size: 28px;
+        font-weight: 900;
+        margin-bottom: 12px;
+    }
+    
+    .result-desc {
+        font-size: 15px;
+        color: var(--text-muted);
+        margin-bottom: 24px;
+        line-height: 1.6;
+    }
+    
+    .result-planet {
+        background: var(--bg-input);
+        border-radius: 16px;
+        padding: 20px;
+        margin-bottom: 24px;
+    }
+    
+    .result-planet-name {
+        font-family: 'Orbitron', sans-serif;
+        font-size: 20px;
+        font-weight: 700;
+        color: var(--primary);
+        margin-bottom: 4px;
+    }
+    
+    .result-planet-type {
+        font-size: 13px;
+        color: var(--text-muted);
+    }
+    
+    .result-buttons {
+        display: flex;
+        gap: 12px;
+        justify-content: center;
+    }
+    
     /* Utilities */
     .hidden { display: none !important; }
     .text-center { text-align: center; }
@@ -734,21 +975,62 @@
     
     <div id="app"></div>
     
-    <canvas id="cellWorldCanvas"></canvas>
+    <canvas id="worldCanvas"></canvas>
     
-    <div class="cell-ui" id="cellUI">
-        <div class="cell-entropy-box">
-            <div class="cell-entropy-label">ENTROPY</div>
-            <div class="cell-entropy-value" id="cellEntropyValue">0</div>
+    <!-- Cell World UI -->
+    <div class="world-ui" id="cellUI">
+        <div class="world-left">
+            <div class="world-entropy-box">
+                <div class="world-entropy-label">ENTROPY</div>
+                <div class="world-entropy-value" id="cellEntropyValue">0</div>
+            </div>
+            <div class="world-nav-buttons">
+                <button class="world-nav-btn" onclick="window.exitWorld()">🏠 홈</button>
+                <button class="world-nav-btn next-stage" id="nextStageBtn" onclick="window.goToStage2()" disabled>🚀 행성 낙하</button>
+            </div>
         </div>
-        <div class="cell-evo-panel" id="cellEvoPanel"></div>
+        <div class="world-evo-panel" id="cellEvoPanel"></div>
     </div>
     
-    <div class="cell-controls" id="cellControls">
+    <div class="world-controls" id="cellControls">
         <div><span class="key">W A S D</span> 이동</div>
         <div><span class="key">마우스</span> 방향</div>
         <div><span class="key">SPACE</span> 대시</div>
-        <div><span class="key">ESC</span> 나가기</div>
+        <div><span class="key">ESC</span> 홈으로</div>
+    </div>
+    
+    <!-- Landing UI -->
+    <div class="landing-ui" id="landingUI">
+        <div class="landing-score">
+            <div class="landing-score-label">DISTANCE</div>
+            <div class="landing-score-value" id="landingDistance">0m</div>
+        </div>
+        <div class="landing-health">
+            <div class="landing-health-label">SHIELD</div>
+            <div class="landing-health-bar">
+                <div class="landing-health-fill" id="landingHealthBar" style="width: 100%"></div>
+            </div>
+        </div>
+        <div class="landing-planet-info" id="landingPlanetInfo">
+            <div class="landing-planet-name" id="landingPlanetName">행성 Q-7</div>
+            <div class="landing-planet-desc">목표까지 진입하세요</div>
+        </div>
+    </div>
+    
+    <!-- Result Modal -->
+    <div class="result-modal" id="resultModal">
+        <div class="result-content">
+            <div class="result-icon" id="resultIcon">🪐</div>
+            <div class="result-title" id="resultTitle">착륙 성공!</div>
+            <div class="result-desc" id="resultDesc">새로운 행성에 도착했습니다.</div>
+            <div class="result-planet">
+                <div class="result-planet-name" id="resultPlanetName">행성 Q-7</div>
+                <div class="result-planet-type" id="resultPlanetType">생명체 서식 가능 행성</div>
+            </div>
+            <div class="result-buttons">
+                <button class="btn btn-primary" onclick="window.explorePlanet()">🌍 행성 탐험</button>
+            </div>
+        </div>
     </div>
     
     <div class="toast-container" id="toastContainer"></div>
@@ -816,6 +1098,18 @@
         }
     };
     
+    // Planet Names
+    const PLANET_NAMES = [
+        'Kepler-22b', 'Proxima-B', 'Trappist-1e', 'Gliese-581g', 
+        'HD-40307g', 'Tau-Ceti-e', 'Wolf-1061c', 'Ross-128b',
+        'Luyten-B', 'K2-18b', 'TOI-700d', 'Teegarden-B'
+    ];
+    
+    const PLANET_TYPES = [
+        '생명체 서식 가능 행성', '얼음 행성', '사막 행성', '해양 행성',
+        '화산 행성', '가스 거인의 위성', '고대 문명 흔적 행성'
+    ];
+    
     // Utils
     function createStars() {
         const c = document.getElementById('stars');
@@ -862,7 +1156,9 @@
         if (p === 'login') renderLogin();
         else if (p === 'dashboard') renderDashboard();
         else if (p === 'cell-world') startCellWorld();
+        else if (p === 'planet-landing') startPlanetLanding();
         else if (p === 'history') renderHistory();
+        else if (p === 'planet') renderPlanet();
         else renderPlaceholder(p);
     }
     
@@ -883,14 +1179,32 @@
                         <div class="entropy-icon">⚡</div>
                         <span class="entropy-value">${State.game.entropy.toLocaleString()}</span>
                     </div>
-                    <div class="user-profile" onclick="window.logout()">
-                        <img class="user-avatar" src="${State.user?.photoURL||'https://via.placeholder.com/36'}">
-                        <span class="user-name">${State.user?.displayName||'User'}</span>
+                    <div class="user-menu">
+                        <div class="user-profile" onclick="toggleUserMenu()">
+                            <img class="user-avatar" src="${State.user?.photoURL||'https://via.placeholder.com/36'}">
+                            <span class="user-name">${State.user?.displayName||'User'}</span>
+                        </div>
+                        <div class="user-dropdown" id="userDropdown">
+                            <div class="dropdown-item" onclick="window.nav('history')">📜 내 역사서</div>
+                            <div class="dropdown-item danger" onclick="window.logout()">🚪 로그아웃</div>
+                        </div>
                     </div>
                 </div>
             </nav>
         `;
     }
+    
+    function toggleUserMenu() {
+        document.getElementById('userDropdown').classList.toggle('show');
+    }
+    
+    // Close dropdown when clicking outside
+    document.addEventListener('click', (e) => {
+        if (!e.target.closest('.user-menu')) {
+            const dropdown = document.getElementById('userDropdown');
+            if (dropdown) dropdown.classList.remove('show');
+        }
+    });
     
     // Login
     function renderLogin() {
@@ -938,30 +1252,34 @@
                     <div class="dashboard-grid">
                         <div class="card entity-card">
                             <div class="entity-visual"><canvas id="entityCanvas" width="180" height="180"></canvas></div>
-                            <div class="entity-stage-label">STAGE ${stage} · ${['','세포','낙하','정착','문명','정복'][stage]}</div>
+                            <div class="entity-stage-label">STAGE ${stage} · ${['','세포','정착','탐험','문명','정복'][stage]}</div>
                             <div class="entity-name">Entity #${State.user?.uid?.slice(-4)||'0000'}</div>
                             <div class="progress-bar mb-16"><div class="progress-fill" style="width:${Math.min(entropy/800*100,100)}%"></div></div>
-                            <p class="text-muted text-center mb-24" style="font-size:12px">${entropy<800?`다음 단계까지 ${800-entropy} 엔트로피`:'🎉 행성 낙하 준비 완료!'}</p>
+                            <p class="text-muted text-center mb-24" style="font-size:12px">${stage===1?(entropy<800?`다음 단계까지 ${800-entropy} 엔트로피`:'🎉 행성 낙하 준비 완료!'):'행성에 정착했습니다'}</p>
                             <div class="entity-stats">
                                 <div class="stat-box"><div class="stat-value">${evoCount}/5</div><div class="stat-label">진화</div></div>
                                 <div class="stat-box"><div class="stat-value">${State.game.territories?.length||0}</div><div class="stat-label">영토</div></div>
                                 <div class="stat-box"><div class="stat-value">+${(State.game.territories?.length||0)*5}</div><div class="stat-label">세금</div></div>
                                 <div class="stat-box"><div class="stat-value">1</div><div class="stat-label">생존</div></div>
                             </div>
-                            ${stage===1?`<button class="btn btn-primary btn-block mt-24" onclick="window.nav('cell-world')">🌌 세포 세계로 진입</button>`:''}
+                            ${stage===1?`
+                                <button class="btn btn-primary btn-block mt-24" onclick="window.nav('cell-world')">🌌 세포 세계로 진입</button>
+                                ${entropy>=800?`<button class="btn btn-energy btn-block mt-24" onclick="window.nav('planet-landing')">🚀 행성으로 떠나기</button>`:''}
+                            `:''}
+                            ${stage>=2?`<button class="btn btn-primary btn-block mt-24" onclick="window.nav('planet')">🪐 행성 탐험</button>`:''}
                         </div>
                         
                         <div>
                             <div class="quick-actions">
                                 <div class="quick-action" onclick="window.nav('cell-world')"><div class="quick-action-icon">🦠</div><div class="quick-action-label">세포 세계</div></div>
-                                <div class="quick-action ${stage<2?'locked':''}"><div class="quick-action-icon">🪐</div><div class="quick-action-label">행성</div></div>
+                                <div class="quick-action ${stage<2&&entropy<800?'locked':''}" onclick="${stage>=2||entropy>=800?"window.nav(stage>=2?'planet':'planet-landing')":""}"><div class="quick-action-icon">${stage>=2?'🪐':'🚀'}</div><div class="quick-action-label">${stage>=2?'행성':'행성 낙하'}</div></div>
                                 <div class="quick-action ${stage<3?'locked':''}"><div class="quick-action-icon">🌌</div><div class="quick-action-label">은하</div></div>
                                 <div class="quick-action" onclick="window.nav('history')"><div class="quick-action-icon">📜</div><div class="quick-action-label">역사서</div></div>
                             </div>
                             <div class="card">
                                 <div class="card-header">
                                     <span class="card-title">📜 나의 역사서</span>
-                                    <button class="btn btn-outline" style="padding:8px 16px;font-size:13px" onclick="window.nav('history')">전체</button>
+                                    <button class="btn btn-outline btn-sm" onclick="window.nav('history')">전체</button>
                                 </div>
                                 ${(history||[]).length===0?`
                                     <div class="text-center text-muted" style="padding:40px">
@@ -1111,6 +1429,31 @@
         `;
     }
     
+    // Planet Page
+    function renderPlanet() {
+        const planet = State.game.currentPlanet;
+        document.getElementById('app').innerHTML = `
+            ${navbar()}
+            <main class="main-content">
+                <div class="page-container">
+                    <div class="card text-center" style="padding:60px;max-width:600px;margin:0 auto;">
+                        <h1 style="font-size:64px;margin-bottom:24px">🪐</h1>
+                        <h2 class="font-display mb-16" style="font-size:28px">${planet?.name || '행성'}</h2>
+                        <p class="text-muted mb-24">${planet?.type || '미지의 행성'}</p>
+                        <div class="card mb-24" style="background:var(--bg-input)">
+                            <p style="font-size:14px;line-height:1.8">
+                                당신은 이 행성의 첫 번째 정착자입니다.<br>
+                                영토를 확장하고 문명을 건설하세요.
+                            </p>
+                        </div>
+                        <p class="text-muted" style="font-size:13px">🚧 행성 시스템 개발 중...</p>
+                        <button class="btn btn-outline mt-24" onclick="window.nav('dashboard')">대시보드로</button>
+                    </div>
+                </div>
+            </main>
+        `;
+    }
+    
     // Placeholder
     function renderPlaceholder(p) {
         document.getElementById('app').innerHTML = `
@@ -1126,15 +1469,35 @@
         `;
     }
     
-    // Cell World
-    let cellRunning = false;
+    // ========================================
+    // CELL WORLD
+    // ========================================
+    let worldRunning = false;
+    
+    function exitWorld() {
+        worldRunning = false;
+        document.getElementById('worldCanvas').classList.remove('active');
+        document.getElementById('cellUI').classList.remove('active');
+        document.getElementById('cellControls').classList.remove('active');
+        document.getElementById('landingUI').classList.remove('active');
+        navigate('dashboard');
+    }
+    
+    function goToStage2() {
+        if (State.game.entropy < 800) return;
+        worldRunning = false;
+        document.getElementById('worldCanvas').classList.remove('active');
+        document.getElementById('cellUI').classList.remove('active');
+        document.getElementById('cellControls').classList.remove('active');
+        navigate('planet-landing');
+    }
     
     function startCellWorld() {
         console.log('Starting Cell World');
         
         document.getElementById('app').innerHTML = '';
         
-        const canvas = document.getElementById('cellWorldCanvas');
+        const canvas = document.getElementById('worldCanvas');
         const ctx = canvas.getContext('2d');
         
         canvas.width = window.innerWidth;
@@ -1144,9 +1507,8 @@
         document.getElementById('cellUI').classList.add('active');
         document.getElementById('cellControls').classList.add('active');
         
-        cellRunning = true;
+        worldRunning = true;
         
-        // Player
         const player = {
             x: 0, y: 0,
             vx: 0, vy: 0,
@@ -1177,7 +1539,6 @@
         let useMouse = false;
         let time = 0;
         
-        // Events
         function onKeyDown(e) {
             keys[e.key.toLowerCase()] = true;
             useMouse = false;
@@ -1186,7 +1547,7 @@
                 player.dashCD = 60;
                 setTimeout(() => player.dashing = false, 200);
             }
-            if (e.key === 'Escape') exitCellWorld();
+            if (e.key === 'Escape') exitWorld();
         }
         
         function onKeyUp(e) { keys[e.key.toLowerCase()] = false; }
@@ -1198,29 +1559,30 @@
         window.addEventListener('mousemove', onMouseMove);
         window.addEventListener('resize', onResize);
         
-        function exitCellWorld() {
-            cellRunning = false;
+        function cleanup() {
             window.removeEventListener('keydown', onKeyDown);
             window.removeEventListener('keyup', onKeyUp);
             window.removeEventListener('mousemove', onMouseMove);
             window.removeEventListener('resize', onResize);
-            canvas.classList.remove('active');
-            document.getElementById('cellUI').classList.remove('active');
-            document.getElementById('cellControls').classList.remove('active');
-            navigate('dashboard');
         }
         
         function updateEvoPanel() {
             const evo = State.game.evolution;
             const e = State.game.entropy;
             document.getElementById('cellEvoPanel').innerHTML = `
-                <div class="cell-evo-title">🧬 진화 단계</div>
-                <div class="cell-evo-item ${evo.eye?'unlocked':(e>=80?'next':'')}"><div class="cell-evo-icon">👁️</div><div><div class="cell-evo-name">시각</div><div class="cell-evo-req">${evo.eye?'✓':'100'}</div></div></div>
-                <div class="cell-evo-item ${evo.arm?'unlocked':(e>=180&&evo.eye?'next':'')}"><div class="cell-evo-icon">🦾</div><div><div class="cell-evo-name">팔</div><div class="cell-evo-req">${evo.arm?'✓':'200'}</div></div></div>
-                <div class="cell-evo-item ${evo.leg?'unlocked':(e>=280&&evo.arm?'next':'')}"><div class="cell-evo-icon">🦵</div><div><div class="cell-evo-name">다리</div><div class="cell-evo-req">${evo.leg?'✓':'300'}</div></div></div>
-                <div class="cell-evo-item ${evo.brain?'unlocked':(e>=480&&evo.leg?'next':'')}"><div class="cell-evo-icon">🧠</div><div><div class="cell-evo-name">두뇌</div><div class="cell-evo-req">${evo.brain?'✓':'500'}</div></div></div>
-                <div class="cell-evo-item ${evo.wing?'unlocked':(e>=780&&evo.brain?'next':'')}"><div class="cell-evo-icon">🪽</div><div><div class="cell-evo-name">날개</div><div class="cell-evo-req">${evo.wing?'✓':'800'}</div></div></div>
+                <div class="world-evo-title">🧬 진화 단계</div>
+                <div class="world-evo-item ${evo.eye?'unlocked':(e>=80?'next':'')}"><div class="world-evo-icon">👁️</div><div><div class="world-evo-name">시각</div><div class="world-evo-req">${evo.eye?'✓':'100'}</div></div></div>
+                <div class="world-evo-item ${evo.arm?'unlocked':(e>=180&&evo.eye?'next':'')}"><div class="world-evo-icon">🦾</div><div><div class="world-evo-name">팔</div><div class="world-evo-req">${evo.arm?'✓':'200'}</div></div></div>
+                <div class="world-evo-item ${evo.leg?'unlocked':(e>=280&&evo.arm?'next':'')}"><div class="world-evo-icon">🦵</div><div><div class="world-evo-name">다리</div><div class="world-evo-req">${evo.leg?'✓':'300'}</div></div></div>
+                <div class="world-evo-item ${evo.brain?'unlocked':(e>=480&&evo.leg?'next':'')}"><div class="world-evo-icon">🧠</div><div><div class="world-evo-name">두뇌</div><div class="world-evo-req">${evo.brain?'✓':'500'}</div></div></div>
+                <div class="world-evo-item ${evo.wing?'unlocked':(e>=780&&evo.brain?'next':'')}"><div class="world-evo-icon">🪽</div><div><div class="world-evo-name">날개</div><div class="world-evo-req">${evo.wing?'✓':'800'}</div></div></div>
             `;
+            
+            // Update next stage button
+            const btn = document.getElementById('nextStageBtn');
+            if (State.game.entropy >= 800) {
+                btn.disabled = false;
+            }
         }
         updateEvoPanel();
         
@@ -1276,9 +1638,9 @@
             if (!evo.wing && e >= 800) {
                 State.game.evolution.wing = true;
                 showEvoAlert('🪽', '날개 진화!', '날개가 생겨났습니다', 'SPACE 대시');
-                State.game.history.push({ chapter: 5, title: '우주를 향해', content: '800 엔트로피의 정점에서 날개가 펼쳐졌다.', timestamp: new Date().toISOString() });
+                State.game.history.push({ chapter: 5, title: '우주를 향해', content: '800 엔트로피의 정점에서 날개가 펼쳐졌다. 이제 새로운 세계로 떠날 준비가 되었다.', timestamp: new Date().toISOString() });
                 updateEvoPanel();
-                showToast('🎉 모든 진화 완료!', 'success');
+                showToast('🎉 모든 진화 완료! 행성으로 떠날 수 있습니다.', 'success');
             }
             
             player.size = player.baseSize + e * 0.03;
@@ -1486,7 +1848,7 @@
         }
         
         function loop() {
-            if (!cellRunning) return;
+            if (!worldRunning) { cleanup(); return; }
             time++;
             update();
             spawn();
@@ -1513,6 +1875,444 @@
         
         document.getElementById('cellEntropyValue').textContent = State.game.entropy;
         loop();
+    }
+    
+    // ========================================
+    // PLANET LANDING (Stage 2)
+    // ========================================
+    function startPlanetLanding() {
+        console.log('Starting Planet Landing');
+        
+        document.getElementById('app').innerHTML = '';
+        
+        const canvas = document.getElementById('worldCanvas');
+        const ctx = canvas.getContext('2d');
+        
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        canvas.classList.add('active');
+        
+        document.getElementById('landingUI').classList.add('active');
+        
+        worldRunning = true;
+        
+        // Generate random planet
+        const targetPlanet = {
+            name: PLANET_NAMES[Math.floor(Math.random() * PLANET_NAMES.length)],
+            type: PLANET_TYPES[Math.floor(Math.random() * PLANET_TYPES.length)]
+        };
+        
+        document.getElementById('landingPlanetName').textContent = targetPlanet.name;
+        
+        // Player
+        const player = {
+            x: canvas.width / 2,
+            y: 100,
+            size: 30,
+            health: 100,
+            speed: 8
+        };
+        
+        // Obstacles
+        let obstacles = [];
+        let distance = 0;
+        let targetDistance = 3000;
+        let gameOver = false;
+        let success = false;
+        let time = 0;
+        
+        const keys = {};
+        
+        function onKeyDown(e) {
+            keys[e.key.toLowerCase()] = true;
+            if (e.key === 'Escape') {
+                worldRunning = false;
+                exitLanding();
+            }
+        }
+        
+        function onKeyUp(e) { keys[e.key.toLowerCase()] = false; }
+        
+        function onResize() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            player.x = Math.min(player.x, canvas.width - 50);
+        }
+        
+        window.addEventListener('keydown', onKeyDown);
+        window.addEventListener('keyup', onKeyUp);
+        window.addEventListener('resize', onResize);
+        
+        function cleanup() {
+            window.removeEventListener('keydown', onKeyDown);
+            window.removeEventListener('keyup', onKeyUp);
+            window.removeEventListener('resize', onResize);
+        }
+        
+        function exitLanding() {
+            cleanup();
+            canvas.classList.remove('active');
+            document.getElementById('landingUI').classList.remove('active');
+            document.getElementById('resultModal').classList.remove('active');
+            navigate('dashboard');
+        }
+        
+        function spawnObstacle() {
+            const type = Math.random();
+            let obstacle;
+            
+            if (type < 0.4) {
+                // Asteroid
+                obstacle = {
+                    type: 'asteroid',
+                    x: Math.random() * (canvas.width - 60) + 30,
+                    y: canvas.height + 50,
+                    size: 20 + Math.random() * 30,
+                    speed: 3 + Math.random() * 3,
+                    rotation: 0,
+                    rotSpeed: (Math.random() - 0.5) * 0.1
+                };
+            } else if (type < 0.7) {
+                // Energy barrier
+                const width = 100 + Math.random() * 200;
+                obstacle = {
+                    type: 'barrier',
+                    x: Math.random() * (canvas.width - width),
+                    y: canvas.height + 30,
+                    width: width,
+                    height: 20,
+                    speed: 4 + Math.random() * 2
+                };
+            } else {
+                // Debris field
+                obstacle = {
+                    type: 'debris',
+                    x: Math.random() * canvas.width,
+                    y: canvas.height + 50,
+                    particles: Array(5).fill(0).map(() => ({
+                        ox: (Math.random() - 0.5) * 100,
+                        oy: (Math.random() - 0.5) * 50,
+                        size: 5 + Math.random() * 10
+                    })),
+                    speed: 5 + Math.random() * 3
+                };
+            }
+            
+            obstacles.push(obstacle);
+        }
+        
+        function update() {
+            if (gameOver) return;
+            
+            // Player movement
+            if (keys['a'] || keys['arrowleft']) {
+                player.x -= player.speed;
+            }
+            if (keys['d'] || keys['arrowright']) {
+                player.x += player.speed;
+            }
+            
+            player.x = Math.max(player.size, Math.min(canvas.width - player.size, player.x));
+            
+            // Update distance
+            distance += 5;
+            document.getElementById('landingDistance').textContent = `${Math.floor(distance)}m / ${targetDistance}m`;
+            
+            // Spawn obstacles
+            if (Math.random() < 0.03 + (distance / targetDistance) * 0.02) {
+                spawnObstacle();
+            }
+            
+            // Update obstacles
+            obstacles = obstacles.filter(o => {
+                o.y -= o.speed;
+                if (o.rotation !== undefined) o.rotation += o.rotSpeed;
+                
+                // Collision check
+                let hit = false;
+                
+                if (o.type === 'asteroid') {
+                    const dx = player.x - o.x;
+                    const dy = player.y - o.y;
+                    if (Math.sqrt(dx*dx + dy*dy) < player.size + o.size) {
+                        hit = true;
+                    }
+                } else if (o.type === 'barrier') {
+                    if (player.x > o.x - player.size && 
+                        player.x < o.x + o.width + player.size &&
+                        player.y > o.y - player.size &&
+                        player.y < o.y + o.height + player.size) {
+                        hit = true;
+                    }
+                } else if (o.type === 'debris') {
+                    o.particles.forEach(p => {
+                        const dx = player.x - (o.x + p.ox);
+                        const dy = player.y - (o.y + p.oy);
+                        if (Math.sqrt(dx*dx + dy*dy) < player.size + p.size) {
+                            hit = true;
+                        }
+                    });
+                }
+                
+                if (hit) {
+                    player.health -= 20;
+                    document.getElementById('landingHealthBar').style.width = player.health + '%';
+                    
+                    if (player.health <= 0) {
+                        gameOver = true;
+                        success = false;
+                        showResult(false, targetPlanet);
+                    }
+                    return false;
+                }
+                
+                return o.y > -100;
+            });
+            
+            // Check success
+            if (distance >= targetDistance) {
+                gameOver = true;
+                success = true;
+                showResult(true, targetPlanet);
+            }
+        }
+        
+        function showResult(isSuccess, planet) {
+            setTimeout(() => {
+                const modal = document.getElementById('resultModal');
+                
+                if (isSuccess) {
+                    document.getElementById('resultIcon').textContent = '🪐';
+                    document.getElementById('resultTitle').textContent = '착륙 성공!';
+                    document.getElementById('resultDesc').textContent = '새로운 행성에 무사히 도착했습니다. 이제 이 행성을 탐험하고 정착할 수 있습니다.';
+                    document.getElementById('resultPlanetName').textContent = planet.name;
+                    document.getElementById('resultPlanetType').textContent = planet.type;
+                    
+                    // Save planet
+                    State.game.currentPlanet = planet;
+                    State.game.stage = 2;
+                    State.game.history.push({
+                        chapter: State.game.history.length + 1,
+                        title: '새로운 세계',
+                        content: `오랜 여정 끝에 ${planet.name}에 착륙했다. ${planet.type}... 이곳에서 새로운 삶이 시작된다.`,
+                        timestamp: new Date().toISOString()
+                    });
+                    State.sync();
+                } else {
+                    document.getElementById('resultIcon').textContent = '💥';
+                    document.getElementById('resultTitle').textContent = '착륙 실패';
+                    document.getElementById('resultDesc').textContent = '장애물에 부딪혀 추락했습니다. 다시 시도하세요.';
+                    document.getElementById('resultPlanetName').textContent = '???';
+                    document.getElementById('resultPlanetType').textContent = '다시 도전하세요';
+                }
+                
+                modal.classList.add('active');
+            }, 500);
+        }
+        
+        function drawBackground() {
+            // Space gradient
+            const g = ctx.createLinearGradient(0, 0, 0, canvas.height);
+            g.addColorStop(0, '#050510');
+            g.addColorStop(0.7, '#0a0a2a');
+            g.addColorStop(1, '#1a1a4a');
+            ctx.fillStyle = g;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            // Stars (moving down)
+            ctx.fillStyle = 'rgba(255,255,255,0.6)';
+            for (let i = 0; i < 50; i++) {
+                const x = (i * 137.5) % canvas.width;
+                const y = ((i * 73.7 + distance * 0.5) % canvas.height);
+                ctx.beginPath();
+                ctx.arc(x, y, 1 + Math.random(), 0, Math.PI * 2);
+                ctx.fill();
+            }
+            
+            // Planet at bottom
+            const planetProgress = Math.min(distance / targetDistance, 1);
+            const planetSize = 200 + planetProgress * 300;
+            const planetY = canvas.height + 200 - planetProgress * 300;
+            
+            const pg = ctx.createRadialGradient(
+                canvas.width/2 - planetSize * 0.2, planetY - planetSize * 0.2, 0,
+                canvas.width/2, planetY, planetSize
+            );
+            pg.addColorStop(0, '#4ade80');
+            pg.addColorStop(0.5, '#22c55e');
+            pg.addColorStop(0.8, '#15803d');
+            pg.addColorStop(1, '#14532d');
+            
+            ctx.beginPath();
+            ctx.arc(canvas.width/2, planetY, planetSize, 0, Math.PI * 2);
+            ctx.fillStyle = pg;
+            ctx.fill();
+            
+            // Atmosphere glow
+            ctx.beginPath();
+            ctx.arc(canvas.width/2, planetY, planetSize + 30, 0, Math.PI * 2);
+            const ag = ctx.createRadialGradient(
+                canvas.width/2, planetY, planetSize,
+                canvas.width/2, planetY, planetSize + 30
+            );
+            ag.addColorStop(0, 'rgba(74, 222, 128, 0.3)');
+            ag.addColorStop(1, 'rgba(74, 222, 128, 0)');
+            ctx.fillStyle = ag;
+            ctx.fill();
+        }
+        
+        function drawObstacles() {
+            obstacles.forEach(o => {
+                if (o.type === 'asteroid') {
+                    ctx.save();
+                    ctx.translate(o.x, o.y);
+                    ctx.rotate(o.rotation);
+                    
+                    const ag = ctx.createRadialGradient(0, 0, 0, 0, 0, o.size);
+                    ag.addColorStop(0, '#6b7280');
+                    ag.addColorStop(0.7, '#4b5563');
+                    ag.addColorStop(1, '#374151');
+                    
+                    ctx.beginPath();
+                    for (let i = 0; i < 8; i++) {
+                        const angle = (i / 8) * Math.PI * 2;
+                        const r = o.size * (0.8 + Math.sin(i * 2.5) * 0.2);
+                        const x = Math.cos(angle) * r;
+                        const y = Math.sin(angle) * r;
+                        i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+                    }
+                    ctx.closePath();
+                    ctx.fillStyle = ag;
+                    ctx.fill();
+                    ctx.restore();
+                    
+                } else if (o.type === 'barrier') {
+                    const bg = ctx.createLinearGradient(o.x, o.y, o.x + o.width, o.y);
+                    bg.addColorStop(0, 'rgba(239, 68, 68, 0.8)');
+                    bg.addColorStop(0.5, 'rgba(248, 113, 113, 0.9)');
+                    bg.addColorStop(1, 'rgba(239, 68, 68, 0.8)');
+                    
+                    ctx.fillStyle = bg;
+                    ctx.fillRect(o.x, o.y, o.width, o.height);
+                    
+                    // Glow
+                    ctx.shadowColor = '#ef4444';
+                    ctx.shadowBlur = 20;
+                    ctx.fillRect(o.x, o.y, o.width, o.height);
+                    ctx.shadowBlur = 0;
+                    
+                } else if (o.type === 'debris') {
+                    o.particles.forEach(p => {
+                        ctx.beginPath();
+                        ctx.arc(o.x + p.ox, o.y + p.oy, p.size, 0, Math.PI * 2);
+                        ctx.fillStyle = '#78716c';
+                        ctx.fill();
+                    });
+                }
+            });
+        }
+        
+        function drawPlayer() {
+            const wobble = Math.sin(time * 0.2) * 2;
+            
+            ctx.save();
+            ctx.translate(player.x, player.y);
+            
+            // Glow
+            ctx.shadowColor = '#00f5d4';
+            ctx.shadowBlur = 30;
+            
+            // Body
+            ctx.beginPath();
+            for (let i = 0; i < 12; i++) {
+                const angle = (i / 12) * Math.PI * 2;
+                const r = player.size + Math.sin(time * 0.3 + i) * 3;
+                const x = Math.cos(angle) * r;
+                const y = Math.sin(angle) * r;
+                i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+            }
+            ctx.closePath();
+            
+            const g = ctx.createRadialGradient(-10, -10, 0, 0, 0, player.size);
+            g.addColorStop(0, '#00f5d4');
+            g.addColorStop(0.6, '#7b2cbf');
+            g.addColorStop(1, '#4c1d95');
+            ctx.fillStyle = g;
+            ctx.fill();
+            
+            ctx.shadowBlur = 0;
+            
+            // Eye
+            ctx.beginPath();
+            ctx.arc(8, -3, 8, 0, Math.PI * 2);
+            ctx.fillStyle = 'white';
+            ctx.fill();
+            ctx.beginPath();
+            ctx.arc(10, -2, 4, 0, Math.PI * 2);
+            ctx.fillStyle = '#1a1a2e';
+            ctx.fill();
+            
+            // Wings (flapping)
+            const wingFlap = Math.sin(time * 0.5) * 0.4;
+            ctx.fillStyle = 'rgba(139, 92, 246, 0.6)';
+            
+            ctx.save();
+            ctx.rotate(wingFlap - 0.5);
+            ctx.beginPath();
+            ctx.moveTo(10, -5);
+            ctx.quadraticCurveTo(40, -25, 55, -5);
+            ctx.quadraticCurveTo(40, 5, 10, 0);
+            ctx.fill();
+            ctx.restore();
+            
+            ctx.save();
+            ctx.scale(-1, 1);
+            ctx.rotate(wingFlap - 0.5);
+            ctx.beginPath();
+            ctx.moveTo(10, -5);
+            ctx.quadraticCurveTo(40, -25, 55, -5);
+            ctx.quadraticCurveTo(40, 5, 10, 0);
+            ctx.fill();
+            ctx.restore();
+            
+            ctx.restore();
+            
+            // Trail effect
+            ctx.globalAlpha = 0.3;
+            for (let i = 1; i <= 3; i++) {
+                ctx.beginPath();
+                ctx.arc(player.x, player.y + i * 20, player.size - i * 5, 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(0, 245, 212, ${0.3 - i * 0.1})`;
+                ctx.fill();
+            }
+            ctx.globalAlpha = 1;
+        }
+        
+        function loop() {
+            if (!worldRunning) { cleanup(); return; }
+            
+            time++;
+            
+            if (!gameOver) {
+                update();
+            }
+            
+            drawBackground();
+            drawObstacles();
+            drawPlayer();
+            
+            requestAnimationFrame(loop);
+        }
+        
+        loop();
+    }
+    
+    function explorePlanet() {
+        document.getElementById('resultModal').classList.remove('active');
+        worldRunning = false;
+        document.getElementById('worldCanvas').classList.remove('active');
+        document.getElementById('landingUI').classList.remove('active');
+        navigate('planet');
     }
     
     // Auth
@@ -1567,6 +2367,10 @@
         window.nav = navigate;
         window.googleLogin = googleLogin;
         window.logout = logout;
+        window.exitWorld = exitWorld;
+        window.goToStage2 = goToStage2;
+        window.explorePlanet = explorePlanet;
+        window.toggleUserMenu = toggleUserMenu;
     }
     
     init();
