@@ -31,36 +31,10 @@
     --safe-bottom: env(safe-area-inset-bottom, 0px);
 }
 
-html, body {
-    height: 100%;
-    overflow: hidden;
-    touch-action: manipulation;
-    -webkit-tap-highlight-color: transparent;
-    -webkit-user-select: none;
-    user-select: none;
-}
+html, body { height: 100%; overflow: hidden; touch-action: manipulation; -webkit-tap-highlight-color: transparent; -webkit-user-select: none; user-select: none; }
+body { background: var(--void); color: var(--text-primary); font-family: 'Noto Sans KR', sans-serif; font-size: 14px; }
 
-body {
-    background: var(--void);
-    color: var(--text-primary);
-    font-family: 'Noto Sans KR', sans-serif;
-    font-size: 14px;
-}
-
-.btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    padding: 14px 28px;
-    border: none;
-    border-radius: 12px;
-    font-family: inherit;
-    font-size: 1rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: transform 0.2s;
-}
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 14px 28px; border: none; border-radius: 12px; font-family: inherit; font-size: 1rem; font-weight: 600; cursor: pointer; transition: transform 0.2s; }
 .btn:active { transform: scale(0.96); }
 .btn-energy { background: var(--gradient-energy); color: var(--void); }
 .btn-outline { background: transparent; color: var(--text-primary); border: 1px solid var(--border-default); }
@@ -70,28 +44,11 @@ body {
 
 #app { position: fixed; inset: 0; overflow: hidden; }
 #stars-bg { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
-
-.star {
-    position: absolute;
-    background: white;
-    border-radius: 50%;
-    animation: twinkle var(--dur, 3s) ease-in-out infinite;
-}
+.star { position: absolute; background: white; border-radius: 50%; animation: twinkle var(--dur, 3s) ease-in-out infinite; }
 @keyframes twinkle { 0%,100%{opacity:0.2} 50%{opacity:1} }
 @keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-10px)} }
 
-.page-center {
-    position: fixed;
-    inset: 0;
-    z-index: 100;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 24px;
-    background: linear-gradient(180deg, rgba(3,3,8,0.95), rgba(10,10,26,0.98));
-}
-
+.page-center { position: fixed; inset: 0; z-index: 100; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 24px; background: linear-gradient(180deg, rgba(3,3,8,0.95), rgba(10,10,26,0.98)); }
 .page-content { max-width: 400px; width: 100%; text-align: center; }
 .page-icon { font-size: 4rem; margin-bottom: 16px; animation: float 3s ease-in-out infinite; }
 .page-title { font-family: 'Orbitron', monospace; font-size: clamp(1.25rem,5vw,1.75rem); font-weight: 700; margin-bottom: 20px; background: var(--gradient-energy); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
@@ -105,35 +62,15 @@ body {
 .dot.active { background: var(--neon-cyan); width: 24px; border-radius: 4px; }
 .dot.done { background: var(--text-muted); }
 
-.dice-box {
-    width: 140px; height: 140px; margin: 24px auto;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 5rem;
-    background: var(--void-surface);
-    border: 2px solid var(--border-default);
-    border-radius: 20px;
-}
+.dice-box { width: 140px; height: 140px; margin: 24px auto; display: flex; align-items: center; justify-content: center; font-size: 5rem; background: var(--void-surface); border: 2px solid var(--border-default); border-radius: 20px; }
 .dice-box.rolling { animation: shake 0.1s linear infinite; }
 @keyframes shake { 0%,100%{transform:rotate(0) scale(1)} 25%{transform:rotate(-10deg) scale(1.05)} 50%{transform:rotate(10deg) scale(0.95)} }
 
 #game-canvas { position: fixed; inset: 0; z-index: 1; touch-action: none; }
 
-.hud-top {
-    position: fixed; top: 0; left: 0; right: 0; z-index: 50;
-    padding: 12px 16px; padding-top: calc(12px + var(--safe-top));
-    display: flex; justify-content: space-between; align-items: flex-start; gap: 8px;
-    pointer-events: none;
-}
+.hud-top { position: fixed; top: 0; left: 0; right: 0; z-index: 50; padding: 12px 16px; padding-top: calc(12px + var(--safe-top)); display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; pointer-events: none; }
 .hud-top > * { pointer-events: auto; }
-
-.hud-panel {
-    background: rgba(10,10,26,0.92);
-    border: 1px solid var(--border-default);
-    border-radius: 14px;
-    padding: 10px 12px;
-    backdrop-filter: blur(8px);
-}
-
+.hud-panel { background: rgba(10,10,26,0.92); border: 1px solid var(--border-default); border-radius: 14px; padding: 10px 12px; backdrop-filter: blur(8px); }
 .hud-name { font-family: 'Orbitron', monospace; font-size: 0.7rem; color: var(--neon-cyan); margin-bottom: 6px; }
 .hud-row { display: flex; align-items: center; gap: 6px; font-size: 0.8rem; margin-bottom: 3px; }
 .hud-val { font-family: 'Orbitron', monospace; font-weight: 700; color: var(--neon-yellow); }
@@ -160,27 +97,15 @@ body {
 
 .hud-btns { display: flex; gap: 6px; }
 .hud-btn { width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; background: rgba(10,10,26,0.92); border: 1px solid var(--border-default); border-radius: 8px; font-size: 1rem; cursor: pointer; }
-.hud-btn:active { transform: scale(0.95); }
 
-.hud-bottom {
-    position: fixed; bottom: 0; left: 0; right: 0; z-index: 50;
-    padding: 10px 16px; padding-bottom: calc(70px + var(--safe-bottom));
-    pointer-events: none;
-}
-
+.hud-bottom { position: fixed; bottom: 0; left: 0; right: 0; z-index: 50; padding: 10px 16px; padding-bottom: calc(70px + var(--safe-bottom)); pointer-events: none; }
 .stage-bar { background: rgba(10,10,26,0.9); border: 1px solid var(--border-default); border-radius: 10px; padding: 8px 12px; max-width: 340px; margin: 0 auto; }
 .stage-row { display: flex; justify-content: space-between; font-size: 0.65rem; margin-bottom: 4px; }
 .stage-cur { font-family: 'Orbitron', monospace; color: var(--neon-purple); }
 .stage-next { color: var(--text-muted); }
 
-.controls {
-    position: fixed; bottom: 0; left: 0; right: 0; z-index: 50;
-    padding: 14px; padding-bottom: calc(14px + var(--safe-bottom));
-    display: flex; justify-content: space-between; align-items: flex-end;
-    pointer-events: none;
-}
+.controls { position: fixed; bottom: 0; left: 0; right: 0; z-index: 50; padding: 14px; padding-bottom: calc(14px + var(--safe-bottom)); display: flex; justify-content: space-between; align-items: flex-end; pointer-events: none; }
 .controls.joy-right { flex-direction: row-reverse; }
-
 .joystick { width: 100px; height: 100px; position: relative; pointer-events: auto; }
 .joy-base { width: 100%; height: 100%; background: rgba(10,10,26,0.5); border: 2px solid var(--border-default); border-radius: 50%; }
 .joy-knob { position: absolute; top: 50%; left: 50%; width: 40px; height: 40px; margin: -20px; background: var(--gradient-energy); border-radius: 50%; box-shadow: 0 4px 12px rgba(0,245,212,0.4); }
@@ -188,6 +113,8 @@ body {
 .action-btn { width: 60px; height: 60px; background: rgba(10,10,26,0.8); border: 2px solid var(--neon-cyan); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.3rem; cursor: pointer; pointer-events: auto; box-shadow: 0 0 12px rgba(0,245,212,0.3); }
 .action-btn:active { transform: scale(0.95); background: rgba(0,245,212,0.2); }
 .action-btn.disabled { opacity: 0.3; border-color: var(--text-muted); }
+.action-btn.ready { border-color: var(--neon-yellow); box-shadow: 0 0 20px rgba(254,228,64,0.5); animation: pulse 1s infinite; }
+@keyframes pulse { 0%,100%{box-shadow:0 0 20px rgba(254,228,64,0.5)} 50%{box-shadow:0 0 30px rgba(254,228,64,0.8)} }
 
 .toast-box { position: fixed; top: calc(14px + var(--safe-top)); left: 50%; transform: translateX(-50%); z-index: 300; display: flex; flex-direction: column; gap: 6px; pointer-events: none; }
 .toast { background: var(--void-elevated); border: 1px solid var(--border-default); border-radius: 10px; padding: 8px 14px; display: flex; align-items: center; gap: 6px; animation: toastIn 0.3s, toastOut 0.3s 2.5s forwards; font-size: 0.85rem; white-space: nowrap; }
@@ -205,7 +132,7 @@ body {
 .evo-fx { color: var(--neon-cyan); font-size: 0.75rem; font-weight: 600; margin-top: 4px; }
 
 .modal { position: fixed; inset: 0; z-index: 300; display: flex; align-items: center; justify-content: center; padding: 24px; background: rgba(3,3,8,0.95); }
-.modal-box { text-align: center; max-width: 320px; }
+.modal-box { text-align: center; max-width: 340px; }
 .modal-icon { font-size: 4rem; margin-bottom: 12px; }
 .modal-title { font-family: 'Orbitron', monospace; font-size: 1.6rem; font-weight: 900; margin-bottom: 8px; }
 .modal-title.fail { color: var(--danger); }
@@ -242,8 +169,18 @@ body {
 .runner-hud { position: fixed; top: 0; left: 0; right: 0; z-index: 50; padding: 12px 16px; padding-top: calc(12px + var(--safe-top)); display: flex; justify-content: space-between; align-items: center; pointer-events: none; }
 .runner-hud > * { pointer-events: auto; }
 .runner-stage { background: rgba(10,10,26,0.92); border: 1px solid var(--neon-purple); border-radius: 10px; padding: 8px 14px; text-align: center; }
-.runner-stage-name { font-family: 'Orbitron', monospace; font-size: 0.8rem; color: var(--neon-purple); }
-.runner-dist { font-family: 'Orbitron', monospace; font-size: 1rem; font-weight: 700; color: var(--neon-cyan); }
+.runner-stage-name { font-family: 'Orbitron', monospace; font-size: 0.75rem; color: var(--neon-purple); }
+.runner-dist { font-family: 'Orbitron', monospace; font-size: 0.9rem; font-weight: 700; color: var(--neon-cyan); }
+
+.evo-dice-overlay { position: fixed; inset: 0; z-index: 200; display: flex; align-items: center; justify-content: center; background: rgba(3,3,8,0.95); }
+.evo-dice-box { text-align: center; max-width: 320px; padding: 24px; }
+.evo-dice-title { font-family: 'Orbitron', monospace; font-size: 1.3rem; font-weight: 700; margin-bottom: 8px; background: var(--gradient-energy); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+.evo-dice-sub { color: var(--text-secondary); font-size: 0.85rem; margin-bottom: 20px; }
+.trait-result { background: var(--void-surface); border: 2px solid var(--neon-cyan); border-radius: 16px; padding: 20px; margin: 16px 0; }
+.trait-icon { font-size: 3rem; margin-bottom: 8px; }
+.trait-name { font-family: 'Orbitron', monospace; font-size: 1.1rem; font-weight: 700; color: var(--neon-cyan); }
+.trait-desc { color: var(--text-secondary); font-size: 0.8rem; margin-top: 4px; }
+.trait-effect { color: var(--neon-yellow); font-size: 0.75rem; margin-top: 8px; font-weight: 600; }
     </style>
 </head>
 <body>
@@ -262,28 +199,36 @@ body {
    Constants & Configuration
 ======================================== */
 const CONFIG = {
-    GROWTH_THRESHOLD: 15,        // 파츠 획득 주기 (15마리마다)
-    STAGE_THRESHOLD: 2000,       // 다세포 진화 점수 (수정: 500→2000)
-    LAND_HEIGHT: 3000,           // 육지까지 거리 (수정: 1000→3000, 3배)
+    EVO_THRESHOLD: 25,           // 진화 주사위 필요 점수
+    STAGE_THRESHOLD: 2000,
+    LAND_HEIGHT: 3000,
     INITIAL_SIZE: 12,
     MAX_SIZE: 80,
     ENEMY_INTERVAL: 3500,
     MAX_ENEMIES: 7,
     MAX_FOODS: 35,
     SAVE_INTERVAL: 20000,
-    RUNNER_STAGE_DIST: 400       // 러너 스테이지당 거리
+    RUNNER_STAGE_DIST: 300
 };
 
-const BODY_PARTS = {
-    eye: { icon: '👁️', name: '눈', max: 3, fx: '시야 +20%' },
-    mouth: { icon: '👄', name: '입', max: 2, fx: '점수 +15%' },
-    arm: { icon: '🦾', name: '팔', max: 4, fx: '자석 효과' },
-    leg: { icon: '🦿', name: '다리', max: 4, fx: '속도 +10%' },
-    tail: { icon: '🐍', name: '꼬리', max: 2, fx: '대시' },
-    ear: { icon: '👂', name: '귀', max: 2, fx: '적 감지' },
-    nose: { icon: '👃', name: '코', max: 2, fx: '먹이 탐지' },
-    antenna: { icon: '📡', name: '더듬이', max: 2, fx: '범위 +15%' }
-};
+// 진화 특성 테이블 (주사위 결과별)
+const EVO_TRAITS = [
+    { id: 'eye_keen', roll: [1,10], part: 'eye', icon: '👁️', name: '예리한 눈', desc: '주변을 더 잘 볼 수 있다', effect: '시야 +25%', stat: { sight: 1.25 } },
+    { id: 'eye_multi', roll: [11,15], part: 'eye', icon: '👀', name: '복안', desc: '여러 개의 눈이 생겼다', effect: '시야 +50%, 속도 -5%', stat: { sight: 1.5, speed: 0.95 } },
+    { id: 'mouth_big', roll: [16,25], part: 'mouth', icon: '👄', name: '큰 입', desc: '더 많이 먹을 수 있다', effect: '점수 +20%', stat: { score: 1.2 } },
+    { id: 'mouth_filter', roll: [26,30], part: 'mouth', icon: '🫧', name: '여과 장치', desc: '작은 먹이를 자동 흡수', effect: '자동 수집 범위', stat: { autoEat: 30 } },
+    { id: 'arm_tentacle', roll: [31,40], part: 'arm', icon: '🦑', name: '촉수', desc: '먹이를 끌어당긴다', effect: '자석 효과', stat: { magnet: 80 } },
+    { id: 'arm_claw', roll: [41,45], part: 'arm', icon: '🦀', name: '집게', desc: '적을 공격할 수 있다', effect: '공격력 +1', stat: { attack: 1 } },
+    { id: 'leg_fin', roll: [46,55], part: 'leg', icon: '🐟', name: '지느러미', desc: '빠르게 헤엄친다', effect: '속도 +15%', stat: { speed: 1.15 } },
+    { id: 'leg_jet', roll: [56,60], part: 'leg', icon: '💨', name: '제트 추진', desc: '순간 가속 가능', effect: '대시 강화', stat: { dash: 1.5 } },
+    { id: 'tail_whip', roll: [61,70], part: 'tail', icon: '🐍', name: '꼬리 채찍', desc: '꼬리로 대시한다', effect: '대시 획득', stat: { canDash: true } },
+    { id: 'tail_poison', roll: [71,75], part: 'tail', icon: '🦂', name: '독침', desc: '적에게 독 피해', effect: '독 공격', stat: { poison: true } },
+    { id: 'shell', roll: [76,82], part: 'shell', icon: '🐚', name: '보호막', desc: '한 번 피해를 막는다', effect: '실드 +1', stat: { shield: 1 } },
+    { id: 'antenna', roll: [83,88], part: 'antenna', icon: '📡', name: '더듬이', desc: '먹이를 감지한다', effect: '탐지 범위 +30%', stat: { detect: 1.3 } },
+    { id: 'ear', roll: [89,93], part: 'ear', icon: '👂', name: '청각 기관', desc: '적의 움직임을 감지', effect: '적 표시', stat: { enemySense: true } },
+    { id: 'nose', roll: [94,97], part: 'nose', icon: '👃', name: '후각 기관', desc: '먹이를 더 잘 찾는다', effect: '먹이 표시', stat: { foodSense: true } },
+    { id: 'brain', roll: [98,100], part: 'brain', icon: '🧠', name: '원시 뇌', desc: '지능이 생겼다!', effect: '경험치 +30%', stat: { exp: 1.3 } }
+];
 
 const ENVS = [
     { id: 'ocean', name: '원시 해양', icon: '🌊', range: [1,16], colors: { bg1: '#001a33', bg2: '#003366', particle: '#00aaff', food: '#00ff88', enemy: '#ff4444' }, desc: '바다는 생명의 요람.', weak: '건조함은 치명적.', creatures: ['🦠','🫧','💧','🌀'] },
@@ -301,23 +246,15 @@ const Audio = (() => {
     let ctx = null;
     const settings = { master: 0.7, sfx: 0.8, on: true };
     
-    const init = () => {
-        if (!ctx) ctx = new (window.AudioContext || window.webkitAudioContext)();
-        if (ctx.state === 'suspended') ctx.resume();
-    };
-    
+    const init = () => { if (!ctx) ctx = new (window.AudioContext || window.webkitAudioContext)(); if (ctx.state === 'suspended') ctx.resume(); };
     const tone = (freq, dur, type = 'sine', v = 0.3) => {
         if (!settings.on || !ctx) return;
-        const osc = ctx.createOscillator();
-        const gain = ctx.createGain();
-        osc.connect(gain);
-        gain.connect(ctx.destination);
-        osc.type = type;
-        osc.frequency.value = freq;
+        const osc = ctx.createOscillator(), gain = ctx.createGain();
+        osc.connect(gain); gain.connect(ctx.destination);
+        osc.type = type; osc.frequency.value = freq;
         gain.gain.setValueAtTime(settings.master * settings.sfx * v, ctx.currentTime);
         gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + dur);
-        osc.start();
-        osc.stop(ctx.currentTime + dur);
+        osc.start(); osc.stop(ctx.currentTime + dur);
     };
     
     const playEat = () => { tone(500, 0.08); setTimeout(() => tone(700, 0.1), 50); };
@@ -336,49 +273,39 @@ const Audio = (() => {
     
     const load = () => { try { Object.assign(settings, JSON.parse(localStorage.getItem('bokluck_audio') || '{}')); } catch{} };
     const save = () => { localStorage.setItem('bokluck_audio', JSON.stringify(settings)); };
-    
     load();
     return { init, settings, save, playEat, playJump, playWind, playEatBig, playClick, playDice, playResult, playEvolve, playDeath, playWin, playDash, playLand, playCollect };
 })();
 
 /* ========================================
-   Settings System
+   Settings & Save System
 ======================================== */
 const Settings = (() => {
     const defaults = { joyRight: true };
     let current = { ...defaults };
-    
     const load = () => { try { Object.assign(current, JSON.parse(localStorage.getItem('bokluck_settings') || '{}')); } catch{} };
     const save = () => { localStorage.setItem('bokluck_settings', JSON.stringify(current)); };
     const get = k => current[k];
     const set = (k, v) => { current[k] = v; save(); };
-    
     load();
     return { get, set, save };
 })();
 
-/* ========================================
-   Save System
-======================================== */
 const Save = (() => {
-    const KEY = 'bokluck_save_';
-    const MAX = 5;
-    
+    const KEY = 'bokluck_save_', MAX = 5;
     const create = () => ({
-        v: 6, created: Date.now(), updated: Date.now(), playTime: 0,
+        v: 7, created: Date.now(), updated: Date.now(), playTime: 0,
         stage: 0, tutDone: false, name: null, score: 0,
-        dna: { origin: null, traits: [] }, design: null,
-        parts: { eye: 0, mouth: 0, arm: 0, leg: 0, tail: 0, ear: 0, nose: 0, antenna: 0 },
-        stats: { size: CONFIG.INITIAL_SIZE, speed: 3, eaten: 0, deaths: 0, maxSize: CONFIG.INITIAL_SIZE, maxH: 0 },
-        runnerStage: 0
+        dna: { origin: null }, design: null,
+        traits: [],  // 획득한 특성 ID 목록
+        stats: { size: CONFIG.INITIAL_SIZE, speed: 3, eaten: 0, deaths: 0, maxSize: CONFIG.INITIAL_SIZE, maxH: 0, evoPoints: 0, shield: 0 },
+        runnerStage: 0, runnerEvo: 0
     });
-    
     const get = i => { try { return JSON.parse(localStorage.getItem(KEY + i)); } catch { return null; } };
     const set = (i, d) => { d.updated = Date.now(); localStorage.setItem(KEY + i, JSON.stringify(d)); };
     const del = i => localStorage.removeItem(KEY + i);
     const all = () => Array.from({ length: MAX }, (_, i) => get(i));
     const fmt = ts => ts ? new Date(ts).toLocaleDateString('ko-KR', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : '-';
-    
     return { MAX, create, get, set, del, all, fmt };
 })();
 
@@ -395,17 +322,37 @@ const newGame = i => { G.slot = i; G.data = Save.create(); G.start = Date.now();
 const envByRoll = r => ENVS.find(e => r >= e.range[0] && r <= e.range[1]);
 const envById = id => ENVS.find(e => e.id === id);
 
-const totalParts = () => G.data?.parts ? Object.values(G.data.parts).reduce((a, b) => a + b, 0) : 0;
-const hasPart = k => (G.data?.parts?.[k] || 0) > 0;
-const partCnt = k => G.data?.parts?.[k] || 0;
-const nextPartThreshold = () => (totalParts() + 1) * CONFIG.GROWTH_THRESHOLD;
+const getTraitById = id => EVO_TRAITS.find(t => t.id === id);
+const getTraitByRoll = r => EVO_TRAITS.find(t => r >= t.roll[0] && r <= t.roll[1]);
+const hasTrait = id => G.data?.traits?.includes(id);
+const traitCount = () => G.data?.traits?.length || 0;
 
-const addRandomPart = () => {
-    const avail = Object.keys(BODY_PARTS).filter(k => G.data.parts[k] < BODY_PARTS[k].max);
-    if (!avail.length) return null;
-    const k = avail[Math.floor(Math.random() * avail.length)];
-    G.data.parts[k]++;
-    return { key: k, ...BODY_PARTS[k], cnt: G.data.parts[k] };
+// 특성 기반 스탯 계산
+const calcStats = () => {
+    const base = { speed: 1, score: 1, sight: 1, magnet: 0, autoEat: 0, dash: 1, canDash: false, shield: 0, detect: 1, exp: 1, attack: 0, poison: false, enemySense: false, foodSense: false };
+    if (!G.data?.traits) return base;
+    G.data.traits.forEach(id => {
+        const t = getTraitById(id);
+        if (t?.stat) {
+            Object.keys(t.stat).forEach(k => {
+                if (typeof base[k] === 'boolean') base[k] = base[k] || t.stat[k];
+                else if (k === 'magnet' || k === 'autoEat' || k === 'shield' || k === 'attack') base[k] += t.stat[k];
+                else base[k] *= t.stat[k];
+            });
+        }
+    });
+    return base;
+};
+
+// 특성 기반 외모 (파츠 개수 계산)
+const getAppearance = () => {
+    const parts = { eye: 0, mouth: 0, arm: 0, leg: 0, tail: 0, antenna: 0, ear: 0, nose: 0, shell: 0, brain: 0 };
+    if (!G.data?.traits) return parts;
+    G.data.traits.forEach(id => {
+        const t = getTraitById(id);
+        if (t?.part && parts[t.part] !== undefined) parts[t.part]++;
+    });
+    return parts;
 };
 
 /* ========================================
@@ -457,22 +404,21 @@ const STORIES = {
     intro: [
         { icon: '🌌', title: '태초에...', text: '끝없이 펼쳐진 <span class="hl">우주의 심연</span>...<br>아주 작은 <span class="gold">불꽃</span>이 피어오르려 한다.' },
         { icon: '✨', title: '의식의 탄생', text: '당신은 아직 <span class="hl">아무것도 아니다</span>.<br>오직 <span class="gold">존재하고자 하는 의지</span>만이 깜빡인다.' },
-        { icon: '🎲', title: '운명의 주사위', text: '<span class="hl">BOK(복)</span>과 <span class="danger">LUCK(운)</span>이 모든 것을 결정한다.<br>당신이 <span class="gold">어디서 태어날지</span>조차 운명이 결정한다.' }
+        { icon: '🎲', title: '운명의 주사위', text: '<span class="hl">BOK(복)</span>과 <span class="danger">LUCK(운)</span>이 모든 것을 결정한다.<br>진화할 때마다 <span class="gold">주사위</span>가 운명을 정한다.' }
     ],
     afterBirth: env => [
         { icon: env.icon, title: env.name, text: `<span class="hl">${env.name}</span>에서 태어났다.<br><span class="gold">"${env.desc}"</span><br><span class="danger">⚠️ ${env.weak}</span>` },
         { icon: '🦠', title: '첫 번째 생명', text: '아주 작은 <span class="hl">하나의 세포</span>.<br>살아남으려면 <span class="gold">먹어야 한다</span>.' },
-        { icon: '⚔️', title: '경쟁과 생존', text: '<span class="danger">더 큰 존재</span>들이 당신을 노린다.<br><span class="hl">작은 것</span>을 먹고 <span class="gold">커져야</span> 살아남는다.' }
+        { icon: '🎲', title: '진화의 법칙', text: '충분히 먹으면 <span class="gold">진화 주사위</span>를 던질 수 있다!<br>주사위가 <span class="hl">어떤 특성</span>을 줄지 결정한다.' }
     ],
     multi: [
         { icon: '🧬', title: '다세포 진화!', text: '마침내 <span class="hl">단일 세포</span>의 한계를 넘어섰다!' },
         { icon: '🏔️', title: '새로운 도전', text: '바다 깊은 곳에서 <span class="gold">육지</span>까지 올라가야 한다.' },
-        { icon: '⬆️', title: '점프!', text: '<span class="hl">발판</span>을 밟고 위로!<br>🌪️ 토네이도를 타면 더 높이! <span class="gold">육지</span>에 도달하면 승리!' }
+        { icon: '⬆️', title: '점프!', text: '<span class="hl">발판</span>을 밟고 위로!<br>🌪️ 토네이도를 타면 더 높이!' }
     ],
     runner: [
-        { icon: '🏃', title: '육지의 시작', text: '마침내 <span class="hl">육지</span>에 도착했다!<br>이제 <span class="gold">문명을 향해</span> 달려야 한다.' },
-        { icon: '🌲', title: '진화의 여정', text: '<span class="hl">숲</span>을 지나 <span class="gold">평원</span>을 달리고<br><span class="danger">문명</span>을 발견하라!' },
-        { icon: '🔥', title: '달리면서 진화', text: '벌레를 먹고, 번개를 얻고<br><span class="gold">불</span>을 발견하며 <span class="hl">진화</span>하라!' }
+        { icon: '🏃', title: '육지 도착!', text: '마침내 <span class="hl">육지</span>에 도착했다!' },
+        { icon: '🌍', title: '진화의 여정', text: '달리면서 <span class="gold">아이템</span>을 모아<br><span class="hl">문명</span>을 향해 진화하라!' }
     ]
 };
 
@@ -492,15 +438,13 @@ const renderStory = (id, done = null) => {
         }
         
         app.innerHTML = `
-            <div class="page-center">
-                <div class="page-content">
-                    <div class="page-icon">${s.icon}</div>
-                    <h2 class="page-title">${s.title}</h2>
-                    <div class="page-text">${s.text}</div>
-                    <div class="dots">${seq.map((_, i) => `<div class="dot ${i < idx ? 'done' : ''} ${i === idx ? 'active' : ''}"></div>`).join('')}</div>
-                    <button class="btn btn-energy" id="btn-next">${btnText}</button>
-                </div>
-            </div>
+            <div class="page-center"><div class="page-content">
+                <div class="page-icon">${s.icon}</div>
+                <h2 class="page-title">${s.title}</h2>
+                <div class="page-text">${s.text}</div>
+                <div class="dots">${seq.map((_, i) => `<div class="dot ${i < idx ? 'done' : ''} ${i === idx ? 'active' : ''}"></div>`).join('')}</div>
+                <button class="btn btn-energy" id="btn-next">${btnText}</button>
+            </div></div>
         `;
         
         document.getElementById('btn-next').onclick = () => {
@@ -518,21 +462,19 @@ const renderStory = (id, done = null) => {
 };
 
 /* ========================================
-   Dice Roll
+   Dice Roll (Origin)
 ======================================== */
 const renderDice = () => {
     let rolling = false;
     
     app.innerHTML = `
-        <div class="page-center">
-            <div class="page-content">
-                <h2 class="page-title">🎲 운명의 주사위</h2>
-                <p style="color:var(--text-secondary);margin-bottom:16px;">태어날 곳이 결정됩니다</p>
-                <div class="dice-box" id="dice">🎲</div>
-                <div id="result"></div>
-                <button class="btn btn-energy btn-block" id="btn-roll">운명을 받아들인다</button>
-            </div>
-        </div>
+        <div class="page-center"><div class="page-content">
+            <h2 class="page-title">🎲 운명의 주사위</h2>
+            <p style="color:var(--text-secondary);margin-bottom:16px;">태어날 곳이 결정됩니다</p>
+            <div class="dice-box" id="dice">🎲</div>
+            <div id="result"></div>
+            <button class="btn btn-energy btn-block" id="btn-roll">운명을 받아들인다</button>
+        </div></div>
     `;
     
     const dice = document.getElementById('dice');
@@ -541,9 +483,7 @@ const renderDice = () => {
     
     btn.onclick = () => {
         if (rolling) return;
-        rolling = true;
-        btn.disabled = true;
-        btn.textContent = '결정 중...';
+        rolling = true; btn.disabled = true; btn.textContent = '결정 중...';
         dice.classList.add('rolling');
         Audio.playDice();
         
@@ -552,22 +492,18 @@ const renderDice = () => {
         setTimeout(() => {
             clearInterval(anim);
             dice.classList.remove('rolling');
-            
             const roll = Math.floor(Math.random() * 100) + 1;
             const env = envByRoll(roll);
             
             dice.textContent = roll;
             dice.style.cssText = 'font-size:3rem;font-family:Orbitron;font-weight:900;color:var(--neon-cyan);text-shadow:0 0 25px var(--neon-cyan);';
-            
             Audio.playResult();
             
-            result.innerHTML = `
-                <div style="text-align:center;margin:16px 0;">
-                    <div style="font-size:3rem;margin-bottom:6px;">${env.icon}</div>
-                    <div style="font-family:Orbitron;font-size:1.2rem;font-weight:700;margin-bottom:4px;">${env.name}</div>
-                    <div style="color:var(--text-secondary);font-size:0.85rem;">${env.desc}</div>
-                </div>
-            `;
+            result.innerHTML = `<div style="text-align:center;margin:16px 0;">
+                <div style="font-size:3rem;margin-bottom:6px;">${env.icon}</div>
+                <div style="font-family:Orbitron;font-size:1.2rem;font-weight:700;margin-bottom:4px;">${env.name}</div>
+                <div style="color:var(--text-secondary);font-size:0.85rem;">${env.desc}</div>
+            </div>`;
             
             btn.disabled = false;
             btn.textContent = '이 운명을 받아들인다';
@@ -578,8 +514,8 @@ const renderDice = () => {
                 G.data.score = 0;
                 G.data.name = genName(env.id);
                 G.data.design = genDesign(env.id);
-                G.data.parts = { eye: 0, mouth: 0, arm: 0, leg: 0, tail: 0, ear: 0, nose: 0, antenna: 0 };
-                G.data.stats = { size: CONFIG.INITIAL_SIZE, speed: 3, eaten: 0, deaths: G.data.stats?.deaths || 0, maxSize: CONFIG.INITIAL_SIZE, maxH: 0 };
+                G.data.traits = [];
+                G.data.stats = { size: CONFIG.INITIAL_SIZE, speed: 3, eaten: 0, deaths: G.data.stats?.deaths || 0, maxSize: CONFIG.INITIAL_SIZE, maxH: 0, evoPoints: 0, shield: 0 };
                 saveGame();
                 renderStory('afterBirth');
             };
@@ -601,16 +537,87 @@ const genDesign = id => {
 };
 
 /* ========================================
+   Evolution Dice (Trait)
+======================================== */
+let evoDiceResolve = null;
+
+const showEvoDice = () => {
+    return new Promise(resolve => {
+        evoDiceResolve = resolve;
+        
+        const overlay = document.createElement('div');
+        overlay.className = 'evo-dice-overlay';
+        overlay.id = 'evo-dice-overlay';
+        overlay.innerHTML = `
+            <div class="evo-dice-box">
+                <div class="evo-dice-title">🎲 진화 주사위!</div>
+                <div class="evo-dice-sub">어떤 특성을 얻게 될까?</div>
+                <div class="dice-box" id="evo-dice">🎲</div>
+                <div id="trait-result"></div>
+                <button class="btn btn-energy btn-block" id="btn-evo-roll">주사위를 던진다!</button>
+            </div>
+        `;
+        document.body.appendChild(overlay);
+        
+        const dice = document.getElementById('evo-dice');
+        const resultDiv = document.getElementById('trait-result');
+        const btn = document.getElementById('btn-evo-roll');
+        let rolling = false;
+        
+        btn.onclick = () => {
+            if (rolling) return;
+            rolling = true; btn.disabled = true; btn.textContent = '운명 결정 중...';
+            dice.classList.add('rolling');
+            Audio.playDice();
+            
+            const anim = setInterval(() => { dice.textContent = Math.floor(Math.random() * 100) + 1; }, 50);
+            
+            setTimeout(() => {
+                clearInterval(anim);
+                dice.classList.remove('rolling');
+                
+                const roll = Math.floor(Math.random() * 100) + 1;
+                const trait = getTraitByRoll(roll);
+                
+                dice.textContent = roll;
+                dice.style.cssText = 'font-size:3rem;font-family:Orbitron;font-weight:900;color:var(--neon-cyan);text-shadow:0 0 25px var(--neon-cyan);';
+                Audio.playResult();
+                
+                resultDiv.innerHTML = `
+                    <div class="trait-result">
+                        <div class="trait-icon">${trait.icon}</div>
+                        <div class="trait-name">${trait.name}</div>
+                        <div class="trait-desc">${trait.desc}</div>
+                        <div class="trait-effect">✨ ${trait.effect}</div>
+                    </div>
+                `;
+                
+                btn.textContent = '진화 완료!';
+                btn.onclick = () => {
+                    Audio.playClick();
+                    overlay.remove();
+                    if (evoDiceResolve) evoDiceResolve(trait);
+                };
+            }, 1500);
+        };
+    });
+};
+
+/* ========================================
    Cell World Game
 ======================================== */
 let player, foods = [], enemies = [], particles = [];
 let joyPos = { x: 0, y: 0 }, joyActive = false, keys = {};
 let lastSpawn = 0, dashCD = 0, dashing = false;
+let canEvolve = false;
 
 const startCellWorld = () => {
     cleanup();
     const env = envById(G.data.dna.origin);
     const joyRight = Settings.get('joyRight');
+    const stats = calcStats();
+    
+    canEvolve = false;
     
     app.innerHTML = `
         <canvas id="game-canvas"></canvas>
@@ -618,13 +625,13 @@ const startCellWorld = () => {
             <div class="hud-panel" style="min-width:120px">
                 <div class="hud-name">${G.data.name}</div>
                 <div class="hud-row"><span>⚡</span><span class="hud-val" id="h-score">${G.data.score}</span><span class="hud-label">점수</span></div>
-                <div class="hud-row"><span>🍴</span><span class="hud-val" id="h-eaten">${G.data.stats.eaten}</span><span class="hud-label">섭취</span></div>
+                <div class="hud-row"><span>🧬</span><span class="hud-val" id="h-traits">${traitCount()}</span><span class="hud-label">특성</span></div>
                 <div class="size-bar"><span style="font-size:0.6rem">📏</span><div class="size-track"><div class="size-fill" id="h-size" style="width:${(G.data.stats.size/CONFIG.MAX_SIZE)*100}%"></div></div><span class="size-num" id="h-sizeN">${Math.round(G.data.stats.size)}</span></div>
             </div>
             <div class="hud-panel" style="max-width:150px">
-                <div style="font-family:Orbitron;font-size:0.55rem;color:var(--text-muted);margin-bottom:4px;">🧬 신체 파츠</div>
-                <div class="parts-grid" id="h-parts"></div>
-                <div class="prog-section"><div class="prog-label"><span class="prog-left">다음 파츠</span><span class="prog-right" id="h-partP">0/${CONFIG.GROWTH_THRESHOLD}</span></div><div class="prog-track"><div class="prog-fill evo" id="h-partB" style="width:0%"></div></div></div>
+                <div style="font-family:Orbitron;font-size:0.55rem;color:var(--text-muted);margin-bottom:4px;">🎲 진화 게이지</div>
+                <div class="prog-section"><div class="prog-label"><span class="prog-left">다음 진화</span><span class="prog-right" id="h-evoP">${G.data.stats.evoPoints}/${CONFIG.EVO_THRESHOLD}</span></div><div class="prog-track"><div class="prog-fill evo" id="h-evoB" style="width:${(G.data.stats.evoPoints/CONFIG.EVO_THRESHOLD)*100}%"></div></div></div>
+                <div class="parts-grid" id="h-traits-list"></div>
             </div>
             <div class="hud-btns">
                 <button class="hud-btn" id="btn-home">🏠</button>
@@ -634,11 +641,11 @@ const startCellWorld = () => {
         <div class="hud-bottom"><div class="stage-bar"><div class="stage-row"><span class="stage-cur">🦠 세포</span><span class="stage-next">다세포: <span id="h-stageP">${G.data.score}/${CONFIG.STAGE_THRESHOLD}</span></span></div><div class="prog-track"><div class="prog-fill stage" id="h-stageB" style="width:${(G.data.score/CONFIG.STAGE_THRESHOLD)*100}%"></div></div></div></div>
         <div class="controls ${joyRight ? 'joy-right' : ''}">
             <div class="joystick" id="joy"><div class="joy-base"></div><div class="joy-knob" id="joy-knob"></div></div>
-            <button class="action-btn ${hasPart('tail')?'':'disabled'}" id="btn-dash">💨</button>
+            <button class="action-btn ${stats.canDash ? '' : 'disabled'}" id="btn-action">🎲</button>
         </div>
     `;
     
-    updatePartsUI();
+    updateTraitsUI();
     
     canvas = document.getElementById('game-canvas');
     ctx = canvas.getContext('2d');
@@ -658,15 +665,15 @@ const startCellWorld = () => {
     gameLoop = requestAnimationFrame(updateCell);
 };
 
-const updatePartsUI = () => {
-    const el = document.getElementById('h-parts');
+const updateTraitsUI = () => {
+    const el = document.getElementById('h-traits-list');
     if (!el) return;
     let html = '';
-    Object.keys(BODY_PARTS).forEach(k => {
-        const cnt = G.data.parts[k] || 0;
-        if (cnt > 0) html += `<div class="part-badge on"><span>${BODY_PARTS[k].icon}</span><span class="part-cnt">×${cnt}</span></div>`;
+    (G.data.traits || []).slice(-6).forEach(id => {
+        const t = getTraitById(id);
+        if (t) html += `<div class="part-badge on" title="${t.name}"><span>${t.icon}</span></div>`;
     });
-    el.innerHTML = html || '<span style="font-size:0.6rem;color:var(--text-muted)">없음</span>';
+    el.innerHTML = html || '<span style="font-size:0.55rem;color:var(--text-muted)">특성 없음</span>';
 };
 
 const resize = () => { if (canvas) { canvas.width = window.innerWidth; canvas.height = window.innerHeight; } };
@@ -688,15 +695,13 @@ const spawnEnemy = () => {
     const smaller = Math.random() < 0.4;
     let sz = smaller ? ps * (0.3 + Math.random() * 0.5) : ps * (1.2 + Math.random() * 0.8);
     sz = Math.max(8, Math.min(sz, 100));
-    
     let x, y;
     const side = Math.floor(Math.random() * 4);
     if (side === 0) { x = -50; y = Math.random() * canvas.height; }
     else if (side === 1) { x = canvas.width + 50; y = Math.random() * canvas.height; }
     else if (side === 2) { x = Math.random() * canvas.width; y = -50; }
     else { x = Math.random() * canvas.width; y = canvas.height + 50; }
-    
-    enemies.push({ x, y, size: sz, speed: 1 + Math.random() * 1.5, angle: Math.random() * Math.PI * 2, wobble: Math.random(), variant: Math.floor(Math.random() * 2) });
+    enemies.push({ x, y, size: sz, speed: 1 + Math.random() * 1.5, angle: Math.random() * Math.PI * 2, wobble: Math.random() });
 };
 
 const setupCellControls = () => {
@@ -713,7 +718,6 @@ const setupCellControls = () => {
         knob.style.transform = `translate(${dx}px, ${dy}px)`;
         joyPos = { x: dx / maxD, y: dy / maxD };
     };
-    
     const end = () => { joyActive = false; knob.style.transform = ''; joyPos = { x: 0, y: 0 }; };
     
     joy.addEventListener('touchstart', e => { e.preventDefault(); joyActive = true; move(e.touches[0].clientX, e.touches[0].clientY); }, { passive: false });
@@ -722,21 +726,41 @@ const setupCellControls = () => {
     joy.addEventListener('mousedown', e => { joyActive = true; move(e.clientX, e.clientY); });
     window.addEventListener('mousemove', e => { if (joyActive) move(e.clientX, e.clientY); });
     window.addEventListener('mouseup', end);
-    window.addEventListener('keydown', e => { keys[e.key.toLowerCase()] = true; if (e.key === ' ') tryDash(); });
+    window.addEventListener('keydown', e => { keys[e.key.toLowerCase()] = true; if (e.key === ' ') handleAction(); });
     window.addEventListener('keyup', e => { keys[e.key.toLowerCase()] = false; });
     
-    document.getElementById('btn-dash').onclick = tryDash;
+    document.getElementById('btn-action').onclick = handleAction;
 };
 
-const tryDash = () => {
-    if (!hasPart('tail') || dashCD > 0 || dashing) return;
-    dashing = true; dashCD = 3000;
-    Audio.playDash();
-    const spd = 15;
-    const dir = { x: joyPos.x || (keys.d ? 1 : keys.a ? -1 : 0), y: joyPos.y || (keys.s ? 1 : keys.w ? -1 : 0) };
-    const len = Math.sqrt(dir.x * dir.x + dir.y * dir.y) || 1;
-    player.vx = dir.x / len * spd; player.vy = dir.y / len * spd;
-    setTimeout(() => { dashing = false; }, 200);
+const handleAction = async () => {
+    const stats = calcStats();
+    const btn = document.getElementById('btn-action');
+    
+    if (canEvolve) {
+        // 진화 주사위!
+        cancelAnimationFrame(gameLoop); gameLoop = null;
+        const trait = await showEvoDice();
+        G.data.traits.push(trait.id);
+        G.data.stats.evoPoints = 0;
+        canEvolve = false;
+        saveGame();
+        showEvo(trait.icon, trait.name + ' 획득!', trait.desc, trait.effect);
+        setTimeout(() => {
+            updateTraitsUI();
+            btn.classList.remove('ready');
+            btn.textContent = stats.canDash ? '💨' : '🎲';
+            gameLoop = requestAnimationFrame(updateCell);
+        }, 2200);
+    } else if (stats.canDash && dashCD <= 0 && !dashing) {
+        // 대시
+        dashing = true; dashCD = 3000;
+        Audio.playDash();
+        const spd = 15 * stats.dash;
+        const dir = { x: joyPos.x || (keys.d ? 1 : keys.a ? -1 : 0), y: joyPos.y || (keys.s ? 1 : keys.w ? -1 : 0) };
+        const len = Math.sqrt(dir.x * dir.x + dir.y * dir.y) || 1;
+        player.vx = dir.x / len * spd; player.vy = dir.y / len * spd;
+        setTimeout(() => { dashing = false; }, 200);
+    }
 };
 
 const setupCellHUD = () => {
@@ -752,6 +776,7 @@ const setupCellHUD = () => {
 const updateCell = () => {
     if (!canvas || !ctx) return;
     const env = envById(G.data.dna.origin);
+    const stats = calcStats();
     
     if (dashCD > 0) dashCD -= 16;
     
@@ -761,7 +786,7 @@ const updateCell = () => {
     if (keys.a || keys.arrowleft) ix = -1;
     if (keys.d || keys.arrowright) ix = 1;
     
-    const spd = G.data.stats.speed + partCnt('leg') * 0.4;
+    const spd = G.data.stats.speed * stats.speed;
     if (!dashing) { player.vx = ix * spd; player.vy = iy * spd; }
     else { player.vx *= 0.95; player.vy *= 0.95; }
     
@@ -771,7 +796,8 @@ const updateCell = () => {
     
     if (Date.now() - lastSpawn > CONFIG.ENEMY_INTERVAL && enemies.length < CONFIG.MAX_ENEMIES) { spawnEnemy(); lastSpawn = Date.now(); }
     
-    const magnet = hasPart('arm') ? 70 + partCnt('arm') * 18 : 0;
+    const magnet = stats.magnet;
+    const autoEat = stats.autoEat;
     
     for (let i = foods.length - 1; i >= 0; i--) {
         const f = foods[i];
@@ -783,15 +809,16 @@ const updateCell = () => {
         
         const dx = player.x - f.x, dy = player.y - f.y;
         const dist = Math.sqrt(dx * dx + dy * dy);
-        if (magnet && dist < magnet) { f.x += dx * 0.03; f.y += dy * 0.03; }
+        if (magnet && dist < magnet) { f.x += dx * 0.04; f.y += dy * 0.04; }
         
-        if (dist < player.size + f.size * 0.4) {
+        const eatDist = autoEat > 0 ? Math.max(player.size + f.size * 0.4, autoEat) : player.size + f.size * 0.4;
+        if (dist < eatDist) {
             Audio.playEat();
             player.size = Math.min(CONFIG.MAX_SIZE, player.size + f.size * 0.12);
             G.data.stats.size = player.size;
             G.data.stats.eaten++;
-            G.data.score += Math.floor(f.size * 2 * (1 + partCnt('mouth') * 0.15));
-            checkEvo();
+            G.data.stats.evoPoints++;
+            G.data.score += Math.floor(f.size * 2 * stats.score * stats.exp);
             foods.splice(i, 1);
             setTimeout(() => { if (foods.length < CONFIG.MAX_FOODS) spawnFoods(1); }, 400);
         }
@@ -812,63 +839,74 @@ const updateCell = () => {
         if (e.x < -200 || e.x > canvas.width + 200 || e.y < -200 || e.y > canvas.height + 200) { enemies.splice(i, 1); continue; }
         
         if (dist < player.size + e.size * 0.55) {
-            if (danger) { gameOverCell(); return; }
-            else {
+            if (danger) {
+                if (G.data.stats.shield > 0) {
+                    G.data.stats.shield--;
+                    enemies.splice(i, 1);
+                    toast('🛡️ 보호막이 피해를 막았다!', 'warning');
+                } else {
+                    gameOverCell(); return;
+                }
+            } else {
                 Audio.playEatBig();
                 player.size = Math.min(CONFIG.MAX_SIZE, player.size + e.size * 0.2);
                 G.data.stats.size = player.size;
                 G.data.stats.eaten++;
-                G.data.score += Math.floor(e.size * 4 * (1 + partCnt('mouth') * 0.15));
-                checkEvo();
+                G.data.stats.evoPoints += 3;
+                G.data.score += Math.floor(e.size * 4 * stats.score * stats.exp);
                 enemies.splice(i, 1);
             }
         }
     }
     
-    renderCell(env);
+    // 진화 가능 체크
+    const btn = document.getElementById('btn-action');
+    if (G.data.stats.evoPoints >= CONFIG.EVO_THRESHOLD && !canEvolve) {
+        canEvolve = true;
+        btn.classList.add('ready');
+        btn.textContent = '🎲';
+        toast('🎲 진화 가능! 버튼을 눌러 주사위를 던져라!', 'success');
+    }
+    
+    renderCell(env, stats);
     updateCellHUD();
     
-    // 다세포 진화 조건: 2000점 이상 + 5개 이상 파츠
-    if (G.data.stage === 1 && G.data.score >= CONFIG.STAGE_THRESHOLD && totalParts() >= 5) { evolveMulti(); return; }
+    if (G.data.stage === 1 && G.data.score >= CONFIG.STAGE_THRESHOLD && traitCount() >= 3) { evolveMulti(); return; }
     
     gameLoop = requestAnimationFrame(updateCell);
-};
-
-const checkEvo = () => {
-    const threshold = nextPartThreshold();
-    if (G.data.stats.eaten >= threshold) {
-        const part = addRandomPart();
-        if (part) {
-            showEvo(part.icon, `${part.name} 획득!`, `${part.name} ×${part.cnt}`, part.fx);
-            updatePartsUI();
-            if (part.key === 'tail') document.getElementById('btn-dash')?.classList.remove('disabled');
-            saveGame();
-        }
-    }
 };
 
 const updateCellHUD = () => {
     const $ = id => document.getElementById(id);
     if (!$('h-score')) return;
     $('h-score').textContent = G.data.score;
-    $('h-eaten').textContent = G.data.stats.eaten;
+    $('h-traits').textContent = traitCount();
     $('h-size').style.width = `${(player.size / CONFIG.MAX_SIZE) * 100}%`;
     $('h-sizeN').textContent = Math.round(player.size);
-    const base = totalParts() * CONFIG.GROWTH_THRESHOLD;
-    const prog = ((G.data.stats.eaten - base) / CONFIG.GROWTH_THRESHOLD) * 100;
-    $('h-partB').style.width = `${Math.min(100, Math.max(0, prog))}%`;
-    $('h-partP').textContent = `${Math.max(0, G.data.stats.eaten - base)}/${CONFIG.GROWTH_THRESHOLD}`;
+    $('h-evoB').style.width = `${Math.min(100, (G.data.stats.evoPoints / CONFIG.EVO_THRESHOLD) * 100)}%`;
+    $('h-evoP').textContent = `${Math.min(G.data.stats.evoPoints, CONFIG.EVO_THRESHOLD)}/${CONFIG.EVO_THRESHOLD}`;
     $('h-stageB').style.width = `${Math.min(100, (G.data.score / CONFIG.STAGE_THRESHOLD) * 100)}%`;
     $('h-stageP').textContent = `${G.data.score}/${CONFIG.STAGE_THRESHOLD}`;
 };
 
-const renderCell = env => {
+const renderCell = (env, stats) => {
     const w = canvas.width, h = canvas.height;
     const bg = ctx.createLinearGradient(0, 0, 0, h);
     bg.addColorStop(0, env.colors.bg1);
     bg.addColorStop(1, env.colors.bg2);
     ctx.fillStyle = bg;
     ctx.fillRect(0, 0, w, h);
+    
+    // 먹이 센싱
+    if (stats.foodSense) {
+        foods.forEach(f => {
+            ctx.strokeStyle = 'rgba(0,255,136,0.3)';
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.arc(f.x, f.y, f.size * 2, 0, Math.PI * 2);
+            ctx.stroke();
+        });
+    }
     
     foods.forEach(f => {
         ctx.font = `${f.size * 1.6}px Arial`;
@@ -877,7 +915,20 @@ const renderCell = env => {
         ctx.fillText(f.type, f.x, f.y);
     });
     
-    enemies.forEach(e => drawCreature(e, e.size > player.size, env));
+    // 적 센싱
+    enemies.forEach(e => {
+        if (stats.enemySense && e.size > player.size) {
+            ctx.strokeStyle = 'rgba(255,68,68,0.4)';
+            ctx.lineWidth = 2;
+            ctx.setLineDash([5,5]);
+            ctx.beginPath();
+            ctx.arc(e.x, e.y, e.size * 1.5, 0, Math.PI * 2);
+            ctx.stroke();
+            ctx.setLineDash([]);
+        }
+        drawCreature(e, e.size > player.size, env);
+    });
+    
     drawPlayer();
 };
 
@@ -898,23 +949,88 @@ const drawCreature = (e, danger, env) => {
     ctx.fillStyle = danger ? env.colors.enemy : env.colors.food;
     ctx.fill();
     ctx.shadowBlur = 0;
-    ctx.beginPath();
-    ctx.arc(0, -e.size * 0.2, e.size * 0.15, 0, Math.PI * 2);
-    ctx.fillStyle = 'white';
-    ctx.fill();
-    ctx.beginPath();
-    ctx.arc(e.size * 0.03, -e.size * 0.2, e.size * 0.07, 0, Math.PI * 2);
-    ctx.fillStyle = '#222';
-    ctx.fill();
+    ctx.beginPath(); ctx.arc(0, -e.size * 0.2, e.size * 0.15, 0, Math.PI * 2); ctx.fillStyle = 'white'; ctx.fill();
+    ctx.beginPath(); ctx.arc(e.size * 0.03, -e.size * 0.2, e.size * 0.07, 0, Math.PI * 2); ctx.fillStyle = '#222'; ctx.fill();
     ctx.restore();
 };
 
 const drawPlayer = () => {
-    const d = G.data.design, p = G.data.parts, t = Date.now() * 0.003, s = player.size;
+    const d = G.data.design, t = Date.now() * 0.003, s = player.size;
+    const parts = getAppearance();
+    
     ctx.save();
     ctx.translate(player.x, player.y);
+    
+    // 보호막 표시
+    if (G.data.stats.shield > 0) {
+        ctx.strokeStyle = 'rgba(0,245,212,0.5)';
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.arc(0, 0, s + 8, 0, Math.PI * 2);
+        ctx.stroke();
+    }
+    
     ctx.shadowColor = d.primary;
     ctx.shadowBlur = 18;
+    
+    // 꼬리
+    if (parts.tail > 0) {
+        ctx.strokeStyle = d.primary;
+        ctx.lineWidth = Math.max(3, s * 0.07);
+        ctx.lineCap = 'round';
+        const tw = Math.sin(t * 2) * s * 0.25;
+        ctx.beginPath();
+        ctx.moveTo(-s * 0.7, 0);
+        ctx.bezierCurveTo(-s * 1.1, tw, -s * 1.4, -tw * 0.4, -s * 1.7, tw * 0.3);
+        ctx.stroke();
+    }
+    
+    // 팔/촉수
+    if (parts.arm > 0) {
+        ctx.strokeStyle = d.primary;
+        ctx.lineWidth = Math.max(2, s * 0.06);
+        for (let i = 0; i < parts.arm; i++) {
+            const ba = (0.2 + i * 0.2) * (i % 2 === 0 ? 1 : -1) * Math.PI;
+            const w = Math.sin(t * 2 + i) * 0.15;
+            ctx.beginPath();
+            ctx.moveTo(Math.cos(ba) * s * 0.85, Math.sin(ba) * s * 0.85);
+            ctx.quadraticCurveTo(Math.cos(ba) * s * 1.3, Math.sin(ba + w) * s * 1.1, Math.cos(ba) * s * 1.5, Math.sin(ba + w * 2) * s * 0.85);
+            ctx.stroke();
+        }
+    }
+    
+    // 다리
+    if (parts.leg > 0) {
+        ctx.strokeStyle = d.secondary;
+        ctx.lineWidth = Math.max(2, s * 0.05);
+        for (let i = 0; i < parts.leg; i++) {
+            const ba = Math.PI * 0.5 + (i - (parts.leg - 1) / 2) * 0.2;
+            const w = Math.sin(t * 3 + i) * 0.12;
+            ctx.beginPath();
+            ctx.moveTo(Math.cos(ba) * s * 0.7, Math.sin(ba) * s * 0.7);
+            ctx.lineTo(Math.cos(ba + w) * s * 1.3, Math.sin(ba) * s * 1.2);
+            ctx.stroke();
+        }
+    }
+    
+    // 더듬이
+    if (parts.antenna > 0) {
+        ctx.strokeStyle = d.primary;
+        ctx.lineWidth = 2;
+        for (let i = 0; i < parts.antenna; i++) {
+            const aa = -Math.PI * 0.35 + i * 0.3;
+            ctx.beginPath();
+            ctx.moveTo(Math.cos(aa) * s * 0.6, Math.sin(aa) * s * 0.6);
+            ctx.quadraticCurveTo(Math.cos(aa) * s * 1.1, Math.sin(aa) * s * 1.0, Math.cos(aa) * s * 1.4, Math.sin(aa + Math.sin(t*3)*0.1) * s * 1.1);
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.arc(Math.cos(aa) * s * 1.4, Math.sin(aa + Math.sin(t*3)*0.1) * s * 1.1, 4, 0, Math.PI * 2);
+            ctx.fillStyle = d.primary;
+            ctx.fill();
+        }
+    }
+    
+    // 몸통
     ctx.beginPath();
     for (let i = 0; i < 10; i++) {
         const ang = (i / 10) * Math.PI * 2;
@@ -930,28 +1046,18 @@ const drawPlayer = () => {
     ctx.fill();
     ctx.shadowBlur = 0;
     
-    // 더듬이
-    const antCnt = p.antenna || 0;
-    if (antCnt > 0) {
-        ctx.strokeStyle = d.primary;
-        ctx.lineWidth = 2;
-        for (let i = 0; i < antCnt; i++) {
-            const aa = -Math.PI * 0.35 + i * 0.3;
-            ctx.beginPath();
-            ctx.moveTo(Math.cos(aa) * s * 0.6, Math.sin(aa) * s * 0.6);
-            ctx.quadraticCurveTo(Math.cos(aa) * s * 1.1, Math.sin(aa) * s * 1.0, Math.cos(aa) * s * 1.4, Math.sin(aa + Math.sin(t*3)*0.1) * s * 1.1);
-            ctx.stroke();
-            ctx.beginPath();
-            ctx.arc(Math.cos(aa) * s * 1.4, Math.sin(aa + Math.sin(t*3)*0.1) * s * 1.1, 4, 0, Math.PI * 2);
-            ctx.fillStyle = d.primary;
-            ctx.fill();
-        }
+    // 껍데기
+    if (parts.shell > 0) {
+        ctx.strokeStyle = 'rgba(255,255,255,0.4)';
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.arc(0, 0, s * 0.9, -Math.PI * 0.3, Math.PI * 0.3);
+        ctx.stroke();
     }
     
     // 귀
-    const earCnt = p.ear || 0;
-    if (earCnt > 0) {
-        for (let i = 0; i < earCnt; i++) {
+    if (parts.ear > 0) {
+        for (let i = 0; i < parts.ear; i++) {
             const side = i % 2 === 0 ? 1 : -1;
             ctx.beginPath();
             ctx.ellipse(side * s * 0.7, -s * 0.4, s * 0.12, s * 0.2, side * 0.3, 0, Math.PI * 2);
@@ -961,90 +1067,43 @@ const drawPlayer = () => {
     }
     
     // 눈
-    const eyeCnt = p.eye || 0;
+    const eyeCnt = Math.max(1, parts.eye);
     for (let i = 0; i < eyeCnt; i++) {
         const eX = (i - (eyeCnt - 1) / 2) * 0.3 * s * 0.7, eY = -s * 0.2;
-        ctx.beginPath(); ctx.arc(eX, eY, s * 0.2, 0, Math.PI * 2); ctx.fillStyle = 'white'; ctx.fill();
-        ctx.beginPath(); ctx.arc(eX + s * 0.03, eY, s * 0.1, 0, Math.PI * 2); ctx.fillStyle = '#222'; ctx.fill();
-        ctx.beginPath(); ctx.arc(eX - s * 0.04, eY - s * 0.05, s * 0.04, 0, Math.PI * 2); ctx.fillStyle = 'rgba(255,255,255,0.8)'; ctx.fill();
+        ctx.beginPath(); ctx.arc(eX, eY, s * 0.18, 0, Math.PI * 2); ctx.fillStyle = 'white'; ctx.fill();
+        ctx.beginPath(); ctx.arc(eX + s * 0.03, eY, s * 0.09, 0, Math.PI * 2); ctx.fillStyle = '#222'; ctx.fill();
+        ctx.beginPath(); ctx.arc(eX - s * 0.04, eY - s * 0.04, s * 0.03, 0, Math.PI * 2); ctx.fillStyle = 'rgba(255,255,255,0.8)'; ctx.fill();
+    }
+    
+    // 뇌 (후광)
+    if (parts.brain > 0) {
+        ctx.strokeStyle = 'rgba(254,228,64,0.4)';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.arc(0, -s * 0.5, s * 0.3, Math.PI, 0);
+        ctx.stroke();
     }
     
     // 코
-    if (p.nose > 0) {
+    if (parts.nose > 0) {
         ctx.fillStyle = '#ffcc99';
-        ctx.strokeStyle = '#cc9966';
-        ctx.lineWidth = 1;
         ctx.beginPath();
         ctx.moveTo(0, 0);
         ctx.lineTo(-s * 0.08, s * 0.12);
         ctx.lineTo(s * 0.08, s * 0.12);
         ctx.closePath();
         ctx.fill();
-        ctx.stroke();
     }
     
     // 입
-    if (p.mouth > 0) {
+    if (parts.mouth > 0) {
         ctx.strokeStyle = d.secondary;
         ctx.lineWidth = 2.5;
         ctx.lineCap = 'round';
         ctx.beginPath();
-        ctx.arc(0, s * 0.25, s * 0.12, 0.2, Math.PI - 0.2);
+        ctx.arc(0, s * 0.2, s * 0.12, 0.2, Math.PI - 0.2);
         ctx.stroke();
     }
-    
-    // 팔
-    const armCnt = p.arm || 0;
-    if (armCnt > 0) {
-        ctx.strokeStyle = d.primary;
-        ctx.lineWidth = Math.max(2, s * 0.06);
-        ctx.lineCap = 'round';
-        for (let i = 0; i < armCnt; i++) {
-            const ba = (0.2 + i * 0.18) * (i % 2 === 0 ? 1 : -1) * Math.PI;
-            const w = Math.sin(t * 2 + i) * 0.15;
-            ctx.beginPath();
-            ctx.moveTo(Math.cos(ba) * s * 0.85, Math.sin(ba) * s * 0.85);
-            ctx.quadraticCurveTo(Math.cos(ba) * s * 1.3, Math.sin(ba + w) * s * 1.1, Math.cos(ba) * s * 1.5, Math.sin(ba + w * 2) * s * 0.85);
-            ctx.stroke();
-        }
-    }
-    
-    // 다리
-    const legCnt = p.leg || 0;
-    if (legCnt > 0) {
-        ctx.strokeStyle = d.secondary;
-        ctx.lineWidth = Math.max(2, s * 0.05);
-        for (let i = 0; i < legCnt; i++) {
-            const ba = Math.PI * 0.5 + (i - (legCnt - 1) / 2) * 0.2;
-            const w = Math.sin(t * 3 + i) * 0.12;
-            ctx.beginPath();
-            ctx.moveTo(Math.cos(ba) * s * 0.7, Math.sin(ba) * s * 0.7);
-            ctx.lineTo(Math.cos(ba + w) * s * 1.3, Math.sin(ba) * s * 1.2);
-            ctx.stroke();
-        }
-    }
-    
-    // 꼬리
-    const tailCnt = p.tail || 0;
-    if (tailCnt > 0) {
-        ctx.strokeStyle = d.primary;
-        ctx.lineWidth = Math.max(3, s * 0.07);
-        ctx.lineCap = 'round';
-        for (let i = 0; i < tailCnt; i++) {
-            const tw = Math.sin(t * 2 + i) * s * 0.25;
-            const oy = (i - (tailCnt - 1) / 2) * s * 0.1;
-            ctx.beginPath();
-            ctx.moveTo(-s * 0.7, oy);
-            ctx.bezierCurveTo(-s * 1.1, tw + oy, -s * 1.4, -tw * 0.4 + oy, -s * 1.7, tw * 0.3 + oy);
-            ctx.stroke();
-        }
-    }
-    
-    // 볼터치
-    ctx.globalAlpha = 0.3;
-    ctx.beginPath(); ctx.arc(-s * 0.35, s * 0.1, s * 0.08, 0, Math.PI * 2); ctx.fillStyle = '#ffaaaa'; ctx.fill();
-    ctx.beginPath(); ctx.arc(s * 0.35, s * 0.1, s * 0.08, 0, Math.PI * 2); ctx.fill();
-    ctx.globalAlpha = 1;
     
     ctx.restore();
 };
@@ -1080,12 +1139,10 @@ const evolveMulti = () => {
 };
 
 /* ========================================
-   Climb Game - 토네이도 + 육지 착지 수정
+   Climb Game
 ======================================== */
 let climber, platforms = [], climbItems = [], camY = 0, curH = 0, canDblJump = false, wasOnGround = true;
-let deathLineY = 0;
-let landY = 0; // 육지 Y 좌표 저장
-let shownOvershootWarning = false;
+let deathLineY = 0, landY = 0, shownOvershootWarning = false;
 
 const startClimb = () => {
     cleanup();
@@ -1116,7 +1173,7 @@ const startClimb = () => {
     window.addEventListener('resize', resize);
     addCleanup(() => window.removeEventListener('resize', resize));
     
-    const pSize = 28 + totalParts() * 2;
+    const pSize = 28 + traitCount() * 2;
     climber = { x: canvas.width / 2, y: canvas.height - 80, w: pSize, h: pSize, vx: 0, vy: 0, onGround: true };
     wasOnGround = true;
     shownOvershootWarning = false;
@@ -1124,11 +1181,10 @@ const startClimb = () => {
     platforms = [];
     climbItems = [];
     deathLineY = canvas.height + 100;
-    landY = -CONFIG.LAND_HEIGHT * 10 - 40; // 육지 Y 좌표
+    landY = -CONFIG.LAND_HEIGHT * 10 - 40;
     
     genPlats(canvas.height - 50, landY - 200);
     platforms.push({ x: canvas.width / 2 - 70, y: canvas.height - 40, w: 140, h: 18, type: 'normal' });
-    // 육지 플랫폼 (넓게!)
     platforms.push({ x: 0, y: landY, w: canvas.width, h: 150, type: 'land' });
     
     camY = 0; curH = 0;
@@ -1151,13 +1207,8 @@ const genPlats = (fromY, toY) => {
             if (hr > 0.3 && Math.random() < 0.1) type = 'moving';
             if (hr > 0.5 && Math.random() < 0.06) type = 'breaking';
             if (hr > 0.6 && Math.random() < 0.1) type = 'bouncy';
-            
             platforms.push({ x, y, w, h: 14, type, dir: Math.random() < 0.5 ? 1 : -1, spd: 1 + Math.random() * 1.2, broken: false, timer: 0 });
-            
-            // 🌪️ 토네이도 아이템 (12% 확률)
-            if (Math.random() < 0.12) {
-                climbItems.push({ x: x + w / 2, y: y - 45, type: 'tornado', collected: false });
-            }
+            if (Math.random() < 0.12) climbItems.push({ x: x + w / 2, y: y - 45, type: 'tornado', collected: false });
         }
         y -= 45 + Math.random() * 25;
     }
@@ -1166,6 +1217,7 @@ const genPlats = (fromY, toY) => {
 const setupClimbControls = () => {
     const joy = document.getElementById('joy');
     const knob = document.getElementById('joy-knob');
+    const stats = calcStats();
     
     const move = (cx, cy) => {
         const r = joy.getBoundingClientRect();
@@ -1184,7 +1236,7 @@ const setupClimbControls = () => {
             climber.vy = -16;
             climber.onGround = false;
             wasOnGround = false;
-            canDblJump = hasPart('leg') && partCnt('leg') >= 2;
+            canDblJump = stats.speed > 1.1;
             Audio.playJump();
         } else if (canDblJump) {
             climber.vy = -13;
@@ -1220,12 +1272,13 @@ const setupClimbHUD = () => {
 const updateClimb = () => {
     if (!canvas || !ctx) return;
     const env = envById(G.data.dna.origin);
+    const stats = calcStats();
     
     let mx = joyPos.x;
     if (keys.a || keys.arrowleft) mx = -1;
     if (keys.d || keys.arrowright) mx = 1;
     
-    const spd = 5 + partCnt('leg') * 0.4;
+    const spd = 5 * stats.speed;
     climber.vx = mx * spd;
     climber.vy += 0.55;
     if (climber.vy > 14) climber.vy = 14;
@@ -1242,33 +1295,22 @@ const updateClimb = () => {
         if (p.broken) continue;
         if (p.type === 'moving') { p.x += p.dir * p.spd; if (p.x <= 0 || p.x + p.w >= canvas.width) p.dir *= -1; }
         
-        if (climber.vy >= 0 &&
-            climber.x + climber.w > p.x + 4 &&
-            climber.x < p.x + p.w - 4 &&
-            climber.y + climber.h >= p.y &&
-            climber.y + climber.h <= p.y + p.h + 16) {
-            
+        if (climber.vy >= 0 && climber.x + climber.w > p.x + 4 && climber.x < p.x + p.w - 4 && climber.y + climber.h >= p.y && climber.y + climber.h <= p.y + p.h + 16) {
             climber.y = p.y - climber.h;
             climber.vy = 0;
             climber.onGround = true;
-            canDblJump = hasPart('leg') && partCnt('leg') >= 2;
+            canDblJump = stats.speed > 1.1;
             
             if (p.type === 'bouncy') { climber.vy = -20; climber.onGround = false; Audio.playJump(); }
             else if (p.type === 'breaking') { p.timer++; if (p.timer > 25) p.broken = true; }
-            else if (p.type === 'land') { 
-                // 육지 도착!
-                climbWin(); 
-                return; 
-            }
+            else if (p.type === 'land') { climbWin(); return; }
             else if (!wasOnGroundBefore && !wasOnGround) { Audio.playLand(); }
-            
             if (p.type === 'moving') climber.x += p.dir * p.spd;
         }
     }
     
     wasOnGround = climber.onGround;
     
-    // 🌪️ 토네이도 아이템 수집
     for (const item of climbItems) {
         if (item.collected) continue;
         const dx = (climber.x + climber.w / 2) - item.x;
@@ -1276,7 +1318,7 @@ const updateClimb = () => {
         if (Math.sqrt(dx * dx + dy * dy) < 35) {
             item.collected = true;
             Audio.playWind();
-            climber.vy = -48; // 3배 점프!
+            climber.vy = -48;
             toast('🌪️ 토네이도의 힘!', 'success');
         }
     }
@@ -1286,22 +1328,13 @@ const updateClimb = () => {
     curH = Math.max(0, Math.floor(-climber.y / 10));
     G.data.stats.maxH = Math.max(G.data.stats.maxH, curH);
     
-    // 육지보다 너무 높이 올라갔을 때 경고
-    if (climber.y < landY - 200 && !shownOvershootWarning) {
-        shownOvershootWarning = true;
-        toast('⚠️ 너무 올라왔다! 육지로 내려가자!', 'warning');
-    }
-    // 육지 근처로 돌아오면 리셋
-    if (climber.y > landY - 100) {
-        shownOvershootWarning = false;
-    }
+    if (climber.y < landY - 200 && !shownOvershootWarning) { shownOvershootWarning = true; toast('⚠️ 너무 올라왔다! 육지로 내려가자!', 'warning'); }
+    if (climber.y > landY - 100) shownOvershootWarning = false;
     
     const highest = Math.min(...platforms.filter(p => p.type !== 'land').map(p => p.y));
     if (-camY - canvas.height < highest + 400) genPlats(highest, highest - canvas.height * 2);
     
-    // 데스라인
-    if (climber.y > deathLineY) { climbFail(); return; }
-    if (climber.y > -camY + canvas.height + 80) { climbFail(); return; }
+    if (climber.y > deathLineY || climber.y > -camY + canvas.height + 80) { climbFail(); return; }
     
     renderClimb(env);
     document.getElementById('c-height').textContent = curH + 'm';
@@ -1312,15 +1345,11 @@ const updateClimb = () => {
 const renderClimb = env => {
     const w = canvas.width, h = canvas.height;
     const hr = Math.min(1, curH / CONFIG.LAND_HEIGHT);
+    const t = Date.now() * 0.005;
     
     const bg = ctx.createLinearGradient(0, 0, 0, h);
-    if (hr < 0.5) {
-        bg.addColorStop(0, lerpCol(env.colors.bg1, '#1a3a5e', hr * 2));
-        bg.addColorStop(1, lerpCol(env.colors.bg2, '#0a2040', hr * 2));
-    } else {
-        bg.addColorStop(0, lerpCol('#1a3a5e', '#87CEEB', (hr - 0.5) * 2));
-        bg.addColorStop(1, lerpCol('#0a2040', '#E0F7FA', (hr - 0.5) * 2));
-    }
+    if (hr < 0.5) { bg.addColorStop(0, lerpCol(env.colors.bg1, '#1a3a5e', hr * 2)); bg.addColorStop(1, lerpCol(env.colors.bg2, '#0a2040', hr * 2)); }
+    else { bg.addColorStop(0, lerpCol('#1a3a5e', '#87CEEB', (hr - 0.5) * 2)); bg.addColorStop(1, lerpCol('#0a2040', '#E0F7FA', (hr - 0.5) * 2)); }
     ctx.fillStyle = bg;
     ctx.fillRect(0, 0, w, h);
     
@@ -1331,15 +1360,12 @@ const renderClimb = env => {
         if (p.broken) continue;
         const sy = p.y + camY;
         if (sy < -40 || sy > h + 40) continue;
-        
         ctx.fillStyle = platCol(p.type, hr, env);
-        
         if (p.type === 'land') {
             ctx.fillStyle = '#8B4513';
             ctx.fillRect(p.x, p.y, p.w, p.h);
             ctx.fillStyle = '#228B22';
             ctx.fillRect(p.x, p.y, p.w, 20);
-            // 나무들
             for (let i = 0; i < 6; i++) {
                 const tx = 30 + i * (p.w / 6);
                 ctx.fillStyle = '#654321';
@@ -1356,16 +1382,13 @@ const renderClimb = env => {
         }
     }
     
-    // 🌪️ 토네이도 아이템 그리기
-    const t = Date.now() * 0.005;
     for (const item of climbItems) {
         if (item.collected) continue;
         const sy = item.y + camY;
         if (sy < -40 || sy > h + 40) continue;
-        
         ctx.save();
         ctx.translate(item.x, item.y + Math.sin(t) * 5);
-        ctx.rotate(t * 2); // 회전 효과
+        ctx.rotate(-Math.PI / 2); // 시계방향 90도 회전
         ctx.font = '28px Arial';
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
@@ -1376,7 +1399,6 @@ const renderClimb = env => {
     drawClimber();
     ctx.restore();
     
-    // 높이 게이지
     const gH = h - 90, gX = w - 25;
     const prog = Math.min(1, curH / CONFIG.LAND_HEIGHT);
     ctx.fillStyle = 'rgba(0,0,0,0.25)';
@@ -1401,20 +1423,15 @@ const lerpCol = (a, b, t) => {
     const ah = parseInt(a.replace('#', ''), 16), bh = parseInt(b.replace('#', ''), 16);
     const ar = ah >> 16, ag = (ah >> 8) & 0xff, ab = ah & 0xff;
     const br = bh >> 16, bg = (bh >> 8) & 0xff, bb = bh & 0xff;
-    const rr = Math.round(ar + (br - ar) * t), rg = Math.round(ag + (bg - ag) * t), rb = Math.round(ab + (bb - ab) * t);
-    return `#${((rr << 16) | (rg << 8) | rb).toString(16).padStart(6, '0')}`;
+    return `#${((Math.round(ar + (br - ar) * t) << 16) | (Math.round(ag + (bg - ag) * t) << 8) | Math.round(ab + (bb - ab) * t)).toString(16).padStart(6, '0')}`;
 };
 
 const drawClimber = () => {
-    const d = G.data.design, p = G.data.parts, t = Date.now() * 0.005;
-    const s = climber.w / 2;
-    
+    const d = G.data.design, t = Date.now() * 0.005, s = climber.w / 2;
     ctx.save();
     ctx.translate(climber.x + climber.w / 2, climber.y + climber.h / 2);
-    
     ctx.shadowColor = d.primary;
     ctx.shadowBlur = 12;
-    
     ctx.beginPath();
     for (let i = 0; i < 8; i++) {
         const ang = (i / 8) * Math.PI * 2;
@@ -1429,16 +1446,14 @@ const drawClimber = () => {
     ctx.fillStyle = grad;
     ctx.fill();
     ctx.shadowBlur = 0;
-    
-    // 눈
-    const eyeCnt = p.eye || 0;
+    const parts = getAppearance();
+    const eyeCnt = Math.max(1, parts.eye);
     for (let i = 0; i < eyeCnt; i++) {
         const eA = (i - (eyeCnt - 1) / 2) * 0.35;
         const eX = eA * s * 0.7, eY = -s * 0.25;
         ctx.beginPath(); ctx.arc(eX, eY, s * 0.22, 0, Math.PI * 2); ctx.fillStyle = 'white'; ctx.fill();
         ctx.beginPath(); ctx.arc(eX + s * 0.03, eY, s * 0.1, 0, Math.PI * 2); ctx.fillStyle = '#222'; ctx.fill();
     }
-    
     ctx.restore();
 };
 
@@ -1446,23 +1461,18 @@ const climbFail = () => {
     cancelAnimationFrame(gameLoop); gameLoop = null;
     Audio.playDeath();
     saveGame();
-    
     app.innerHTML = `
         <div class="modal"><div class="modal-box">
             <div class="modal-icon">💧</div>
             <h1 class="modal-title fail">추락!</h1>
             <p class="modal-desc">바다로 떨어졌습니다...</p>
-            <div class="modal-stats">
-                <div class="stat-row"><span class="stat-label">도달 높이</span><span class="stat-val">${curH}m</span></div>
-                <div class="stat-row"><span class="stat-label">최고 기록</span><span class="stat-val">${G.data.stats.maxH}m</span></div>
-            </div>
+            <div class="modal-stats"><div class="stat-row"><span class="stat-label">도달 높이</span><span class="stat-val">${curH}m</span></div><div class="stat-row"><span class="stat-label">최고 기록</span><span class="stat-val">${G.data.stats.maxH}m</span></div></div>
             <div style="display:flex;flex-direction:column;gap:10px;">
                 <button class="btn btn-energy btn-block" id="btn-retry">🔄 다시</button>
                 <button class="btn btn-outline btn-block" id="btn-home">🏠 홈</button>
             </div>
         </div></div>
     `;
-    
     document.getElementById('btn-retry').onclick = () => { Audio.playClick(); startClimb(); };
     document.getElementById('btn-home').onclick = () => { Audio.playClick(); renderSaves(); };
 };
@@ -1472,23 +1482,25 @@ const climbWin = () => {
     Audio.playWin();
     G.data.stage = 3;
     G.data.runnerStage = 0;
+    G.data.runnerEvo = 0;
     saveGame();
     renderStory('runner');
 };
 
 /* ========================================
-   Runner Game - 속도/간격 조절, 캐릭터 달리기
+   Runner Game - 5단계 진화
 ======================================== */
 const RUNNER_STAGES = [
-    { id: 'forest', name: '🌲 원시의 숲', dist: CONFIG.RUNNER_STAGE_DIST, bgColors: ['#1a3a1a', '#0a2a0a'], groundColor: '#3d2817', items: ['🐛', '🦗', '🐜'], obstacles: ['🪨', '🌳'], evolveMsg: '몸이 커지고 있다!', baseSpeed: 2 },
-    { id: 'plains', name: '⚡ 번개의 평원', dist: CONFIG.RUNNER_STAGE_DIST, bgColors: ['#2a2a4a', '#1a1a3a'], groundColor: '#4a3a2a', items: ['⚡', '🔥'], obstacles: ['🪨', '💀'], evolveMsg: '직립보행을 시작했다!', baseSpeed: 3 },
-    { id: 'civilization', name: '🏛️ 문명의 여명', dist: CONFIG.RUNNER_STAGE_DIST, bgColors: ['#3a2a1a', '#2a1a0a'], groundColor: '#5a4a3a', items: ['🔧', '🏠', '📜'], obstacles: ['🗿'], evolveMsg: '지성을 얻었다!', baseSpeed: 4 }
+    { id: 'forest', name: '🌲 원시의 숲', dist: CONFIG.RUNNER_STAGE_DIST, bgColors: ['#1a3a1a', '#0a2a0a'], groundColor: '#3d2817', items: ['🐛', '🦗'], obstacles: ['🪨'], evoMsg: '사지가 발달했다!', baseSpeed: 2 },
+    { id: 'plains', name: '⚡ 번개의 평원', dist: CONFIG.RUNNER_STAGE_DIST, bgColors: ['#2a2a4a', '#1a1a3a'], groundColor: '#4a3a2a', items: ['⚡'], obstacles: ['🪨','💀'], evoMsg: '직립보행을 시작했다!', baseSpeed: 2.5 },
+    { id: 'fire', name: '🔥 불의 발견', dist: CONFIG.RUNNER_STAGE_DIST, bgColors: ['#3a1a0a', '#2a0a00'], groundColor: '#4a3020', items: ['🔥'], obstacles: ['🌋'], evoMsg: '불을 다루게 되었다!', baseSpeed: 3 },
+    { id: 'tools', name: '🔧 도구의 시대', dist: CONFIG.RUNNER_STAGE_DIST, bgColors: ['#2a2a2a', '#1a1a1a'], groundColor: '#3a3a3a', items: ['🔧','🪓'], obstacles: ['🗿'], evoMsg: '도구를 만들기 시작했다!', baseSpeed: 3.5 },
+    { id: 'civilization', name: '🏛️ 문명의 여명', dist: CONFIG.RUNNER_STAGE_DIST, bgColors: ['#3a2a1a', '#2a1a0a'], groundColor: '#5a4a3a', items: ['📜','🏠'], obstacles: ['🗿'], evoMsg: '문명이 시작되었다!', baseSpeed: 4 }
 ];
 
 let runner, runnerDist, runnerStage, obstacles, items, runnerParticles;
-let runnerSpeed, evoScale, bgOffset;
-let lastObstacleTime = 0;
-const MIN_OBSTACLE_GAP = 1500; // 최소 장애물 간격 (ms)
+let runnerSpeed, bgOffset, lastObstacleTime = 0;
+const MIN_OBSTACLE_GAP = 1800;
 
 const startRunner = () => {
     cleanup();
@@ -1496,14 +1508,14 @@ const startRunner = () => {
     
     runnerStage = G.data.runnerStage || 0;
     runnerDist = 0;
-    evoScale = 1 + runnerStage * 0.3;
     bgOffset = 0;
     lastObstacleTime = 0;
     
     const stage = RUNNER_STAGES[runnerStage];
-    runnerSpeed = stage.baseSpeed; // 스테이지별 기본 속도
+    runnerSpeed = stage.baseSpeed;
     
-    runner = { x: 100, y: 0, w: 40 * evoScale, h: 50 * evoScale, vy: 0, onGround: true, ducking: false };
+    const evoScale = 1 + G.data.runnerEvo * 0.15;
+    runner = { x: 100, y: 0, w: 40 * evoScale, h: 55 * evoScale, vy: 0, onGround: true, ducking: false };
     obstacles = [];
     items = [];
     runnerParticles = [];
@@ -1537,39 +1549,22 @@ const startRunner = () => {
 };
 
 const setupRunnerControls = () => {
-    const jump = () => {
-        if (runner.onGround && !runner.ducking) {
-            runner.vy = -18;
-            runner.onGround = false;
-            Audio.playJump();
-        }
-    };
-    
-    const duckStart = () => { if (runner.onGround) { runner.ducking = true; runner.h = 25 * evoScale; } };
-    const duckEnd = () => { runner.ducking = false; runner.h = 50 * evoScale; };
+    const jump = () => { if (runner.onGround && !runner.ducking) { runner.vy = -18; runner.onGround = false; Audio.playJump(); } };
+    const duckStart = () => { if (runner.onGround) { runner.ducking = true; runner.h = 30 * (1 + G.data.runnerEvo * 0.15); } };
+    const duckEnd = () => { runner.ducking = false; runner.h = 55 * (1 + G.data.runnerEvo * 0.15); };
     
     document.getElementById('btn-jump').onclick = jump;
     document.getElementById('btn-jump').ontouchstart = e => { e.preventDefault(); jump(); };
-    
     document.getElementById('btn-duck').ontouchstart = e => { e.preventDefault(); duckStart(); };
     document.getElementById('btn-duck').ontouchend = duckEnd;
     document.getElementById('btn-duck').onmousedown = duckStart;
     document.getElementById('btn-duck').onmouseup = duckEnd;
     
-    const onKeyDown = e => {
-        if (e.key === ' ' || e.key === 'ArrowUp' || e.key.toLowerCase() === 'w') jump();
-        if (e.key === 'ArrowDown' || e.key.toLowerCase() === 's') duckStart();
-    };
-    const onKeyUp = e => {
-        if (e.key === 'ArrowDown' || e.key.toLowerCase() === 's') duckEnd();
-    };
-    
+    const onKeyDown = e => { if (e.key === ' ' || e.key === 'ArrowUp' || e.key.toLowerCase() === 'w') jump(); if (e.key === 'ArrowDown' || e.key.toLowerCase() === 's') duckStart(); };
+    const onKeyUp = e => { if (e.key === 'ArrowDown' || e.key.toLowerCase() === 's') duckEnd(); };
     window.addEventListener('keydown', onKeyDown);
     window.addEventListener('keyup', onKeyUp);
-    addCleanup(() => {
-        window.removeEventListener('keydown', onKeyDown);
-        window.removeEventListener('keyup', onKeyUp);
-    });
+    addCleanup(() => { window.removeEventListener('keydown', onKeyDown); window.removeEventListener('keyup', onKeyUp); });
 };
 
 const setupRunnerHUD = () => {
@@ -1589,124 +1584,60 @@ const updateRunner = () => {
     const groundY = canvas.height - 80;
     const now = Date.now();
     
-    // 중력
     runner.vy += 0.8;
     runner.y += runner.vy;
+    if (runner.y >= groundY - runner.h) { runner.y = groundY - runner.h; runner.vy = 0; runner.onGround = true; }
     
-    if (runner.y >= groundY - runner.h) {
-        runner.y = groundY - runner.h;
-        runner.vy = 0;
-        runner.onGround = true;
-    }
-    
-    // 거리 증가 (속도에 비례)
     runnerDist += runnerSpeed * 0.08;
-    
-    // 점진적 속도 증가 (거리에 따라 아주 천천히)
-    runnerSpeed = stage.baseSpeed + runnerDist * 0.003;
-    runnerSpeed = Math.min(runnerSpeed, stage.baseSpeed + 4); // 최대 속도 제한
-    
-    // 배경 스크롤
+    runnerSpeed = stage.baseSpeed + runnerDist * 0.002;
+    runnerSpeed = Math.min(runnerSpeed, stage.baseSpeed + 3);
     bgOffset += runnerSpeed;
     
-    // 장애물 생성 (간격 조절!)
-    if (now - lastObstacleTime > MIN_OBSTACLE_GAP && Math.random() < 0.015) {
+    if (now - lastObstacleTime > MIN_OBSTACLE_GAP && Math.random() < 0.012) {
         const type = stage.obstacles[Math.floor(Math.random() * stage.obstacles.length)];
-        const tall = Math.random() < 0.25;
-        obstacles.push({
-            x: canvas.width + 50,
-            y: tall ? groundY - 70 : groundY - 40,
-            w: 40,
-            h: tall ? 35 : 40,
-            type,
-            tall
-        });
+        const tall = Math.random() < 0.2;
+        obstacles.push({ x: canvas.width + 50, y: tall ? groundY - 65 : groundY - 40, w: 40, h: tall ? 30 : 40, type, tall });
         lastObstacleTime = now;
     }
     
-    // 아이템 생성 (더 자주)
-    if (Math.random() < 0.012) {
+    if (Math.random() < 0.015) {
         const type = stage.items[Math.floor(Math.random() * stage.items.length)];
-        items.push({
-            x: canvas.width + 50,
-            y: groundY - 90 - Math.random() * 40,
-            type,
-            collected: false
-        });
+        items.push({ x: canvas.width + 50, y: groundY - 90 - Math.random() * 40, type, collected: false });
     }
     
-    // 장애물 이동 & 충돌
     for (let i = obstacles.length - 1; i >= 0; i--) {
         const o = obstacles[i];
-        o.x -= runnerSpeed * 1.5; // 장애물은 더 빠르게 다가옴 (상대 속도)
-        
+        o.x -= runnerSpeed * 1.5;
         if (o.x < -60) { obstacles.splice(i, 1); continue; }
-        
-        // 충돌 체크 (여유있게)
-        const hitboxShrink = 8;
-        if (runner.x + runner.w - hitboxShrink > o.x + hitboxShrink && 
-            runner.x + hitboxShrink < o.x + o.w - hitboxShrink &&
-            runner.y + runner.h > o.y + hitboxShrink && 
-            runner.y < o.y + o.h - hitboxShrink) {
-            runnerFail();
-            return;
-        }
+        const hs = 10;
+        if (runner.x + runner.w - hs > o.x + hs && runner.x + hs < o.x + o.w - hs && runner.y + runner.h > o.y + hs && runner.y < o.y + o.h - hs) { runnerFail(); return; }
     }
     
-    // 아이템 수집
     for (let i = items.length - 1; i >= 0; i--) {
         const item = items[i];
         item.x -= runnerSpeed * 1.5;
-        
         if (item.x < -50) { items.splice(i, 1); continue; }
-        
         if (!item.collected) {
-            const dx = (runner.x + runner.w / 2) - item.x;
-            const dy = (runner.y + runner.h / 2) - item.y;
+            const dx = (runner.x + runner.w / 2) - item.x, dy = (runner.y + runner.h / 2) - item.y;
             if (Math.sqrt(dx * dx + dy * dy) < 45) {
                 item.collected = true;
                 Audio.playCollect();
-                
-                if (item.type === '⚡') {
-                    toast('⚡ 번개의 힘!', 'success');
-                    runnerSpeed += 0.5;
-                } else if (item.type === '🔥') {
-                    toast('🔥 불을 발견!', 'success');
-                    runnerDist += 30;
-                } else {
-                    runnerDist += 8;
-                }
-                
-                for (let j = 0; j < 5; j++) {
-                    runnerParticles.push({
-                        x: item.x, y: item.y,
-                        vx: (Math.random() - 0.5) * 4,
-                        vy: (Math.random() - 0.5) * 4,
-                        life: 20,
-                        color: '#ffff00'
-                    });
-                }
-                
+                if (item.type === '⚡') { toast('⚡ 번개의 힘!', 'success'); runnerSpeed += 0.3; }
+                else if (item.type === '🔥') { toast('🔥 불을 발견!', 'success'); runnerDist += 25; }
+                else { runnerDist += 10; }
+                for (let j = 0; j < 5; j++) runnerParticles.push({ x: item.x, y: item.y, vx: (Math.random() - 0.5) * 4, vy: (Math.random() - 0.5) * 4, life: 20, color: '#ffff00' });
                 items.splice(i, 1);
             }
         }
     }
     
-    // 파티클
-    runnerParticles = runnerParticles.filter(p => {
-        p.x += p.vx; p.y += p.vy; p.life--;
-        return p.life > 0;
-    });
+    runnerParticles = runnerParticles.filter(p => { p.x += p.vx; p.y += p.vy; p.life--; return p.life > 0; });
     
     renderRunner(stage, groundY);
-    
     const distEl = document.getElementById('r-dist');
     if (distEl) distEl.textContent = `${Math.floor(runnerDist)}m / ${stage.dist}m`;
     
-    if (runnerDist >= stage.dist) {
-        runnerStageComplete();
-        return;
-    }
+    if (runnerDist >= stage.dist) { runnerStageComplete(); return; }
     
     gameLoop = requestAnimationFrame(updateRunner);
 };
@@ -1715,42 +1646,23 @@ const renderRunner = (stage, groundY) => {
     const w = canvas.width, h = canvas.height;
     const t = Date.now() * 0.001;
     
-    // 배경
     const bg = ctx.createLinearGradient(0, 0, 0, h);
     bg.addColorStop(0, stage.bgColors[0]);
     bg.addColorStop(1, stage.bgColors[1]);
     ctx.fillStyle = bg;
     ctx.fillRect(0, 0, w, h);
     
-    // 배경 장식 (스크롤!)
+    // 배경 장식
     if (runnerStage === 0) {
-        // 나무들
         for (let i = 0; i < 8; i++) {
             const tx = ((w + 150) - (bgOffset * 0.3 + i * 180) % (w + 150));
             ctx.fillStyle = '#1a4a1a';
-            ctx.beginPath();
-            ctx.moveTo(tx, groundY);
-            ctx.lineTo(tx + 25, groundY - 100);
-            ctx.lineTo(tx + 50, groundY);
-            ctx.fill();
+            ctx.beginPath(); ctx.moveTo(tx, groundY); ctx.lineTo(tx + 25, groundY - 100); ctx.lineTo(tx + 50, groundY); ctx.fill();
         }
-    } else if (runnerStage === 1) {
-        // 번개
-        if (Math.random() < 0.005) {
-            ctx.fillStyle = 'rgba(255,255,0,0.2)';
-            ctx.fillRect(0, 0, w, h);
-        }
-        // 구름
-        for (let i = 0; i < 3; i++) {
-            const cx = ((w + 100) - (bgOffset * 0.2 + i * 250) % (w + 100));
-            ctx.fillStyle = 'rgba(100,100,150,0.4)';
-            ctx.beginPath();
-            ctx.arc(cx, 80 + i * 30, 40, 0, Math.PI * 2);
-            ctx.arc(cx + 30, 70 + i * 30, 35, 0, Math.PI * 2);
-            ctx.fill();
-        }
-    } else {
-        // 건물들
+    } else if (runnerStage === 2) {
+        ctx.fillStyle = 'rgba(255,100,0,0.15)';
+        ctx.fillRect(0, groundY - 50, w, 50);
+    } else if (runnerStage === 4) {
         for (let i = 0; i < 5; i++) {
             const bx = ((w + 150) - (bgOffset * 0.15 + i * 200) % (w + 150));
             const bh = 50 + i * 15;
@@ -1758,202 +1670,111 @@ const renderRunner = (stage, groundY) => {
             ctx.fillRect(bx, groundY - bh, 50, bh);
             ctx.fillStyle = '#ffa500';
             ctx.fillRect(bx + 10, groundY - bh + 15, 10, 10);
-            ctx.fillRect(bx + 30, groundY - bh + 15, 10, 10);
         }
     }
     
-    // 땅
     ctx.fillStyle = stage.groundColor;
     ctx.fillRect(0, groundY, w, h - groundY);
-    
-    // 땅 디테일 (움직이는 점선)
     ctx.strokeStyle = 'rgba(255,255,255,0.2)';
     ctx.lineWidth = 2;
     ctx.setLineDash([20, 15]);
     ctx.lineDashOffset = -bgOffset;
-    ctx.beginPath();
-    ctx.moveTo(0, groundY + 10);
-    ctx.lineTo(w, groundY + 10);
-    ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(0, groundY + 10); ctx.lineTo(w, groundY + 10); ctx.stroke();
     ctx.setLineDash([]);
     
-    // 장애물
-    obstacles.forEach(o => {
-        ctx.font = `${o.h}px Arial`;
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'bottom';
-        ctx.fillText(o.type, o.x + o.w / 2, o.y + o.h);
-    });
-    
-    // 아이템
-    items.forEach(item => {
-        if (item.collected) return;
-        ctx.font = '32px Arial';
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        ctx.fillText(item.type, item.x, item.y + Math.sin(t * 5) * 5);
-    });
-    
-    // 파티클
-    runnerParticles.forEach(p => {
-        ctx.globalAlpha = p.life / 20;
-        ctx.fillStyle = p.color;
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, 4, 0, Math.PI * 2);
-        ctx.fill();
-    });
+    obstacles.forEach(o => { ctx.font = `${o.h}px Arial`; ctx.textAlign = 'center'; ctx.textBaseline = 'bottom'; ctx.fillText(o.type, o.x + o.w / 2, o.y + o.h); });
+    items.forEach(item => { if (item.collected) return; ctx.font = '32px Arial'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(item.type, item.x, item.y + Math.sin(t * 5) * 5); });
+    runnerParticles.forEach(p => { ctx.globalAlpha = p.life / 20; ctx.fillStyle = p.color; ctx.beginPath(); ctx.arc(p.x, p.y, 4, 0, Math.PI * 2); ctx.fill(); });
     ctx.globalAlpha = 1;
     
-    // 캐릭터 (달리는 애니메이션!)
     drawRunnerChar(groundY);
 };
 
 const drawRunnerChar = groundY => {
     const d = G.data.design;
-    const p = G.data.parts;
-    const t = Date.now() * 0.015; // 빠른 달리기 애니메이션
+    const t = Date.now() * 0.015;
+    const evo = G.data.runnerEvo || 0;
     
     ctx.save();
     ctx.translate(runner.x + runner.w / 2, runner.y + runner.h / 2);
     
-    if (runnerStage === 0) {
-        // 1단계: 큰 세포 (통통 튀는 느낌)
+    const legPhase = Math.sin(t * 2) * 0.4;
+    const armPhase = Math.sin(t * 2 + Math.PI) * 0.3;
+    
+    if (evo === 0) {
+        // 초기: 큰 세포
         const bounce = runner.onGround ? Math.abs(Math.sin(t)) * 3 : 0;
         ctx.translate(0, -bounce);
-        
         ctx.shadowColor = d.primary;
         ctx.shadowBlur = 15;
-        
         ctx.beginPath();
         for (let i = 0; i < 8; i++) {
-            const ang = (i / 8) * Math.PI * 2;
-            const w = Math.sin(t * 0.5 + i) * 3;
-            const r = runner.w / 2 + w;
+            const ang = (i / 8) * Math.PI * 2, w = Math.sin(t * 0.5 + i) * 3, r = runner.w / 2 + w;
             i === 0 ? ctx.moveTo(Math.cos(ang) * r, Math.sin(ang) * r) : ctx.lineTo(Math.cos(ang) * r, Math.sin(ang) * r);
         }
         ctx.closePath();
         ctx.fillStyle = d.primary;
         ctx.fill();
         ctx.shadowBlur = 0;
-        
-        // 눈 (달리는 방향 보기)
-        for (let i = 0; i < Math.min(3, (p.eye || 1)); i++) {
-            const ex = 5 + (i - 1) * 10;
-            ctx.beginPath(); ctx.arc(ex, -5, 8, 0, Math.PI * 2); ctx.fillStyle = 'white'; ctx.fill();
-            ctx.beginPath(); ctx.arc(ex + 3, -5, 4, 0, Math.PI * 2); ctx.fillStyle = '#222'; ctx.fill();
-        }
-        
-        // 다리 (빠르게 움직임!)
-        if ((p.leg || 0) > 0) {
-            ctx.strokeStyle = d.secondary;
-            ctx.lineWidth = 4;
-            const legPhase = Math.sin(t * 2);
-            ctx.beginPath();
-            ctx.moveTo(-8, runner.h / 3);
-            ctx.lineTo(-8 + legPhase * 15, runner.h / 2 + 5);
-            ctx.stroke();
-            ctx.beginPath();
-            ctx.moveTo(8, runner.h / 3);
-            ctx.lineTo(8 - legPhase * 15, runner.h / 2 + 5);
-            ctx.stroke();
-        }
-        
-    } else if (runnerStage === 1) {
-        // 2단계: 직립보행
-        const legPhase = Math.sin(t * 2) * 0.4;
-        const armPhase = Math.sin(t * 2 + Math.PI) * 0.3;
-        
-        // 몸통
+        ctx.beginPath(); ctx.arc(5, -5, 8, 0, Math.PI * 2); ctx.fillStyle = 'white'; ctx.fill();
+        ctx.beginPath(); ctx.arc(8, -5, 4, 0, Math.PI * 2); ctx.fillStyle = '#222'; ctx.fill();
+    } else if (evo === 1) {
+        // 사지 발달
+        ctx.strokeStyle = d.secondary; ctx.lineWidth = 5; ctx.lineCap = 'round';
+        ctx.beginPath(); ctx.moveTo(-8, runner.h / 4); ctx.lineTo(-8 + Math.sin(legPhase) * 15, runner.h / 2 + 5); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(8, runner.h / 4); ctx.lineTo(8 - Math.sin(legPhase) * 15, runner.h / 2 + 5); ctx.stroke();
         ctx.fillStyle = d.primary;
         ctx.beginPath();
-        ctx.ellipse(0, 0, runner.w / 3, runner.h / 2.5, 0, 0, Math.PI * 2);
-        ctx.fill();
-        
-        // 머리
-        ctx.beginPath();
-        ctx.arc(0, -runner.h / 2, runner.w / 4, 0, Math.PI * 2);
-        ctx.fill();
-        
-        // 눈 (앞 보기)
+        for (let i = 0; i < 8; i++) { const ang = (i / 8) * Math.PI * 2, r = runner.w / 2.5; i === 0 ? ctx.moveTo(Math.cos(ang) * r, Math.sin(ang) * r) : ctx.lineTo(Math.cos(ang) * r, Math.sin(ang) * r); }
+        ctx.closePath(); ctx.fill();
+        ctx.beginPath(); ctx.arc(5, -8, 7, 0, Math.PI * 2); ctx.fillStyle = 'white'; ctx.fill();
+        ctx.beginPath(); ctx.arc(7, -8, 3.5, 0, Math.PI * 2); ctx.fillStyle = '#222'; ctx.fill();
+    } else if (evo === 2) {
+        // 직립보행
+        ctx.fillStyle = d.primary;
+        ctx.beginPath(); ctx.ellipse(0, 0, runner.w / 3, runner.h / 2.5, 0, 0, Math.PI * 2); ctx.fill();
+        ctx.beginPath(); ctx.arc(0, -runner.h / 2, runner.w / 4, 0, Math.PI * 2); ctx.fill();
         ctx.beginPath(); ctx.arc(-5, -runner.h / 2 - 2, 5, 0, Math.PI * 2); ctx.fillStyle = 'white'; ctx.fill();
         ctx.beginPath(); ctx.arc(5, -runner.h / 2 - 2, 5, 0, Math.PI * 2); ctx.fill();
         ctx.beginPath(); ctx.arc(-3, -runner.h / 2 - 2, 2.5, 0, Math.PI * 2); ctx.fillStyle = '#222'; ctx.fill();
         ctx.beginPath(); ctx.arc(7, -runner.h / 2 - 2, 2.5, 0, Math.PI * 2); ctx.fill();
-        
-        // 다리 (달리기!)
-        ctx.strokeStyle = d.secondary;
-        ctx.lineWidth = 6;
-        ctx.lineCap = 'round';
-        ctx.beginPath();
-        ctx.moveTo(-8, runner.h / 4);
-        ctx.lineTo(-8 + Math.sin(legPhase) * 20, runner.h / 2 + 8);
-        ctx.stroke();
-        ctx.beginPath();
-        ctx.moveTo(8, runner.h / 4);
-        ctx.lineTo(8 - Math.sin(legPhase) * 20, runner.h / 2 + 8);
-        ctx.stroke();
-        
-        // 팔 (달리기!)
-        ctx.strokeStyle = d.primary;
-        ctx.lineWidth = 5;
-        ctx.beginPath();
-        ctx.moveTo(-runner.w / 3, -5);
-        ctx.lineTo(-runner.w / 2 - Math.sin(armPhase) * 15, 15);
-        ctx.stroke();
-        ctx.beginPath();
-        ctx.moveTo(runner.w / 3, -5);
-        ctx.lineTo(runner.w / 2 + Math.sin(armPhase) * 15, 15);
-        ctx.stroke();
-        
-    } else {
-        // 3단계: 문명인
-        const legPhase = Math.sin(t * 2) * 0.3;
-        const armPhase = Math.sin(t * 2 + Math.PI) * 0.25;
-        
-        // 몸통 (옷)
-        ctx.fillStyle = '#8B4513';
-        ctx.beginPath();
-        ctx.roundRect(-runner.w / 3, -runner.h / 4, runner.w / 1.5, runner.h / 1.8, 5);
-        ctx.fill();
-        
-        // 머리
+        ctx.strokeStyle = d.secondary; ctx.lineWidth = 6;
+        ctx.beginPath(); ctx.moveTo(-8, runner.h / 4); ctx.lineTo(-8 + Math.sin(legPhase) * 18, runner.h / 2 + 8); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(8, runner.h / 4); ctx.lineTo(8 - Math.sin(legPhase) * 18, runner.h / 2 + 8); ctx.stroke();
+        ctx.strokeStyle = d.primary; ctx.lineWidth = 5;
+        ctx.beginPath(); ctx.moveTo(-runner.w / 3, -5); ctx.lineTo(-runner.w / 2 - Math.sin(armPhase) * 12, 12); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(runner.w / 3, -5); ctx.lineTo(runner.w / 2 + Math.sin(armPhase) * 12, 12); ctx.stroke();
+    } else if (evo === 3) {
+        // 불 사용
         ctx.fillStyle = d.primary;
-        ctx.beginPath();
-        ctx.arc(0, -runner.h / 2 - 5, runner.w / 3.5, 0, Math.PI * 2);
-        ctx.fill();
-        
-        // 눈
+        ctx.beginPath(); ctx.ellipse(0, 0, runner.w / 3, runner.h / 2.5, 0, 0, Math.PI * 2); ctx.fill();
+        ctx.beginPath(); ctx.arc(0, -runner.h / 2, runner.w / 4, 0, Math.PI * 2); ctx.fill();
+        ctx.beginPath(); ctx.arc(-5, -runner.h / 2 - 2, 5, 0, Math.PI * 2); ctx.fillStyle = 'white'; ctx.fill();
+        ctx.beginPath(); ctx.arc(5, -runner.h / 2 - 2, 5, 0, Math.PI * 2); ctx.fill();
+        ctx.beginPath(); ctx.arc(-3, -runner.h / 2 - 2, 2.5, 0, Math.PI * 2); ctx.fillStyle = '#222'; ctx.fill();
+        ctx.beginPath(); ctx.arc(7, -runner.h / 2 - 2, 2.5, 0, Math.PI * 2); ctx.fill();
+        ctx.strokeStyle = d.secondary; ctx.lineWidth = 6;
+        ctx.beginPath(); ctx.moveTo(-8, runner.h / 4); ctx.lineTo(-8 + Math.sin(legPhase) * 16, runner.h / 2 + 6); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(8, runner.h / 4); ctx.lineTo(8 - Math.sin(legPhase) * 16, runner.h / 2 + 6); ctx.stroke();
+        ctx.strokeStyle = d.primary; ctx.lineWidth = 5;
+        ctx.beginPath(); ctx.moveTo(runner.w / 3, -5); ctx.lineTo(runner.w / 2 + 10, -15); ctx.stroke();
+        ctx.font = '16px Arial'; ctx.fillText('🔥', runner.w / 2 + 12, -22);
+    } else {
+        // 도구/문명
+        ctx.fillStyle = '#8B4513';
+        ctx.beginPath(); ctx.roundRect(-runner.w / 3, -runner.h / 4, runner.w / 1.5, runner.h / 1.8, 5); ctx.fill();
+        ctx.fillStyle = d.primary;
+        ctx.beginPath(); ctx.arc(0, -runner.h / 2 - 5, runner.w / 3.5, 0, Math.PI * 2); ctx.fill();
         ctx.beginPath(); ctx.arc(-6, -runner.h / 2 - 5, 5, 0, Math.PI * 2); ctx.fillStyle = 'white'; ctx.fill();
         ctx.beginPath(); ctx.arc(6, -runner.h / 2 - 5, 5, 0, Math.PI * 2); ctx.fill();
         ctx.beginPath(); ctx.arc(-4, -runner.h / 2 - 5, 2.5, 0, Math.PI * 2); ctx.fillStyle = '#222'; ctx.fill();
         ctx.beginPath(); ctx.arc(8, -runner.h / 2 - 5, 2.5, 0, Math.PI * 2); ctx.fill();
-        
-        // 미소
-        ctx.strokeStyle = '#222';
-        ctx.lineWidth = 2;
-        ctx.beginPath();
-        ctx.arc(0, -runner.h / 2 - 2, 6, 0.2, Math.PI - 0.2);
-        ctx.stroke();
-        
-        // 다리
-        ctx.strokeStyle = d.primary;
-        ctx.lineWidth = 7;
-        ctx.lineCap = 'round';
-        ctx.beginPath();
-        ctx.moveTo(-10, runner.h / 4);
-        ctx.lineTo(-10 + Math.sin(legPhase) * 18, runner.h / 2 + 8);
-        ctx.stroke();
-        ctx.beginPath();
-        ctx.moveTo(10, runner.h / 4);
-        ctx.lineTo(10 - Math.sin(legPhase) * 18, runner.h / 2 + 8);
-        ctx.stroke();
-        
-        // 도구 (횃불) - 흔들림
-        const torchX = runner.w / 2 + 8 + Math.sin(armPhase) * 5;
-        ctx.fillStyle = '#8B4513';
-        ctx.fillRect(torchX, -25, 6, 35);
-        ctx.font = '18px Arial';
-        ctx.fillText('🔥', torchX + 3, -32);
+        ctx.strokeStyle = '#222'; ctx.lineWidth = 2;
+        ctx.beginPath(); ctx.arc(0, -runner.h / 2 - 2, 6, 0.2, Math.PI - 0.2); ctx.stroke();
+        ctx.strokeStyle = d.primary; ctx.lineWidth = 7;
+        ctx.beginPath(); ctx.moveTo(-10, runner.h / 4); ctx.lineTo(-10 + Math.sin(legPhase) * 15, runner.h / 2 + 6); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(10, runner.h / 4); ctx.lineTo(10 - Math.sin(legPhase) * 15, runner.h / 2 + 6); ctx.stroke();
+        ctx.font = '14px Arial'; ctx.fillText(evo >= 4 ? '📜' : '🔧', runner.w / 2 + 8, -10);
     }
     
     ctx.restore();
@@ -1962,22 +1783,18 @@ const drawRunnerChar = groundY => {
 const runnerFail = () => {
     cancelAnimationFrame(gameLoop); gameLoop = null;
     Audio.playDeath();
-    
     app.innerHTML = `
         <div class="modal"><div class="modal-box">
             <div class="modal-icon">💥</div>
             <h1 class="modal-title fail">충돌!</h1>
             <p class="modal-desc">장애물에 부딪혔습니다.</p>
-            <div class="modal-stats">
-                <div class="stat-row"><span class="stat-label">진행 거리</span><span class="stat-val">${Math.floor(runnerDist)}m</span></div>
-            </div>
+            <div class="modal-stats"><div class="stat-row"><span class="stat-label">진행 거리</span><span class="stat-val">${Math.floor(runnerDist)}m</span></div></div>
             <div style="display:flex;flex-direction:column;gap:10px;">
                 <button class="btn btn-energy btn-block" id="btn-retry">🔄 다시</button>
                 <button class="btn btn-outline btn-block" id="btn-home">🏠 홈</button>
             </div>
         </div></div>
     `;
-    
     document.getElementById('btn-retry').onclick = () => { Audio.playClick(); startRunner(); };
     document.getElementById('btn-home').onclick = () => { Audio.playClick(); renderSaves(); };
 };
@@ -1989,19 +1806,16 @@ const runnerStageComplete = () => {
     const stage = RUNNER_STAGES[runnerStage];
     const isLast = runnerStage >= RUNNER_STAGES.length - 1;
     
+    G.data.runnerEvo++;
+    
     if (!isLast) {
         G.data.runnerStage = runnerStage + 1;
         saveGame();
-        
-        showEvo('🧬', '진화!', stage.evolveMsg, '다음 단계로...');
-        
-        setTimeout(() => {
-            startRunner();
-        }, 2500);
+        showEvo('🧬', '진화!', stage.evoMsg, `${runnerStage + 2}단계로...`);
+        setTimeout(() => startRunner(), 2500);
     } else {
         G.data.stage = 4;
         saveGame();
-        
         app.innerHTML = `
             <div class="modal"><div class="modal-box">
                 <div class="modal-icon">🎉</div>
@@ -2009,14 +1823,12 @@ const runnerStageComplete = () => {
                 <p class="modal-desc">당신은 미생물에서 시작하여<br>마침내 문명을 이루었습니다!</p>
                 <div class="modal-stats">
                     <div class="stat-row"><span class="stat-label">최종 점수</span><span class="stat-val">${G.data.score}</span></div>
-                    <div class="stat-row"><span class="stat-label">획득 파츠</span><span class="stat-val">${totalParts()}개</span></div>
+                    <div class="stat-row"><span class="stat-label">획득 특성</span><span class="stat-val">${traitCount()}개</span></div>
+                    <div class="stat-row"><span class="stat-label">진화 단계</span><span class="stat-val">${G.data.runnerEvo}단계</span></div>
                 </div>
-                <div style="display:flex;flex-direction:column;gap:10px;">
-                    <button class="btn btn-energy btn-block" id="btn-home">🏠 홈으로</button>
-                </div>
+                <button class="btn btn-energy btn-block" id="btn-home">🏠 홈으로</button>
             </div></div>
         `;
-        
         document.getElementById('btn-home').onclick = () => { Audio.playClick(); renderSaves(); };
     }
 };
@@ -2026,24 +1838,19 @@ const runnerStageComplete = () => {
 ======================================== */
 const renderTitle = () => {
     app.innerHTML = `
-        <div class="page-center">
-            <div class="page-content">
-                <div class="page-icon">🎲</div>
-                <h1 style="font-family:Orbitron;font-size:clamp(2rem,8vw,3rem);font-weight:900;background:var(--gradient-energy);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:4px;">BOKLUCK</h1>
-                <h2 style="font-family:Orbitron;font-size:1rem;color:var(--text-secondary);margin-bottom:24px;">Universe</h2>
-                <p style="font-size:0.85rem;color:var(--text-muted);line-height:1.7;max-width:260px;margin:0 auto 32px;">
-                    <strong style="color:var(--neon-cyan)">BOK(복)</strong> 또는 
-                    <strong style="color:var(--neon-pink)">LUCK(운)</strong>으로<br>
-                    만들어가는 당신만의 우주
-                </p>
-                <div style="display:flex;flex-direction:column;gap:10px;max-width:240px;margin:0 auto;">
-                    <button class="btn btn-energy btn-block" id="btn-start">🚀 게임 시작</button>
-                    <button class="btn btn-outline btn-block" id="btn-settings">⚙️ 설정</button>
-                </div>
+        <div class="page-center"><div class="page-content">
+            <div class="page-icon">🎲</div>
+            <h1 style="font-family:Orbitron;font-size:clamp(2rem,8vw,3rem);font-weight:900;background:var(--gradient-energy);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:4px;">BOKLUCK</h1>
+            <h2 style="font-family:Orbitron;font-size:1rem;color:var(--text-secondary);margin-bottom:24px;">Universe</h2>
+            <p style="font-size:0.85rem;color:var(--text-muted);line-height:1.7;max-width:260px;margin:0 auto 32px;">
+                <strong style="color:var(--neon-cyan)">BOK(복)</strong> 또는 <strong style="color:var(--neon-pink)">LUCK(운)</strong>으로<br>만들어가는 당신만의 우주
+            </p>
+            <div style="display:flex;flex-direction:column;gap:10px;max-width:240px;margin:0 auto;">
+                <button class="btn btn-energy btn-block" id="btn-start">🚀 게임 시작</button>
+                <button class="btn btn-outline btn-block" id="btn-settings">⚙️ 설정</button>
             </div>
-        </div>
+        </div></div>
     `;
-    
     document.getElementById('btn-start').onclick = () => { Audio.init(); Audio.playClick(); renderSaves(); };
     document.getElementById('btn-settings').onclick = () => { Audio.init(); Audio.playClick(); renderSettings(); };
 };
@@ -2059,7 +1866,7 @@ const renderSaves = () => {
             html += `<div class="slot">
                 <div class="slot-head"><span class="slot-num">슬롯 ${i + 1}</span><span style="font-size:0.6rem;color:var(--text-muted)">${Save.fmt(s.updated)}</span></div>
                 <div class="slot-name">${s.name || '이름없음'}</div>
-                <div class="slot-info">${s.dna?.origin ? envById(s.dna.origin)?.icon : '❓'} ${st} · 점수: ${s.score || 0}</div>
+                <div class="slot-info">${s.dna?.origin ? envById(s.dna.origin)?.icon : '❓'} ${st} · 점수: ${s.score || 0} · 특성: ${s.traits?.length || 0}개</div>
                 <div class="slot-actions">
                     <button class="btn btn-energy btn-sm" style="flex:1" onclick="handleLoad(${i})">▶️ 계속</button>
                     <button class="del-btn" onclick="handleDel(${i})">🗑️</button>
@@ -2069,7 +1876,6 @@ const renderSaves = () => {
             html += `<div class="slot empty" onclick="handleNew(${i})"><span style="font-size:1.6rem;opacity:0.5">➕</span><p style="color:var(--text-muted);margin-top:6px;font-size:0.8rem;">슬롯 ${i + 1} - 새 게임</p></div>`;
         }
     }
-    
     app.innerHTML = `
         <div class="save-page">
             <div class="save-header">
@@ -2080,7 +1886,6 @@ const renderSaves = () => {
             <div class="slots">${html}</div>
         </div>
     `;
-    
     document.getElementById('btn-back').onclick = () => { Audio.playClick(); renderTitle(); };
 };
 
@@ -2098,47 +1903,41 @@ window.handleDel = i => { Audio.playClick(); if (confirm('정말 삭제?')) { Sa
 
 const renderSettings = () => {
     const joyRight = Settings.get('joyRight');
-    
     app.innerHTML = `
-        <div class="page-center">
-            <div class="page-content" style="max-width:340px;">
-                <h2 class="page-title">⚙️ 설정</h2>
-                <div style="background:var(--void-surface);border-radius:12px;padding:16px;margin-bottom:16px;text-align:left;">
-                    <div style="font-size:0.7rem;color:var(--text-muted);margin-bottom:8px;">🔊 사운드</div>
-                    <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border-subtle);">
-                        <span>마스터</span>
-                        <input type="range" id="vol-m" min="0" max="100" value="${Audio.settings.master * 100}" style="width:80px;">
-                    </div>
-                    <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;">
-                        <span>효과음</span>
-                        <div style="display:flex;gap:8px;align-items:center;">
-                            <input type="range" id="vol-s" min="0" max="100" value="${Audio.settings.sfx * 100}" style="width:80px;">
-                            <button class="btn btn-ghost btn-sm" id="toggle-sfx">${Audio.settings.on ? '🔊' : '🔇'}</button>
-                        </div>
+        <div class="page-center"><div class="page-content" style="max-width:340px;">
+            <h2 class="page-title">⚙️ 설정</h2>
+            <div style="background:var(--void-surface);border-radius:12px;padding:16px;margin-bottom:16px;text-align:left;">
+                <div style="font-size:0.7rem;color:var(--text-muted);margin-bottom:8px;">🔊 사운드</div>
+                <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border-subtle);">
+                    <span>마스터</span>
+                    <input type="range" id="vol-m" min="0" max="100" value="${Audio.settings.master * 100}" style="width:80px;">
+                </div>
+                <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;">
+                    <span>효과음</span>
+                    <div style="display:flex;gap:8px;align-items:center;">
+                        <input type="range" id="vol-s" min="0" max="100" value="${Audio.settings.sfx * 100}" style="width:80px;">
+                        <button class="btn btn-ghost btn-sm" id="toggle-sfx">${Audio.settings.on ? '🔊' : '🔇'}</button>
                     </div>
                 </div>
-                <div style="background:var(--void-surface);border-radius:12px;padding:16px;margin-bottom:16px;text-align:left;">
-                    <div style="font-size:0.7rem;color:var(--text-muted);margin-bottom:8px;">🕹️ 조작</div>
-                    <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;">
-                        <span>조이스틱</span>
-                        <div style="display:flex;gap:6px;">
-                            <button class="btn btn-sm ${!joyRight ? 'btn-energy' : 'btn-ghost'}" id="joy-left">⬅️ 왼쪽</button>
-                            <button class="btn btn-sm ${joyRight ? 'btn-energy' : 'btn-ghost'}" id="joy-right">➡️ 오른쪽</button>
-                        </div>
-                    </div>
-                </div>
-                <button class="btn btn-energy btn-block" id="btn-close">확인</button>
             </div>
-        </div>
+            <div style="background:var(--void-surface);border-radius:12px;padding:16px;margin-bottom:16px;text-align:left;">
+                <div style="font-size:0.7rem;color:var(--text-muted);margin-bottom:8px;">🕹️ 조작</div>
+                <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;">
+                    <span>조이스틱</span>
+                    <div style="display:flex;gap:6px;">
+                        <button class="btn btn-sm ${!joyRight ? 'btn-energy' : 'btn-ghost'}" id="joy-left">⬅️ 왼쪽</button>
+                        <button class="btn btn-sm ${joyRight ? 'btn-energy' : 'btn-ghost'}" id="joy-right">➡️ 오른쪽</button>
+                    </div>
+                </div>
+            </div>
+            <button class="btn btn-energy btn-block" id="btn-close">확인</button>
+        </div></div>
     `;
-    
     document.getElementById('vol-m').oninput = e => { Audio.settings.master = e.target.value / 100; Audio.save(); };
     document.getElementById('vol-s').oninput = e => { Audio.settings.sfx = e.target.value / 100; Audio.save(); };
     document.getElementById('toggle-sfx').onclick = e => { Audio.settings.on = !Audio.settings.on; e.target.textContent = Audio.settings.on ? '🔊' : '🔇'; Audio.save(); };
-    
     document.getElementById('joy-left').onclick = () => { Settings.set('joyRight', false); renderSettings(); };
     document.getElementById('joy-right').onclick = () => { Settings.set('joyRight', true); renderSettings(); };
-    
     document.getElementById('btn-close').onclick = () => { Audio.playClick(); renderTitle(); };
 };
 
@@ -2150,7 +1949,7 @@ document.addEventListener('DOMContentLoaded', () => {
     renderTitle();
     setInterval(saveGame, CONFIG.SAVE_INTERVAL);
     window.addEventListener('beforeunload', saveGame);
-    console.log('🎲 BOKLUCK Universe v0.9.0');
+    console.log('🎲 BOKLUCK Universe v1.0.0');
 });
 </script>
 </body>
