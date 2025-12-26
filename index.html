@@ -2462,12 +2462,17 @@ const rollEvoDice = () => {
             
             if (available.length > 0) {
                 const trait = available[Math.floor(Math.random() * available.length)];
+                const randX = 0.4 + Math.random() * 0.2;
+                const randY = 0.3 + Math.random() * 0.4;
                 const newTrait = {
                     id: trait.id,
-                    x: 0.4 + Math.random() * 0.2,
-                    y: 0.3 + Math.random() * 0.4,
+                    x: randX,
+                    y: randY,
                     scale: 1,
-                    rotation: 0
+                    rotation: 0,
+                    // bodySize 기준 상대좌표 (0.15 = 에디터 기본 비율)
+                    relX: (randX - 0.5) / 0.15,
+                    relY: (randY - 0.5) / 0.15
                 };
                 if (!G.data.evoTraits) G.data.evoTraits = [];
                 G.data.evoTraits.push(newTrait);
@@ -2862,6 +2867,12 @@ const openEvoEditor = (isNew = false) => {
         }
     };
     
+    // 에디터 bodySize 계산 (게임과 일치시키기 위해)
+    const getEditorBodySize = () => {
+        const baseSize = Math.min(cvs.width, cvs.height) * 0.15;
+        return baseSize * (G.data.charScale || 1);
+    };
+    
     const onPointerMove = e => {
         if (!isDragging || selectedPart === null) return;
         const rect = cvs.getBoundingClientRect();
@@ -2870,8 +2881,19 @@ const openEvoEditor = (isNew = false) => {
         
         const et = G.data.evoTraits[selectedPart];
         if (et) {
-            et.x = Math.max(0.05, Math.min(0.95, (x - dragOffset.x) / cvs.width));
-            et.y = Math.max(0.05, Math.min(0.95, (y - dragOffset.y) / cvs.height));
+            const newX = x - dragOffset.x;
+            const newY = y - dragOffset.y;
+            
+            // 캔버스 비율 저장 (호환성)
+            et.x = Math.max(0.05, Math.min(0.95, newX / cvs.width));
+            et.y = Math.max(0.05, Math.min(0.95, newY / cvs.height));
+            
+            // bodySize 기준 상대좌표 저장 (정확한 위치)
+            const cx = cvs.width / 2;
+            const cy = cvs.height / 2;
+            const bodySize = getEditorBodySize();
+            et.relX = (newX - cx) / bodySize;
+            et.relY = (newY - cy) / bodySize;
         }
     };
     
@@ -3380,14 +3402,20 @@ const drawRunnerChar = groundY => {
     
     // 진화 파츠들 (스테이지3)
     const traits = getRegionTraits();
+    const charScale = G.data.charScale || 1;
+    
     evoTraits.forEach(et => {
         const trait = traits.find(t => t.id === et.id) || getTraitById(et.id);
         if (!trait) return;
         
         // 에디터와 동일한 좌표 계산
+        // 에디터: bodySize = min(w,h) * 0.15 * charScale, 파츠위치 = (et.x-0.5)*w
+        // 비율 = (et.x-0.5) / (0.15 * charScale)
+        // 게임: px = 비율 * bodyW
         const editorBodyRatio = 0.15;
-        const px = (et.x - 0.5) / editorBodyRatio * bodyW;
-        const py = (et.y - 0.5) / editorBodyRatio * bodyH;
+        const px = (et.x - 0.5) / (editorBodyRatio * charScale) * bodyW;
+        const py = (et.y - 0.5) / (editorBodyRatio * charScale) * bodyH;
+        
         const scale = et.scale || 1;
         const flipX = et.flipX ? -1 : 1;
         
@@ -3663,18 +3691,95 @@ const renderDice = () => {
 // 타이틀 화면
 const renderTitle = () => {
     app.innerHTML = `
-        <div class="page-center"><div class="page-content">
-            <div class="page-icon">🎲</div>
-            <h1 style="font-family:Orbitron;font-size:clamp(2rem,8vw,3rem);font-weight:900;background:var(--gradient-energy);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:4px;">BOKLUCK</h1>
-            <h2 style="font-family:Orbitron;font-size:1rem;color:var(--text-secondary);margin-bottom:24px;">Universe</h2>
-            <p style="font-size:0.85rem;color:var(--text-muted);line-height:1.7;max-width:260px;margin:0 auto 32px;">
+        <div style="position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;overflow:hidden;">
+            <!-- 작은 주사위 (상단) -->
+            <div style="position:absolute;top:calc(20px + var(--safe-top));font-size:1.5rem;opacity:0.8;">🎲</div>
+            
+            <!-- 대형 우주선 SVG -->
+            <div style="position:relative;width:100%;max-width:400px;margin-bottom:20px;">
+                <svg viewBox="0 0 400 200" style="width:100%;filter:drop-shadow(0 0 20px rgba(0,245,212,0.5));">
+                    <!-- 우주선 몸체 (밀레니엄 팔콘 + 스타 디스트로이어 느낌) -->
+                    <defs>
+                        <linearGradient id="shipGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" style="stop-color:#4a5568"/>
+                            <stop offset="50%" style="stop-color:#2d3748"/>
+                            <stop offset="100%" style="stop-color:#1a202c"/>
+                        </linearGradient>
+                        <linearGradient id="engineGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+                            <stop offset="0%" style="stop-color:#00f5d4"/>
+                            <stop offset="100%" style="stop-color:#7b2cbf"/>
+                        </linearGradient>
+                    </defs>
+                    
+                    <!-- 메인 선체 -->
+                    <path d="M50 100 L120 60 L280 60 L350 100 L280 140 L120 140 Z" fill="url(#shipGrad)" stroke="#718096" stroke-width="2"/>
+                    
+                    <!-- 전방 조종실 -->
+                    <ellipse cx="330" cy="100" rx="35" ry="25" fill="#2d3748" stroke="#4a5568" stroke-width="2"/>
+                    <ellipse cx="340" cy="100" rx="15" ry="10" fill="#1a365d" opacity="0.8"/>
+                    <ellipse cx="340" cy="100" rx="8" ry="5" fill="#00f5d4" opacity="0.6">
+                        <animate attributeName="opacity" values="0.6;1;0.6" dur="2s" repeatCount="indefinite"/>
+                    </ellipse>
+                    
+                    <!-- 상부 구조물 -->
+                    <rect x="150" y="50" width="100" height="20" rx="5" fill="#4a5568" stroke="#718096"/>
+                    <rect x="170" y="40" width="60" height="15" rx="3" fill="#2d3748"/>
+                    
+                    <!-- 엔진 글로우 (후방) -->
+                    <ellipse cx="60" cy="85" rx="15" ry="8" fill="url(#engineGrad)" opacity="0.9">
+                        <animate attributeName="rx" values="15;18;15" dur="0.5s" repeatCount="indefinite"/>
+                    </ellipse>
+                    <ellipse cx="60" cy="115" rx="15" ry="8" fill="url(#engineGrad)" opacity="0.9">
+                        <animate attributeName="rx" values="15;18;15" dur="0.5s" repeatCount="indefinite" begin="0.1s"/>
+                    </ellipse>
+                    <ellipse cx="50" cy="100" rx="12" ry="6" fill="#00f5d4">
+                        <animate attributeName="rx" values="12;16;12" dur="0.3s" repeatCount="indefinite"/>
+                    </ellipse>
+                    
+                    <!-- 윙 디테일 -->
+                    <path d="M120 60 L90 40 L110 40 L140 60" fill="#4a5568" stroke="#718096"/>
+                    <path d="M120 140 L90 160 L110 160 L140 140" fill="#4a5568" stroke="#718096"/>
+                    
+                    <!-- 측면 무기/센서 -->
+                    <rect x="200" y="55" width="40" height="6" rx="2" fill="#718096"/>
+                    <rect x="200" y="139" width="40" height="6" rx="2" fill="#718096"/>
+                    
+                    <!-- 조명들 -->
+                    <circle cx="180" cy="80" r="3" fill="#f56565">
+                        <animate attributeName="opacity" values="1;0.3;1" dur="1s" repeatCount="indefinite"/>
+                    </circle>
+                    <circle cx="220" cy="80" r="3" fill="#48bb78">
+                        <animate attributeName="opacity" values="1;0.3;1" dur="1.2s" repeatCount="indefinite"/>
+                    </circle>
+                    <circle cx="180" cy="120" r="3" fill="#f56565">
+                        <animate attributeName="opacity" values="1;0.3;1" dur="1s" repeatCount="indefinite" begin="0.5s"/>
+                    </circle>
+                    <circle cx="220" cy="120" r="3" fill="#48bb78">
+                        <animate attributeName="opacity" values="1;0.3;1" dur="1.2s" repeatCount="indefinite" begin="0.3s"/>
+                    </circle>
+                    
+                    <!-- 선체 라인 디테일 -->
+                    <line x1="130" y1="75" x2="270" y2="75" stroke="#4a5568" stroke-width="1"/>
+                    <line x1="130" y1="125" x2="270" y2="125" stroke="#4a5568" stroke-width="1"/>
+                </svg>
+            </div>
+            
+            <!-- 타이틀 -->
+            <h1 style="font-family:Orbitron;font-size:clamp(2.5rem,10vw,4rem);font-weight:900;background:var(--gradient-energy);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin:0;letter-spacing:4px;">BOKLUCK</h1>
+            <h2 style="font-family:Orbitron;font-size:1.2rem;color:var(--text-secondary);margin:8px 0 20px;letter-spacing:8px;">UNIVERSE</h2>
+            
+            <p style="font-size:0.9rem;color:var(--text-muted);line-height:1.8;max-width:280px;text-align:center;margin-bottom:30px;">
                 <strong style="color:var(--neon-cyan)">BOK(복)</strong> 또는 <strong style="color:var(--neon-pink)">LUCK(운)</strong>으로<br>만들어가는 당신만의 우주
             </p>
-            <div style="display:flex;flex-direction:column;gap:10px;max-width:240px;margin:0 auto;">
-                <button class="btn btn-energy btn-block" id="btn-start">🚀 게임 시작</button>
+            
+            <div style="display:flex;flex-direction:column;gap:12px;width:100%;max-width:260px;padding:0 20px;">
+                <button class="btn btn-energy btn-block" id="btn-start" style="font-size:1.1rem;padding:14px;">🚀 게임 시작</button>
                 <button class="btn btn-outline btn-block" id="btn-settings">⚙️ 설정</button>
             </div>
-        </div></div>
+            
+            <!-- 하단 버전 -->
+            <div style="position:absolute;bottom:calc(10px + var(--safe-bottom));font-size:0.7rem;color:var(--text-muted);opacity:0.5;">v1.4</div>
+        </div>
     `;
     
     document.getElementById('btn-start').onclick = () => { Audio.init(); Audio.playClick(); renderSaves(); };
