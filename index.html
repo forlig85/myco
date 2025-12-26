@@ -188,12 +188,12 @@ body {
 .action-btn { width: 60px; height: 60px; background: rgba(10,10,26,0.8); border: 2px solid var(--neon-cyan); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.3rem; cursor: pointer; pointer-events: auto; box-shadow: 0 0 12px rgba(0,245,212,0.3); }
 .action-btn:active { transform: scale(0.95); background: rgba(0,245,212,0.2); }
 .action-btn.disabled { opacity: 0.3; border-color: var(--text-muted); }
-.action-btn.cooldown { opacity: 0.5; }
 
 .toast-box { position: fixed; top: calc(14px + var(--safe-top)); left: 50%; transform: translateX(-50%); z-index: 300; display: flex; flex-direction: column; gap: 6px; pointer-events: none; }
-.toast { background: var(--void-elevated); border: 1px solid var(--border-default); border-radius: 10px; padding: 8px 14px; display: flex; align-items: center; gap: 6px; animation: toastIn 0.3s, toastOut 0.3s 2.5s forwards; font-size: 0.85rem; }
+.toast { background: var(--void-elevated); border: 1px solid var(--border-default); border-radius: 10px; padding: 8px 14px; display: flex; align-items: center; gap: 6px; animation: toastIn 0.3s, toastOut 0.3s 2.5s forwards; font-size: 0.85rem; white-space: nowrap; }
 .toast.success { border-color: var(--success); }
 .toast.danger { border-color: var(--danger); }
+.toast.warning { border-color: var(--neon-yellow); }
 @keyframes toastIn { from{transform:translateY(-20px);opacity:0} to{transform:translateY(0);opacity:1} }
 @keyframes toastOut { from{opacity:1} to{opacity:0} }
 
@@ -223,14 +223,12 @@ body {
 .slots { display: flex; flex-direction: column; gap: 10px; max-width: 440px; width: 100%; }
 .slot { background: var(--void-surface); border: 2px solid var(--border-subtle); border-radius: 12px; padding: 12px; text-align: left; }
 .slot.empty { border-style: dashed; opacity: 0.6; text-align: center; padding: 24px 12px; cursor: pointer; }
-.slot.empty:hover { opacity: 0.8; }
 .slot-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
 .slot-num { font-family: 'Orbitron', monospace; font-size: 0.6rem; color: var(--text-muted); background: var(--void-light); padding: 2px 6px; border-radius: 4px; }
 .slot-name { font-family: 'Orbitron', monospace; font-weight: 600; font-size: 0.9rem; margin-bottom: 2px; }
 .slot-info { font-size: 0.7rem; color: var(--text-secondary); margin-bottom: 8px; }
 .slot-actions { display: flex; gap: 6px; }
 .del-btn { padding: 6px 12px; background: rgba(239,68,68,0.2); border: 1px solid var(--danger); border-radius: 6px; color: var(--danger); font-size: 0.8rem; cursor: pointer; }
-.del-btn:active { transform: scale(0.95); }
 
 .climb-hud { position: fixed; top: 0; left: 0; right: 0; z-index: 50; padding: 12px 16px; padding-top: calc(12px + var(--safe-top)); display: flex; justify-content: space-between; align-items: center; pointer-events: none; }
 .climb-hud > * { pointer-events: auto; }
@@ -264,16 +262,16 @@ body {
    Constants & Configuration
 ======================================== */
 const CONFIG = {
-    GROWTH_THRESHOLD: 20,
-    STAGE_THRESHOLD: 500,
-    LAND_HEIGHT: 1000,
+    GROWTH_THRESHOLD: 15,        // 파츠 획득 주기 (15마리마다)
+    STAGE_THRESHOLD: 2000,       // 다세포 진화 점수 (수정: 500→2000)
+    LAND_HEIGHT: 3000,           // 육지까지 거리 (수정: 1000→3000, 3배)
     INITIAL_SIZE: 12,
     MAX_SIZE: 80,
     ENEMY_INTERVAL: 3500,
     MAX_ENEMIES: 7,
     MAX_FOODS: 35,
     SAVE_INTERVAL: 20000,
-    RUNNER_STAGE_DIST: 500
+    RUNNER_STAGE_DIST: 400       // 러너 스테이지당 거리
 };
 
 const BODY_PARTS = {
@@ -367,7 +365,7 @@ const Save = (() => {
     const MAX = 5;
     
     const create = () => ({
-        v: 5, created: Date.now(), updated: Date.now(), playTime: 0,
+        v: 6, created: Date.now(), updated: Date.now(), playTime: 0,
         stage: 0, tutDone: false, name: null, score: 0,
         dna: { origin: null, traits: [] }, design: null,
         parts: { eye: 0, mouth: 0, arm: 0, leg: 0, tail: 0, ear: 0, nose: 0, antenna: 0 },
@@ -431,7 +429,7 @@ const toast = (msg, type = 'info') => {
     const c = document.getElementById('toasts');
     const t = document.createElement('div');
     t.className = `toast ${type}`;
-    const icons = { success: '✅', danger: '💀', info: 'ℹ️' };
+    const icons = { success: '✅', danger: '💀', info: 'ℹ️', warning: '⚠️' };
     t.innerHTML = `<span>${icons[type] || 'ℹ️'}</span><span>${msg}</span>`;
     c.appendChild(t);
     setTimeout(() => t.remove(), 3000);
@@ -469,7 +467,7 @@ const STORIES = {
     multi: [
         { icon: '🧬', title: '다세포 진화!', text: '마침내 <span class="hl">단일 세포</span>의 한계를 넘어섰다!' },
         { icon: '🏔️', title: '새로운 도전', text: '바다 깊은 곳에서 <span class="gold">육지</span>까지 올라가야 한다.' },
-        { icon: '⬆️', title: '점프!', text: '<span class="hl">발판</span>을 밟고 위로!<br>💨 바람을 타면 더 높이! <span class="gold">육지</span>에 도달하면 승리!' }
+        { icon: '⬆️', title: '점프!', text: '<span class="hl">발판</span>을 밟고 위로!<br>🌪️ 토네이도를 타면 더 높이! <span class="gold">육지</span>에 도달하면 승리!' }
     ],
     runner: [
         { icon: '🏃', title: '육지의 시작', text: '마침내 <span class="hl">육지</span>에 도착했다!<br>이제 <span class="gold">문명을 향해</span> 달려야 한다.' },
@@ -603,7 +601,7 @@ const genDesign = id => {
 };
 
 /* ========================================
-   Cell World Game (간략화)
+   Cell World Game
 ======================================== */
 let player, foods = [], enemies = [], particles = [];
 let joyPos = { x: 0, y: 0 }, joyActive = false, keys = {};
@@ -830,13 +828,15 @@ const updateCell = () => {
     renderCell(env);
     updateCellHUD();
     
+    // 다세포 진화 조건: 2000점 이상 + 5개 이상 파츠
     if (G.data.stage === 1 && G.data.score >= CONFIG.STAGE_THRESHOLD && totalParts() >= 5) { evolveMulti(); return; }
     
     gameLoop = requestAnimationFrame(updateCell);
 };
 
 const checkEvo = () => {
-    if (G.data.stats.eaten >= nextPartThreshold()) {
+    const threshold = nextPartThreshold();
+    if (G.data.stats.eaten >= threshold) {
         const part = addRandomPart();
         if (part) {
             showEvo(part.icon, `${part.name} 획득!`, `${part.name} ×${part.cnt}`, part.fx);
@@ -930,33 +930,121 @@ const drawPlayer = () => {
     ctx.fill();
     ctx.shadowBlur = 0;
     
+    // 더듬이
+    const antCnt = p.antenna || 0;
+    if (antCnt > 0) {
+        ctx.strokeStyle = d.primary;
+        ctx.lineWidth = 2;
+        for (let i = 0; i < antCnt; i++) {
+            const aa = -Math.PI * 0.35 + i * 0.3;
+            ctx.beginPath();
+            ctx.moveTo(Math.cos(aa) * s * 0.6, Math.sin(aa) * s * 0.6);
+            ctx.quadraticCurveTo(Math.cos(aa) * s * 1.1, Math.sin(aa) * s * 1.0, Math.cos(aa) * s * 1.4, Math.sin(aa + Math.sin(t*3)*0.1) * s * 1.1);
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.arc(Math.cos(aa) * s * 1.4, Math.sin(aa + Math.sin(t*3)*0.1) * s * 1.1, 4, 0, Math.PI * 2);
+            ctx.fillStyle = d.primary;
+            ctx.fill();
+        }
+    }
+    
+    // 귀
+    const earCnt = p.ear || 0;
+    if (earCnt > 0) {
+        for (let i = 0; i < earCnt; i++) {
+            const side = i % 2 === 0 ? 1 : -1;
+            ctx.beginPath();
+            ctx.ellipse(side * s * 0.7, -s * 0.4, s * 0.12, s * 0.2, side * 0.3, 0, Math.PI * 2);
+            ctx.fillStyle = d.primary;
+            ctx.fill();
+        }
+    }
+    
     // 눈
     const eyeCnt = p.eye || 0;
     for (let i = 0; i < eyeCnt; i++) {
         const eX = (i - (eyeCnt - 1) / 2) * 0.3 * s * 0.7, eY = -s * 0.2;
         ctx.beginPath(); ctx.arc(eX, eY, s * 0.2, 0, Math.PI * 2); ctx.fillStyle = 'white'; ctx.fill();
         ctx.beginPath(); ctx.arc(eX + s * 0.03, eY, s * 0.1, 0, Math.PI * 2); ctx.fillStyle = '#222'; ctx.fill();
+        ctx.beginPath(); ctx.arc(eX - s * 0.04, eY - s * 0.05, s * 0.04, 0, Math.PI * 2); ctx.fillStyle = 'rgba(255,255,255,0.8)'; ctx.fill();
     }
     
     // 코
     if (p.nose > 0) {
         ctx.fillStyle = '#ffcc99';
+        ctx.strokeStyle = '#cc9966';
+        ctx.lineWidth = 1;
         ctx.beginPath();
         ctx.moveTo(0, 0);
         ctx.lineTo(-s * 0.08, s * 0.12);
         ctx.lineTo(s * 0.08, s * 0.12);
         ctx.closePath();
         ctx.fill();
+        ctx.stroke();
     }
     
     // 입
     if (p.mouth > 0) {
         ctx.strokeStyle = d.secondary;
-        ctx.lineWidth = 2;
+        ctx.lineWidth = 2.5;
+        ctx.lineCap = 'round';
         ctx.beginPath();
         ctx.arc(0, s * 0.25, s * 0.12, 0.2, Math.PI - 0.2);
         ctx.stroke();
     }
+    
+    // 팔
+    const armCnt = p.arm || 0;
+    if (armCnt > 0) {
+        ctx.strokeStyle = d.primary;
+        ctx.lineWidth = Math.max(2, s * 0.06);
+        ctx.lineCap = 'round';
+        for (let i = 0; i < armCnt; i++) {
+            const ba = (0.2 + i * 0.18) * (i % 2 === 0 ? 1 : -1) * Math.PI;
+            const w = Math.sin(t * 2 + i) * 0.15;
+            ctx.beginPath();
+            ctx.moveTo(Math.cos(ba) * s * 0.85, Math.sin(ba) * s * 0.85);
+            ctx.quadraticCurveTo(Math.cos(ba) * s * 1.3, Math.sin(ba + w) * s * 1.1, Math.cos(ba) * s * 1.5, Math.sin(ba + w * 2) * s * 0.85);
+            ctx.stroke();
+        }
+    }
+    
+    // 다리
+    const legCnt = p.leg || 0;
+    if (legCnt > 0) {
+        ctx.strokeStyle = d.secondary;
+        ctx.lineWidth = Math.max(2, s * 0.05);
+        for (let i = 0; i < legCnt; i++) {
+            const ba = Math.PI * 0.5 + (i - (legCnt - 1) / 2) * 0.2;
+            const w = Math.sin(t * 3 + i) * 0.12;
+            ctx.beginPath();
+            ctx.moveTo(Math.cos(ba) * s * 0.7, Math.sin(ba) * s * 0.7);
+            ctx.lineTo(Math.cos(ba + w) * s * 1.3, Math.sin(ba) * s * 1.2);
+            ctx.stroke();
+        }
+    }
+    
+    // 꼬리
+    const tailCnt = p.tail || 0;
+    if (tailCnt > 0) {
+        ctx.strokeStyle = d.primary;
+        ctx.lineWidth = Math.max(3, s * 0.07);
+        ctx.lineCap = 'round';
+        for (let i = 0; i < tailCnt; i++) {
+            const tw = Math.sin(t * 2 + i) * s * 0.25;
+            const oy = (i - (tailCnt - 1) / 2) * s * 0.1;
+            ctx.beginPath();
+            ctx.moveTo(-s * 0.7, oy);
+            ctx.bezierCurveTo(-s * 1.1, tw + oy, -s * 1.4, -tw * 0.4 + oy, -s * 1.7, tw * 0.3 + oy);
+            ctx.stroke();
+        }
+    }
+    
+    // 볼터치
+    ctx.globalAlpha = 0.3;
+    ctx.beginPath(); ctx.arc(-s * 0.35, s * 0.1, s * 0.08, 0, Math.PI * 2); ctx.fillStyle = '#ffaaaa'; ctx.fill();
+    ctx.beginPath(); ctx.arc(s * 0.35, s * 0.1, s * 0.08, 0, Math.PI * 2); ctx.fill();
+    ctx.globalAlpha = 1;
     
     ctx.restore();
 };
@@ -992,10 +1080,12 @@ const evolveMulti = () => {
 };
 
 /* ========================================
-   Climb Game - 바람 아이템 + 데스라인 추가
+   Climb Game - 토네이도 + 육지 착지 수정
 ======================================== */
 let climber, platforms = [], climbItems = [], camY = 0, curH = 0, canDblJump = false, wasOnGround = true;
-let deathLineY = 0; // 데스라인
+let deathLineY = 0;
+let landY = 0; // 육지 Y 좌표 저장
+let shownOvershootWarning = false;
 
 const startClimb = () => {
     cleanup();
@@ -1029,13 +1119,17 @@ const startClimb = () => {
     const pSize = 28 + totalParts() * 2;
     climber = { x: canvas.width / 2, y: canvas.height - 80, w: pSize, h: pSize, vx: 0, vy: 0, onGround: true };
     wasOnGround = true;
+    shownOvershootWarning = false;
     
     platforms = [];
     climbItems = [];
-    deathLineY = canvas.height + 100; // 시작점 아래 100px에 데스라인
+    deathLineY = canvas.height + 100;
+    landY = -CONFIG.LAND_HEIGHT * 10 - 40; // 육지 Y 좌표
     
-    genPlats(canvas.height - 50, -CONFIG.LAND_HEIGHT * 12);
+    genPlats(canvas.height - 50, landY - 200);
     platforms.push({ x: canvas.width / 2 - 70, y: canvas.height - 40, w: 140, h: 18, type: 'normal' });
+    // 육지 플랫폼 (넓게!)
+    platforms.push({ x: 0, y: landY, w: canvas.width, h: 150, type: 'land' });
     
     camY = 0; curH = 0;
     
@@ -1046,29 +1140,26 @@ const startClimb = () => {
 };
 
 const genPlats = (fromY, toY) => {
-    let y = fromY - 45;
+    let y = fromY - 50;
     while (y > toY) {
         const num = 1 + Math.floor(Math.random() * 2);
         for (let i = 0; i < num; i++) {
-            const w = 65 + Math.random() * 50;
+            const w = 70 + Math.random() * 50;
             const x = Math.random() * (canvas.width - w);
             let type = 'normal';
             const hr = Math.abs(y) / (CONFIG.LAND_HEIGHT * 10);
-            if (hr > 0.3 && Math.random() < 0.12) type = 'moving';
-            if (hr > 0.5 && Math.random() < 0.08) type = 'breaking';
-            if (hr > 0.6 && Math.random() < 0.12) type = 'bouncy';
+            if (hr > 0.3 && Math.random() < 0.1) type = 'moving';
+            if (hr > 0.5 && Math.random() < 0.06) type = 'breaking';
+            if (hr > 0.6 && Math.random() < 0.1) type = 'bouncy';
             
             platforms.push({ x, y, w, h: 14, type, dir: Math.random() < 0.5 ? 1 : -1, spd: 1 + Math.random() * 1.2, broken: false, timer: 0 });
             
-            // 바람 아이템 생성 (15% 확률)
-            if (Math.random() < 0.15) {
-                climbItems.push({ x: x + w / 2, y: y - 40, type: 'wind', collected: false });
+            // 🌪️ 토네이도 아이템 (12% 확률)
+            if (Math.random() < 0.12) {
+                climbItems.push({ x: x + w / 2, y: y - 45, type: 'tornado', collected: false });
             }
         }
-        y -= 38 + Math.random() * 22;
-    }
-    if (toY <= -CONFIG.LAND_HEIGHT * 10) {
-        platforms.push({ x: 0, y: -CONFIG.LAND_HEIGHT * 10 - 40, w: canvas.width, h: 100, type: 'land' });
+        y -= 45 + Math.random() * 25;
     }
 };
 
@@ -1164,7 +1255,11 @@ const updateClimb = () => {
             
             if (p.type === 'bouncy') { climber.vy = -20; climber.onGround = false; Audio.playJump(); }
             else if (p.type === 'breaking') { p.timer++; if (p.timer > 25) p.broken = true; }
-            else if (p.type === 'land') { climbWin(); return; }
+            else if (p.type === 'land') { 
+                // 육지 도착!
+                climbWin(); 
+                return; 
+            }
             else if (!wasOnGroundBefore && !wasOnGround) { Audio.playLand(); }
             
             if (p.type === 'moving') climber.x += p.dir * p.spd;
@@ -1173,16 +1268,16 @@ const updateClimb = () => {
     
     wasOnGround = climber.onGround;
     
-    // 바람 아이템 수집
+    // 🌪️ 토네이도 아이템 수집
     for (const item of climbItems) {
         if (item.collected) continue;
         const dx = (climber.x + climber.w / 2) - item.x;
         const dy = (climber.y + climber.h / 2) - item.y;
-        if (Math.sqrt(dx * dx + dy * dy) < 30) {
+        if (Math.sqrt(dx * dx + dy * dy) < 35) {
             item.collected = true;
             Audio.playWind();
-            climber.vy = -48; // 기존 점프(-16)의 3배
-            toast('💨 바람의 힘!', 'success');
+            climber.vy = -48; // 3배 점프!
+            toast('🌪️ 토네이도의 힘!', 'success');
         }
     }
     
@@ -1191,13 +1286,21 @@ const updateClimb = () => {
     curH = Math.max(0, Math.floor(-climber.y / 10));
     G.data.stats.maxH = Math.max(G.data.stats.maxH, curH);
     
-    const highest = Math.min(...platforms.map(p => p.y));
+    // 육지보다 너무 높이 올라갔을 때 경고
+    if (climber.y < landY - 200 && !shownOvershootWarning) {
+        shownOvershootWarning = true;
+        toast('⚠️ 너무 올라왔다! 육지로 내려가자!', 'warning');
+    }
+    // 육지 근처로 돌아오면 리셋
+    if (climber.y > landY - 100) {
+        shownOvershootWarning = false;
+    }
+    
+    const highest = Math.min(...platforms.filter(p => p.type !== 'land').map(p => p.y));
     if (-camY - canvas.height < highest + 400) genPlats(highest, highest - canvas.height * 2);
     
-    // 데스라인 체크 (시작점 아래로 떨어지면)
+    // 데스라인
     if (climber.y > deathLineY) { climbFail(); return; }
-    
-    // 기존 화면 밖 체크도 유지
     if (climber.y > -camY + canvas.height + 80) { climbFail(); return; }
     
     renderClimb(env);
@@ -1235,7 +1338,17 @@ const renderClimb = env => {
             ctx.fillStyle = '#8B4513';
             ctx.fillRect(p.x, p.y, p.w, p.h);
             ctx.fillStyle = '#228B22';
-            ctx.fillRect(p.x, p.y, p.w, 18);
+            ctx.fillRect(p.x, p.y, p.w, 20);
+            // 나무들
+            for (let i = 0; i < 6; i++) {
+                const tx = 30 + i * (p.w / 6);
+                ctx.fillStyle = '#654321';
+                ctx.fillRect(tx, p.y - 40, 10, 40);
+                ctx.fillStyle = '#228B22';
+                ctx.beginPath();
+                ctx.arc(tx + 5, p.y - 50, 25, 0, Math.PI * 2);
+                ctx.fill();
+            }
         } else {
             ctx.beginPath();
             ctx.roundRect(p.x, p.y, p.w, p.h, 5);
@@ -1243,19 +1356,20 @@ const renderClimb = env => {
         }
     }
     
-    // 바람 아이템 그리기
+    // 🌪️ 토네이도 아이템 그리기
+    const t = Date.now() * 0.005;
     for (const item of climbItems) {
         if (item.collected) continue;
         const sy = item.y + camY;
         if (sy < -40 || sy > h + 40) continue;
         
-        const t = Date.now() * 0.005;
         ctx.save();
         ctx.translate(item.x, item.y + Math.sin(t) * 5);
-        ctx.font = '24px Arial';
+        ctx.rotate(t * 2); // 회전 효과
+        ctx.font = '28px Arial';
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
-        ctx.fillText('💨', 0, 0);
+        ctx.fillText('🌪️', 0, 0);
         ctx.restore();
     }
     
@@ -1272,6 +1386,8 @@ const renderClimb = env => {
     gFill.addColorStop(1, '#fee440');
     ctx.fillStyle = gFill;
     ctx.fillRect(gX - 2, 45 + gH * (1 - prog), 12, gH * prog);
+    ctx.fillStyle = '#228B22';
+    ctx.fillRect(gX - 6, 40, 20, 8);
 };
 
 const platCol = (type, hr, env) => {
@@ -1361,16 +1477,18 @@ const climbWin = () => {
 };
 
 /* ========================================
-   Runner Game - 문명 진화 러너
+   Runner Game - 속도/간격 조절, 캐릭터 달리기
 ======================================== */
 const RUNNER_STAGES = [
-    { id: 'forest', name: '🌲 원시의 숲', dist: 500, bgColors: ['#1a3a1a', '#0a2a0a'], groundColor: '#3d2817', items: ['🐛', '🦗', '🐜'], obstacles: ['🪨', '🌳'], evolveMsg: '세포가 커지고 있다!' },
-    { id: 'plains', name: '⚡ 번개의 평원', dist: 500, bgColors: ['#2a2a4a', '#1a1a3a'], groundColor: '#4a3a2a', items: ['⚡', '🔥'], obstacles: ['🪨', '💀'], evolveMsg: '직립보행을 시작했다!' },
-    { id: 'civilization', name: '🏛️ 문명의 여명', dist: 500, bgColors: ['#3a2a1a', '#2a1a0a'], groundColor: '#5a4a3a', items: ['🔧', '🏠', '📜'], obstacles: ['🗿'], evolveMsg: '지성을 얻었다!' }
+    { id: 'forest', name: '🌲 원시의 숲', dist: CONFIG.RUNNER_STAGE_DIST, bgColors: ['#1a3a1a', '#0a2a0a'], groundColor: '#3d2817', items: ['🐛', '🦗', '🐜'], obstacles: ['🪨', '🌳'], evolveMsg: '몸이 커지고 있다!', baseSpeed: 2 },
+    { id: 'plains', name: '⚡ 번개의 평원', dist: CONFIG.RUNNER_STAGE_DIST, bgColors: ['#2a2a4a', '#1a1a3a'], groundColor: '#4a3a2a', items: ['⚡', '🔥'], obstacles: ['🪨', '💀'], evolveMsg: '직립보행을 시작했다!', baseSpeed: 3 },
+    { id: 'civilization', name: '🏛️ 문명의 여명', dist: CONFIG.RUNNER_STAGE_DIST, bgColors: ['#3a2a1a', '#2a1a0a'], groundColor: '#5a4a3a', items: ['🔧', '🏠', '📜'], obstacles: ['🗿'], evolveMsg: '지성을 얻었다!', baseSpeed: 4 }
 ];
 
 let runner, runnerDist, runnerStage, obstacles, items, runnerParticles;
-let runnerSpeed, evoScale;
+let runnerSpeed, evoScale, bgOffset;
+let lastObstacleTime = 0;
+const MIN_OBSTACLE_GAP = 1500; // 최소 장애물 간격 (ms)
 
 const startRunner = () => {
     cleanup();
@@ -1378,15 +1496,17 @@ const startRunner = () => {
     
     runnerStage = G.data.runnerStage || 0;
     runnerDist = 0;
-    runnerSpeed = 5;
     evoScale = 1 + runnerStage * 0.3;
+    bgOffset = 0;
+    lastObstacleTime = 0;
     
-    runner = { x: 80, y: 0, w: 40 * evoScale, h: 50 * evoScale, vy: 0, onGround: true, ducking: false };
+    const stage = RUNNER_STAGES[runnerStage];
+    runnerSpeed = stage.baseSpeed; // 스테이지별 기본 속도
+    
+    runner = { x: 100, y: 0, w: 40 * evoScale, h: 50 * evoScale, vy: 0, onGround: true, ducking: false };
     obstacles = [];
     items = [];
     runnerParticles = [];
-    
-    const stage = RUNNER_STAGES[runnerStage];
     
     app.innerHTML = `
         <canvas id="game-canvas"></canvas>
@@ -1467,6 +1587,7 @@ const updateRunner = () => {
     
     const stage = RUNNER_STAGES[runnerStage];
     const groundY = canvas.height - 80;
+    const now = Date.now();
     
     // 중력
     runner.vy += 0.8;
@@ -1478,30 +1599,37 @@ const updateRunner = () => {
         runner.onGround = true;
     }
     
-    // 거리 증가
-    runnerDist += runnerSpeed * 0.1;
-    runnerSpeed = Math.min(12, 5 + runnerDist * 0.002);
+    // 거리 증가 (속도에 비례)
+    runnerDist += runnerSpeed * 0.08;
     
-    // 장애물 생성
-    if (Math.random() < 0.02) {
+    // 점진적 속도 증가 (거리에 따라 아주 천천히)
+    runnerSpeed = stage.baseSpeed + runnerDist * 0.003;
+    runnerSpeed = Math.min(runnerSpeed, stage.baseSpeed + 4); // 최대 속도 제한
+    
+    // 배경 스크롤
+    bgOffset += runnerSpeed;
+    
+    // 장애물 생성 (간격 조절!)
+    if (now - lastObstacleTime > MIN_OBSTACLE_GAP && Math.random() < 0.015) {
         const type = stage.obstacles[Math.floor(Math.random() * stage.obstacles.length)];
-        const tall = Math.random() < 0.3;
+        const tall = Math.random() < 0.25;
         obstacles.push({
             x: canvas.width + 50,
-            y: tall ? groundY - 80 : groundY - 40,
+            y: tall ? groundY - 70 : groundY - 40,
             w: 40,
-            h: tall ? 40 : 40,
+            h: tall ? 35 : 40,
             type,
             tall
         });
+        lastObstacleTime = now;
     }
     
-    // 아이템 생성
-    if (Math.random() < 0.015) {
+    // 아이템 생성 (더 자주)
+    if (Math.random() < 0.012) {
         const type = stage.items[Math.floor(Math.random() * stage.items.length)];
         items.push({
             x: canvas.width + 50,
-            y: groundY - 80 - Math.random() * 60,
+            y: groundY - 90 - Math.random() * 40,
             type,
             collected: false
         });
@@ -1510,13 +1638,16 @@ const updateRunner = () => {
     // 장애물 이동 & 충돌
     for (let i = obstacles.length - 1; i >= 0; i--) {
         const o = obstacles[i];
-        o.x -= runnerSpeed;
+        o.x -= runnerSpeed * 1.5; // 장애물은 더 빠르게 다가옴 (상대 속도)
         
-        if (o.x < -50) { obstacles.splice(i, 1); continue; }
+        if (o.x < -60) { obstacles.splice(i, 1); continue; }
         
-        // 충돌 체크
-        if (runner.x + runner.w * 0.7 > o.x && runner.x + runner.w * 0.3 < o.x + o.w &&
-            runner.y + runner.h > o.y && runner.y < o.y + o.h) {
+        // 충돌 체크 (여유있게)
+        const hitboxShrink = 8;
+        if (runner.x + runner.w - hitboxShrink > o.x + hitboxShrink && 
+            runner.x + hitboxShrink < o.x + o.w - hitboxShrink &&
+            runner.y + runner.h > o.y + hitboxShrink && 
+            runner.y < o.y + o.h - hitboxShrink) {
             runnerFail();
             return;
         }
@@ -1525,34 +1656,32 @@ const updateRunner = () => {
     // 아이템 수집
     for (let i = items.length - 1; i >= 0; i--) {
         const item = items[i];
-        item.x -= runnerSpeed;
+        item.x -= runnerSpeed * 1.5;
         
         if (item.x < -50) { items.splice(i, 1); continue; }
         
         if (!item.collected) {
             const dx = (runner.x + runner.w / 2) - item.x;
             const dy = (runner.y + runner.h / 2) - item.y;
-            if (Math.sqrt(dx * dx + dy * dy) < 40) {
+            if (Math.sqrt(dx * dx + dy * dy) < 45) {
                 item.collected = true;
                 Audio.playCollect();
                 
-                // 아이템 효과
                 if (item.type === '⚡') {
                     toast('⚡ 번개의 힘!', 'success');
-                    runnerSpeed += 2;
+                    runnerSpeed += 0.5;
                 } else if (item.type === '🔥') {
-                    toast('🔥 불을 발견했다!', 'success');
-                    runnerDist += 50;
+                    toast('🔥 불을 발견!', 'success');
+                    runnerDist += 30;
                 } else {
-                    runnerDist += 10;
+                    runnerDist += 8;
                 }
                 
-                // 파티클
                 for (let j = 0; j < 5; j++) {
                     runnerParticles.push({
                         x: item.x, y: item.y,
-                        vx: (Math.random() - 0.5) * 5,
-                        vy: (Math.random() - 0.5) * 5,
+                        vx: (Math.random() - 0.5) * 4,
+                        vy: (Math.random() - 0.5) * 4,
                         life: 20,
                         color: '#ffff00'
                     });
@@ -1563,7 +1692,7 @@ const updateRunner = () => {
         }
     }
     
-    // 파티클 업데이트
+    // 파티클
     runnerParticles = runnerParticles.filter(p => {
         p.x += p.vx; p.y += p.vy; p.life--;
         return p.life > 0;
@@ -1574,7 +1703,6 @@ const updateRunner = () => {
     const distEl = document.getElementById('r-dist');
     if (distEl) distEl.textContent = `${Math.floor(runnerDist)}m / ${stage.dist}m`;
     
-    // 스테이지 클리어
     if (runnerDist >= stage.dist) {
         runnerStageComplete();
         return;
@@ -1585,6 +1713,7 @@ const updateRunner = () => {
 
 const renderRunner = (stage, groundY) => {
     const w = canvas.width, h = canvas.height;
+    const t = Date.now() * 0.001;
     
     // 배경
     const bg = ctx.createLinearGradient(0, 0, 0, h);
@@ -1593,40 +1722,60 @@ const renderRunner = (stage, groundY) => {
     ctx.fillStyle = bg;
     ctx.fillRect(0, 0, w, h);
     
-    // 배경 장식 (스테이지별)
-    const t = Date.now() * 0.001;
+    // 배경 장식 (스크롤!)
     if (runnerStage === 0) {
         // 나무들
-        for (let i = 0; i < 5; i++) {
-            const tx = ((t * 30 + i * 200) % (w + 100)) - 50;
-            ctx.fillStyle = '#2a5a2a';
+        for (let i = 0; i < 8; i++) {
+            const tx = ((w + 150) - (bgOffset * 0.3 + i * 180) % (w + 150));
+            ctx.fillStyle = '#1a4a1a';
             ctx.beginPath();
             ctx.moveTo(tx, groundY);
-            ctx.lineTo(tx + 20, groundY - 80);
-            ctx.lineTo(tx + 40, groundY);
+            ctx.lineTo(tx + 25, groundY - 100);
+            ctx.lineTo(tx + 50, groundY);
             ctx.fill();
         }
     } else if (runnerStage === 1) {
         // 번개
-        if (Math.random() < 0.01) {
-            ctx.fillStyle = 'rgba(255,255,0,0.3)';
+        if (Math.random() < 0.005) {
+            ctx.fillStyle = 'rgba(255,255,0,0.2)';
             ctx.fillRect(0, 0, w, h);
+        }
+        // 구름
+        for (let i = 0; i < 3; i++) {
+            const cx = ((w + 100) - (bgOffset * 0.2 + i * 250) % (w + 100));
+            ctx.fillStyle = 'rgba(100,100,150,0.4)';
+            ctx.beginPath();
+            ctx.arc(cx, 80 + i * 30, 40, 0, Math.PI * 2);
+            ctx.arc(cx + 30, 70 + i * 30, 35, 0, Math.PI * 2);
+            ctx.fill();
         }
     } else {
         // 건물들
-        for (let i = 0; i < 3; i++) {
-            const bx = ((t * 20 + i * 300) % (w + 200)) - 100;
-            ctx.fillStyle = '#4a3a2a';
-            ctx.fillRect(bx, groundY - 60, 40, 60);
+        for (let i = 0; i < 5; i++) {
+            const bx = ((w + 150) - (bgOffset * 0.15 + i * 200) % (w + 150));
+            const bh = 50 + i * 15;
+            ctx.fillStyle = '#3a2a1a';
+            ctx.fillRect(bx, groundY - bh, 50, bh);
             ctx.fillStyle = '#ffa500';
-            ctx.fillRect(bx + 10, groundY - 50, 8, 8);
-            ctx.fillRect(bx + 22, groundY - 50, 8, 8);
+            ctx.fillRect(bx + 10, groundY - bh + 15, 10, 10);
+            ctx.fillRect(bx + 30, groundY - bh + 15, 10, 10);
         }
     }
     
     // 땅
     ctx.fillStyle = stage.groundColor;
     ctx.fillRect(0, groundY, w, h - groundY);
+    
+    // 땅 디테일 (움직이는 점선)
+    ctx.strokeStyle = 'rgba(255,255,255,0.2)';
+    ctx.lineWidth = 2;
+    ctx.setLineDash([20, 15]);
+    ctx.lineDashOffset = -bgOffset;
+    ctx.beginPath();
+    ctx.moveTo(0, groundY + 10);
+    ctx.lineTo(w, groundY + 10);
+    ctx.stroke();
+    ctx.setLineDash([]);
     
     // 장애물
     obstacles.forEach(o => {
@@ -1655,28 +1804,30 @@ const renderRunner = (stage, groundY) => {
     });
     ctx.globalAlpha = 1;
     
-    // 러너 캐릭터
+    // 캐릭터 (달리는 애니메이션!)
     drawRunnerChar(groundY);
 };
 
 const drawRunnerChar = groundY => {
     const d = G.data.design;
     const p = G.data.parts;
-    const t = Date.now() * 0.01;
+    const t = Date.now() * 0.015; // 빠른 달리기 애니메이션
     
     ctx.save();
     ctx.translate(runner.x + runner.w / 2, runner.y + runner.h / 2);
     
-    // 스테이지에 따른 진화 형태
     if (runnerStage === 0) {
-        // 1단계: 큰 세포
+        // 1단계: 큰 세포 (통통 튀는 느낌)
+        const bounce = runner.onGround ? Math.abs(Math.sin(t)) * 3 : 0;
+        ctx.translate(0, -bounce);
+        
         ctx.shadowColor = d.primary;
         ctx.shadowBlur = 15;
         
         ctx.beginPath();
         for (let i = 0; i < 8; i++) {
             const ang = (i / 8) * Math.PI * 2;
-            const w = Math.sin(t + i) * 3;
+            const w = Math.sin(t * 0.5 + i) * 3;
             const r = runner.w / 2 + w;
             i === 0 ? ctx.moveTo(Math.cos(ang) * r, Math.sin(ang) * r) : ctx.lineTo(Math.cos(ang) * r, Math.sin(ang) * r);
         }
@@ -1685,16 +1836,32 @@ const drawRunnerChar = groundY => {
         ctx.fill();
         ctx.shadowBlur = 0;
         
-        // 눈
+        // 눈 (달리는 방향 보기)
         for (let i = 0; i < Math.min(3, (p.eye || 1)); i++) {
-            const ex = (i - 1) * 12;
+            const ex = 5 + (i - 1) * 10;
             ctx.beginPath(); ctx.arc(ex, -5, 8, 0, Math.PI * 2); ctx.fillStyle = 'white'; ctx.fill();
-            ctx.beginPath(); ctx.arc(ex + 2, -5, 4, 0, Math.PI * 2); ctx.fillStyle = '#222'; ctx.fill();
+            ctx.beginPath(); ctx.arc(ex + 3, -5, 4, 0, Math.PI * 2); ctx.fillStyle = '#222'; ctx.fill();
+        }
+        
+        // 다리 (빠르게 움직임!)
+        if ((p.leg || 0) > 0) {
+            ctx.strokeStyle = d.secondary;
+            ctx.lineWidth = 4;
+            const legPhase = Math.sin(t * 2);
+            ctx.beginPath();
+            ctx.moveTo(-8, runner.h / 3);
+            ctx.lineTo(-8 + legPhase * 15, runner.h / 2 + 5);
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.moveTo(8, runner.h / 3);
+            ctx.lineTo(8 - legPhase * 15, runner.h / 2 + 5);
+            ctx.stroke();
         }
         
     } else if (runnerStage === 1) {
-        // 2단계: 직립보행 형태
-        const legPhase = Math.sin(t * 0.5) * 0.3;
+        // 2단계: 직립보행
+        const legPhase = Math.sin(t * 2) * 0.4;
+        const armPhase = Math.sin(t * 2 + Math.PI) * 0.3;
         
         // 몸통
         ctx.fillStyle = d.primary;
@@ -1707,40 +1874,43 @@ const drawRunnerChar = groundY => {
         ctx.arc(0, -runner.h / 2, runner.w / 4, 0, Math.PI * 2);
         ctx.fill();
         
-        // 눈
+        // 눈 (앞 보기)
         ctx.beginPath(); ctx.arc(-5, -runner.h / 2 - 2, 5, 0, Math.PI * 2); ctx.fillStyle = 'white'; ctx.fill();
         ctx.beginPath(); ctx.arc(5, -runner.h / 2 - 2, 5, 0, Math.PI * 2); ctx.fill();
-        ctx.beginPath(); ctx.arc(-4, -runner.h / 2 - 2, 2.5, 0, Math.PI * 2); ctx.fillStyle = '#222'; ctx.fill();
-        ctx.beginPath(); ctx.arc(6, -runner.h / 2 - 2, 2.5, 0, Math.PI * 2); ctx.fill();
+        ctx.beginPath(); ctx.arc(-3, -runner.h / 2 - 2, 2.5, 0, Math.PI * 2); ctx.fillStyle = '#222'; ctx.fill();
+        ctx.beginPath(); ctx.arc(7, -runner.h / 2 - 2, 2.5, 0, Math.PI * 2); ctx.fill();
         
-        // 다리
+        // 다리 (달리기!)
         ctx.strokeStyle = d.secondary;
         ctx.lineWidth = 6;
         ctx.lineCap = 'round';
         ctx.beginPath();
         ctx.moveTo(-8, runner.h / 4);
-        ctx.lineTo(-8 + Math.sin(legPhase) * 10, runner.h / 2);
+        ctx.lineTo(-8 + Math.sin(legPhase) * 20, runner.h / 2 + 8);
         ctx.stroke();
         ctx.beginPath();
         ctx.moveTo(8, runner.h / 4);
-        ctx.lineTo(8 - Math.sin(legPhase) * 10, runner.h / 2);
+        ctx.lineTo(8 - Math.sin(legPhase) * 20, runner.h / 2 + 8);
         ctx.stroke();
         
-        // 팔
+        // 팔 (달리기!)
+        ctx.strokeStyle = d.primary;
+        ctx.lineWidth = 5;
         ctx.beginPath();
         ctx.moveTo(-runner.w / 3, -5);
-        ctx.lineTo(-runner.w / 2 - Math.sin(legPhase) * 8, 10);
+        ctx.lineTo(-runner.w / 2 - Math.sin(armPhase) * 15, 15);
         ctx.stroke();
         ctx.beginPath();
         ctx.moveTo(runner.w / 3, -5);
-        ctx.lineTo(runner.w / 2 + Math.sin(legPhase) * 8, 10);
+        ctx.lineTo(runner.w / 2 + Math.sin(armPhase) * 15, 15);
         ctx.stroke();
         
     } else {
-        // 3단계: 문명인 형태
-        const legPhase = Math.sin(t * 0.5) * 0.2;
+        // 3단계: 문명인
+        const legPhase = Math.sin(t * 2) * 0.3;
+        const armPhase = Math.sin(t * 2 + Math.PI) * 0.25;
         
-        // 몸통 (옷 입은 형태)
+        // 몸통 (옷)
         ctx.fillStyle = '#8B4513';
         ctx.beginPath();
         ctx.roundRect(-runner.w / 3, -runner.h / 4, runner.w / 1.5, runner.h / 1.8, 5);
@@ -1755,8 +1925,8 @@ const drawRunnerChar = groundY => {
         // 눈
         ctx.beginPath(); ctx.arc(-6, -runner.h / 2 - 5, 5, 0, Math.PI * 2); ctx.fillStyle = 'white'; ctx.fill();
         ctx.beginPath(); ctx.arc(6, -runner.h / 2 - 5, 5, 0, Math.PI * 2); ctx.fill();
-        ctx.beginPath(); ctx.arc(-5, -runner.h / 2 - 5, 2.5, 0, Math.PI * 2); ctx.fillStyle = '#222'; ctx.fill();
-        ctx.beginPath(); ctx.arc(7, -runner.h / 2 - 5, 2.5, 0, Math.PI * 2); ctx.fill();
+        ctx.beginPath(); ctx.arc(-4, -runner.h / 2 - 5, 2.5, 0, Math.PI * 2); ctx.fillStyle = '#222'; ctx.fill();
+        ctx.beginPath(); ctx.arc(8, -runner.h / 2 - 5, 2.5, 0, Math.PI * 2); ctx.fill();
         
         // 미소
         ctx.strokeStyle = '#222';
@@ -1771,18 +1941,19 @@ const drawRunnerChar = groundY => {
         ctx.lineCap = 'round';
         ctx.beginPath();
         ctx.moveTo(-10, runner.h / 4);
-        ctx.lineTo(-10 + Math.sin(legPhase) * 8, runner.h / 2 + 5);
+        ctx.lineTo(-10 + Math.sin(legPhase) * 18, runner.h / 2 + 8);
         ctx.stroke();
         ctx.beginPath();
         ctx.moveTo(10, runner.h / 4);
-        ctx.lineTo(10 - Math.sin(legPhase) * 8, runner.h / 2 + 5);
+        ctx.lineTo(10 - Math.sin(legPhase) * 18, runner.h / 2 + 8);
         ctx.stroke();
         
-        // 도구 (횃불)
+        // 도구 (횃불) - 흔들림
+        const torchX = runner.w / 2 + 8 + Math.sin(armPhase) * 5;
         ctx.fillStyle = '#8B4513';
-        ctx.fillRect(runner.w / 2 + 5, -20, 5, 30);
-        ctx.font = '16px Arial';
-        ctx.fillText('🔥', runner.w / 2 + 7, -25);
+        ctx.fillRect(torchX, -25, 6, 35);
+        ctx.font = '18px Arial';
+        ctx.fillText('🔥', torchX + 3, -32);
     }
     
     ctx.restore();
@@ -1828,7 +1999,6 @@ const runnerStageComplete = () => {
             startRunner();
         }, 2500);
     } else {
-        // 게임 클리어!
         G.data.stage = 4;
         saveGame();
         
@@ -1840,7 +2010,6 @@ const runnerStageComplete = () => {
                 <div class="modal-stats">
                     <div class="stat-row"><span class="stat-label">최종 점수</span><span class="stat-val">${G.data.score}</span></div>
                     <div class="stat-row"><span class="stat-label">획득 파츠</span><span class="stat-val">${totalParts()}개</span></div>
-                    <div class="stat-row"><span class="stat-label">플레이 시간</span><span class="stat-val">${Math.floor(G.data.playTime / 60000)}분</span></div>
                 </div>
                 <div style="display:flex;flex-direction:column;gap:10px;">
                     <button class="btn btn-energy btn-block" id="btn-home">🏠 홈으로</button>
@@ -1940,7 +2109,7 @@ const renderSettings = () => {
                         <span>마스터</span>
                         <input type="range" id="vol-m" min="0" max="100" value="${Audio.settings.master * 100}" style="width:80px;">
                     </div>
-                    <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border-subtle);">
+                    <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;">
                         <span>효과음</span>
                         <div style="display:flex;gap:8px;align-items:center;">
                             <input type="range" id="vol-s" min="0" max="100" value="${Audio.settings.sfx * 100}" style="width:80px;">
@@ -1951,7 +2120,7 @@ const renderSettings = () => {
                 <div style="background:var(--void-surface);border-radius:12px;padding:16px;margin-bottom:16px;text-align:left;">
                     <div style="font-size:0.7rem;color:var(--text-muted);margin-bottom:8px;">🕹️ 조작</div>
                     <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;">
-                        <span>조이스틱 위치</span>
+                        <span>조이스틱</span>
                         <div style="display:flex;gap:6px;">
                             <button class="btn btn-sm ${!joyRight ? 'btn-energy' : 'btn-ghost'}" id="joy-left">⬅️ 왼쪽</button>
                             <button class="btn btn-sm ${joyRight ? 'btn-energy' : 'btn-ghost'}" id="joy-right">➡️ 오른쪽</button>
@@ -1981,7 +2150,7 @@ document.addEventListener('DOMContentLoaded', () => {
     renderTitle();
     setInterval(saveGame, CONFIG.SAVE_INTERVAL);
     window.addEventListener('beforeunload', saveGame);
-    console.log('🎲 BOKLUCK Universe v0.8.0');
+    console.log('🎲 BOKLUCK Universe v0.9.0');
 });
 </script>
 </body>
