@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>BOKLUCK Universe</title>
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎲</text></svg>">
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Noto+Sans+KR:wght@400;700&display=swap" rel="stylesheet">
     <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -14,28 +14,19 @@
     --void-light: #0a0a1a;
     --void-surface: #12122a;
     --void-elevated: #1a1a3a;
-    
     --neon-cyan: #00f5d4;
     --neon-pink: #f72585;
     --neon-purple: #7b2cbf;
     --neon-yellow: #fee440;
-    --neon-orange: #ff6b35;
-    
     --success: #10b981;
     --danger: #ef4444;
-    --warning: #f59e0b;
-    --legendary: #ffd700;
-    
     --text-primary: #e8e8ff;
     --text-secondary: #9090b0;
     --text-muted: #606080;
-    
-    --border-subtle: rgba(255, 255, 255, 0.06);
-    --border-default: rgba(0, 245, 212, 0.15);
-    
-    --gradient-energy: linear-gradient(135deg, #00f5d4 0%, #fee440 100%);
-    --gradient-danger: linear-gradient(135deg, #ef4444 0%, #f72585 100%);
-    
+    --border-subtle: rgba(255,255,255,0.06);
+    --border-default: rgba(0,245,212,0.15);
+    --gradient-energy: linear-gradient(135deg, #00f5d4, #fee440);
+    --gradient-danger: linear-gradient(135deg, #ef4444, #f72585);
     --safe-top: env(safe-area-inset-top, 0px);
     --safe-bottom: env(safe-area-inset-bottom, 0px);
 }
@@ -52,13 +43,9 @@ html, body {
 body {
     background: var(--void);
     color: var(--text-primary);
-    font-family: 'Noto Sans KR', -apple-system, sans-serif;
+    font-family: 'Noto Sans KR', sans-serif;
     font-size: 14px;
-    line-height: 1.5;
 }
-
-.font-display { font-family: 'Orbitron', monospace; }
-.hidden { display: none !important; }
 
 .btn {
     display: inline-flex;
@@ -72,12 +59,10 @@ body {
     font-size: 1rem;
     font-weight: 600;
     cursor: pointer;
-    transition: all 0.2s;
+    transition: transform 0.2s;
 }
-
 .btn:active { transform: scale(0.96); }
 .btn-energy { background: var(--gradient-energy); color: var(--void); }
-.btn-danger { background: var(--gradient-danger); color: white; }
 .btn-outline { background: transparent; color: var(--text-primary); border: 1px solid var(--border-default); }
 .btn-ghost { background: rgba(255,255,255,0.08); color: var(--text-primary); }
 .btn-sm { padding: 10px 16px; font-size: 0.85rem; }
@@ -92,13 +77,10 @@ body {
     border-radius: 50%;
     animation: twinkle var(--dur, 3s) ease-in-out infinite;
 }
+@keyframes twinkle { 0%,100%{opacity:0.2} 50%{opacity:1} }
+@keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-10px)} }
 
-@keyframes twinkle {
-    0%, 100% { opacity: 0.2; }
-    50% { opacity: 1; }
-}
-
-.story-overlay {
+.page-center {
     position: fixed;
     inset: 0;
     z-index: 100;
@@ -107,800 +89,289 @@ body {
     align-items: center;
     justify-content: center;
     padding: 24px;
-    padding-bottom: calc(24px + var(--safe-bottom));
-    background: linear-gradient(180deg, rgba(3,3,8,0.95) 0%, rgba(10,10,26,0.98) 100%);
+    background: linear-gradient(180deg, rgba(3,3,8,0.95), rgba(10,10,26,0.98));
 }
 
-.story-content { max-width: 400px; width: 100%; text-align: center; }
+.page-content { max-width: 400px; width: 100%; text-align: center; }
+.page-icon { font-size: 4rem; margin-bottom: 16px; animation: float 3s ease-in-out infinite; }
+.page-title { font-family: 'Orbitron', monospace; font-size: clamp(1.25rem,5vw,1.75rem); font-weight: 700; margin-bottom: 20px; background: var(--gradient-energy); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+.page-text { font-size: 1rem; line-height: 1.9; color: var(--text-secondary); margin-bottom: 28px; }
+.page-text .hl { color: var(--neon-cyan); font-weight: 500; }
+.page-text .gold { color: var(--neon-yellow); }
+.page-text .danger { color: var(--neon-pink); }
 
-.story-icon {
-    font-size: 4rem;
-    margin-bottom: 16px;
-    animation: float 3s ease-in-out infinite;
-}
+.dots { display: flex; justify-content: center; gap: 8px; margin-bottom: 20px; }
+.dot { width: 8px; height: 8px; border-radius: 50%; background: var(--void-elevated); transition: all 0.3s; }
+.dot.active { background: var(--neon-cyan); width: 24px; border-radius: 4px; }
+.dot.done { background: var(--text-muted); }
 
-@keyframes float {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-10px); }
-}
-
-.story-title {
-    font-family: 'Orbitron', monospace;
-    font-size: clamp(1.25rem, 5vw, 1.75rem);
-    font-weight: 700;
-    margin-bottom: 24px;
-    background: var(--gradient-energy);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-}
-
-.story-text {
-    font-size: 1rem;
-    line-height: 1.9;
-    color: var(--text-secondary);
-    margin-bottom: 32px;
-    min-height: 100px;
-}
-
-.story-text .highlight { color: var(--neon-cyan); font-weight: 500; }
-.story-text .danger { color: var(--neon-pink); }
-.story-text .golden { color: var(--neon-yellow); }
-
-.story-indicator { display: flex; justify-content: center; gap: 8px; margin-bottom: 24px; }
-
-.story-dot {
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    background: var(--void-elevated);
-    transition: all 0.3s;
-}
-
-.story-dot.active { background: var(--neon-cyan); width: 24px; border-radius: 4px; }
-.story-dot.done { background: var(--text-muted); }
-
-.dice-modal {
-    position: fixed;
-    inset: 0;
-    z-index: 200;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 24px;
-    background: rgba(3,3,8,0.95);
-}
-
-.dice-container { text-align: center; max-width: 350px; width: 100%; }
-
-.dice-visual {
-    width: 140px;
-    height: 140px;
-    margin: 24px auto;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+.dice-box {
+    width: 140px; height: 140px; margin: 24px auto;
+    display: flex; align-items: center; justify-content: center;
     font-size: 5rem;
     background: var(--void-surface);
     border: 2px solid var(--border-default);
     border-radius: 20px;
 }
+.dice-box.rolling { animation: shake 0.1s linear infinite; }
+@keyframes shake { 0%,100%{transform:rotate(0) scale(1)} 25%{transform:rotate(-10deg) scale(1.05)} 50%{transform:rotate(10deg) scale(0.95)} }
 
-.dice-visual.rolling { animation: diceShake 0.1s linear infinite; }
+#game-canvas { position: fixed; inset: 0; z-index: 1; touch-action: none; }
 
-@keyframes diceShake {
-    0%, 100% { transform: rotate(0deg) scale(1); }
-    25% { transform: rotate(-10deg) scale(1.05); }
-    50% { transform: rotate(10deg) scale(0.95); }
-    75% { transform: rotate(-5deg) scale(1.02); }
-}
-
-#game-canvas {
-    position: fixed;
-    inset: 0;
-    z-index: 1;
-    touch-action: none;
-}
-
-.game-hud-top {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    z-index: 50;
-    padding: 12px 16px;
-    padding-top: calc(12px + var(--safe-top));
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    gap: 8px;
+.hud-top {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 50;
+    padding: 12px 16px; padding-top: calc(12px + var(--safe-top));
+    display: flex; justify-content: space-between; align-items: flex-start; gap: 8px;
     pointer-events: none;
 }
+.hud-top > * { pointer-events: auto; }
 
-.game-hud-top > * { pointer-events: auto; }
-
-.hud-left-panel {
-    background: rgba(10, 10, 26, 0.92);
+.hud-panel {
+    background: rgba(10,10,26,0.92);
     border: 1px solid var(--border-default);
-    border-radius: 16px;
-    padding: 12px;
-    backdrop-filter: blur(10px);
-    min-width: 130px;
+    border-radius: 14px;
+    padding: 10px 12px;
+    backdrop-filter: blur(8px);
 }
 
-.hud-name {
-    font-family: 'Orbitron', monospace;
-    font-size: 0.75rem;
-    font-weight: 600;
-    color: var(--neon-cyan);
-    margin-bottom: 8px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
+.hud-name { font-family: 'Orbitron', monospace; font-size: 0.7rem; color: var(--neon-cyan); margin-bottom: 6px; }
+.hud-row { display: flex; align-items: center; gap: 6px; font-size: 0.8rem; margin-bottom: 3px; }
+.hud-val { font-family: 'Orbitron', monospace; font-weight: 700; color: var(--neon-yellow); }
+.hud-label { color: var(--text-muted); font-size: 0.65rem; }
 
-.hud-stat-row {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    margin-bottom: 4px;
-    font-size: 0.8rem;
-}
+.size-bar { display: flex; align-items: center; gap: 6px; margin-top: 6px; padding-top: 6px; border-top: 1px solid var(--border-subtle); }
+.size-track { flex: 1; height: 6px; background: var(--void-elevated); border-radius: 3px; overflow: hidden; }
+.size-fill { height: 100%; background: var(--gradient-energy); border-radius: 3px; transition: width 0.2s; }
+.size-num { font-family: 'Orbitron', monospace; font-size: 0.65rem; color: var(--text-muted); }
 
-.hud-stat-row:last-child { margin-bottom: 0; }
-.hud-stat-icon { width: 18px; text-align: center; font-size: 0.9rem; }
-.hud-stat-value { font-family: 'Orbitron', monospace; font-weight: 700; color: var(--neon-yellow); }
-.hud-stat-label { color: var(--text-muted); font-size: 0.7rem; }
+.parts-grid { display: flex; flex-wrap: wrap; gap: 3px; margin-bottom: 6px; }
+.part-badge { display: flex; align-items: center; gap: 2px; background: var(--void-elevated); border: 1px solid var(--border-subtle); border-radius: 5px; padding: 2px 5px; font-size: 0.65rem; }
+.part-badge.on { border-color: var(--neon-cyan); box-shadow: 0 0 4px rgba(0,245,212,0.3); }
+.part-cnt { font-family: 'Orbitron', monospace; font-size: 0.55rem; color: var(--neon-yellow); }
 
-.size-indicator {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    margin-top: 8px;
-    padding-top: 8px;
-    border-top: 1px solid var(--border-subtle);
-}
+.prog-section { margin-bottom: 6px; }
+.prog-label { display: flex; justify-content: space-between; font-size: 0.6rem; margin-bottom: 2px; }
+.prog-left { color: var(--text-muted); }
+.prog-right { color: var(--neon-cyan); font-family: 'Orbitron', monospace; }
+.prog-track { height: 6px; background: var(--void-elevated); border-radius: 3px; overflow: hidden; }
+.prog-fill { height: 100%; border-radius: 3px; transition: width 0.2s; }
+.prog-fill.evo { background: var(--gradient-energy); }
+.prog-fill.stage { background: linear-gradient(90deg, var(--neon-purple), var(--neon-pink)); }
 
-.size-bar {
-    flex: 1;
-    height: 8px;
-    background: var(--void-elevated);
-    border-radius: 4px;
-    overflow: hidden;
-}
-
-.size-fill {
-    height: 100%;
-    background: var(--gradient-energy);
-    border-radius: 4px;
-    transition: width 0.3s;
-}
-
-.size-text {
-    font-family: 'Orbitron', monospace;
-    font-size: 0.7rem;
-    color: var(--text-muted);
-    min-width: 30px;
-    text-align: right;
-}
-
-.hud-right-panel {
-    background: rgba(10, 10, 26, 0.92);
-    border: 1px solid var(--border-default);
-    border-radius: 16px;
-    padding: 10px;
-    backdrop-filter: blur(10px);
-    max-width: 160px;
-}
-
-.hud-section-title {
-    font-family: 'Orbitron', monospace;
-    font-size: 0.65rem;
-    color: var(--text-muted);
-    margin-bottom: 6px;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-}
-
-.body-parts-grid {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 4px;
-    margin-bottom: 8px;
-}
-
-.body-part {
-    display: flex;
-    align-items: center;
-    gap: 2px;
-    background: var(--void-elevated);
-    border: 1px solid var(--border-subtle);
-    border-radius: 6px;
-    padding: 3px 6px;
-    font-size: 0.7rem;
-}
-
-.body-part.active {
-    border-color: var(--neon-cyan);
-    box-shadow: 0 0 6px rgba(0, 245, 212, 0.3);
-}
-
-.body-part-icon { font-size: 0.8rem; }
-.body-part-count { font-family: 'Orbitron', monospace; font-size: 0.6rem; color: var(--neon-yellow); }
-
-.progress-section { margin-bottom: 8px; }
-
-.progress-label {
-    display: flex;
-    justify-content: space-between;
-    font-size: 0.65rem;
-    margin-bottom: 3px;
-}
-
-.progress-label-left { color: var(--text-muted); }
-.progress-label-right { color: var(--neon-cyan); font-family: 'Orbitron', monospace; }
-
-.progress-bar-container {
-    height: 8px;
-    background: var(--void-elevated);
-    border-radius: 4px;
-    overflow: hidden;
-}
-
-.progress-bar-fill {
-    height: 100%;
-    border-radius: 4px;
-    transition: width 0.3s;
-}
-
-.progress-bar-fill.evo { background: var(--gradient-energy); }
-.progress-bar-fill.stage { background: linear-gradient(90deg, var(--neon-purple), var(--neon-pink)); }
-
-.hud-buttons { display: flex; gap: 8px; }
-
-.hud-btn {
-    width: 40px;
-    height: 40px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: rgba(10, 10, 26, 0.92);
-    border: 1px solid var(--border-default);
-    border-radius: 10px;
-    font-size: 1.1rem;
-    cursor: pointer;
-    backdrop-filter: blur(10px);
-}
-
+.hud-btns { display: flex; gap: 6px; }
+.hud-btn { width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; background: rgba(10,10,26,0.92); border: 1px solid var(--border-default); border-radius: 8px; font-size: 1rem; cursor: pointer; }
 .hud-btn:active { transform: scale(0.95); }
 
-.game-hud-bottom {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    z-index: 50;
-    padding: 12px 16px;
-    padding-bottom: calc(75px + var(--safe-bottom));
+.hud-bottom {
+    position: fixed; bottom: 0; left: 0; right: 0; z-index: 50;
+    padding: 10px 16px; padding-bottom: calc(70px + var(--safe-bottom));
     pointer-events: none;
 }
 
-.stage-progress-bar {
-    background: rgba(10, 10, 26, 0.9);
-    border: 1px solid var(--border-default);
-    border-radius: 12px;
-    padding: 10px 14px;
-    backdrop-filter: blur(10px);
-    max-width: 360px;
-    margin: 0 auto;
-}
+.stage-bar { background: rgba(10,10,26,0.9); border: 1px solid var(--border-default); border-radius: 10px; padding: 8px 12px; max-width: 340px; margin: 0 auto; }
+.stage-row { display: flex; justify-content: space-between; font-size: 0.65rem; margin-bottom: 4px; }
+.stage-cur { font-family: 'Orbitron', monospace; color: var(--neon-purple); }
+.stage-next { color: var(--text-muted); }
 
-.stage-label {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 6px;
-}
-
-.stage-current {
-    font-family: 'Orbitron', monospace;
-    font-size: 0.7rem;
-    color: var(--neon-purple);
-}
-
-.stage-next { font-size: 0.65rem; color: var(--text-muted); }
-
-.stage-bar {
-    height: 8px;
-    background: var(--void-elevated);
-    border-radius: 4px;
-    overflow: hidden;
-}
-
-.stage-fill {
-    height: 100%;
-    background: linear-gradient(90deg, var(--neon-purple), var(--neon-pink));
-    border-radius: 4px;
-    transition: width 0.3s;
-}
-
-.mobile-controls {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    z-index: 50;
-    padding: 16px;
-    padding-bottom: calc(16px + var(--safe-bottom));
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-end;
+.controls {
+    position: fixed; bottom: 0; left: 0; right: 0; z-index: 50;
+    padding: 14px; padding-bottom: calc(14px + var(--safe-bottom));
+    display: flex; justify-content: space-between; align-items: flex-end;
     pointer-events: none;
 }
 
-.joystick-container {
-    width: 110px;
-    height: 110px;
-    position: relative;
-    pointer-events: auto;
-}
+.joystick { width: 100px; height: 100px; position: relative; pointer-events: auto; }
+.joy-base { width: 100%; height: 100%; background: rgba(10,10,26,0.5); border: 2px solid var(--border-default); border-radius: 50%; }
+.joy-knob { position: absolute; top: 50%; left: 50%; width: 40px; height: 40px; margin: -20px; background: var(--gradient-energy); border-radius: 50%; box-shadow: 0 4px 12px rgba(0,245,212,0.4); }
 
-.joystick-base {
-    width: 100%;
-    height: 100%;
-    background: rgba(10, 10, 26, 0.6);
-    border: 2px solid var(--border-default);
-    border-radius: 50%;
-}
+.action-btn { width: 60px; height: 60px; background: rgba(10,10,26,0.8); border: 2px solid var(--neon-cyan); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.3rem; cursor: pointer; pointer-events: auto; box-shadow: 0 0 12px rgba(0,245,212,0.3); }
+.action-btn:active { transform: scale(0.95); background: rgba(0,245,212,0.2); }
+.action-btn.disabled { opacity: 0.3; border-color: var(--text-muted); }
+.action-btn.cooldown { opacity: 0.5; }
 
-.joystick-knob {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 45px;
-    height: 45px;
-    margin: -22.5px 0 0 -22.5px;
-    background: var(--gradient-energy);
-    border-radius: 50%;
-    box-shadow: 0 4px 15px rgba(0, 245, 212, 0.4);
-    transition: transform 0.05s;
-}
-
-.action-btn {
-    width: 70px;
-    height: 70px;
-    background: rgba(10, 10, 26, 0.8);
-    border: 2px solid var(--neon-cyan);
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.5rem;
-    cursor: pointer;
-    pointer-events: auto;
-    box-shadow: 0 0 15px rgba(0, 245, 212, 0.3);
-}
-
-.action-btn:active { transform: scale(0.95); background: rgba(0, 245, 212, 0.2); }
-
-.toast-container {
-    position: fixed;
-    top: calc(16px + var(--safe-top));
-    left: 50%;
-    transform: translateX(-50%);
-    z-index: 300;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 8px;
-    pointer-events: none;
-}
-
-.toast {
-    background: var(--void-elevated);
-    border: 1px solid var(--border-default);
-    border-radius: 12px;
-    padding: 10px 16px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    animation: toastIn 0.3s ease, toastOut 0.3s ease 2.5s forwards;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
-    font-size: 0.9rem;
-}
-
+.toast-box { position: fixed; top: calc(14px + var(--safe-top)); left: 50%; transform: translateX(-50%); z-index: 300; display: flex; flex-direction: column; gap: 6px; pointer-events: none; }
+.toast { background: var(--void-elevated); border: 1px solid var(--border-default); border-radius: 10px; padding: 8px 14px; display: flex; align-items: center; gap: 6px; animation: toastIn 0.3s, toastOut 0.3s 2.5s forwards; font-size: 0.85rem; }
 .toast.success { border-color: var(--success); }
 .toast.danger { border-color: var(--danger); }
-.toast.warning { border-color: var(--warning); }
-.toast.legendary { border-color: var(--legendary); background: linear-gradient(135deg, rgba(255,215,0,0.2), rgba(255,140,0,0.1)); }
+@keyframes toastIn { from{transform:translateY(-20px);opacity:0} to{transform:translateY(0);opacity:1} }
+@keyframes toastOut { from{opacity:1} to{opacity:0} }
 
-@keyframes toastIn {
-    from { transform: translateY(-20px); opacity: 0; }
-    to { transform: translateY(0); opacity: 1; }
-}
+.evo-popup { position: fixed; top: 50%; left: 50%; transform: translate(-50%,-50%) scale(0); z-index: 250; background: rgba(10,10,26,0.98); border: 2px solid var(--neon-cyan); border-radius: 18px; padding: 24px 36px; text-align: center; opacity: 0; transition: all 0.4s cubic-bezier(0.34,1.56,0.64,1); }
+.evo-popup.show { transform: translate(-50%,-50%) scale(1); opacity: 1; }
+.evo-icon { font-size: 3rem; margin-bottom: 8px; }
+.evo-title { font-family: 'Orbitron', monospace; font-size: 1.2rem; font-weight: 900; background: var(--gradient-energy); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 4px; }
+.evo-desc { color: var(--text-secondary); font-size: 0.8rem; }
+.evo-fx { color: var(--neon-cyan); font-size: 0.75rem; font-weight: 600; margin-top: 4px; }
 
-@keyframes toastOut {
-    from { opacity: 1; }
-    to { opacity: 0; }
-}
+.modal { position: fixed; inset: 0; z-index: 300; display: flex; align-items: center; justify-content: center; padding: 24px; background: rgba(3,3,8,0.95); }
+.modal-box { text-align: center; max-width: 320px; }
+.modal-icon { font-size: 4rem; margin-bottom: 12px; }
+.modal-title { font-family: 'Orbitron', monospace; font-size: 1.6rem; font-weight: 900; margin-bottom: 8px; }
+.modal-title.fail { color: var(--danger); }
+.modal-title.win { color: var(--success); }
+.modal-desc { color: var(--text-secondary); margin-bottom: 16px; line-height: 1.6; }
+.modal-stats { background: var(--void-surface); border-radius: 10px; padding: 12px; margin-bottom: 16px; }
+.stat-row { display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 1px solid var(--border-subtle); font-size: 0.85rem; }
+.stat-row:last-child { border-bottom: none; }
+.stat-label { color: var(--text-muted); }
+.stat-val { font-family: 'Orbitron', monospace; color: var(--neon-cyan); }
 
-.evo-alert {
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%) scale(0);
-    z-index: 250;
-    background: rgba(10, 10, 26, 0.98);
-    border: 2px solid var(--neon-cyan);
-    border-radius: 20px;
-    padding: 28px 40px;
-    text-align: center;
-    opacity: 0;
-    transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
-}
+.save-page { position: fixed; inset: 0; z-index: 100; display: flex; flex-direction: column; align-items: center; padding: 24px; padding-top: calc(24px + var(--safe-top)); overflow-y: auto; background: linear-gradient(180deg, rgba(3,3,8,0.95), rgba(10,10,26,0.98)); }
+.save-header { display: flex; align-items: center; justify-content: space-between; width: 100%; max-width: 440px; margin-bottom: 16px; }
+.save-title { font-family: 'Orbitron', monospace; font-size: 1.1rem; }
+.slots { display: flex; flex-direction: column; gap: 10px; max-width: 440px; width: 100%; }
+.slot { background: var(--void-surface); border: 2px solid var(--border-subtle); border-radius: 12px; padding: 12px; text-align: left; }
+.slot.empty { border-style: dashed; opacity: 0.6; text-align: center; padding: 24px 12px; cursor: pointer; }
+.slot.empty:hover { opacity: 0.8; }
+.slot-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
+.slot-num { font-family: 'Orbitron', monospace; font-size: 0.6rem; color: var(--text-muted); background: var(--void-light); padding: 2px 6px; border-radius: 4px; }
+.slot-name { font-family: 'Orbitron', monospace; font-weight: 600; font-size: 0.9rem; margin-bottom: 2px; }
+.slot-info { font-size: 0.7rem; color: var(--text-secondary); margin-bottom: 8px; }
+.slot-actions { display: flex; gap: 6px; }
+.del-btn { padding: 6px 12px; background: rgba(239,68,68,0.2); border: 1px solid var(--danger); border-radius: 6px; color: var(--danger); font-size: 0.8rem; cursor: pointer; }
+.del-btn:active { transform: scale(0.95); }
 
-.evo-alert.show {
-    transform: translate(-50%, -50%) scale(1);
-    opacity: 1;
-}
-
-.evo-alert-icon { font-size: 3.5rem; margin-bottom: 10px; }
-
-.evo-alert-title {
-    font-family: 'Orbitron', monospace;
-    font-size: 1.3rem;
-    font-weight: 900;
-    background: var(--gradient-energy);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    margin-bottom: 6px;
-}
-
-.evo-alert-desc { color: var(--text-secondary); font-size: 0.85rem; margin-bottom: 6px; }
-.evo-alert-effect { color: var(--neon-cyan); font-size: 0.8rem; font-weight: 600; }
-
-.gameover-modal {
-    position: fixed;
-    inset: 0;
-    z-index: 300;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 24px;
-    background: rgba(3, 3, 8, 0.95);
-}
-
-.gameover-content { text-align: center; max-width: 340px; }
-.gameover-icon { font-size: 4.5rem; margin-bottom: 14px; }
-
-.gameover-title {
-    font-family: 'Orbitron', monospace;
-    font-size: 1.8rem;
-    font-weight: 900;
-    color: var(--danger);
-    margin-bottom: 10px;
-}
-
-.gameover-title.success { color: var(--success); }
-
-.gameover-desc { color: var(--text-secondary); margin-bottom: 20px; line-height: 1.6; }
-
-.gameover-stats {
-    background: var(--void-surface);
-    border-radius: 12px;
-    padding: 14px;
-    margin-bottom: 20px;
-}
-
-.gameover-stat {
-    display: flex;
-    justify-content: space-between;
-    padding: 6px 0;
-    border-bottom: 1px solid var(--border-subtle);
-    font-size: 0.9rem;
-}
-
-.gameover-stat:last-child { border-bottom: none; }
-.gameover-stat-label { color: var(--text-muted); }
-.gameover-stat-value { font-family: 'Orbitron', monospace; color: var(--neon-cyan); }
-
-.title-page, .save-page {
-    position: fixed;
-    inset: 0;
-    z-index: 100;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 24px;
-    text-align: center;
-}
-
-.save-page {
-    justify-content: flex-start;
-    padding-top: calc(24px + var(--safe-top));
-    overflow-y: auto;
-}
-
-.title-logo { font-size: 4.5rem; margin-bottom: 14px; animation: float 3s ease-in-out infinite; }
-
-.title-main {
-    font-family: 'Orbitron', monospace;
-    font-size: clamp(2.2rem, 9vw, 3.5rem);
-    font-weight: 900;
-    background: var(--gradient-energy);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    margin-bottom: 6px;
-}
-
-.title-sub { font-family: 'Orbitron', monospace; font-size: 1rem; color: var(--text-secondary); margin-bottom: 28px; }
-.title-tagline { font-size: 0.9rem; color: var(--text-muted); line-height: 1.7; max-width: 280px; margin-bottom: 40px; }
-.title-buttons { display: flex; flex-direction: column; gap: 12px; width: 100%; max-width: 260px; }
-
-.save-header { display: flex; align-items: center; justify-content: space-between; width: 100%; max-width: 460px; margin-bottom: 20px; }
-.save-title { font-family: 'Orbitron', monospace; font-size: 1.2rem; }
-.save-slots { display: flex; flex-direction: column; gap: 12px; max-width: 460px; width: 100%; }
-
-.save-slot {
-    background: var(--void-surface);
-    border: 2px solid var(--border-subtle);
-    border-radius: 14px;
-    padding: 14px;
-    text-align: left;
-}
-
-.save-slot.empty { border-style: dashed; opacity: 0.6; text-align: center; padding: 28px 14px; cursor: pointer; }
-.save-slot.empty:hover { opacity: 0.8; }
-.save-slot-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
-.save-slot-number { font-family: 'Orbitron', monospace; font-size: 0.65rem; color: var(--text-muted); background: var(--void-light); padding: 3px 7px; border-radius: 5px; }
-.save-slot-name { font-family: 'Orbitron', monospace; font-weight: 600; margin-bottom: 3px; font-size: 0.95rem; }
-.save-slot-info { font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 10px; }
-.save-slot-actions { display: flex; gap: 8px; }
-
-.delete-btn {
-    padding: 8px 14px;
-    background: rgba(239, 68, 68, 0.2);
-    border: 1px solid var(--danger);
-    border-radius: 8px;
-    color: var(--danger);
-    font-size: 0.85rem;
-    cursor: pointer;
-    transition: all 0.2s;
-}
-
-.delete-btn:hover { background: rgba(239, 68, 68, 0.4); }
-.delete-btn:active { transform: scale(0.95); }
-
-.settings-modal {
-    position: fixed;
-    inset: 0;
-    z-index: 400;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 24px;
-    background: rgba(3,3,8,0.95);
-}
-
-.settings-content {
-    background: var(--void-surface);
-    border: 1px solid var(--border-default);
-    border-radius: 18px;
-    padding: 22px;
-    max-width: 380px;
-    width: 100%;
-    max-height: 80vh;
-    overflow-y: auto;
-}
-
-.settings-title { font-family: 'Orbitron', monospace; font-size: 1.2rem; text-align: center; margin-bottom: 22px; }
-.settings-section { margin-bottom: 22px; }
-.settings-section-title { font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 10px; }
-.settings-row { display: flex; align-items: center; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid var(--border-subtle); }
-
-.volume-slider {
-    -webkit-appearance: none;
-    width: 90px;
-    height: 6px;
-    background: var(--void-light);
-    border-radius: 3px;
-}
-
-.volume-slider::-webkit-slider-thumb {
-    -webkit-appearance: none;
-    width: 16px;
-    height: 16px;
-    background: var(--gradient-energy);
-    border-radius: 50%;
-    cursor: pointer;
-}
-
-.toggle {
-    width: 46px;
-    height: 26px;
-    background: var(--void-light);
-    border-radius: 13px;
-    cursor: pointer;
-    position: relative;
-}
-
-.toggle.active { background: var(--neon-cyan); }
-
-.toggle-knob {
-    position: absolute;
-    top: 3px;
-    left: 3px;
-    width: 20px;
-    height: 20px;
-    background: white;
-    border-radius: 50%;
-    transition: transform 0.2s;
-}
-
-.toggle.active .toggle-knob { transform: translateX(20px); }
-
-/* 다세포 게임 전용 스타일 */
-.climb-hud {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    z-index: 50;
-    padding: 12px 16px;
-    padding-top: calc(12px + var(--safe-top));
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    pointer-events: none;
-}
-
+.climb-hud { position: fixed; top: 0; left: 0; right: 0; z-index: 50; padding: 12px 16px; padding-top: calc(12px + var(--safe-top)); display: flex; justify-content: space-between; align-items: center; pointer-events: none; }
 .climb-hud > * { pointer-events: auto; }
-
-.climb-info {
-    background: rgba(10, 10, 26, 0.92);
-    border: 1px solid var(--border-default);
-    border-radius: 12px;
-    padding: 10px 14px;
-    backdrop-filter: blur(10px);
-}
-
-.climb-height {
-    font-family: 'Orbitron', monospace;
-    font-size: 1.2rem;
-    font-weight: 700;
-    color: var(--neon-cyan);
-}
-
-.climb-height-label {
-    font-size: 0.7rem;
-    color: var(--text-muted);
-}
-
-.climb-goal {
-    background: rgba(10, 10, 26, 0.92);
-    border: 1px solid var(--neon-purple);
-    border-radius: 12px;
-    padding: 10px 14px;
-    backdrop-filter: blur(10px);
-    text-align: center;
-}
-
-.climb-goal-text {
-    font-size: 0.7rem;
-    color: var(--text-muted);
-}
-
-.climb-goal-value {
-    font-family: 'Orbitron', monospace;
-    font-size: 0.9rem;
-    color: var(--neon-purple);
-}
+.climb-info { background: rgba(10,10,26,0.92); border: 1px solid var(--border-default); border-radius: 10px; padding: 8px 12px; }
+.climb-height { font-family: 'Orbitron', monospace; font-size: 1.1rem; font-weight: 700; color: var(--neon-cyan); }
+.climb-label { font-size: 0.6rem; color: var(--text-muted); }
+.climb-goal { background: rgba(10,10,26,0.92); border: 1px solid var(--neon-purple); border-radius: 10px; padding: 8px 12px; text-align: center; }
+.climb-goal-text { font-size: 0.6rem; color: var(--text-muted); }
+.climb-goal-val { font-family: 'Orbitron', monospace; font-size: 0.85rem; color: var(--neon-purple); }
     </style>
 </head>
 <body>
     <div id="stars-bg"></div>
     <div id="app"></div>
-    <div class="toast-container" id="toast-container"></div>
-    <div class="evo-alert" id="evo-alert">
-        <div class="evo-alert-icon" id="evo-alert-icon">🧬</div>
-        <div class="evo-alert-title" id="evo-alert-title">진화!</div>
-        <div class="evo-alert-desc" id="evo-alert-desc">설명</div>
-        <div class="evo-alert-effect" id="evo-alert-effect">효과</div>
+    <div class="toast-box" id="toasts"></div>
+    <div class="evo-popup" id="evo-popup">
+        <div class="evo-icon" id="evo-icon">🧬</div>
+        <div class="evo-title" id="evo-title">진화!</div>
+        <div class="evo-desc" id="evo-desc"></div>
+        <div class="evo-fx" id="evo-fx"></div>
     </div>
 
 <script>
 /* ========================================
-   Constants
+   Constants & Configuration
 ======================================== */
-const GROWTH_THRESHOLD = 20;
-const STAGE_THRESHOLD = 500;
-const INITIAL_SIZE = 12;
-const MAX_SIZE = 80;
-const ENEMY_SPAWN_INTERVAL = 3500;
-const MAX_ENEMIES = 7;
-const MAX_FOODS = 35;
-
-// 육지 올라가기 목표 높이
-const LAND_HEIGHT = 1000;
-
-const BODY_PARTS = {
-    eye: { icon: '👁️', name: '눈', maxCount: 3, effect: '시야 +20%' },
-    mouth: { icon: '👄', name: '입', maxCount: 2, effect: '섭취 속도 +15%' },
-    arm: { icon: '🦾', name: '팔', maxCount: 4, effect: '자석 효과' },
-    leg: { icon: '🦿', name: '다리', maxCount: 4, effect: '속도 +10%' },
-    tail: { icon: '🐍', name: '꼬리', maxCount: 2, effect: '대시 가능' },
-    ear: { icon: '👂', name: '귀', maxCount: 2, effect: '적 감지' },
-    nose: { icon: '👃', name: '코', maxCount: 2, effect: '먹이 탐지' },
-    antenna: { icon: '📡', name: '더듬이', maxCount: 2, effect: '범위 +15%' }
+const CONFIG = {
+    GROWTH_THRESHOLD: 20,
+    STAGE_THRESHOLD: 500,
+    LAND_HEIGHT: 1000,
+    INITIAL_SIZE: 12,
+    MAX_SIZE: 80,
+    ENEMY_INTERVAL: 3500,
+    MAX_ENEMIES: 7,
+    MAX_FOODS: 35,
+    SAVE_INTERVAL: 20000
 };
 
-const Environments = [
-    { id: 'ocean', name: '원시 해양', icon: '🌊', range: [1, 16], 
-      colors: { bg1: '#001a33', bg2: '#003366', particle: '#00aaff', food: '#00ff88', enemy: '#ff4444' },
-      desc: '바다는 생명의 요람.', weak: '건조한 환경은 치명적.', creatures: ['🦠', '🫧', '💧', '🌀'] },
-    { id: 'hydrothermal', name: '열수구', icon: '🔥', range: [17, 32],
-      colors: { bg1: '#1a0a00', bg2: '#4d1a00', particle: '#ff6600', food: '#ffaa00', enemy: '#00ffff' },
-      desc: '극한 환경이 일상.', weak: '평온함이 오히려 불안.', creatures: ['🔴', '🟠', '💥', '⚡'] },
-    { id: 'ice', name: '얼음 바다', icon: '🧊', range: [33, 48],
-      colors: { bg1: '#0a1a2e', bg2: '#1a3a5e', particle: '#88ddff', food: '#aaeeff', enemy: '#ff6666' },
-      desc: '효율의 달인.', weak: '뜨거움은 치명적.', creatures: ['❄️', '🔵', '💠', '🫧'] },
-    { id: 'magma', name: '마그마 호수', icon: '🌋', range: [49, 64],
-      colors: { bg1: '#1a0000', bg2: '#4d0000', particle: '#ff3300', food: '#ffff00', enemy: '#00aaff' },
-      desc: '용암이 놀이터.', weak: '얼음이 무덤.', creatures: ['🔥', '🟡', '⭐', '💛'] },
-    { id: 'atmosphere', name: '대기 부유', icon: '☁️', range: [65, 80],
-      colors: { bg1: '#1a1033', bg2: '#2d1a4d', particle: '#cc88ff', food: '#ffaaff', enemy: '#ff4444' },
-      desc: '하늘을 나는 자.', weak: '무거움이 적.', creatures: ['💜', '🟣', '✨', '💫'] },
-    { id: 'toxic', name: '독성 늪', icon: '💀', range: [81, 100],
-      colors: { bg1: '#0a1a0a', bg2: '#1a3a1a', particle: '#88ff00', food: '#aaff44', enemy: '#ff00ff' },
-      desc: '독이 곧 약.', weak: '깨끗함이 불편.', creatures: ['🟢', '💚', '🧪', '☢️'] }
+const BODY_PARTS = {
+    eye: { icon: '👁️', name: '눈', max: 3, fx: '시야 +20%' },
+    mouth: { icon: '👄', name: '입', max: 2, fx: '점수 +15%' },
+    arm: { icon: '🦾', name: '팔', max: 4, fx: '자석 효과' },
+    leg: { icon: '🦿', name: '다리', max: 4, fx: '속도 +10%' },
+    tail: { icon: '🐍', name: '꼬리', max: 2, fx: '대시' },
+    ear: { icon: '👂', name: '귀', max: 2, fx: '적 감지' },
+    nose: { icon: '👃', name: '코', max: 2, fx: '먹이 탐지' },
+    antenna: { icon: '📡', name: '더듬이', max: 2, fx: '범위 +15%' }
+};
+
+const ENVS = [
+    { id: 'ocean', name: '원시 해양', icon: '🌊', range: [1,16], colors: { bg1: '#001a33', bg2: '#003366', particle: '#00aaff', food: '#00ff88', enemy: '#ff4444' }, desc: '바다는 생명의 요람.', weak: '건조함은 치명적.', creatures: ['🦠','🫧','💧','🌀'] },
+    { id: 'hydrothermal', name: '열수구', icon: '🔥', range: [17,32], colors: { bg1: '#1a0a00', bg2: '#4d1a00', particle: '#ff6600', food: '#ffaa00', enemy: '#00ffff' }, desc: '극한 환경이 일상.', weak: '평온함이 불안.', creatures: ['🔴','🟠','💥','⚡'] },
+    { id: 'ice', name: '얼음 바다', icon: '🧊', range: [33,48], colors: { bg1: '#0a1a2e', bg2: '#1a3a5e', particle: '#88ddff', food: '#aaeeff', enemy: '#ff6666' }, desc: '효율의 달인.', weak: '뜨거움은 치명적.', creatures: ['❄️','🔵','💠','🫧'] },
+    { id: 'magma', name: '마그마 호수', icon: '🌋', range: [49,64], colors: { bg1: '#1a0000', bg2: '#4d0000', particle: '#ff3300', food: '#ffff00', enemy: '#00aaff' }, desc: '용암이 놀이터.', weak: '얼음이 무덤.', creatures: ['🔥','🟡','⭐','💛'] },
+    { id: 'atmosphere', name: '대기 부유', icon: '☁️', range: [65,80], colors: { bg1: '#1a1033', bg2: '#2d1a4d', particle: '#cc88ff', food: '#ffaaff', enemy: '#ff4444' }, desc: '하늘을 나는 자.', weak: '무거움이 적.', creatures: ['💜','🟣','✨','💫'] },
+    { id: 'toxic', name: '독성 늪', icon: '💀', range: [81,100], colors: { bg1: '#0a1a0a', bg2: '#1a3a1a', particle: '#88ff00', food: '#aaff44', enemy: '#ff00ff' }, desc: '독이 곧 약.', weak: '깨끗함이 불편.', creatures: ['🟢','💚','🧪','☢️'] }
 ];
 
 /* ========================================
-   Audio System
+   Audio System - 개선된 버전
 ======================================== */
 const Audio = (() => {
     let ctx = null;
-    const settings = { master: 0.7, sfx: 0.8, sfxOn: true };
+    const sounds = {};
+    const settings = { master: 0.7, sfx: 0.8, on: true };
     
     const init = () => {
         if (!ctx) ctx = new (window.AudioContext || window.webkitAudioContext)();
         if (ctx.state === 'suspended') ctx.resume();
     };
     
-    const vol = () => settings.sfxOn ? settings.sfx * settings.master : 0;
+    // MP3 파일 로드
+    const loadSound = async (name, url) => {
+        try {
+            const res = await fetch(url);
+            const buf = await res.arrayBuffer();
+            sounds[name] = await ctx.decodeAudioData(buf);
+        } catch(e) { console.warn(`Sound load failed: ${name}`, e); }
+    };
     
+    // 사운드 재생
+    const playSound = (name, vol = 1) => {
+        if (!settings.on || !ctx || !sounds[name]) return;
+        const src = ctx.createBufferSource();
+        const gain = ctx.createGain();
+        src.buffer = sounds[name];
+        src.connect(gain);
+        gain.connect(ctx.destination);
+        gain.gain.value = settings.master * settings.sfx * vol;
+        src.start(0);
+    };
+    
+    // 합성 사운드 (폴백용)
     const tone = (freq, dur, type = 'sine', v = 0.3) => {
-        if (!settings.sfxOn || !ctx) return;
+        if (!settings.on || !ctx) return;
         const osc = ctx.createOscillator();
         const gain = ctx.createGain();
         osc.connect(gain);
         gain.connect(ctx.destination);
         osc.type = type;
         osc.frequency.value = freq;
-        gain.gain.setValueAtTime(vol() * v, ctx.currentTime);
+        gain.gain.setValueAtTime(settings.master * settings.sfx * v, ctx.currentTime);
         gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + dur);
         osc.start();
         osc.stop(ctx.currentTime + dur);
     };
     
-    const playDiceRoll = () => { init(); for (let i = 0; i < 8; i++) setTimeout(() => tone(200 + Math.random() * 400, 0.05, 'square', 0.2), i * 50); };
-    const playDiceResult = (s) => { init(); if (s) { tone(400, 0.15); setTimeout(() => tone(600, 0.15), 100); setTimeout(() => tone(800, 0.2), 200); } else { tone(300, 0.3, 'sawtooth'); setTimeout(() => tone(150, 0.4, 'sawtooth'), 150); } };
-    const playEat = () => { init(); tone(600, 0.06); setTimeout(() => tone(800, 0.08), 40); };
-    const playEatBig = () => { init(); tone(400, 0.1); setTimeout(() => tone(600, 0.1), 60); setTimeout(() => tone(800, 0.15), 120); };
-    const playEvolve = () => { init(); [523, 659, 784, 1047].forEach((f, i) => setTimeout(() => tone(f, 0.3, 'sine', 0.4), i * 120)); };
-    const playClick = () => { init(); tone(500, 0.06, 'sine', 0.2); };
-    const playDeath = () => { init(); [400, 300, 200, 100].forEach((f, i) => setTimeout(() => tone(f, 0.3, 'sawtooth', 0.4), i * 150)); };
-    const playJump = () => { init(); tone(400, 0.1); setTimeout(() => tone(600, 0.08), 50); };
-    const playLand = () => { init(); tone(300, 0.15, 'square', 0.2); };
-    const playWin = () => { init(); [523, 659, 784, 1047, 1318].forEach((f, i) => setTimeout(() => tone(f, 0.4, 'sine', 0.5), i * 150)); };
+    // 효과음 함수들
+    const playEat = () => { 
+        if (sounds.eat) playSound('eat', 0.5);
+        else { tone(500, 0.08); setTimeout(() => tone(700, 0.1), 50); }
+    };
     
-    const load = () => { try { Object.assign(settings, JSON.parse(localStorage.getItem('bokluck_audio') || '{}')); } catch {} };
+    const playJump = () => { 
+        if (sounds.jump) playSound('jump', 0.4);
+        else { tone(400, 0.1); setTimeout(() => tone(550, 0.08), 50); }
+    };
+    
+    const playEatBig = () => { tone(400, 0.12); setTimeout(() => tone(600, 0.12), 70); setTimeout(() => tone(800, 0.15), 140); };
+    const playClick = () => { tone(500, 0.05, 'sine', 0.15); };
+    const playDice = () => { for (let i = 0; i < 8; i++) setTimeout(() => tone(200 + Math.random() * 400, 0.05, 'square', 0.15), i * 50); };
+    const playResult = () => { tone(400, 0.12); setTimeout(() => tone(600, 0.12), 100); setTimeout(() => tone(800, 0.15), 200); };
+    const playEvolve = () => { [523, 659, 784, 1047].forEach((f, i) => setTimeout(() => tone(f, 0.25, 'sine', 0.35), i * 100)); };
+    const playDeath = () => { [400, 300, 200, 100].forEach((f, i) => setTimeout(() => tone(f, 0.25, 'sawtooth', 0.3), i * 120)); };
+    const playWin = () => { [523, 659, 784, 1047, 1318].forEach((f, i) => setTimeout(() => tone(f, 0.35, 'sine', 0.4), i * 130)); };
+    const playDash = () => { tone(700, 0.08); tone(900, 0.06); };
+    const playLand = () => { tone(300, 0.1, 'square', 0.15); };
+    
+    // 초기 로드
+    const preload = async () => {
+        init();
+        await Promise.all([
+            loadSound('eat', 'eat.mp3'),
+            loadSound('jump', 'jump.mp3')
+        ]);
+    };
+    
+    const load = () => { try { Object.assign(settings, JSON.parse(localStorage.getItem('bokluck_audio') || '{}')); } catch{} };
     const save = () => { localStorage.setItem('bokluck_audio', JSON.stringify(settings)); };
     
     load();
-    return { init, settings, save, playDiceRoll, playDiceResult, playEat, playEatBig, playEvolve, playClick, playDeath, playJump, playLand, playWin };
+    return { init, preload, settings, save, playEat, playJump, playEatBig, playClick, playDice, playResult, playEvolve, playDeath, playWin, playDash, playLand };
 })();
 
 /* ========================================
@@ -910,45 +381,48 @@ const Save = (() => {
     const KEY = 'bokluck_save_';
     const MAX = 5;
     
-    const newGame = () => ({
-        version: 3,
-        created: Date.now(),
-        updated: Date.now(),
-        playTime: 0,
-        stage: 0, // 0: 튜토리얼전, 1: 세포, 2: 다세포(육지올라가기), 3: 육지도달
-        tutorialDone: false,
-        name: null,
-        score: 0,
-        dna: { origin: null, traits: [] },
-        design: null,
-        bodyParts: {
-            eye: 0, mouth: 0, arm: 0, leg: 0,
-            tail: 0, ear: 0, nose: 0, antenna: 0
-        },
-        stats: { size: INITIAL_SIZE, speed: 3, eaten: 0, deaths: 0, maxSize: INITIAL_SIZE, maxHeight: 0 },
-        history: []
+    const create = () => ({
+        v: 4, created: Date.now(), updated: Date.now(), playTime: 0,
+        stage: 0, tutDone: false, name: null, score: 0,
+        dna: { origin: null, traits: [] }, design: null,
+        parts: { eye: 0, mouth: 0, arm: 0, leg: 0, tail: 0, ear: 0, nose: 0, antenna: 0 },
+        stats: { size: CONFIG.INITIAL_SIZE, speed: 3, eaten: 0, deaths: 0, maxSize: CONFIG.INITIAL_SIZE, maxH: 0 }
     });
     
-    const get = (i) => { try { return JSON.parse(localStorage.getItem(KEY + i)); } catch { return null; } };
+    const get = i => { try { return JSON.parse(localStorage.getItem(KEY + i)); } catch { return null; } };
     const set = (i, d) => { d.updated = Date.now(); localStorage.setItem(KEY + i, JSON.stringify(d)); };
-    const del = (i) => { localStorage.removeItem(KEY + i); };
+    const del = i => localStorage.removeItem(KEY + i);
     const all = () => Array.from({ length: MAX }, (_, i) => get(i));
-    const formatDate = (ts) => ts ? new Date(ts).toLocaleDateString('ko-KR', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : '-';
+    const fmt = ts => ts ? new Date(ts).toLocaleDateString('ko-KR', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : '-';
     
-    return { MAX, newGame, get, set, del, all, formatDate };
+    return { MAX, create, get, set, del, all, fmt };
 })();
 
 /* ========================================
    Game State
 ======================================== */
-let State = { slot: null, data: null, sessionStart: 0 };
+let G = { slot: null, data: null, start: 0 };
+let canvas, ctx, gameLoop = null;
 
-const loadSlot = (i) => { State.slot = i; State.data = Save.get(i); State.sessionStart = Date.now(); };
-const saveGame = () => { if (State.slot !== null && State.data) { State.data.playTime += Date.now() - State.sessionStart; State.sessionStart = Date.now(); Save.set(State.slot, State.data); } };
-const newGame = (i) => { State.slot = i; State.data = Save.newGame(); State.sessionStart = Date.now(); Save.set(i, State.data); };
+const load = i => { G.slot = i; G.data = Save.get(i); G.start = Date.now(); };
+const saveGame = () => { if (G.slot !== null && G.data) { G.data.playTime += Date.now() - G.start; G.start = Date.now(); Save.set(G.slot, G.data); } };
+const newGame = i => { G.slot = i; G.data = Save.create(); G.start = Date.now(); Save.set(i, G.data); };
 
-const getEnvByRoll = (r) => Environments.find(e => r >= e.range[0] && r <= e.range[1]);
-const getEnvById = (id) => Environments.find(e => e.id === id);
+const envByRoll = r => ENVS.find(e => r >= e.range[0] && r <= e.range[1]);
+const envById = id => ENVS.find(e => e.id === id);
+
+const totalParts = () => G.data?.parts ? Object.values(G.data.parts).reduce((a, b) => a + b, 0) : 0;
+const hasPart = k => (G.data?.parts?.[k] || 0) > 0;
+const partCnt = k => G.data?.parts?.[k] || 0;
+const nextPartThreshold = () => (totalParts() + 1) * CONFIG.GROWTH_THRESHOLD;
+
+const addRandomPart = () => {
+    const avail = Object.keys(BODY_PARTS).filter(k => G.data.parts[k] < BODY_PARTS[k].max);
+    if (!avail.length) return null;
+    const k = avail[Math.floor(Math.random() * avail.length)];
+    G.data.parts[k]++;
+    return { key: k, ...BODY_PARTS[k], cnt: G.data.parts[k] };
+};
 
 /* ========================================
    UI Helpers
@@ -958,116 +432,90 @@ const app = document.getElementById('app');
 const createStars = () => {
     const c = document.getElementById('stars-bg');
     c.innerHTML = '';
-    for (let i = 0; i < 80; i++) {
+    for (let i = 0; i < 60; i++) {
         const s = document.createElement('div');
         s.className = 'star';
-        s.style.cssText = `left:${Math.random()*100}%;top:${Math.random()*100}%;width:${Math.random()*2+1}px;height:${s.style.width};--dur:${Math.random()*3+2}s;animation-delay:${Math.random()*3}s;`;
+        const size = Math.random() * 2 + 1;
+        s.style.cssText = `left:${Math.random()*100}%;top:${Math.random()*100}%;width:${size}px;height:${size}px;--dur:${Math.random()*3+2}s;animation-delay:${Math.random()*3}s;`;
         c.appendChild(s);
     }
 };
 
 const toast = (msg, type = 'info') => {
-    const c = document.getElementById('toast-container');
+    const c = document.getElementById('toasts');
     const t = document.createElement('div');
     t.className = `toast ${type}`;
-    const icons = { success: '✅', danger: '💀', warning: '⚠️', legendary: '⭐', info: 'ℹ️' };
+    const icons = { success: '✅', danger: '💀', info: 'ℹ️' };
     t.innerHTML = `<span>${icons[type] || 'ℹ️'}</span><span>${msg}</span>`;
     c.appendChild(t);
     setTimeout(() => t.remove(), 3000);
 };
 
-const showEvoAlert = (icon, title, desc, effect) => {
-    const el = document.getElementById('evo-alert');
-    document.getElementById('evo-alert-icon').textContent = icon;
-    document.getElementById('evo-alert-title').textContent = title;
-    document.getElementById('evo-alert-desc').textContent = desc;
-    document.getElementById('evo-alert-effect').textContent = effect;
+const showEvo = (icon, title, desc, fx) => {
+    const el = document.getElementById('evo-popup');
+    document.getElementById('evo-icon').textContent = icon;
+    document.getElementById('evo-title').textContent = title;
+    document.getElementById('evo-desc').textContent = desc;
+    document.getElementById('evo-fx').textContent = fx;
     el.classList.add('show');
     Audio.playEvolve();
-    setTimeout(() => el.classList.remove('show'), 2200);
+    setTimeout(() => el.classList.remove('show'), 2000);
 };
 
-/* ========================================
-   Body Parts System
-======================================== */
-const getTotalParts = () => {
-    if (!State.data?.bodyParts) return 0;
-    return Object.values(State.data.bodyParts).reduce((a, b) => a + b, 0);
-};
-
-const getNextPartThreshold = () => {
-    const total = getTotalParts();
-    return (total + 1) * GROWTH_THRESHOLD;
-};
-
-const addRandomPart = () => {
-    const parts = State.data.bodyParts;
-    const available = Object.keys(BODY_PARTS).filter(key => 
-        parts[key] < BODY_PARTS[key].maxCount
-    );
-    
-    if (available.length === 0) return null;
-    
-    const chosen = available[Math.floor(Math.random() * available.length)];
-    parts[chosen]++;
-    
-    return { key: chosen, ...BODY_PARTS[chosen], count: parts[chosen] };
-};
-
-const hasPart = (key) => State.data?.bodyParts?.[key] > 0;
-const getPartCount = (key) => State.data?.bodyParts?.[key] || 0;
+// 이벤트 리스너 정리용
+let cleanupFns = [];
+const addCleanup = fn => cleanupFns.push(fn);
+const cleanup = () => { cleanupFns.forEach(fn => fn()); cleanupFns = []; };
 
 /* ========================================
    Story System
 ======================================== */
-const StorySequences = {
+const STORIES = {
     intro: [
-        { icon: '🌌', title: '태초에...', text: '끝없이 펼쳐진 <span class="highlight">우주의 심연</span>...<br><br>그 어딘가에서, 아주 작은 <span class="golden">불꽃</span>이 피어오르려 한다.' },
-        { icon: '✨', title: '의식의 탄생', text: '당신은 아직 <span class="highlight">아무것도 아니다</span>.<br><br>형태도, 이름도 없다.<br>오직 <span class="golden">존재하고자 하는 의지</span>만이 깜빡인다.' },
-        { icon: '🎲', title: '운명의 주사위', text: '이 우주에서는 <span class="highlight">BOK(복)</span>과 <span class="danger">LUCK(운)</span>이<br>모든 것을 결정한다.<br><br>당신이 <span class="golden">어디서 태어날지</span>조차<br>운명의 주사위가 결정할 것이다.' },
-        { icon: '🌊', title: '여섯 개의 요람', text: '원시 해양, 열수구, 얼음 바다,<br>마그마 호수, 대기층, 독성 늪...<br><br>여섯 개의 <span class="highlight">생명의 요람</span> 중 하나가<br>당신의 <span class="golden">첫 번째 고향</span>이 될 것이다.' }
+        { icon: '🌌', title: '태초에...', text: '끝없이 펼쳐진 <span class="hl">우주의 심연</span>...<br>아주 작은 <span class="gold">불꽃</span>이 피어오르려 한다.' },
+        { icon: '✨', title: '의식의 탄생', text: '당신은 아직 <span class="hl">아무것도 아니다</span>.<br>오직 <span class="gold">존재하고자 하는 의지</span>만이 깜빡인다.' },
+        { icon: '🎲', title: '운명의 주사위', text: '<span class="hl">BOK(복)</span>과 <span class="danger">LUCK(운)</span>이 모든 것을 결정한다.<br>당신이 <span class="gold">어디서 태어날지</span>조차 운명이 결정한다.' }
     ],
-    afterBirth: (env) => [
-        { icon: env.icon, title: env.name, text: `당신은 <span class="highlight">${env.name}</span>에서 태어났다.<br><br><span class="golden">"${env.desc}"</span><br><span class="danger">⚠️ ${env.weak}</span>` },
-        { icon: '🦠', title: '첫 번째 생명', text: '아주 작고, 연약한 <span class="highlight">하나의 세포</span>.<br>그것이 지금의 당신이다.<br><br>살아남으려면 <span class="golden">먹어야 한다</span>.' },
-        { icon: '⚔️', title: '경쟁과 생존', text: '하지만 당신만 배고픈 게 아니다.<br><br><span class="danger">더 큰 존재</span>들이 당신을 노린다.<br><span class="highlight">작은 것</span>을 먹고 <span class="golden">커져야</span> 살아남는다.' },
-        { icon: '🧬', title: '진화의 시작', text: '충분히 먹으면 몸이 변한다.<br><br><span class="golden">눈</span>이 생기고, <span class="golden">팔다리</span>가 자라고,<br><span class="golden">꼬리</span>가 뻗어나갈 것이다.<br><br>어떤 형태로 진화할지는... <span class="highlight">운명</span>이 결정한다.' }
+    afterBirth: env => [
+        { icon: env.icon, title: env.name, text: `<span class="hl">${env.name}</span>에서 태어났다.<br><span class="gold">"${env.desc}"</span><br><span class="danger">⚠️ ${env.weak}</span>` },
+        { icon: '🦠', title: '첫 번째 생명', text: '아주 작은 <span class="hl">하나의 세포</span>.<br>살아남으려면 <span class="gold">먹어야 한다</span>.' },
+        { icon: '⚔️', title: '경쟁과 생존', text: '<span class="danger">더 큰 존재</span>들이 당신을 노린다.<br><span class="hl">작은 것</span>을 먹고 <span class="gold">커져야</span> 살아남는다.' }
     ],
-    multicellular: [
-        { icon: '🧬', title: '다세포 진화!', text: '수많은 시행착오 끝에...<br>당신은 마침내 <span class="highlight">단일 세포</span>의 한계를 넘어섰다.' },
-        { icon: '🏔️', title: '새로운 도전', text: '이제 당신 앞에는 <span class="golden">새로운 여정</span>이 펼쳐진다.<br><br>바다 깊은 곳에서 <span class="highlight">육지</span>까지...<br>끝없이 올라가야 한다.' },
-        { icon: '🦘', title: '점프와 발판', text: '<span class="highlight">발판</span>을 밟고 위로 올라가라.<br><br>떨어지면 다시 시작이다.<br><span class="golden">육지</span>에 도달하면 새로운 세계가 열린다!' }
+    multi: [
+        { icon: '🧬', title: '다세포 진화!', text: '마침내 <span class="hl">단일 세포</span>의 한계를 넘어섰다!' },
+        { icon: '🏔️', title: '새로운 도전', text: '바다 깊은 곳에서 <span class="gold">육지</span>까지 올라가야 한다.' },
+        { icon: '🦘', title: '점프!', text: '<span class="hl">발판</span>을 밟고 위로!<br>떨어지면 다시 시작. <span class="gold">육지</span>에 도달하면 승리!' }
     ]
 };
 
-const renderStory = (seqId, onComplete = null) => {
-    let seq = StorySequences[seqId];
-    if (typeof seq === 'function') seq = seq(getEnvById(State.data?.dna?.origin));
+const renderStory = (id, done = null) => {
+    let seq = STORIES[id];
+    if (typeof seq === 'function') seq = seq(envById(G.data?.dna?.origin));
     let idx = 0;
     
     const render = () => {
         const s = seq[idx];
-        const isLast = idx === seq.length - 1;
+        const last = idx === seq.length - 1;
         
         app.innerHTML = `
-            <div class="story-overlay">
-                <div class="story-content">
-                    <div class="story-icon">${s.icon}</div>
-                    <h2 class="story-title">${s.title}</h2>
-                    <div class="story-text">${s.text}</div>
-                    <div class="story-indicator">${seq.map((_, i) => `<div class="story-dot ${i < idx ? 'done' : ''} ${i === idx ? 'active' : ''}"></div>`).join('')}</div>
-                    <button class="btn btn-energy" id="btn-next">${isLast ? (seqId === 'multicellular' ? '🏔️ 육지로 이동하기' : '시작하기 →') : '다음 →'}</button>
+            <div class="page-center">
+                <div class="page-content">
+                    <div class="page-icon">${s.icon}</div>
+                    <h2 class="page-title">${s.title}</h2>
+                    <div class="page-text">${s.text}</div>
+                    <div class="dots">${seq.map((_, i) => `<div class="dot ${i < idx ? 'done' : ''} ${i === idx ? 'active' : ''}"></div>`).join('')}</div>
+                    <button class="btn btn-energy" id="btn-next">${last ? (id === 'multi' ? '🏔️ 육지로!' : '시작하기 →') : '다음 →'}</button>
                 </div>
             </div>
         `;
         
         document.getElementById('btn-next').onclick = () => {
             Audio.playClick();
-            if (isLast) {
-                if (onComplete) onComplete();
-                else if (seqId === 'intro') renderDiceRoll();
-                else if (seqId === 'afterBirth') { State.data.tutorialDone = true; saveGame(); startCellWorld(); }
-                else if (seqId === 'multicellular') { startClimbGame(); }
+            if (last) {
+                if (done) done();
+                else if (id === 'intro') renderDice();
+                else if (id === 'afterBirth') { G.data.tutDone = true; saveGame(); startCellWorld(); }
+                else if (id === 'multi') startClimb();
             } else { idx++; render(); }
         };
     };
@@ -1077,51 +525,51 @@ const renderStory = (seqId, onComplete = null) => {
 /* ========================================
    Dice Roll
 ======================================== */
-const renderDiceRoll = () => {
+const renderDice = () => {
     let rolling = false;
     
     app.innerHTML = `
-        <div class="dice-modal">
-            <div class="dice-container">
-                <h2 style="font-family:Orbitron;font-size:1.2rem;background:var(--gradient-energy);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:8px;">🎲 운명의 주사위</h2>
-                <p style="color:var(--text-secondary);margin-bottom:12px;font-size:0.9rem;">당신이 태어날 곳이 결정됩니다</p>
-                <div class="dice-visual" id="dice-visual">🎲</div>
-                <div id="dice-result"></div>
+        <div class="page-center">
+            <div class="page-content">
+                <h2 class="page-title">🎲 운명의 주사위</h2>
+                <p style="color:var(--text-secondary);margin-bottom:16px;">태어날 곳이 결정됩니다</p>
+                <div class="dice-box" id="dice">🎲</div>
+                <div id="result"></div>
                 <button class="btn btn-energy btn-block" id="btn-roll">운명을 받아들인다</button>
             </div>
         </div>
     `;
     
-    const dv = document.getElementById('dice-visual');
-    const dr = document.getElementById('dice-result');
+    const dice = document.getElementById('dice');
+    const result = document.getElementById('result');
     const btn = document.getElementById('btn-roll');
     
     btn.onclick = () => {
         if (rolling) return;
         rolling = true;
         btn.disabled = true;
-        btn.textContent = '운명을 결정하는 중...';
-        dv.classList.add('rolling');
-        Audio.playDiceRoll();
+        btn.textContent = '결정 중...';
+        dice.classList.add('rolling');
+        Audio.playDice();
         
-        const anim = setInterval(() => { dv.textContent = Math.floor(Math.random() * 100) + 1; }, 50);
+        const anim = setInterval(() => { dice.textContent = Math.floor(Math.random() * 100) + 1; }, 50);
         
         setTimeout(() => {
             clearInterval(anim);
-            dv.classList.remove('rolling');
+            dice.classList.remove('rolling');
             
             const roll = Math.floor(Math.random() * 100) + 1;
-            const env = getEnvByRoll(roll);
+            const env = envByRoll(roll);
             
-            dv.textContent = roll;
-            dv.style.cssText = 'font-size:3.5rem;font-family:Orbitron;font-weight:900;color:var(--neon-cyan);text-shadow:0 0 30px var(--neon-cyan);';
+            dice.textContent = roll;
+            dice.style.cssText = 'font-size:3rem;font-family:Orbitron;font-weight:900;color:var(--neon-cyan);text-shadow:0 0 25px var(--neon-cyan);';
             
-            Audio.playDiceResult(true);
+            Audio.playResult();
             
-            dr.innerHTML = `
-                <div style="text-align:center;margin:20px 0;">
-                    <div style="font-size:3.5rem;margin-bottom:8px;">${env.icon}</div>
-                    <div style="font-family:Orbitron;font-size:1.4rem;font-weight:700;margin-bottom:6px;">${env.name}</div>
+            result.innerHTML = `
+                <div style="text-align:center;margin:16px 0;">
+                    <div style="font-size:3rem;margin-bottom:6px;">${env.icon}</div>
+                    <div style="font-family:Orbitron;font-size:1.2rem;font-weight:700;margin-bottom:4px;">${env.name}</div>
                     <div style="color:var(--text-secondary);font-size:0.85rem;">${env.desc}</div>
                 </div>
             `;
@@ -1130,15 +578,13 @@ const renderDiceRoll = () => {
             btn.textContent = '이 운명을 받아들인다';
             btn.onclick = () => {
                 Audio.playClick();
-                State.data.dna.origin = env.id;
-                State.data.dna.traits.push(`${env.id.toUpperCase()}_NATIVE`);
-                State.data.stage = 1;
-                State.data.score = 0;
-                State.data.name = generateName(env.id);
-                State.data.design = generateDesign(env.id);
-                State.data.bodyParts = { eye: 0, mouth: 0, arm: 0, leg: 0, tail: 0, ear: 0, nose: 0, antenna: 0 };
-                State.data.stats = { size: INITIAL_SIZE, speed: 3, eaten: 0, deaths: State.data.stats?.deaths || 0, maxSize: INITIAL_SIZE, maxHeight: 0 };
-                State.data.history.push({ chapter: 1, title: '탄생', content: `${env.name}에서 생명이 깨어났다.`, time: Date.now() });
+                G.data.dna.origin = env.id;
+                G.data.stage = 1;
+                G.data.score = 0;
+                G.data.name = genName(env.id);
+                G.data.design = genDesign(env.id);
+                G.data.parts = { eye: 0, mouth: 0, arm: 0, leg: 0, tail: 0, ear: 0, nose: 0, antenna: 0 };
+                G.data.stats = { size: CONFIG.INITIAL_SIZE, speed: 3, eaten: 0, deaths: G.data.stats?.deaths || 0, maxSize: CONFIG.INITIAL_SIZE, maxH: 0 };
                 saveGame();
                 renderStory('afterBirth');
             };
@@ -1146,182 +592,107 @@ const renderDiceRoll = () => {
     };
 };
 
-const generateName = (envId) => {
-    const pre = { ocean: ['푸른', '깊은', '흐르는'], hydrothermal: ['뜨거운', '타오르는', '불꽃'], ice: ['차가운', '얼어붙은', '서리'], magma: ['작열하는', '용암', '붉은'], atmosphere: ['떠도는', '바람의', '하늘'], toxic: ['독의', '맹독', '산성'] };
-    const suf = ['의식', '세포', '존재', '영혼', '파동'];
-    const p = pre[envId] || pre.ocean;
+const genName = id => {
+    const pre = { ocean: ['푸른','깊은','흐르는'], hydrothermal: ['뜨거운','타오르는','불꽃'], ice: ['차가운','얼어붙은','서리'], magma: ['작열하는','용암','붉은'], atmosphere: ['떠도는','바람의','하늘'], toxic: ['독의','맹독','산성'] };
+    const suf = ['의식','세포','존재','영혼','파동'];
+    const p = pre[id] || pre.ocean;
     return p[Math.floor(Math.random() * p.length)] + ' ' + suf[Math.floor(Math.random() * suf.length)];
 };
 
-const generateDesign = (envId) => {
-    const cols = { ocean: ['#00b4d8', '#0077b6'], hydrothermal: ['#ff6b35', '#d62828'], ice: ['#a8dadc', '#457b9d'], magma: ['#ff4800', '#ff8500'], atmosphere: ['#e0aaff', '#9d4edd'], toxic: ['#70e000', '#38b000'] };
-    const c = cols[envId] || cols.ocean;
+const genDesign = id => {
+    const cols = { ocean: ['#00b4d8','#0077b6'], hydrothermal: ['#ff6b35','#d62828'], ice: ['#a8dadc','#457b9d'], magma: ['#ff4800','#ff8500'], atmosphere: ['#e0aaff','#9d4edd'], toxic: ['#70e000','#38b000'] };
+    const c = cols[id] || cols.ocean;
     return { primary: c[0], secondary: c[1], wobble: 0.5 + Math.random() * 0.5 };
 };
 
 /* ========================================
-   Cell World Game (Stage 1)
+   Cell World Game
 ======================================== */
-let canvas, ctx;
-let gameLoop = null;
-let player = null;
-let foods = [];
-let enemies = [];
-let particles = [];
-let joystickPos = { x: 0, y: 0 };
-let joystickActive = false;
-let keys = {};
-let lastEnemySpawn = 0;
-let dashCooldown = 0;
-let isDashing = false;
+let player, foods = [], enemies = [], particles = [];
+let joyPos = { x: 0, y: 0 }, joyActive = false, keys = {};
+let lastSpawn = 0, dashCD = 0, dashing = false;
 
 const startCellWorld = () => {
-    const env = getEnvById(State.data.dna.origin);
-    const parts = State.data.bodyParts;
+    cleanup();
+    const env = envById(G.data.dna.origin);
     
     app.innerHTML = `
         <canvas id="game-canvas"></canvas>
-        
-        <div class="game-hud-top">
-            <div class="hud-left-panel">
-                <div class="hud-name" id="hud-name">${State.data.name}</div>
-                <div class="hud-stat-row">
-                    <span class="hud-stat-icon">⚡</span>
-                    <span class="hud-stat-value" id="hud-score">${State.data.score}</span>
-                    <span class="hud-stat-label">점수</span>
-                </div>
-                <div class="hud-stat-row">
-                    <span class="hud-stat-icon">🍴</span>
-                    <span class="hud-stat-value" id="hud-eaten">${State.data.stats.eaten}</span>
-                    <span class="hud-stat-label">섭취</span>
-                </div>
-                <div class="size-indicator">
-                    <span style="font-size:0.65rem;">📏</span>
-                    <div class="size-bar">
-                        <div class="size-fill" id="size-fill" style="width:${(State.data.stats.size / MAX_SIZE) * 100}%"></div>
-                    </div>
-                    <span class="size-text" id="size-text">${Math.round(State.data.stats.size)}</span>
-                </div>
+        <div class="hud-top">
+            <div class="hud-panel" style="min-width:120px">
+                <div class="hud-name">${G.data.name}</div>
+                <div class="hud-row"><span>⚡</span><span class="hud-val" id="h-score">${G.data.score}</span><span class="hud-label">점수</span></div>
+                <div class="hud-row"><span>🍴</span><span class="hud-val" id="h-eaten">${G.data.stats.eaten}</span><span class="hud-label">섭취</span></div>
+                <div class="size-bar"><span style="font-size:0.6rem">📏</span><div class="size-track"><div class="size-fill" id="h-size" style="width:${(G.data.stats.size/CONFIG.MAX_SIZE)*100}%"></div></div><span class="size-num" id="h-sizeN">${Math.round(G.data.stats.size)}</span></div>
             </div>
-            
-            <div class="hud-right-panel">
-                <div class="hud-section-title">🧬 신체 파츠</div>
-                <div class="body-parts-grid" id="body-parts-grid"></div>
-                
-                <div class="progress-section">
-                    <div class="progress-label">
-                        <span class="progress-label-left">다음 파츠</span>
-                        <span class="progress-label-right" id="part-progress-text">0/${GROWTH_THRESHOLD}</span>
-                    </div>
-                    <div class="progress-bar-container">
-                        <div class="progress-bar-fill evo" id="part-progress" style="width:0%"></div>
-                    </div>
-                </div>
+            <div class="hud-panel" style="max-width:150px">
+                <div style="font-family:Orbitron;font-size:0.55rem;color:var(--text-muted);margin-bottom:4px;">🧬 신체 파츠</div>
+                <div class="parts-grid" id="h-parts"></div>
+                <div class="prog-section"><div class="prog-label"><span class="prog-left">다음 파츠</span><span class="prog-right" id="h-partP">0/${CONFIG.GROWTH_THRESHOLD}</span></div><div class="prog-track"><div class="prog-fill evo" id="h-partB" style="width:0%"></div></div></div>
             </div>
-            
-            <div class="hud-buttons">
-                <button class="hud-btn" id="btn-home" title="홈으로">🏠</button>
-                <button class="hud-btn" id="btn-pause" title="일시정지">⏸️</button>
+            <div class="hud-btns">
+                <button class="hud-btn" id="btn-home">🏠</button>
+                <button class="hud-btn" id="btn-pause">⏸️</button>
             </div>
         </div>
-        
-        <div class="game-hud-bottom">
-            <div class="stage-progress-bar">
-                <div class="stage-label">
-                    <span class="stage-current">🦠 세포 단계</span>
-                    <span class="stage-next">다세포까지: <span id="stage-progress-text">${State.data.score}/${STAGE_THRESHOLD}</span></span>
-                </div>
-                <div class="stage-bar">
-                    <div class="stage-fill" id="stage-progress" style="width:${(State.data.score / STAGE_THRESHOLD) * 100}%"></div>
-                </div>
-            </div>
-        </div>
-        
-        <div class="mobile-controls">
-            <div class="joystick-container" id="joystick">
-                <div class="joystick-base"></div>
-                <div class="joystick-knob" id="joystick-knob"></div>
-            </div>
-            <button class="action-btn" id="dash-btn" style="${hasPart('tail') ? '' : 'opacity:0.3;border-color:var(--text-muted);'}">💨</button>
+        <div class="hud-bottom"><div class="stage-bar"><div class="stage-row"><span class="stage-cur">🦠 세포</span><span class="stage-next">다세포: <span id="h-stageP">${G.data.score}/${CONFIG.STAGE_THRESHOLD}</span></span></div><div class="prog-track"><div class="prog-fill stage" id="h-stageB" style="width:${(G.data.score/CONFIG.STAGE_THRESHOLD)*100}%"></div></div></div></div>
+        <div class="controls">
+            <div class="joystick" id="joy"><div class="joy-base"></div><div class="joy-knob" id="joy-knob"></div></div>
+            <button class="action-btn ${hasPart('tail')?'':'disabled'}" id="btn-dash">💨</button>
         </div>
     `;
     
-    updateBodyPartsUI();
+    updatePartsUI();
     
     canvas = document.getElementById('game-canvas');
     ctx = canvas.getContext('2d');
-    resizeCanvas();
-    window.addEventListener('resize', resizeCanvas);
+    resize();
     
-    const legBonus = getPartCount('leg') * 0.4;
-    player = {
-        x: canvas.width / 2,
-        y: canvas.height / 2,
-        size: State.data.stats.size,
-        speed: State.data.stats.speed + legBonus,
-        vx: 0,
-        vy: 0
-    };
+    const onResize = () => resize();
+    window.addEventListener('resize', onResize);
+    addCleanup(() => window.removeEventListener('resize', onResize));
     
-    foods = [];
-    enemies = [];
-    particles = [];
-    spawnFoods(MAX_FOODS);
+    player = { x: canvas.width / 2, y: canvas.height / 2, size: G.data.stats.size, vx: 0, vy: 0 };
+    foods = []; enemies = []; particles = [];
+    spawnFoods(CONFIG.MAX_FOODS);
     
     setupCellControls();
-    setupCellHUDEvents();
+    setupCellHUD();
     
-    lastEnemySpawn = Date.now();
-    gameLoop = requestAnimationFrame(updateCellWorld);
+    lastSpawn = Date.now();
+    gameLoop = requestAnimationFrame(updateCell);
 };
 
-const updateBodyPartsUI = () => {
-    const grid = document.getElementById('body-parts-grid');
-    if (!grid) return;
-    
-    const parts = State.data.bodyParts;
+const updatePartsUI = () => {
+    const el = document.getElementById('h-parts');
+    if (!el) return;
     let html = '';
-    
-    Object.keys(BODY_PARTS).forEach(key => {
-        const part = BODY_PARTS[key];
-        const count = parts[key] || 0;
-        if (count > 0) {
-            html += `<div class="body-part active" title="${part.name}: ${part.effect}">
-                <span class="body-part-icon">${part.icon}</span>
-                <span class="body-part-count">×${count}</span>
-            </div>`;
-        }
+    Object.keys(BODY_PARTS).forEach(k => {
+        const cnt = G.data.parts[k] || 0;
+        if (cnt > 0) html += `<div class="part-badge on"><span>${BODY_PARTS[k].icon}</span><span class="part-cnt">×${cnt}</span></div>`;
     });
-    
-    if (html === '') {
-        html = '<div style="font-size:0.7rem;color:var(--text-muted);padding:4px;">파츠 없음</div>';
-    }
-    
-    grid.innerHTML = html;
+    el.innerHTML = html || '<span style="font-size:0.6rem;color:var(--text-muted)">없음</span>';
 };
 
-const resizeCanvas = () => { if (canvas) { canvas.width = window.innerWidth; canvas.height = window.innerHeight; } };
+const resize = () => { if (canvas) { canvas.width = window.innerWidth; canvas.height = window.innerHeight; } };
 
-const spawnFoods = (count) => {
-    const env = getEnvById(State.data.dna.origin);
-    for (let i = 0; i < count; i++) {
+const spawnFoods = n => {
+    const env = envById(G.data.dna.origin);
+    for (let i = 0; i < n; i++) {
         foods.push({
-            x: Math.random() * canvas.width,
-            y: Math.random() * canvas.height,
-            size: 4 + Math.random() * 8,
-            color: env.colors.food,
-            vx: (Math.random() - 0.5) * 0.3,
-            vy: (Math.random() - 0.5) * 0.3,
+            x: Math.random() * canvas.width, y: Math.random() * canvas.height,
+            size: 4 + Math.random() * 8, color: env.colors.food,
+            vx: (Math.random() - 0.5) * 0.3, vy: (Math.random() - 0.5) * 0.3,
             type: env.creatures[Math.floor(Math.random() * env.creatures.length)]
         });
     }
 };
 
 const spawnEnemy = () => {
-    const playerSize = player.size;
-    const isSmaller = Math.random() < 0.4;
-    let size = isSmaller ? playerSize * (0.3 + Math.random() * 0.5) : playerSize * (1.2 + Math.random() * 0.8);
-    size = Math.max(8, Math.min(size, 100));
+    const ps = player.size;
+    const smaller = Math.random() < 0.4;
+    let sz = smaller ? ps * (0.3 + Math.random() * 0.5) : ps * (1.2 + Math.random() * 0.8);
+    sz = Math.max(8, Math.min(sz, 100));
     
     let x, y;
     const side = Math.floor(Math.random() * 4);
@@ -1330,328 +701,229 @@ const spawnEnemy = () => {
     else if (side === 2) { x = Math.random() * canvas.width; y = -50; }
     else { x = Math.random() * canvas.width; y = canvas.height + 50; }
     
-    const enemyParts = {
-        eye: Math.floor(Math.random() * 4),
-        mouth: Math.floor(Math.random() * 3),
-        arm: Math.floor(Math.random() * 5),
-        leg: Math.floor(Math.random() * 5),
-        tail: Math.floor(Math.random() * 3),
-        antenna: Math.floor(Math.random() * 3)
-    };
-    
     enemies.push({
-        x, y, size,
-        speed: 1 + Math.random() * 1.5,
-        angle: Math.random() * Math.PI * 2,
-        wobble: Math.random(),
-        parts: enemyParts
+        x, y, size: sz, speed: 1 + Math.random() * 1.5, angle: Math.random() * Math.PI * 2, wobble: Math.random(),
+        parts: { eye: Math.floor(Math.random() * 4), arm: Math.floor(Math.random() * 4), leg: Math.floor(Math.random() * 4) }
     });
 };
 
 const setupCellControls = () => {
-    const joystick = document.getElementById('joystick');
-    const knob = document.getElementById('joystick-knob');
+    const joy = document.getElementById('joy');
+    const knob = document.getElementById('joy-knob');
     
-    const handleMove = (cx, cy) => {
-        const r = joystick.getBoundingClientRect();
-        const centerX = r.left + r.width / 2;
-        const centerY = r.top + r.height / 2;
-        const maxDist = r.width / 2 - 22;
-        
-        let dx = cx - centerX;
-        let dy = cy - centerY;
+    const move = (cx, cy) => {
+        const r = joy.getBoundingClientRect();
+        const cX = r.left + r.width / 2, cY = r.top + r.height / 2;
+        const maxD = r.width / 2 - 20;
+        let dx = cx - cX, dy = cy - cY;
         const dist = Math.sqrt(dx * dx + dy * dy);
-        
-        if (dist > maxDist) { dx = (dx / dist) * maxDist; dy = (dy / dist) * maxDist; }
-        
+        if (dist > maxD) { dx = dx / dist * maxD; dy = dy / dist * maxD; }
         knob.style.transform = `translate(${dx}px, ${dy}px)`;
-        joystickPos = { x: dx / maxDist, y: dy / maxDist };
+        joyPos = { x: dx / maxD, y: dy / maxD };
     };
     
-    const handleEnd = () => { joystickActive = false; knob.style.transform = ''; joystickPos = { x: 0, y: 0 }; };
+    const end = () => { joyActive = false; knob.style.transform = ''; joyPos = { x: 0, y: 0 }; };
     
-    joystick.addEventListener('touchstart', (e) => { e.preventDefault(); joystickActive = true; handleMove(e.touches[0].clientX, e.touches[0].clientY); }, { passive: false });
-    joystick.addEventListener('touchmove', (e) => { e.preventDefault(); if (joystickActive) handleMove(e.touches[0].clientX, e.touches[0].clientY); }, { passive: false });
-    joystick.addEventListener('touchend', handleEnd);
-    joystick.addEventListener('touchcancel', handleEnd);
+    const onTouchStart = e => { e.preventDefault(); joyActive = true; move(e.touches[0].clientX, e.touches[0].clientY); };
+    const onTouchMove = e => { e.preventDefault(); if (joyActive) move(e.touches[0].clientX, e.touches[0].clientY); };
+    const onMouseDown = e => { joyActive = true; move(e.clientX, e.clientY); };
+    const onMouseMove = e => { if (joyActive) move(e.clientX, e.clientY); };
+    const onKeyDown = e => { keys[e.key.toLowerCase()] = true; if (e.key === ' ') tryDash(); };
+    const onKeyUp = e => { keys[e.key.toLowerCase()] = false; };
     
-    joystick.addEventListener('mousedown', (e) => { joystickActive = true; handleMove(e.clientX, e.clientY); });
-    window.addEventListener('mousemove', (e) => { if (joystickActive) handleMove(e.clientX, e.clientY); });
-    window.addEventListener('mouseup', handleEnd);
+    joy.addEventListener('touchstart', onTouchStart, { passive: false });
+    joy.addEventListener('touchmove', onTouchMove, { passive: false });
+    joy.addEventListener('touchend', end);
+    joy.addEventListener('touchcancel', end);
+    joy.addEventListener('mousedown', onMouseDown);
+    window.addEventListener('mousemove', onMouseMove);
+    window.addEventListener('mouseup', end);
+    window.addEventListener('keydown', onKeyDown);
+    window.addEventListener('keyup', onKeyUp);
     
-    window.addEventListener('keydown', (e) => { keys[e.key.toLowerCase()] = true; if (e.key === ' ') tryDash(); });
-    window.addEventListener('keyup', (e) => { keys[e.key.toLowerCase()] = false; });
+    addCleanup(() => {
+        joy.removeEventListener('touchstart', onTouchStart);
+        joy.removeEventListener('touchmove', onTouchMove);
+        joy.removeEventListener('touchend', end);
+        joy.removeEventListener('touchcancel', end);
+        joy.removeEventListener('mousedown', onMouseDown);
+        window.removeEventListener('mousemove', onMouseMove);
+        window.removeEventListener('mouseup', end);
+        window.removeEventListener('keydown', onKeyDown);
+        window.removeEventListener('keyup', onKeyUp);
+    });
     
-    document.getElementById('dash-btn').addEventListener('touchstart', (e) => { e.preventDefault(); tryDash(); });
-    document.getElementById('dash-btn').addEventListener('click', tryDash);
+    document.getElementById('btn-dash').onclick = tryDash;
 };
 
 const tryDash = () => {
-    if (!hasPart('tail') || dashCooldown > 0 || isDashing) return;
+    if (!hasPart('tail') || dashCD > 0 || dashing) return;
+    dashing = true;
+    dashCD = 3000;
+    Audio.playDash();
     
-    isDashing = true;
-    dashCooldown = 3000;
-    Audio.playJump();
+    const spd = 15;
+    const dir = { x: joyPos.x || (keys.d ? 1 : keys.a ? -1 : 0), y: joyPos.y || (keys.s ? 1 : keys.w ? -1 : 0) };
+    const len = Math.sqrt(dir.x * dir.x + dir.y * dir.y) || 1;
+    player.vx = dir.x / len * spd;
+    player.vy = dir.y / len * spd;
     
-    const dashSpeed = 15;
-    const dashDir = { x: joystickPos.x || (keys.d ? 1 : keys.a ? -1 : 0), y: joystickPos.y || (keys.s ? 1 : keys.w ? -1 : 0) };
-    const len = Math.sqrt(dashDir.x * dashDir.x + dashDir.y * dashDir.y) || 1;
-    
-    player.vx = (dashDir.x / len) * dashSpeed;
-    player.vy = (dashDir.y / len) * dashSpeed;
-    
-    for (let i = 0; i < 10; i++) {
-        particles.push({
-            x: player.x, y: player.y,
-            vx: -player.vx * 0.3 + (Math.random() - 0.5) * 3,
-            vy: -player.vy * 0.3 + (Math.random() - 0.5) * 3,
-            size: 5, color: State.data.design.primary, life: 20
-        });
+    for (let i = 0; i < 8; i++) {
+        particles.push({ x: player.x, y: player.y, vx: -player.vx * 0.3 + (Math.random() - 0.5) * 3, vy: -player.vy * 0.3 + (Math.random() - 0.5) * 3, size: 4, color: G.data.design.primary, life: 18 });
     }
     
-    setTimeout(() => { isDashing = false; }, 200);
+    setTimeout(() => { dashing = false; }, 200);
 };
 
-const setupCellHUDEvents = () => {
+const setupCellHUD = () => {
     document.getElementById('btn-home').onclick = () => {
         Audio.playClick();
-        if (confirm('홈으로 돌아가시겠습니까?\n진행 상황이 저장됩니다.')) {
-            cancelAnimationFrame(gameLoop);
-            gameLoop = null;
-            saveGame();
-            renderSaveSelect();
-        }
+        if (confirm('홈으로 돌아가시겠습니까?')) { cancelAnimationFrame(gameLoop); gameLoop = null; saveGame(); renderSaves(); }
     };
     
     document.getElementById('btn-pause').onclick = () => {
         Audio.playClick();
-        if (gameLoop) {
-            cancelAnimationFrame(gameLoop);
-            gameLoop = null;
-            document.getElementById('btn-pause').textContent = '▶️';
-            toast('일시정지', 'info');
-        } else {
-            gameLoop = requestAnimationFrame(updateCellWorld);
-            document.getElementById('btn-pause').textContent = '⏸️';
-        }
+        const btn = document.getElementById('btn-pause');
+        if (gameLoop) { cancelAnimationFrame(gameLoop); gameLoop = null; btn.textContent = '▶️'; toast('일시정지', 'info'); }
+        else { gameLoop = requestAnimationFrame(updateCell); btn.textContent = '⏸️'; }
     };
 };
 
-const updateCellWorld = () => {
+const updateCell = () => {
     if (!canvas || !ctx) return;
+    const env = envById(G.data.dna.origin);
     
-    const env = getEnvById(State.data.dna.origin);
-    const parts = State.data.bodyParts;
+    if (dashCD > 0) dashCD -= 16;
+    const dashBtn = document.getElementById('btn-dash');
+    if (dashBtn) dashBtn.classList.toggle('cooldown', dashCD > 0);
     
-    if (dashCooldown > 0) dashCooldown -= 16;
+    let ix = joyPos.x, iy = joyPos.y;
+    if (keys.w || keys.arrowup) iy = -1;
+    if (keys.s || keys.arrowdown) iy = 1;
+    if (keys.a || keys.arrowleft) ix = -1;
+    if (keys.d || keys.arrowright) ix = 1;
     
-    let inputX = joystickPos.x;
-    let inputY = joystickPos.y;
-    if (keys.w || keys.arrowup) inputY = -1;
-    if (keys.s || keys.arrowdown) inputY = 1;
-    if (keys.a || keys.arrowleft) inputX = -1;
-    if (keys.d || keys.arrowright) inputX = 1;
+    const legBonus = partCnt('leg') * 0.4;
+    const spd = G.data.stats.speed + legBonus;
     
-    const legBonus = getPartCount('leg') * 0.4;
-    const baseSpeed = State.data.stats.speed + legBonus;
+    if (!dashing) { player.vx = ix * spd; player.vy = iy * spd; }
+    else { player.vx *= 0.95; player.vy *= 0.95; }
     
-    if (!isDashing) {
-        player.vx = inputX * baseSpeed;
-        player.vy = inputY * baseSpeed;
-    } else {
-        player.vx *= 0.95;
-        player.vy *= 0.95;
-    }
-    
-    player.x += player.vx;
-    player.y += player.vy;
+    player.x += player.vx; player.y += player.vy;
     player.x = Math.max(player.size, Math.min(canvas.width - player.size, player.x));
     player.y = Math.max(player.size, Math.min(canvas.height - player.size, player.y));
     
-    if (Date.now() - lastEnemySpawn > ENEMY_SPAWN_INTERVAL && enemies.length < MAX_ENEMIES) {
-        spawnEnemy();
-        lastEnemySpawn = Date.now();
-    }
+    if (Date.now() - lastSpawn > CONFIG.ENEMY_INTERVAL && enemies.length < CONFIG.MAX_ENEMIES) { spawnEnemy(); lastSpawn = Date.now(); }
     
-    const magnetRange = hasPart('arm') ? 80 + getPartCount('arm') * 20 : 0;
+    const magnet = hasPart('arm') ? 70 + partCnt('arm') * 18 : 0;
     
     for (let i = foods.length - 1; i >= 0; i--) {
-        const food = foods[i];
-        food.x += food.vx;
-        food.y += food.vy;
-        if (food.x < -30) food.x = canvas.width + 30;
-        if (food.x > canvas.width + 30) food.x = -30;
-        if (food.y < -30) food.y = canvas.height + 30;
-        if (food.y > canvas.height + 30) food.y = -30;
+        const f = foods[i];
+        f.x += f.vx; f.y += f.vy;
+        if (f.x < -30) f.x = canvas.width + 30;
+        if (f.x > canvas.width + 30) f.x = -30;
+        if (f.y < -30) f.y = canvas.height + 30;
+        if (f.y > canvas.height + 30) f.y = -30;
         
-        const dx = player.x - food.x;
-        const dy = player.y - food.y;
+        const dx = player.x - f.x, dy = player.y - f.y;
         const dist = Math.sqrt(dx * dx + dy * dy);
         
-        if (magnetRange > 0 && dist < magnetRange) {
-            food.x += dx * 0.04;
-            food.y += dy * 0.04;
-        }
+        if (magnet && dist < magnet) { f.x += dx * 0.03; f.y += dy * 0.03; }
         
-        if (dist < player.size + food.size * 0.4) {
+        if (dist < player.size + f.size * 0.4) {
             Audio.playEat();
+            for (let j = 0; j < 4; j++) particles.push({ x: f.x, y: f.y, vx: (Math.random() - 0.5) * 3, vy: (Math.random() - 0.5) * 3, size: 3, color: f.color, life: 20 });
             
-            for (let j = 0; j < 5; j++) {
-                particles.push({
-                    x: food.x, y: food.y,
-                    vx: (Math.random() - 0.5) * 4, vy: (Math.random() - 0.5) * 4,
-                    size: 3, color: food.color, life: 25
-                });
-            }
+            player.size = Math.min(CONFIG.MAX_SIZE, player.size + f.size * 0.12);
+            G.data.stats.size = player.size;
+            G.data.stats.maxSize = Math.max(G.data.stats.maxSize, player.size);
+            G.data.stats.eaten++;
             
-            const sizeGain = food.size * 0.15;
-            player.size = Math.min(MAX_SIZE, player.size + sizeGain);
-            State.data.stats.size = player.size;
-            State.data.stats.maxSize = Math.max(State.data.stats.maxSize, player.size);
-            State.data.stats.eaten++;
+            const bonus = 1 + partCnt('mouth') * 0.15;
+            G.data.score += Math.floor(f.size * 2 * bonus);
             
-            const mouthBonus = 1 + getPartCount('mouth') * 0.15;
-            const baseScore = Math.floor(food.size * 2 * mouthBonus);
-            State.data.score += baseScore;
-            
-            checkEvolution();
-            
+            checkEvo();
             foods.splice(i, 1);
-            setTimeout(() => { if (foods.length < MAX_FOODS) spawnFoods(1); }, 500);
+            setTimeout(() => { if (foods.length < CONFIG.MAX_FOODS) spawnFoods(1); }, 400);
         }
     }
     
     for (let i = enemies.length - 1; i >= 0; i--) {
-        const enemy = enemies[i];
-        const dx = player.x - enemy.x;
-        const dy = player.y - enemy.y;
+        const e = enemies[i];
+        const dx = player.x - e.x, dy = player.y - e.y;
         const dist = Math.sqrt(dx * dx + dy * dy);
+        const danger = e.size > player.size;
         
-        const isDangerous = enemy.size > player.size;
+        if (danger) { e.x += dx / dist * e.speed * 0.45; e.y += dy / dist * e.speed * 0.45; }
+        else { e.x -= dx / dist * e.speed * 0.25; e.y -= dy / dist * e.speed * 0.25; }
         
-        if (isDangerous) {
-            enemy.x += (dx / dist) * enemy.speed * 0.5;
-            enemy.y += (dy / dist) * enemy.speed * 0.5;
-        } else {
-            enemy.x -= (dx / dist) * enemy.speed * 0.3;
-            enemy.y -= (dy / dist) * enemy.speed * 0.3;
-        }
+        e.angle += (Math.random() - 0.5) * 0.08;
+        e.x += Math.cos(e.angle) * e.speed * 0.25;
+        e.y += Math.sin(e.angle) * e.speed * 0.25;
         
-        enemy.angle += (Math.random() - 0.5) * 0.1;
-        enemy.x += Math.cos(enemy.angle) * enemy.speed * 0.3;
-        enemy.y += Math.sin(enemy.angle) * enemy.speed * 0.3;
+        if (e.x < -200 || e.x > canvas.width + 200 || e.y < -200 || e.y > canvas.height + 200) { enemies.splice(i, 1); continue; }
         
-        if (enemy.x < -200 || enemy.x > canvas.width + 200 || enemy.y < -200 || enemy.y > canvas.height + 200) {
-            enemies.splice(i, 1);
-            continue;
-        }
-        
-        if (dist < player.size + enemy.size * 0.6) {
-            if (isDangerous) {
-                gameOverCell();
-                return;
-            } else {
+        if (dist < player.size + e.size * 0.55) {
+            if (danger) { gameOverCell(); return; }
+            else {
                 Audio.playEatBig();
+                for (let j = 0; j < 8; j++) particles.push({ x: e.x, y: e.y, vx: (Math.random() - 0.5) * 5, vy: (Math.random() - 0.5) * 5, size: 4, color: env.colors.food, life: 25 });
                 
-                for (let j = 0; j < 10; j++) {
-                    particles.push({
-                        x: enemy.x, y: enemy.y,
-                        vx: (Math.random() - 0.5) * 6, vy: (Math.random() - 0.5) * 6,
-                        size: 5, color: env.colors.food, life: 30
-                    });
-                }
+                player.size = Math.min(CONFIG.MAX_SIZE, player.size + e.size * 0.2);
+                G.data.stats.size = player.size;
+                G.data.stats.maxSize = Math.max(G.data.stats.maxSize, player.size);
+                G.data.stats.eaten++;
                 
-                const sizeGain = enemy.size * 0.25;
-                player.size = Math.min(MAX_SIZE, player.size + sizeGain);
-                State.data.stats.size = player.size;
-                State.data.stats.maxSize = Math.max(State.data.stats.maxSize, player.size);
-                State.data.stats.eaten++;
+                const bonus = 1 + partCnt('mouth') * 0.15;
+                const sc = Math.floor(e.size * 4 * bonus);
+                G.data.score += sc;
+                toast(`+${sc} 큰 먹이!`, 'success');
                 
-                const mouthBonus = 1 + getPartCount('mouth') * 0.15;
-                const baseScore = Math.floor(enemy.size * 5 * mouthBonus);
-                State.data.score += baseScore;
-                
-                toast(`+${baseScore} 큰 먹이!`, 'success');
-                checkEvolution();
-                
+                checkEvo();
                 enemies.splice(i, 1);
             }
         }
     }
     
-    particles = particles.filter(p => {
-        p.x += p.vx;
-        p.y += p.vy;
-        p.life--;
-        p.size *= 0.95;
-        return p.life > 0;
-    });
+    particles = particles.filter(p => { p.x += p.vx; p.y += p.vy; p.life--; p.size *= 0.94; return p.life > 0; });
     
-    renderCellWorld(env);
+    renderCell(env);
     updateCellHUD();
     
-    if (Date.now() - State.sessionStart > 15000) saveGame();
+    if (G.data.stage === 1 && G.data.score >= CONFIG.STAGE_THRESHOLD && totalParts() >= 5) { evolveMulti(); return; }
     
-    // 다세포 진화 체크 (stage가 1일 때만!)
-    if (State.data.stage === 1 && State.data.score >= STAGE_THRESHOLD && getTotalParts() >= 5) {
-        evolveToMulticellular();
-        return;
-    }
-    
-    gameLoop = requestAnimationFrame(updateCellWorld);
+    gameLoop = requestAnimationFrame(updateCell);
 };
 
-const checkEvolution = () => {
-    const eaten = State.data.stats.eaten;
-    const nextThreshold = getNextPartThreshold();
-    
-    if (eaten >= nextThreshold) {
-        const newPart = addRandomPart();
-        if (newPart) {
-            showEvoAlert(newPart.icon, `${newPart.name} 획득!`, `${newPart.name}이(가) ${newPart.count}개가 되었다!`, newPart.effect);
-            updateBodyPartsUI();
-            
-            if (newPart.key === 'tail') {
-                const dashBtn = document.getElementById('dash-btn');
-                if (dashBtn) {
-                    dashBtn.style.opacity = '1';
-                    dashBtn.style.borderColor = 'var(--neon-cyan)';
-                }
-            }
-            
-            State.data.history.push({ chapter: State.data.history.length + 1, title: `${newPart.name} 획득`, content: `${newPart.name}이(가) 생겼다.`, time: Date.now() });
+const checkEvo = () => {
+    if (G.data.stats.eaten >= nextPartThreshold()) {
+        const part = addRandomPart();
+        if (part) {
+            showEvo(part.icon, `${part.name} 획득!`, `${part.name} ×${part.cnt}`, part.fx);
+            updatePartsUI();
+            if (part.key === 'tail') document.getElementById('btn-dash')?.classList.remove('disabled');
             saveGame();
         }
     }
 };
 
 const updateCellHUD = () => {
-    const scoreEl = document.getElementById('hud-score');
-    const eatenEl = document.getElementById('hud-eaten');
-    if (scoreEl) scoreEl.textContent = State.data.score;
-    if (eatenEl) eatenEl.textContent = State.data.stats.eaten;
+    const $ = id => document.getElementById(id);
+    $('h-score').textContent = G.data.score;
+    $('h-eaten').textContent = G.data.stats.eaten;
+    $('h-size').style.width = `${(player.size / CONFIG.MAX_SIZE) * 100}%`;
+    $('h-sizeN').textContent = Math.round(player.size);
     
-    const sizeFill = document.getElementById('size-fill');
-    const sizeText = document.getElementById('size-text');
-    if (sizeFill) sizeFill.style.width = `${(player.size / MAX_SIZE) * 100}%`;
-    if (sizeText) sizeText.textContent = Math.round(player.size);
+    const base = totalParts() * CONFIG.GROWTH_THRESHOLD;
+    const prog = ((G.data.stats.eaten - base) / CONFIG.GROWTH_THRESHOLD) * 100;
+    $('h-partB').style.width = `${Math.min(100, Math.max(0, prog))}%`;
+    $('h-partP').textContent = `${Math.max(0, G.data.stats.eaten - base)}/${CONFIG.GROWTH_THRESHOLD}`;
     
-    const eaten = State.data.stats.eaten;
-    const currentBase = getTotalParts() * GROWTH_THRESHOLD;
-    const progress = ((eaten - currentBase) / GROWTH_THRESHOLD) * 100;
-    
-    const partProgress = document.getElementById('part-progress');
-    const partText = document.getElementById('part-progress-text');
-    if (partProgress) partProgress.style.width = `${Math.min(100, Math.max(0, progress))}%`;
-    if (partText) partText.textContent = `${Math.max(0, eaten - currentBase)}/${GROWTH_THRESHOLD}`;
-    
-    const stageProgress = document.getElementById('stage-progress');
-    const stageText = document.getElementById('stage-progress-text');
-    if (stageProgress) stageProgress.style.width = `${Math.min(100, (State.data.score / STAGE_THRESHOLD) * 100)}%`;
-    if (stageText) stageText.textContent = `${State.data.score}/${STAGE_THRESHOLD}`;
+    $('h-stageB').style.width = `${Math.min(100, (G.data.score / CONFIG.STAGE_THRESHOLD) * 100)}%`;
+    $('h-stageP').textContent = `${G.data.score}/${CONFIG.STAGE_THRESHOLD}`;
 };
 
-const renderCellWorld = (env) => {
+const renderCell = env => {
     const w = canvas.width, h = canvas.height;
     
     const bg = ctx.createLinearGradient(0, 0, 0, h);
@@ -1661,29 +933,26 @@ const renderCellWorld = (env) => {
     ctx.fillRect(0, 0, w, h);
     
     ctx.globalAlpha = 0.2;
-    for (let i = 0; i < 40; i++) {
-        const x = (Date.now() * 0.01 + i * 97) % (w + 80) - 40;
-        const y = (Date.now() * 0.005 + i * 43) % (h + 80) - 40;
+    const t = Date.now() * 0.01;
+    for (let i = 0; i < 30; i++) {
         ctx.fillStyle = env.colors.particle;
         ctx.beginPath();
-        ctx.arc(x, y, 2, 0, Math.PI * 2);
+        ctx.arc((t + i * 97) % (w + 60) - 30, (t * 0.5 + i * 43) % (h + 60) - 30, 2, 0, Math.PI * 2);
         ctx.fill();
     }
     ctx.globalAlpha = 1;
     
     foods.forEach(f => {
-        ctx.font = `${f.size * 1.8}px Arial`;
+        ctx.font = `${f.size * 1.6}px Arial`;
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
         ctx.fillText(f.type, f.x, f.y);
     });
     
-    enemies.forEach(e => {
-        drawCreature(ctx, e.x, e.y, e.size, e.parts, e.size > player.size, env, e.wobble);
-    });
+    enemies.forEach(e => drawCreature(e, e.size > player.size, env));
     
     particles.forEach(p => {
-        ctx.globalAlpha = p.life / 30;
+        ctx.globalAlpha = p.life / 25;
         ctx.fillStyle = p.color;
         ctx.beginPath();
         ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
@@ -1691,783 +960,661 @@ const renderCellWorld = (env) => {
     });
     ctx.globalAlpha = 1;
     
-    drawPlayerCell(player.x, player.y, player.size);
+    drawPlayer();
 };
 
-const drawCreature = (ctx, x, y, size, parts, isDangerous, env, wobbleOffset = 0) => {
-    const time = Date.now() * 0.003;
-    
+// 귀여운 세포 그리기
+const drawCreature = (e, danger, env) => {
+    const t = Date.now() * 0.003;
     ctx.save();
-    ctx.translate(x, y);
+    ctx.translate(e.x, e.y);
     
-    ctx.shadowColor = isDangerous ? '#ff0000' : '#00ff00';
-    ctx.shadowBlur = 12;
+    // 그림자
+    ctx.shadowColor = danger ? '#ff4444' : '#44ff88';
+    ctx.shadowBlur = 10;
     
+    // 몸체 - 부드러운 원형
     ctx.beginPath();
-    const points = 8;
-    for (let i = 0; i < points; i++) {
-        const angle = (i / points) * Math.PI * 2;
-        const wobble = Math.sin(time + i + wobbleOffset * 10) * 3;
-        const r = size + wobble;
-        const px = Math.cos(angle) * r;
-        const py = Math.sin(angle) * r;
-        i === 0 ? ctx.moveTo(px, py) : ctx.lineTo(px, py);
+    for (let i = 0; i < 8; i++) {
+        const ang = (i / 8) * Math.PI * 2;
+        const w = Math.sin(t + i + e.wobble * 10) * 2;
+        const r = e.size + w;
+        i === 0 ? ctx.moveTo(Math.cos(ang) * r, Math.sin(ang) * r) : ctx.lineTo(Math.cos(ang) * r, Math.sin(ang) * r);
     }
     ctx.closePath();
-    ctx.fillStyle = isDangerous ? env.colors.enemy : env.colors.food;
+    ctx.fillStyle = danger ? env.colors.enemy : env.colors.food;
     ctx.fill();
     ctx.shadowBlur = 0;
     
-    const eyeCount = parts.eye || 1;
-    for (let i = 0; i < Math.min(eyeCount, 3); i++) {
-        const eyeAngle = -0.3 + (i - (eyeCount - 1) / 2) * 0.4;
-        const eyeX = Math.cos(eyeAngle) * size * 0.5;
-        const eyeY = Math.sin(eyeAngle) * size * 0.5 - size * 0.2;
+    // 눈 (귀엽게!)
+    const eyeCnt = Math.min(e.parts.eye || 1, 3);
+    for (let i = 0; i < eyeCnt; i++) {
+        const eA = (i - (eyeCnt - 1) / 2) * 0.35;
+        const eX = Math.cos(eA) * e.size * 0.4;
+        const eY = -e.size * 0.25 + Math.sin(eA) * e.size * 0.2;
         
+        // 눈 흰자
         ctx.beginPath();
-        ctx.arc(eyeX, eyeY, size * 0.15, 0, Math.PI * 2);
+        ctx.arc(eX, eY, e.size * 0.18, 0, Math.PI * 2);
         ctx.fillStyle = 'white';
         ctx.fill();
+        
+        // 눈동자 (깜빡임)
+        const blink = Math.sin(t * 2 + e.wobble) > 0.9 ? 0.02 : 0.09;
         ctx.beginPath();
-        ctx.arc(eyeX + size * 0.03, eyeY, size * 0.07, 0, Math.PI * 2);
-        ctx.fillStyle = isDangerous ? '#ff0000' : '#000';
+        ctx.arc(eX + e.size * 0.02, eY, e.size * blink, 0, Math.PI * 2);
+        ctx.fillStyle = danger ? '#ff2222' : '#222';
         ctx.fill();
+        
+        // 하이라이트
+        ctx.beginPath();
+        ctx.arc(eX - e.size * 0.04, eY - e.size * 0.04, e.size * 0.04, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(255,255,255,0.8)';
+        ctx.fill();
+    }
+    
+    // 볼터치 (위험하지 않을 때)
+    if (!danger) {
+        ctx.globalAlpha = 0.3;
+        ctx.beginPath();
+        ctx.arc(-e.size * 0.4, e.size * 0.15, e.size * 0.12, 0, Math.PI * 2);
+        ctx.fillStyle = '#ff9999';
+        ctx.fill();
+        ctx.beginPath();
+        ctx.arc(e.size * 0.4, e.size * 0.15, e.size * 0.12, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.globalAlpha = 1;
     }
     
     ctx.restore();
 };
 
-const drawPlayerCell = (x, y, size) => {
-    const design = State.data.design;
-    const parts = State.data.bodyParts;
-    const time = Date.now() * 0.003;
+// 플레이어 세포 (더 귀엽게!)
+const drawPlayer = () => {
+    const d = G.data.design;
+    const p = G.data.parts;
+    const t = Date.now() * 0.003;
+    const s = player.size;
     
     ctx.save();
-    ctx.translate(x, y);
+    ctx.translate(player.x, player.y);
     
-    if (isDashing) {
+    // 대시 잔상
+    if (dashing) {
         for (let i = 1; i <= 3; i++) {
             ctx.save();
             ctx.translate(-player.vx * i * 2, -player.vy * i * 2);
-            ctx.globalAlpha = 0.3 / i;
-            drawPlayerCellBody(size, design, parts, time);
+            ctx.globalAlpha = 0.25 / i;
+            drawPlayerBody(s, d, p, t);
             ctx.restore();
         }
     }
     
     ctx.globalAlpha = 1;
-    drawPlayerCellBody(size, design, parts, time);
+    drawPlayerBody(s, d, p, t);
     ctx.restore();
 };
 
-const drawPlayerCellBody = (size, design, parts, time) => {
-    ctx.shadowColor = design.primary;
-    ctx.shadowBlur = 20;
+const drawPlayerBody = (s, d, p, t) => {
+    // 외곽 글로우
+    ctx.shadowColor = d.primary;
+    ctx.shadowBlur = 18;
     
+    // 부드러운 몸체
     ctx.beginPath();
-    const points = 10;
-    for (let i = 0; i < points; i++) {
-        const angle = (i / points) * Math.PI * 2;
-        const wobble = Math.sin(time + i) * 3 * design.wobble;
-        const r = size + wobble;
-        const px = Math.cos(angle) * r;
-        const py = Math.sin(angle) * r;
-        i === 0 ? ctx.moveTo(px, py) : ctx.lineTo(px, py);
+    for (let i = 0; i < 10; i++) {
+        const ang = (i / 10) * Math.PI * 2;
+        const w = Math.sin(t + i) * 2.5 * d.wobble;
+        const r = s + w;
+        i === 0 ? ctx.moveTo(Math.cos(ang) * r, Math.sin(ang) * r) : ctx.lineTo(Math.cos(ang) * r, Math.sin(ang) * r);
     }
     ctx.closePath();
     
-    const grad = ctx.createRadialGradient(-size * 0.3, -size * 0.3, 0, 0, 0, size);
-    grad.addColorStop(0, design.primary);
-    grad.addColorStop(1, design.secondary);
+    const grad = ctx.createRadialGradient(-s * 0.25, -s * 0.25, 0, 0, 0, s);
+    grad.addColorStop(0, d.primary);
+    grad.addColorStop(1, d.secondary);
     ctx.fillStyle = grad;
     ctx.fill();
     ctx.shadowBlur = 0;
     
+    // 하이라이트
     ctx.beginPath();
-    ctx.arc(-size * 0.25, -size * 0.25, size * 0.18, 0, Math.PI * 2);
-    ctx.fillStyle = 'rgba(255,255,255,0.3)';
+    ctx.arc(-s * 0.22, -s * 0.22, s * 0.15, 0, Math.PI * 2);
+    ctx.fillStyle = 'rgba(255,255,255,0.4)';
     ctx.fill();
     
-    const eyeCount = parts.eye || 0;
-    for (let i = 0; i < eyeCount; i++) {
-        const eyeAngle = -0.2 + (i - (eyeCount - 1) / 2) * 0.35;
-        const eyeX = Math.cos(eyeAngle) * size * 0.45;
-        const eyeY = Math.sin(eyeAngle) * size * 0.3 - size * 0.15;
+    // 눈 (귀엽게!)
+    const eyeCnt = p.eye || 0;
+    for (let i = 0; i < eyeCnt; i++) {
+        const eA = (i - (eyeCnt - 1) / 2) * 0.3;
+        const eX = eA * s * 0.7;
+        const eY = -s * 0.2;
         
+        // 눈 흰자
         ctx.beginPath();
-        ctx.arc(eyeX, eyeY, size * 0.18, 0, Math.PI * 2);
+        ctx.arc(eX, eY, s * 0.2, 0, Math.PI * 2);
         ctx.fillStyle = 'white';
         ctx.fill();
+        
+        // 눈동자
         ctx.beginPath();
-        ctx.arc(eyeX + size * 0.04, eyeY, size * 0.08, 0, Math.PI * 2);
-        ctx.fillStyle = '#111';
+        ctx.arc(eX + s * 0.03, eY, s * 0.1, 0, Math.PI * 2);
+        ctx.fillStyle = '#222';
+        ctx.fill();
+        
+        // 하이라이트
+        ctx.beginPath();
+        ctx.arc(eX - s * 0.04, eY - s * 0.05, s * 0.05, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(255,255,255,0.9)';
         ctx.fill();
     }
     
-    const armCount = parts.arm || 0;
-    if (armCount > 0) {
-        ctx.strokeStyle = design.primary;
-        ctx.lineWidth = Math.max(2, size * 0.08);
+    // 입 (귀엽게 웃는 입)
+    const mouthCnt = p.mouth || 0;
+    if (mouthCnt > 0) {
+        ctx.strokeStyle = d.secondary;
+        ctx.lineWidth = 2;
         ctx.lineCap = 'round';
-        for (let i = 0; i < armCount; i++) {
-            const baseAngle = (0.3 + i * 0.2) * (i % 2 === 0 ? 1 : -1) * Math.PI;
-            const wobble = Math.sin(time * 2 + i) * 0.2;
+        ctx.beginPath();
+        ctx.arc(0, s * 0.25, s * 0.15, 0.2, Math.PI - 0.2);
+        ctx.stroke();
+    }
+    
+    // 볼터치
+    ctx.globalAlpha = 0.35;
+    ctx.beginPath();
+    ctx.arc(-s * 0.35, s * 0.1, s * 0.1, 0, Math.PI * 2);
+    ctx.fillStyle = '#ffaaaa';
+    ctx.fill();
+    ctx.beginPath();
+    ctx.arc(s * 0.35, s * 0.1, s * 0.1, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.globalAlpha = 1;
+    
+    // 팔
+    const armCnt = p.arm || 0;
+    if (armCnt > 0) {
+        ctx.strokeStyle = d.primary;
+        ctx.lineWidth = Math.max(2, s * 0.07);
+        ctx.lineCap = 'round';
+        for (let i = 0; i < armCnt; i++) {
+            const ba = (0.25 + i * 0.2) * (i % 2 === 0 ? 1 : -1) * Math.PI;
+            const w = Math.sin(t * 2 + i) * 0.15;
             ctx.beginPath();
-            ctx.moveTo(Math.cos(baseAngle) * size, Math.sin(baseAngle) * size);
-            ctx.quadraticCurveTo(
-                Math.cos(baseAngle) * size * 1.5,
-                Math.sin(baseAngle + wobble) * size * 1.3,
-                Math.cos(baseAngle) * size * 1.8,
-                Math.sin(baseAngle + wobble * 2) * size
-            );
+            ctx.moveTo(Math.cos(ba) * s * 0.9, Math.sin(ba) * s * 0.9);
+            ctx.quadraticCurveTo(Math.cos(ba) * s * 1.4, Math.sin(ba + w) * s * 1.2, Math.cos(ba) * s * 1.6, Math.sin(ba + w * 2) * s * 0.9);
             ctx.stroke();
         }
     }
     
-    const legCount = parts.leg || 0;
-    if (legCount > 0) {
-        ctx.strokeStyle = design.secondary;
-        ctx.lineWidth = Math.max(2, size * 0.06);
-        for (let i = 0; i < legCount; i++) {
-            const baseAngle = Math.PI * 0.5 + (i - (legCount - 1) / 2) * 0.25;
-            const wobble = Math.sin(time * 3 + i) * 0.15;
+    // 다리
+    const legCnt = p.leg || 0;
+    if (legCnt > 0) {
+        ctx.strokeStyle = d.secondary;
+        ctx.lineWidth = Math.max(2, s * 0.05);
+        for (let i = 0; i < legCnt; i++) {
+            const ba = Math.PI * 0.5 + (i - (legCnt - 1) / 2) * 0.22;
+            const w = Math.sin(t * 3 + i) * 0.12;
             ctx.beginPath();
-            ctx.moveTo(Math.cos(baseAngle) * size * 0.8, Math.sin(baseAngle) * size * 0.8);
-            ctx.lineTo(Math.cos(baseAngle + wobble) * size * 1.5, Math.sin(baseAngle) * size * 1.4);
+            ctx.moveTo(Math.cos(ba) * s * 0.75, Math.sin(ba) * s * 0.75);
+            ctx.lineTo(Math.cos(ba + w) * s * 1.35, Math.sin(ba) * s * 1.25);
             ctx.stroke();
         }
     }
     
-    const tailCount = parts.tail || 0;
-    if (tailCount > 0) {
-        ctx.strokeStyle = design.primary;
-        ctx.lineWidth = Math.max(3, size * 0.1);
+    // 꼬리
+    const tailCnt = p.tail || 0;
+    if (tailCnt > 0) {
+        ctx.strokeStyle = d.primary;
+        ctx.lineWidth = Math.max(3, s * 0.08);
         ctx.lineCap = 'round';
-        for (let i = 0; i < tailCount; i++) {
-            const tailWobble = Math.sin(time * 2 + i) * size * 0.3;
-            const offsetY = (i - (tailCount - 1) / 2) * size * 0.15;
+        for (let i = 0; i < tailCnt; i++) {
+            const tw = Math.sin(t * 2 + i) * s * 0.25;
+            const oy = (i - (tailCnt - 1) / 2) * s * 0.12;
             ctx.beginPath();
-            ctx.moveTo(-size * 0.8, offsetY);
-            ctx.bezierCurveTo(-size * 1.3, tailWobble + offsetY, -size * 1.6, -tailWobble * 0.5 + offsetY, -size * 2, tailWobble * 0.3 + offsetY);
+            ctx.moveTo(-s * 0.75, oy);
+            ctx.bezierCurveTo(-s * 1.2, tw + oy, -s * 1.5, -tw * 0.4 + oy, -s * 1.8, tw * 0.3 + oy);
             ctx.stroke();
+        }
+    }
+    
+    // 더듬이
+    const antCnt = p.antenna || 0;
+    if (antCnt > 0) {
+        ctx.strokeStyle = d.primary;
+        ctx.lineWidth = 2;
+        for (let i = 0; i < antCnt; i++) {
+            const aa = -Math.PI * 0.35 + i * 0.25;
+            const w = Math.sin(t * 4 + i) * 0.1;
+            ctx.beginPath();
+            ctx.moveTo(Math.cos(aa) * s * 0.65, Math.sin(aa) * s * 0.65);
+            ctx.quadraticCurveTo(Math.cos(aa + w) * s * 1, Math.sin(aa) * s * 0.95, Math.cos(aa) * s * 1.3, Math.sin(aa + w) * s * 1.1);
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.arc(Math.cos(aa) * s * 1.3, Math.sin(aa + w) * s * 1.1, 3, 0, Math.PI * 2);
+            ctx.fillStyle = d.primary;
+            ctx.fill();
+        }
+    }
+    
+    // 귀
+    const earCnt = p.ear || 0;
+    if (earCnt > 0) {
+        for (let i = 0; i < earCnt; i++) {
+            const side = i % 2 === 0 ? 1 : -1;
+            ctx.beginPath();
+            ctx.ellipse(side * s * 0.7, -s * 0.45, s * 0.12, s * 0.2, side * 0.25, 0, Math.PI * 2);
+            ctx.fillStyle = d.primary;
+            ctx.fill();
         }
     }
 };
 
 const gameOverCell = () => {
-    cancelAnimationFrame(gameLoop);
-    gameLoop = null;
-    
+    cancelAnimationFrame(gameLoop); gameLoop = null;
     Audio.playDeath();
-    State.data.stats.deaths++;
+    G.data.stats.deaths++;
     saveGame();
     
     app.innerHTML = `
-        <div class="gameover-modal">
-            <div class="gameover-content">
-                <div class="gameover-icon">💀</div>
-                <h1 class="gameover-title">잡아먹혔다!</h1>
-                <p class="gameover-desc">더 큰 존재에게 포식당했습니다.<br>다시 운명의 주사위를 굴려야 합니다.</p>
-                
-                <div class="gameover-stats">
-                    <div class="gameover-stat">
-                        <span class="gameover-stat-label">최종 점수</span>
-                        <span class="gameover-stat-value">${State.data.score}</span>
-                    </div>
-                    <div class="gameover-stat">
-                        <span class="gameover-stat-label">획득 파츠</span>
-                        <span class="gameover-stat-value">${getTotalParts()}개</span>
-                    </div>
-                    <div class="gameover-stat">
-                        <span class="gameover-stat-label">사망 횟수</span>
-                        <span class="gameover-stat-value">${State.data.stats.deaths}</span>
-                    </div>
-                </div>
-                
-                <div style="display:flex;flex-direction:column;gap:12px;">
-                    <button class="btn btn-energy btn-block" id="btn-retry">🎲 다시 시작</button>
-                    <button class="btn btn-outline btn-block" id="btn-home">🏠 홈으로</button>
-                </div>
+        <div class="modal"><div class="modal-box">
+            <div class="modal-icon">💀</div>
+            <h1 class="modal-title fail">잡아먹혔다!</h1>
+            <p class="modal-desc">더 큰 존재에게 포식당했습니다.</p>
+            <div class="modal-stats">
+                <div class="stat-row"><span class="stat-label">최종 점수</span><span class="stat-val">${G.data.score}</span></div>
+                <div class="stat-row"><span class="stat-label">획득 파츠</span><span class="stat-val">${totalParts()}개</span></div>
+                <div class="stat-row"><span class="stat-label">사망 횟수</span><span class="stat-val">${G.data.stats.deaths}</span></div>
             </div>
-        </div>
+            <div style="display:flex;flex-direction:column;gap:10px;">
+                <button class="btn btn-energy btn-block" id="btn-retry">🎲 다시 시작</button>
+                <button class="btn btn-outline btn-block" id="btn-home">🏠 홈으로</button>
+            </div>
+        </div></div>
     `;
     
     document.getElementById('btn-retry').onclick = () => {
         Audio.playClick();
-        State.data.stage = 0;
-        State.data.tutorialDone = false;
-        State.data.score = 0;
-        State.data.dna = { origin: null, traits: [] };
-        State.data.design = null;
-        State.data.bodyParts = { eye: 0, mouth: 0, arm: 0, leg: 0, tail: 0, ear: 0, nose: 0, antenna: 0 };
-        State.data.stats = { size: INITIAL_SIZE, speed: 3, eaten: 0, deaths: State.data.stats.deaths, maxSize: INITIAL_SIZE, maxHeight: 0 };
+        G.data.stage = 0; G.data.tutDone = false; G.data.score = 0;
+        G.data.dna = { origin: null, traits: [] }; G.data.design = null;
+        G.data.parts = { eye: 0, mouth: 0, arm: 0, leg: 0, tail: 0, ear: 0, nose: 0, antenna: 0 };
+        G.data.stats = { size: CONFIG.INITIAL_SIZE, speed: 3, eaten: 0, deaths: G.data.stats.deaths, maxSize: CONFIG.INITIAL_SIZE, maxH: 0 };
         saveGame();
-        renderDiceRoll();
+        renderDice();
     };
     
-    document.getElementById('btn-home').onclick = () => {
-        Audio.playClick();
-        renderSaveSelect();
-    };
+    document.getElementById('btn-home').onclick = () => { Audio.playClick(); renderSaves(); };
 };
 
-const evolveToMulticellular = () => {
-    cancelAnimationFrame(gameLoop);
-    gameLoop = null;
-    
-    // stage를 2로 변경하여 다시 트리거되지 않도록 함
-    State.data.stage = 2;
-    State.data.history.push({ chapter: State.data.history.length + 1, title: '다세포 진화', content: '단일 세포의 한계를 넘어섰다.', time: Date.now() });
+const evolveMulti = () => {
+    cancelAnimationFrame(gameLoop); gameLoop = null;
+    G.data.stage = 2;
     saveGame();
-    
     Audio.playEvolve();
-    
-    // 스토리 시퀀스 재생 후 미니게임으로 이동
-    renderStory('multicellular');
+    renderStory('multi');
 };
 
 /* ========================================
-   Climb Game (Stage 2) - 육지 올라가기
+   Climb Game - 자동점프 제거 버전
 ======================================== */
-let climbPlayer = null;
-let platforms = [];
-let climbParticles = [];
-let cameraY = 0;
-let currentHeight = 0;
-let isJumping = false;
-let canDoubleJump = false;
+let climber, platforms = [], climbParts = [], camY = 0, curH = 0, canDblJump = false;
 
-const startClimbGame = () => {
-    const env = getEnvById(State.data.dna.origin);
+const startClimb = () => {
+    cleanup();
+    const env = envById(G.data.dna.origin);
     
     app.innerHTML = `
         <canvas id="game-canvas"></canvas>
-        
         <div class="climb-hud">
-            <div class="climb-info">
-                <div class="climb-height" id="climb-height">0m</div>
-                <div class="climb-height-label">현재 높이</div>
-            </div>
-            
-            <div class="hud-buttons">
+            <div class="climb-info"><div class="climb-height" id="c-height">0m</div><div class="climb-label">현재 높이</div></div>
+            <div class="hud-btns">
+                <button class="hud-btn" id="btn-restart">🔄</button>
                 <button class="hud-btn" id="btn-home">🏠</button>
                 <button class="hud-btn" id="btn-pause">⏸️</button>
             </div>
-            
-            <div class="climb-goal">
-                <div class="climb-goal-text">🏔️ 육지까지</div>
-                <div class="climb-goal-value" id="climb-goal">${LAND_HEIGHT}m</div>
-            </div>
+            <div class="climb-goal"><div class="climb-goal-text">🏔️ 육지</div><div class="climb-goal-val">${CONFIG.LAND_HEIGHT}m</div></div>
         </div>
-        
-        <div class="mobile-controls">
-            <div class="joystick-container" id="joystick">
-                <div class="joystick-base"></div>
-                <div class="joystick-knob" id="joystick-knob"></div>
-            </div>
-            <button class="action-btn" id="jump-btn">🦘</button>
+        <div class="controls">
+            <div class="joystick" id="joy"><div class="joy-base"></div><div class="joy-knob" id="joy-knob"></div></div>
+            <button class="action-btn" id="btn-jump">🦘</button>
         </div>
     `;
     
     canvas = document.getElementById('game-canvas');
     ctx = canvas.getContext('2d');
-    resizeCanvas();
-    window.addEventListener('resize', resizeCanvas);
+    resize();
     
-    // 플레이어 초기화
-    climbPlayer = {
-        x: canvas.width / 2,
-        y: canvas.height - 100,
-        width: 30 + getTotalParts() * 2,
-        height: 30 + getTotalParts() * 2,
-        vx: 0,
-        vy: 0,
-        onGround: true
-    };
+    window.addEventListener('resize', resize);
+    addCleanup(() => window.removeEventListener('resize', resize));
     
-    // 발판 생성
+    const pSize = 28 + totalParts() * 2;
+    climber = { x: canvas.width / 2, y: canvas.height - 80, w: pSize, h: pSize, vx: 0, vy: 0, onGround: true };
+    
     platforms = [];
-    generatePlatforms(0, canvas.height * 3);
+    genPlats(canvas.height - 50, -CONFIG.LAND_HEIGHT * 12);
+    platforms.push({ x: canvas.width / 2 - 70, y: canvas.height - 40, w: 140, h: 18, type: 'normal' });
     
-    // 시작 발판
-    platforms.push({
-        x: canvas.width / 2 - 60,
-        y: canvas.height - 50,
-        width: 120,
-        height: 15,
-        type: 'normal'
-    });
-    
-    cameraY = 0;
-    currentHeight = 0;
-    climbParticles = [];
+    camY = 0; curH = 0; climbParts = [];
     
     setupClimbControls();
-    setupClimbHUDEvents();
+    setupClimbHUD();
     
-    gameLoop = requestAnimationFrame(updateClimbGame);
+    gameLoop = requestAnimationFrame(updateClimb);
 };
 
-const generatePlatforms = (fromY, toY) => {
-    let y = fromY - 80;
-    
+const genPlats = (fromY, toY) => {
+    let y = fromY - 45;
     while (y > toY) {
-        const numPlatforms = 1 + Math.floor(Math.random() * 2);
-        
-        for (let i = 0; i < numPlatforms; i++) {
-            const width = 60 + Math.random() * 60;
-            const x = Math.random() * (canvas.width - width);
-            
-            // 발판 타입 (높이에 따라 다양해짐)
+        const num = 1 + Math.floor(Math.random() * 2);
+        for (let i = 0; i < num; i++) {
+            const w = 65 + Math.random() * 50;
+            const x = Math.random() * (canvas.width - w);
             let type = 'normal';
-            const heightRatio = Math.abs(y) / LAND_HEIGHT;
-            if (heightRatio > 0.3 && Math.random() < 0.2) type = 'moving';
-            if (heightRatio > 0.5 && Math.random() < 0.15) type = 'breaking';
-            if (heightRatio > 0.7 && Math.random() < 0.1) type = 'bouncy';
+            const hr = Math.abs(y) / (CONFIG.LAND_HEIGHT * 10);
+            if (hr > 0.3 && Math.random() < 0.12) type = 'moving';
+            if (hr > 0.5 && Math.random() < 0.08) type = 'breaking';
+            if (hr > 0.6 && Math.random() < 0.12) type = 'bouncy';
             
-            platforms.push({
-                x, y, width,
-                height: 12,
-                type,
-                moveDir: Math.random() < 0.5 ? 1 : -1,
-                moveSpeed: 1 + Math.random() * 2,
-                broken: false,
-                breakTimer: 0
-            });
+            platforms.push({ x, y, w, h: 14, type, dir: Math.random() < 0.5 ? 1 : -1, spd: 1 + Math.random() * 1.2, broken: false, timer: 0 });
         }
-        
-        y -= 60 + Math.random() * 40;
+        y -= 38 + Math.random() * 22;
     }
-    
-    // 육지 (골인 지점)
-    if (toY <= -LAND_HEIGHT * 10) {
-        platforms.push({
-            x: 0,
-            y: -LAND_HEIGHT * 10 - 50,
-            width: canvas.width,
-            height: 100,
-            type: 'land'
-        });
+    if (toY <= -CONFIG.LAND_HEIGHT * 10) {
+        platforms.push({ x: 0, y: -CONFIG.LAND_HEIGHT * 10 - 40, w: canvas.width, h: 100, type: 'land' });
     }
 };
 
 const setupClimbControls = () => {
-    const joystick = document.getElementById('joystick');
-    const knob = document.getElementById('joystick-knob');
+    const joy = document.getElementById('joy');
+    const knob = document.getElementById('joy-knob');
     
-    const handleMove = (cx, cy) => {
-        const r = joystick.getBoundingClientRect();
-        const centerX = r.left + r.width / 2;
-        const centerY = r.top + r.height / 2;
-        const maxDist = r.width / 2 - 22;
-        
-        let dx = cx - centerX;
-        let dy = cy - centerY;
+    const move = (cx, cy) => {
+        const r = joy.getBoundingClientRect();
+        const cX = r.left + r.width / 2, cY = r.top + r.height / 2;
+        const maxD = r.width / 2 - 20;
+        let dx = cx - cX, dy = cy - cY;
         const dist = Math.sqrt(dx * dx + dy * dy);
-        
-        if (dist > maxDist) { dx = (dx / dist) * maxDist; dy = (dy / dist) * maxDist; }
-        
+        if (dist > maxD) { dx = dx / dist * maxD; dy = dy / dist * maxD; }
         knob.style.transform = `translate(${dx}px, ${dy}px)`;
-        joystickPos = { x: dx / maxDist, y: dy / maxDist };
+        joyPos = { x: dx / maxD, y: dy / maxD };
     };
-    
-    const handleEnd = () => { joystickActive = false; knob.style.transform = ''; joystickPos = { x: 0, y: 0 }; };
-    
-    joystick.addEventListener('touchstart', (e) => { e.preventDefault(); joystickActive = true; handleMove(e.touches[0].clientX, e.touches[0].clientY); }, { passive: false });
-    joystick.addEventListener('touchmove', (e) => { e.preventDefault(); if (joystickActive) handleMove(e.touches[0].clientX, e.touches[0].clientY); }, { passive: false });
-    joystick.addEventListener('touchend', handleEnd);
-    joystick.addEventListener('touchcancel', handleEnd);
-    
-    joystick.addEventListener('mousedown', (e) => { joystickActive = true; handleMove(e.clientX, e.clientY); });
-    window.addEventListener('mousemove', (e) => { if (joystickActive) handleMove(e.clientX, e.clientY); });
-    window.addEventListener('mouseup', handleEnd);
+    const end = () => { joyActive = false; knob.style.transform = ''; joyPos = { x: 0, y: 0 }; };
     
     const jump = () => {
-        if (climbPlayer.onGround) {
-            climbPlayer.vy = -15;
-            climbPlayer.onGround = false;
-            canDoubleJump = hasPart('leg') && getPartCount('leg') >= 2;
+        if (climber.onGround) {
+            climber.vy = -16;
+            climber.onGround = false;
+            canDblJump = hasPart('leg') && partCnt('leg') >= 2;
             Audio.playJump();
-        } else if (canDoubleJump) {
-            climbPlayer.vy = -12;
-            canDoubleJump = false;
+        } else if (canDblJump) {
+            climber.vy = -13;
+            canDblJump = false;
             Audio.playJump();
-            
-            // 더블점프 파티클
-            for (let i = 0; i < 5; i++) {
-                climbParticles.push({
-                    x: climbPlayer.x + climbPlayer.width / 2,
-                    y: climbPlayer.y + climbPlayer.height,
-                    vx: (Math.random() - 0.5) * 4,
-                    vy: 2 + Math.random() * 2,
-                    size: 4,
-                    color: State.data.design.primary,
-                    life: 20
-                });
-            }
+            for (let i = 0; i < 4; i++) climbParts.push({ x: climber.x + climber.w / 2, y: climber.y + climber.h, vx: (Math.random() - 0.5) * 3, vy: 2 + Math.random(), size: 3, color: G.data.design.primary, life: 16 });
         }
     };
     
-    window.addEventListener('keydown', (e) => {
-        keys[e.key.toLowerCase()] = true;
-        if (e.key === ' ' || e.key === 'ArrowUp' || e.key === 'w') jump();
-    });
-    window.addEventListener('keyup', (e) => { keys[e.key.toLowerCase()] = false; });
+    const onTouchStart = e => { e.preventDefault(); joyActive = true; move(e.touches[0].clientX, e.touches[0].clientY); };
+    const onTouchMove = e => { e.preventDefault(); if (joyActive) move(e.touches[0].clientX, e.touches[0].clientY); };
+    const onMouseDown = e => { joyActive = true; move(e.clientX, e.clientY); };
+    const onMouseMove = e => { if (joyActive) move(e.clientX, e.clientY); };
+    const onKeyDown = e => { keys[e.key.toLowerCase()] = true; if (e.key === ' ' || e.key === 'ArrowUp' || e.key.toLowerCase() === 'w') jump(); };
+    const onKeyUp = e => { keys[e.key.toLowerCase()] = false; };
     
-    document.getElementById('jump-btn').addEventListener('touchstart', (e) => { e.preventDefault(); jump(); });
-    document.getElementById('jump-btn').addEventListener('click', jump);
+    joy.addEventListener('touchstart', onTouchStart, { passive: false });
+    joy.addEventListener('touchmove', onTouchMove, { passive: false });
+    joy.addEventListener('touchend', end);
+    joy.addEventListener('touchcancel', end);
+    joy.addEventListener('mousedown', onMouseDown);
+    window.addEventListener('mousemove', onMouseMove);
+    window.addEventListener('mouseup', end);
+    window.addEventListener('keydown', onKeyDown);
+    window.addEventListener('keyup', onKeyUp);
+    
+    document.getElementById('btn-jump').onclick = jump;
+    document.getElementById('btn-jump').ontouchstart = e => { e.preventDefault(); jump(); };
+    
+    addCleanup(() => {
+        joy.removeEventListener('touchstart', onTouchStart);
+        joy.removeEventListener('touchmove', onTouchMove);
+        joy.removeEventListener('touchend', end);
+        joy.removeEventListener('touchcancel', end);
+        joy.removeEventListener('mousedown', onMouseDown);
+        window.removeEventListener('mousemove', onMouseMove);
+        window.removeEventListener('mouseup', end);
+        window.removeEventListener('keydown', onKeyDown);
+        window.removeEventListener('keyup', onKeyUp);
+    });
 };
 
-const setupClimbHUDEvents = () => {
-    document.getElementById('btn-home').onclick = () => {
-        Audio.playClick();
-        if (confirm('홈으로 돌아가시겠습니까?')) {
-            cancelAnimationFrame(gameLoop);
-            gameLoop = null;
-            saveGame();
-            renderSaveSelect();
-        }
-    };
-    
+const setupClimbHUD = () => {
+    document.getElementById('btn-restart').onclick = () => { Audio.playClick(); if (confirm('처음부터?')) { cancelAnimationFrame(gameLoop); gameLoop = null; startClimb(); } };
+    document.getElementById('btn-home').onclick = () => { Audio.playClick(); if (confirm('홈으로?')) { cancelAnimationFrame(gameLoop); gameLoop = null; saveGame(); renderSaves(); } };
     document.getElementById('btn-pause').onclick = () => {
         Audio.playClick();
-        if (gameLoop) {
-            cancelAnimationFrame(gameLoop);
-            gameLoop = null;
-            document.getElementById('btn-pause').textContent = '▶️';
-            toast('일시정지', 'info');
-        } else {
-            gameLoop = requestAnimationFrame(updateClimbGame);
-            document.getElementById('btn-pause').textContent = '⏸️';
-        }
+        const btn = document.getElementById('btn-pause');
+        if (gameLoop) { cancelAnimationFrame(gameLoop); gameLoop = null; btn.textContent = '▶️'; toast('일시정지', 'info'); }
+        else { gameLoop = requestAnimationFrame(updateClimb); btn.textContent = '⏸️'; }
     };
 };
 
-const updateClimbGame = () => {
+const updateClimb = () => {
     if (!canvas || !ctx) return;
+    const env = envById(G.data.dna.origin);
     
-    const env = getEnvById(State.data.dna.origin);
+    let mx = joyPos.x;
+    if (keys.a || keys.arrowleft) mx = -1;
+    if (keys.d || keys.arrowright) mx = 1;
     
-    // 좌우 이동
-    let moveX = joystickPos.x;
-    if (keys.a || keys.arrowleft) moveX = -1;
-    if (keys.d || keys.arrowright) moveX = 1;
+    const spd = 5 + partCnt('leg') * 0.4;
+    climber.vx = mx * spd;
+    climber.vy += 0.55;
+    if (climber.vy > 14) climber.vy = 14;
     
-    const moveSpeed = 5 + getPartCount('leg') * 0.5;
-    climbPlayer.vx = moveX * moveSpeed;
+    climber.x += climber.vx;
+    climber.y += climber.vy;
+    if (climber.x < 0) climber.x = 0;
+    if (climber.x + climber.w > canvas.width) climber.x = canvas.width - climber.w;
     
-    // 중력
-    climbPlayer.vy += 0.6;
-    if (climbPlayer.vy > 15) climbPlayer.vy = 15;
+    climber.onGround = false;
     
-    // 위치 업데이트
-    climbPlayer.x += climbPlayer.vx;
-    climbPlayer.y += climbPlayer.vy;
-    
-    // 화면 경계
-    if (climbPlayer.x < 0) climbPlayer.x = 0;
-    if (climbPlayer.x + climbPlayer.width > canvas.width) climbPlayer.x = canvas.width - climbPlayer.width;
-    
-    // 발판 충돌
-    climbPlayer.onGround = false;
-    
-    platforms.forEach(p => {
-        if (p.broken) return;
+    for (const p of platforms) {
+        if (p.broken) continue;
+        if (p.type === 'moving') { p.x += p.dir * p.spd; if (p.x <= 0 || p.x + p.w >= canvas.width) p.dir *= -1; }
         
-        // 움직이는 발판
-        if (p.type === 'moving') {
-            p.x += p.moveDir * p.moveSpeed;
-            if (p.x <= 0 || p.x + p.width >= canvas.width) p.moveDir *= -1;
+        if (climber.vy >= 0 &&
+            climber.x + climber.w > p.x + 4 &&
+            climber.x < p.x + p.w - 4 &&
+            climber.y + climber.h >= p.y &&
+            climber.y + climber.h <= p.y + p.h + 16) {
+            
+            climber.y = p.y - climber.h;
+            climber.vy = 0;
+            climber.onGround = true;
+            canDblJump = hasPart('leg') && partCnt('leg') >= 2;
+            
+            if (p.type === 'bouncy') { climber.vy = -20; climber.onGround = false; Audio.playJump(); }
+            else if (p.type === 'breaking') { p.timer++; if (p.timer > 25) p.broken = true; }
+            else if (p.type === 'land') { climbWin(); return; }
+            else { Audio.playLand(); }
+            
+            if (p.type === 'moving') climber.x += p.dir * p.spd;
         }
-        
-        // 충돌 체크 (위에서 떨어질 때만)
-        if (climbPlayer.vy > 0 &&
-            climbPlayer.x + climbPlayer.width > p.x &&
-            climbPlayer.x < p.x + p.width &&
-            climbPlayer.y + climbPlayer.height > p.y &&
-            climbPlayer.y + climbPlayer.height < p.y + p.height + 15) {
-            
-            climbPlayer.y = p.y - climbPlayer.height;
-            climbPlayer.vy = 0;
-            climbPlayer.onGround = true;
-            canDoubleJump = hasPart('leg') && getPartCount('leg') >= 2;
-            
-            // 발판 타입별 효과
-            if (p.type === 'bouncy') {
-                climbPlayer.vy = -20;
-                climbPlayer.onGround = false;
-                Audio.playJump();
-            } else if (p.type === 'breaking') {
-                p.breakTimer++;
-                if (p.breakTimer > 30) {
-                    p.broken = true;
-                    Audio.playDeath();
-                }
-            } else if (p.type === 'land') {
-                // 육지 도착!
-                climbSuccess();
-                return;
-            }
-            
-            // 움직이는 발판 위에서
-            if (p.type === 'moving') {
-                climbPlayer.x += p.moveDir * p.moveSpeed;
-            }
-        }
-    });
-    
-    // 카메라 따라가기
-    const targetCameraY = -climbPlayer.y + canvas.height * 0.6;
-    cameraY += (targetCameraY - cameraY) * 0.1;
-    
-    // 현재 높이 계산
-    currentHeight = Math.max(0, Math.floor(-climbPlayer.y / 10));
-    State.data.stats.maxHeight = Math.max(State.data.stats.maxHeight, currentHeight);
-    
-    // 새 발판 생성
-    const highestPlatform = Math.min(...platforms.map(p => p.y));
-    if (-cameraY - canvas.height < highestPlatform + 500) {
-        generatePlatforms(highestPlatform, highestPlatform - canvas.height * 2);
     }
     
-    // 낙하 체크
-    if (climbPlayer.y > -cameraY + canvas.height + 100) {
-        climbFall();
-        return;
-    }
+    const targetCam = -climber.y + canvas.height * 0.6;
+    camY += (targetCam - camY) * 0.1;
+    curH = Math.max(0, Math.floor(-climber.y / 10));
+    G.data.stats.maxH = Math.max(G.data.stats.maxH, curH);
     
-    // 파티클 업데이트
-    climbParticles = climbParticles.filter(p => {
-        p.x += p.vx;
-        p.y += p.vy;
-        p.life--;
-        p.size *= 0.95;
-        return p.life > 0;
-    });
+    const highest = Math.min(...platforms.map(p => p.y));
+    if (-camY - canvas.height < highest + 400) genPlats(highest, highest - canvas.height * 2);
     
-    // 렌더링
-    renderClimbGame(env);
+    if (climber.y > -camY + canvas.height + 80) { climbFail(); return; }
     
-    // HUD 업데이트
-    document.getElementById('climb-height').textContent = currentHeight + 'm';
+    climbParts = climbParts.filter(p => { p.x += p.vx; p.y += p.vy; p.life--; p.size *= 0.93; return p.life > 0; });
     
-    gameLoop = requestAnimationFrame(updateClimbGame);
+    renderClimb(env);
+    document.getElementById('c-height').textContent = curH + 'm';
+    
+    gameLoop = requestAnimationFrame(updateClimb);
 };
 
-const renderClimbGame = (env) => {
+const renderClimb = env => {
     const w = canvas.width, h = canvas.height;
+    const hr = Math.min(1, curH / CONFIG.LAND_HEIGHT);
     
-    // 배경 (높이에 따라 변화)
-    const heightRatio = Math.min(1, currentHeight / LAND_HEIGHT);
-    
-    // 바다 → 하늘 그라데이션
     const bg = ctx.createLinearGradient(0, 0, 0, h);
-    if (heightRatio < 0.5) {
-        bg.addColorStop(0, lerpColor(env.colors.bg1, '#1a3a5e', heightRatio * 2));
-        bg.addColorStop(1, lerpColor(env.colors.bg2, '#0a2040', heightRatio * 2));
+    if (hr < 0.5) {
+        bg.addColorStop(0, lerpCol(env.colors.bg1, '#1a3a5e', hr * 2));
+        bg.addColorStop(1, lerpCol(env.colors.bg2, '#0a2040', hr * 2));
     } else {
-        bg.addColorStop(0, lerpColor('#1a3a5e', '#87CEEB', (heightRatio - 0.5) * 2));
-        bg.addColorStop(1, lerpColor('#0a2040', '#E0F7FA', (heightRatio - 0.5) * 2));
+        bg.addColorStop(0, lerpCol('#1a3a5e', '#87CEEB', (hr - 0.5) * 2));
+        bg.addColorStop(1, lerpCol('#0a2040', '#E0F7FA', (hr - 0.5) * 2));
     }
     ctx.fillStyle = bg;
     ctx.fillRect(0, 0, w, h);
     
-    // 배경 파티클
-    ctx.globalAlpha = 0.3;
-    for (let i = 0; i < 30; i++) {
-        const x = (Date.now() * 0.02 + i * 73) % (w + 40) - 20;
-        const y = ((Date.now() * 0.01 + i * 31 + cameraY * 0.5) % (h + 40) - 20);
-        ctx.fillStyle = heightRatio < 0.5 ? env.colors.particle : '#ffffff';
+    ctx.globalAlpha = 0.25;
+    const t = Date.now() * 0.02;
+    for (let i = 0; i < 25; i++) {
+        ctx.fillStyle = hr < 0.5 ? env.colors.particle : '#fff';
         ctx.beginPath();
-        ctx.arc(x, y, 2, 0, Math.PI * 2);
+        ctx.arc((t + i * 67) % (w + 30) - 15, ((t * 0.5 + i * 31 + camY * 0.5) % (h + 30) - 15), 2, 0, Math.PI * 2);
         ctx.fill();
     }
     ctx.globalAlpha = 1;
     
     ctx.save();
-    ctx.translate(0, cameraY);
+    ctx.translate(0, camY);
     
-    // 발판 그리기
-    platforms.forEach(p => {
-        if (p.broken) return;
+    for (const p of platforms) {
+        if (p.broken) continue;
+        const sy = p.y + camY;
+        if (sy < -40 || sy > h + 40) continue;
         
-        const screenY = p.y + cameraY;
-        if (screenY < -50 || screenY > h + 50) return;
-        
-        ctx.fillStyle = getPlatformColor(p.type, heightRatio);
+        ctx.fillStyle = platCol(p.type, hr, env);
         
         if (p.type === 'land') {
-            // 육지
             ctx.fillStyle = '#8B4513';
-            ctx.fillRect(p.x, p.y, p.width, p.height);
-            
-            // 잔디
+            ctx.fillRect(p.x, p.y, p.w, p.h);
             ctx.fillStyle = '#228B22';
-            ctx.fillRect(p.x, p.y, p.width, 20);
-            
-            // 나무
+            ctx.fillRect(p.x, p.y, p.w, 18);
             for (let i = 0; i < 5; i++) {
-                const tx = p.x + 50 + i * (p.width / 5);
-                ctx.fillStyle = '#8B4513';
-                ctx.fillRect(tx, p.y - 40, 10, 40);
+                const tx = p.x + 40 + i * (p.w / 5);
+                ctx.fillStyle = '#654321';
+                ctx.fillRect(tx, p.y - 35, 8, 35);
                 ctx.fillStyle = '#228B22';
                 ctx.beginPath();
-                ctx.arc(tx + 5, p.y - 50, 25, 0, Math.PI * 2);
+                ctx.arc(tx + 4, p.y - 42, 20, 0, Math.PI * 2);
                 ctx.fill();
             }
         } else {
-            // 일반 발판
             ctx.beginPath();
-            ctx.roundRect(p.x, p.y, p.width, p.height, 6);
+            ctx.roundRect(p.x, p.y, p.w, p.h, 5);
             ctx.fill();
+            ctx.fillStyle = 'rgba(255,255,255,0.15)';
+            ctx.fillRect(p.x + 3, p.y + 2, p.w - 6, 3);
             
-            // 발판 하이라이트
-            ctx.fillStyle = 'rgba(255,255,255,0.2)';
-            ctx.fillRect(p.x + 4, p.y + 2, p.width - 8, 4);
+            if (p.type === 'breaking' && p.timer > 0) {
+                ctx.strokeStyle = '#ff0000';
+                ctx.lineWidth = 2;
+                ctx.setLineDash([4, 4]);
+                ctx.strokeRect(p.x, p.y, p.w, p.h);
+                ctx.setLineDash([]);
+            }
         }
-        
-        // 부서지는 발판 표시
-        if (p.type === 'breaking' && p.breakTimer > 0) {
-            ctx.strokeStyle = '#ff0000';
-            ctx.lineWidth = 2;
-            ctx.setLineDash([5, 5]);
-            ctx.strokeRect(p.x, p.y, p.width, p.height);
-            ctx.setLineDash([]);
-        }
-    });
+    }
     
-    // 파티클
-    climbParticles.forEach(p => {
-        ctx.globalAlpha = p.life / 20;
-        ctx.fillStyle = p.color;
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-        ctx.fill();
-    });
+    climbParts.forEach(c => { ctx.globalAlpha = c.life / 16; ctx.fillStyle = c.color; ctx.beginPath(); ctx.arc(c.x, c.y, c.size, 0, Math.PI * 2); ctx.fill(); });
     ctx.globalAlpha = 1;
     
-    // 플레이어 그리기
-    drawClimbPlayer();
-    
+    drawClimber();
     ctx.restore();
     
-    // 높이 게이지 (오른쪽)
-    const gaugeHeight = h - 100;
-    const gaugeX = w - 30;
-    const progress = Math.min(1, currentHeight / LAND_HEIGHT);
-    
-    ctx.fillStyle = 'rgba(0,0,0,0.3)';
-    ctx.fillRect(gaugeX - 5, 50, 20, gaugeHeight);
-    
-    ctx.fillStyle = 'var(--gradient-energy)';
-    const fill = ctx.createLinearGradient(0, 50 + gaugeHeight, 0, 50);
-    fill.addColorStop(0, '#00f5d4');
-    fill.addColorStop(1, '#fee440');
-    ctx.fillStyle = fill;
-    ctx.fillRect(gaugeX - 3, 50 + gaugeHeight * (1 - progress), 16, gaugeHeight * progress);
-    
-    // 골 마커
+    // 높이 게이지
+    const gH = h - 90, gX = w - 25;
+    const prog = Math.min(1, curH / CONFIG.LAND_HEIGHT);
+    ctx.fillStyle = 'rgba(0,0,0,0.25)';
+    ctx.fillRect(gX - 4, 45, 16, gH);
+    const gFill = ctx.createLinearGradient(0, 45 + gH, 0, 45);
+    gFill.addColorStop(0, '#00f5d4');
+    gFill.addColorStop(1, '#fee440');
+    ctx.fillStyle = gFill;
+    ctx.fillRect(gX - 2, 45 + gH * (1 - prog), 12, gH * prog);
     ctx.fillStyle = '#228B22';
-    ctx.fillRect(gaugeX - 8, 45, 26, 10);
-    ctx.fillStyle = 'white';
-    ctx.font = '10px Orbitron';
-    ctx.textAlign = 'center';
-    ctx.fillText('🏔️', gaugeX + 5, 53);
+    ctx.fillRect(gX - 6, 40, 20, 8);
 };
 
-const getPlatformColor = (type, heightRatio) => {
-    switch (type) {
-        case 'moving': return '#9d4edd';
-        case 'breaking': return '#ef4444';
-        case 'bouncy': return '#10b981';
-        default:
-            // 높이에 따라 색상 변화
-            if (heightRatio < 0.3) return '#00b4d8';
-            if (heightRatio < 0.6) return '#48cae4';
-            if (heightRatio < 0.9) return '#90e0ef';
-            return '#caf0f8';
-    }
+const platCol = (type, hr, env) => {
+    if (type === 'moving') return '#9d4edd';
+    if (type === 'breaking') return '#ef4444';
+    if (type === 'bouncy') return '#10b981';
+    return hr < 0.5 ? lerpCol(env.colors.food, '#48cae4', hr * 2) : lerpCol('#48cae4', '#caf0f8', (hr - 0.5) * 2);
 };
 
-const lerpColor = (a, b, t) => {
-    const ah = parseInt(a.replace('#', ''), 16);
-    const bh = parseInt(b.replace('#', ''), 16);
-    
+const lerpCol = (a, b, t) => {
+    const ah = parseInt(a.replace('#', ''), 16), bh = parseInt(b.replace('#', ''), 16);
     const ar = ah >> 16, ag = (ah >> 8) & 0xff, ab = ah & 0xff;
     const br = bh >> 16, bg = (bh >> 8) & 0xff, bb = bh & 0xff;
-    
-    const rr = Math.round(ar + (br - ar) * t);
-    const rg = Math.round(ag + (bg - ag) * t);
-    const rb = Math.round(ab + (bb - ab) * t);
-    
+    const rr = Math.round(ar + (br - ar) * t), rg = Math.round(ag + (bg - ag) * t), rb = Math.round(ab + (bb - ab) * t);
     return `#${((rr << 16) | (rg << 8) | rb).toString(16).padStart(6, '0')}`;
 };
 
-const drawClimbPlayer = () => {
-    const design = State.data.design;
-    const parts = State.data.bodyParts;
-    const time = Date.now() * 0.005;
+const drawClimber = () => {
+    const d = G.data.design, p = G.data.parts, t = Date.now() * 0.005;
+    const s = climber.w / 2;
     
     ctx.save();
-    ctx.translate(climbPlayer.x + climbPlayer.width / 2, climbPlayer.y + climbPlayer.height / 2);
+    ctx.translate(climber.x + climber.w / 2, climber.y + climber.h / 2);
     
-    // 몸체
-    ctx.shadowColor = design.primary;
-    ctx.shadowBlur = 15;
-    
-    const size = climbPlayer.width / 2;
+    ctx.shadowColor = d.primary;
+    ctx.shadowBlur = 12;
     
     ctx.beginPath();
     for (let i = 0; i < 8; i++) {
-        const angle = (i / 8) * Math.PI * 2;
-        const wobble = Math.sin(time + i) * 2;
-        const r = size + wobble;
-        const px = Math.cos(angle) * r;
-        const py = Math.sin(angle) * r;
-        i === 0 ? ctx.moveTo(px, py) : ctx.lineTo(px, py);
+        const ang = (i / 8) * Math.PI * 2;
+        const w = Math.sin(t + i) * 1.8;
+        const r = s + w;
+        i === 0 ? ctx.moveTo(Math.cos(ang) * r, Math.sin(ang) * r) : ctx.lineTo(Math.cos(ang) * r, Math.sin(ang) * r);
     }
     ctx.closePath();
-    
-    const grad = ctx.createRadialGradient(-size * 0.3, -size * 0.3, 0, 0, 0, size);
-    grad.addColorStop(0, design.primary);
-    grad.addColorStop(1, design.secondary);
+    const grad = ctx.createRadialGradient(-s * 0.2, -s * 0.2, 0, 0, 0, s);
+    grad.addColorStop(0, d.primary);
+    grad.addColorStop(1, d.secondary);
     ctx.fillStyle = grad;
     ctx.fill();
     ctx.shadowBlur = 0;
     
     // 눈
-    const eyeCount = parts.eye || 0;
-    for (let i = 0; i < eyeCount; i++) {
-        const eyeAngle = (i - (eyeCount - 1) / 2) * 0.4;
-        const eyeX = eyeAngle * size * 0.8;
-        const eyeY = -size * 0.3;
-        
-        ctx.beginPath();
-        ctx.arc(eyeX, eyeY, size * 0.25, 0, Math.PI * 2);
-        ctx.fillStyle = 'white';
-        ctx.fill();
-        ctx.beginPath();
-        ctx.arc(eyeX + 2, eyeY, size * 0.12, 0, Math.PI * 2);
-        ctx.fillStyle = '#111';
-        ctx.fill();
+    const eyeCnt = p.eye || 0;
+    for (let i = 0; i < eyeCnt; i++) {
+        const eA = (i - (eyeCnt - 1) / 2) * 0.35;
+        const eX = eA * s * 0.7, eY = -s * 0.25;
+        ctx.beginPath(); ctx.arc(eX, eY, s * 0.22, 0, Math.PI * 2); ctx.fillStyle = 'white'; ctx.fill();
+        ctx.beginPath(); ctx.arc(eX + s * 0.03, eY, s * 0.1, 0, Math.PI * 2); ctx.fillStyle = '#222'; ctx.fill();
+        ctx.beginPath(); ctx.arc(eX - s * 0.04, eY - s * 0.05, s * 0.05, 0, Math.PI * 2); ctx.fillStyle = 'rgba(255,255,255,0.9)'; ctx.fill();
     }
     
+    // 볼터치
+    ctx.globalAlpha = 0.3;
+    ctx.beginPath(); ctx.arc(-s * 0.35, s * 0.1, s * 0.08, 0, Math.PI * 2); ctx.fillStyle = '#ffaaaa'; ctx.fill();
+    ctx.beginPath(); ctx.arc(s * 0.35, s * 0.1, s * 0.08, 0, Math.PI * 2); ctx.fill();
+    ctx.globalAlpha = 1;
+    
     // 다리 (뛰는 모션)
-    const legCount = parts.leg || 0;
-    if (legCount > 0) {
-        ctx.strokeStyle = design.secondary;
-        ctx.lineWidth = 3;
+    const legCnt = p.leg || 0;
+    if (legCnt > 0) {
+        ctx.strokeStyle = d.secondary;
+        ctx.lineWidth = 2.5;
         ctx.lineCap = 'round';
-        
-        const jumpPhase = climbPlayer.onGround ? 0 : Math.sin(time * 3);
-        
-        for (let i = 0; i < legCount; i++) {
-            const baseAngle = Math.PI * 0.5 + (i - (legCount - 1) / 2) * 0.3;
-            const kickAngle = jumpPhase * 0.3;
-            
+        const jPhase = climber.onGround ? 0 : Math.sin(t * 3);
+        for (let i = 0; i < legCnt; i++) {
+            const ba = Math.PI * 0.5 + (i - (legCnt - 1) / 2) * 0.25;
+            const kick = jPhase * 0.25;
             ctx.beginPath();
-            ctx.moveTo(Math.cos(baseAngle) * size * 0.7, Math.sin(baseAngle) * size * 0.7);
-            ctx.lineTo(Math.cos(baseAngle + kickAngle) * size * 1.3, Math.sin(baseAngle) * size * 1.2);
+            ctx.moveTo(Math.cos(ba) * s * 0.65, Math.sin(ba) * s * 0.65);
+            ctx.lineTo(Math.cos(ba + kick) * s * 1.2, Math.sin(ba) * s * 1.1);
             ctx.stroke();
         }
     }
@@ -2475,96 +1622,55 @@ const drawClimbPlayer = () => {
     ctx.restore();
 };
 
-const climbFall = () => {
-    cancelAnimationFrame(gameLoop);
-    gameLoop = null;
-    
+const climbFail = () => {
+    cancelAnimationFrame(gameLoop); gameLoop = null;
     Audio.playDeath();
-    
-    app.innerHTML = `
-        <div class="gameover-modal">
-            <div class="gameover-content">
-                <div class="gameover-icon">💧</div>
-                <h1 class="gameover-title">추락!</h1>
-                <p class="gameover-desc">바다로 다시 떨어졌습니다...<br>다시 올라가야 합니다!</p>
-                
-                <div class="gameover-stats">
-                    <div class="gameover-stat">
-                        <span class="gameover-stat-label">도달 높이</span>
-                        <span class="gameover-stat-value">${currentHeight}m</span>
-                    </div>
-                    <div class="gameover-stat">
-                        <span class="gameover-stat-label">최고 기록</span>
-                        <span class="gameover-stat-value">${State.data.stats.maxHeight}m</span>
-                    </div>
-                </div>
-                
-                <div style="display:flex;flex-direction:column;gap:12px;">
-                    <button class="btn btn-energy btn-block" id="btn-retry">🔄 다시 시도</button>
-                    <button class="btn btn-outline btn-block" id="btn-home">🏠 홈으로</button>
-                </div>
-            </div>
-        </div>
-    `;
-    
     saveGame();
     
-    document.getElementById('btn-retry').onclick = () => {
-        Audio.playClick();
-        startClimbGame();
-    };
+    app.innerHTML = `
+        <div class="modal"><div class="modal-box">
+            <div class="modal-icon">💧</div>
+            <h1 class="modal-title fail">추락!</h1>
+            <p class="modal-desc">바다로 떨어졌습니다...</p>
+            <div class="modal-stats">
+                <div class="stat-row"><span class="stat-label">도달 높이</span><span class="stat-val">${curH}m</span></div>
+                <div class="stat-row"><span class="stat-label">최고 기록</span><span class="stat-val">${G.data.stats.maxH}m</span></div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:10px;">
+                <button class="btn btn-energy btn-block" id="btn-retry">🔄 다시</button>
+                <button class="btn btn-outline btn-block" id="btn-home">🏠 홈</button>
+            </div>
+        </div></div>
+    `;
     
-    document.getElementById('btn-home').onclick = () => {
-        Audio.playClick();
-        renderSaveSelect();
-    };
+    document.getElementById('btn-retry').onclick = () => { Audio.playClick(); startClimb(); };
+    document.getElementById('btn-home').onclick = () => { Audio.playClick(); renderSaves(); };
 };
 
-const climbSuccess = () => {
-    cancelAnimationFrame(gameLoop);
-    gameLoop = null;
-    
+const climbWin = () => {
+    cancelAnimationFrame(gameLoop); gameLoop = null;
     Audio.playWin();
-    
-    State.data.stage = 3;
-    State.data.history.push({ chapter: State.data.history.length + 1, title: '육지 도달', content: '마침내 육지에 발을 디뎠다!', time: Date.now() });
+    G.data.stage = 3;
     saveGame();
     
     app.innerHTML = `
-        <div class="gameover-modal">
-            <div class="gameover-content">
-                <div class="gameover-icon">🏔️</div>
-                <h1 class="gameover-title success">육지 도달!</h1>
-                <p class="gameover-desc">마침내 바다를 벗어나 육지에 도착했습니다!<br><br>새로운 세계가 당신을 기다리고 있습니다...</p>
-                
-                <div class="gameover-stats">
-                    <div class="gameover-stat">
-                        <span class="gameover-stat-label">총 이동 거리</span>
-                        <span class="gameover-stat-value">${LAND_HEIGHT}m</span>
-                    </div>
-                    <div class="gameover-stat">
-                        <span class="gameover-stat-label">획득 파츠</span>
-                        <span class="gameover-stat-value">${getTotalParts()}개</span>
-                    </div>
-                </div>
-                
-                <div style="display:flex;flex-direction:column;gap:12px;">
-                    <button class="btn btn-energy btn-block" id="btn-continue">🌍 다음 단계 (준비 중)</button>
-                    <button class="btn btn-outline btn-block" id="btn-home">🏠 홈으로</button>
-                </div>
+        <div class="modal"><div class="modal-box">
+            <div class="modal-icon">🏔️</div>
+            <h1 class="modal-title win">육지 도달!</h1>
+            <p class="modal-desc">마침내 바다를 벗어나 육지에 도착했습니다!</p>
+            <div class="modal-stats">
+                <div class="stat-row"><span class="stat-label">총 이동</span><span class="stat-val">${CONFIG.LAND_HEIGHT}m</span></div>
+                <div class="stat-row"><span class="stat-label">획득 파츠</span><span class="stat-val">${totalParts()}개</span></div>
             </div>
-        </div>
+            <div style="display:flex;flex-direction:column;gap:10px;">
+                <button class="btn btn-energy btn-block" id="btn-next">🌍 다음 (준비중)</button>
+                <button class="btn btn-outline btn-block" id="btn-home">🏠 홈</button>
+            </div>
+        </div></div>
     `;
     
-    document.getElementById('btn-continue').onclick = () => {
-        Audio.playClick();
-        toast('다음 단계는 준비 중입니다!', 'info');
-    };
-    
-    document.getElementById('btn-home').onclick = () => {
-        Audio.playClick();
-        renderSaveSelect();
-    };
+    document.getElementById('btn-next').onclick = () => { Audio.playClick(); toast('다음 단계 준비 중!', 'info'); };
+    document.getElementById('btn-home').onclick = () => { Audio.playClick(); renderSaves(); };
 };
 
 /* ========================================
@@ -2572,59 +1678,46 @@ const climbSuccess = () => {
 ======================================== */
 const renderTitle = () => {
     app.innerHTML = `
-        <div class="title-page">
-            <div class="title-logo">🎲</div>
-            <h1 class="title-main">BOKLUCK</h1>
-            <h2 class="title-sub">Universe</h2>
-            <p class="title-tagline">
-                <strong style="color:var(--neon-cyan)">BOK(복)</strong> 또는 
-                <strong style="color:var(--neon-pink)">LUCK(운)</strong>으로<br>
-                만들어가는 당신만의 우주 이야기
-            </p>
-            <div class="title-buttons">
-                <button class="btn btn-energy btn-block" id="btn-start">🚀 게임 시작</button>
-                <button class="btn btn-outline btn-block" id="btn-settings">⚙️ 설정</button>
+        <div class="page-center">
+            <div class="page-content">
+                <div class="page-icon">🎲</div>
+                <h1 style="font-family:Orbitron;font-size:clamp(2rem,8vw,3rem);font-weight:900;background:var(--gradient-energy);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:4px;">BOKLUCK</h1>
+                <h2 style="font-family:Orbitron;font-size:1rem;color:var(--text-secondary);margin-bottom:24px;">Universe</h2>
+                <p style="font-size:0.85rem;color:var(--text-muted);line-height:1.7;max-width:260px;margin:0 auto 32px;">
+                    <strong style="color:var(--neon-cyan)">BOK(복)</strong> 또는 
+                    <strong style="color:var(--neon-pink)">LUCK(운)</strong>으로<br>
+                    만들어가는 당신만의 우주
+                </p>
+                <div style="display:flex;flex-direction:column;gap:10px;max-width:240px;margin:0 auto;">
+                    <button class="btn btn-energy btn-block" id="btn-start">🚀 게임 시작</button>
+                    <button class="btn btn-outline btn-block" id="btn-settings">⚙️ 설정</button>
+                </div>
             </div>
         </div>
     `;
     
-    document.getElementById('btn-start').onclick = () => { Audio.init(); Audio.playClick(); renderSaveSelect(); };
+    document.getElementById('btn-start').onclick = () => { Audio.init(); Audio.preload(); Audio.playClick(); renderSaves(); };
     document.getElementById('btn-settings').onclick = () => { Audio.init(); Audio.playClick(); renderSettings(); };
 };
 
-const renderSaveSelect = () => {
+const renderSaves = () => {
     const slots = Save.all();
-    
-    let slotsHTML = '';
+    let html = '';
     for (let i = 0; i < Save.MAX; i++) {
         const s = slots[i];
         if (s) {
-            const stageText = s.stage === 1 ? '세포' : s.stage === 2 ? '다세포' : s.stage === 3 ? '육지' : '시작전';
-            slotsHTML += `
-                <div class="save-slot">
-                    <div class="save-slot-header">
-                        <span class="save-slot-number">슬롯 ${i + 1}</span>
-                        <span style="font-size:0.7rem;color:var(--text-muted)">${Save.formatDate(s.updated)}</span>
-                    </div>
-                    <div class="save-slot-name">${s.name || '이름 없음'}</div>
-                    <div class="save-slot-info">
-                        ${s.dna?.origin ? getEnvById(s.dna.origin)?.icon : '❓'} ${stageText}
-                        · 점수: ${s.score || 0}
-                        · 파츠: ${s.bodyParts ? Object.values(s.bodyParts).reduce((a,b)=>a+b,0) : 0}개
-                    </div>
-                    <div class="save-slot-actions">
-                        <button class="btn btn-energy btn-sm" style="flex:1" onclick="handleLoadSlot(${i})">▶️ 계속</button>
-                        <button class="delete-btn" onclick="handleDeleteSlot(${i})">🗑️</button>
-                    </div>
+            const st = s.stage === 1 ? '세포' : s.stage === 2 ? '다세포' : s.stage === 3 ? '육지' : '시작전';
+            html += `<div class="slot">
+                <div class="slot-head"><span class="slot-num">슬롯 ${i + 1}</span><span style="font-size:0.6rem;color:var(--text-muted)">${Save.fmt(s.updated)}</span></div>
+                <div class="slot-name">${s.name || '이름없음'}</div>
+                <div class="slot-info">${s.dna?.origin ? envById(s.dna.origin)?.icon : '❓'} ${st} · 점수: ${s.score || 0}</div>
+                <div class="slot-actions">
+                    <button class="btn btn-energy btn-sm" style="flex:1" onclick="handleLoad(${i})">▶️ 계속</button>
+                    <button class="del-btn" onclick="handleDel(${i})">🗑️</button>
                 </div>
-            `;
+            </div>`;
         } else {
-            slotsHTML += `
-                <div class="save-slot empty" onclick="handleNewSlot(${i})">
-                    <span style="font-size:1.8rem;opacity:0.5">➕</span>
-                    <p style="color:var(--text-muted);margin-top:6px;font-size:0.85rem;">슬롯 ${i + 1} - 새 게임</p>
-                </div>
-            `;
+            html += `<div class="slot empty" onclick="handleNew(${i})"><span style="font-size:1.6rem;opacity:0.5">➕</span><p style="color:var(--text-muted);margin-top:6px;font-size:0.8rem;">슬롯 ${i + 1} - 새 게임</p></div>`;
         }
     }
     
@@ -2633,97 +1726,64 @@ const renderSaveSelect = () => {
             <div class="save-header">
                 <button class="btn btn-ghost btn-sm" id="btn-back">← 뒤로</button>
                 <h1 class="save-title">💾 저장 슬롯</h1>
-                <div style="width:60px"></div>
+                <div style="width:55px"></div>
             </div>
-            <div class="save-slots">
-                ${slotsHTML}
-            </div>
+            <div class="slots">${html}</div>
         </div>
     `;
     
     document.getElementById('btn-back').onclick = () => { Audio.playClick(); renderTitle(); };
 };
 
-// 전역 함수로 정의하여 onclick에서 호출 가능하게
-window.handleNewSlot = (i) => {
-    Audio.playClick();
-    newGame(i);
-    renderStory('intro');
+window.handleNew = i => { Audio.playClick(); newGame(i); renderStory('intro'); };
+window.handleLoad = i => {
+    Audio.playClick(); load(i);
+    if (!G.data.tutDone) renderStory('intro');
+    else if (G.data.stage === 1) startCellWorld();
+    else if (G.data.stage >= 2) startClimb();
+    else renderDice();
 };
-
-window.handleLoadSlot = (i) => {
-    Audio.playClick();
-    loadSlot(i);
-    
-    if (!State.data.tutorialDone) {
-        renderStory('intro');
-    } else if (State.data.stage === 1) {
-        startCellWorld();
-    } else if (State.data.stage === 2) {
-        startClimbGame();
-    } else if (State.data.stage === 3) {
-        // 육지 도달 후 - 일단 클라이밍 다시
-        startClimbGame();
-    } else {
-        renderDiceRoll();
-    }
-};
-
-window.handleDeleteSlot = (i) => {
-    Audio.playClick();
-    if (confirm('정말 삭제하시겠습니까?\n이 작업은 되돌릴 수 없습니다.')) {
-        Save.del(i);
-        renderSaveSelect();
-    }
-};
+window.handleDel = i => { Audio.playClick(); if (confirm('정말 삭제?')) { Save.del(i); renderSaves(); } };
 
 const renderSettings = () => {
     app.innerHTML = `
-        <div class="settings-modal">
-            <div class="settings-content">
-                <h2 class="settings-title">⚙️ 설정</h2>
-                <div class="settings-section">
-                    <div class="settings-section-title">🔊 사운드</div>
-                    <div class="settings-row">
-                        <span>마스터 볼륨</span>
-                        <input type="range" class="volume-slider" id="vol-master" min="0" max="100" value="${Audio.settings.master * 100}">
+        <div class="page-center">
+            <div class="page-content" style="max-width:340px;">
+                <h2 class="page-title">⚙️ 설정</h2>
+                <div style="background:var(--void-surface);border-radius:12px;padding:16px;margin-bottom:16px;text-align:left;">
+                    <div style="font-size:0.7rem;color:var(--text-muted);margin-bottom:8px;">🔊 사운드</div>
+                    <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border-subtle);">
+                        <span>마스터</span>
+                        <input type="range" id="vol-m" min="0" max="100" value="${Audio.settings.master * 100}" style="width:80px;">
                     </div>
-                    <div class="settings-row">
+                    <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;">
                         <span>효과음</span>
-                        <div style="display:flex;align-items:center;gap:10px">
-                            <input type="range" class="volume-slider" id="vol-sfx" min="0" max="100" value="${Audio.settings.sfx * 100}">
-                            <div class="toggle ${Audio.settings.sfxOn ? 'active' : ''}" id="toggle-sfx"><div class="toggle-knob"></div></div>
+                        <div style="display:flex;gap:8px;align-items:center;">
+                            <input type="range" id="vol-s" min="0" max="100" value="${Audio.settings.sfx * 100}" style="width:80px;">
+                            <button class="btn btn-ghost btn-sm" id="toggle-sfx">${Audio.settings.on ? '🔊' : '🔇'}</button>
                         </div>
                     </div>
                 </div>
-                <div class="settings-section">
-                    <div class="settings-section-title">🎮 테스트</div>
-                    <div class="settings-row">
-                        <span>효과음 테스트</span>
-                        <button class="btn btn-outline btn-sm" id="test-sfx">🔔 재생</button>
-                    </div>
-                </div>
-                <button class="btn btn-energy btn-block" id="btn-close" style="margin-top:20px">확인</button>
+                <button class="btn btn-energy btn-block" id="btn-close">확인</button>
             </div>
         </div>
     `;
     
-    document.getElementById('vol-master').oninput = (e) => { Audio.settings.master = e.target.value / 100; Audio.save(); };
-    document.getElementById('vol-sfx').oninput = (e) => { Audio.settings.sfx = e.target.value / 100; Audio.save(); };
-    document.getElementById('toggle-sfx').onclick = (e) => { Audio.settings.sfxOn = !Audio.settings.sfxOn; e.currentTarget.classList.toggle('active'); Audio.save(); };
-    document.getElementById('test-sfx').onclick = () => { Audio.init(); Audio.playEvolve(); };
+    document.getElementById('vol-m').oninput = e => { Audio.settings.master = e.target.value / 100; Audio.save(); };
+    document.getElementById('vol-s').oninput = e => { Audio.settings.sfx = e.target.value / 100; Audio.save(); };
+    document.getElementById('toggle-sfx').onclick = e => { Audio.settings.on = !Audio.settings.on; e.target.textContent = Audio.settings.on ? '🔊' : '🔇'; Audio.save(); };
     document.getElementById('btn-close').onclick = () => { Audio.playClick(); renderTitle(); };
 };
 
 /* ========================================
-   Initialize
+   Init
 ======================================== */
 document.addEventListener('DOMContentLoaded', () => {
     createStars();
     renderTitle();
-    setInterval(saveGame, 30000);
+    setInterval(saveGame, CONFIG.SAVE_INTERVAL);
     window.addEventListener('beforeunload', saveGame);
-    console.log('🎲 BOKLUCK Universe v0.5.0');
+    console.log('🎲 BOKLUCK Universe v0.6.0');
 });
 </script>
 </body>
