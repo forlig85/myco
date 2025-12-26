@@ -3303,14 +3303,12 @@ const drawRunnerChar = groundY => {
         const trait = traits.find(t => t.id === et.id) || getTraitById(et.id);
         if (!trait) return;
         
-        // 에디터와 동일한 좌표 시스템 사용 (캐릭터 중심 기준)
-        // 에디터: et.x * canvasW, et.y * canvasH (캔버스 전체 기준)
-        // 게임: 캐릭터 중심에서 상대 좌표
-        const charCenterX = 0; // ctx.translate로 이미 중심에 있음
-        const charCenterY = 0;
-        // et.x, et.y는 0-1 비율이고, 0.5가 캐릭터 중심
-        const px = (et.x - 0.5) * bodyW * 4;
-        const py = (et.y - 0.5) * bodyH * 4;
+        // 에디터와 동일한 좌표 계산
+        // 에디터: bodySize = min(w,h) * 0.15 * charScale, 파츠는 et.x * w 위치
+        // 캐릭터 중심 기준 비율: (et.x - 0.5) / (0.15 * charScale)
+        const editorBodyRatio = 0.15;
+        const px = (et.x - 0.5) / editorBodyRatio * bodyW;
+        const py = (et.y - 0.5) / editorBodyRatio * bodyH;
         const scale = et.scale || 1;
         
         ctx.save();
