@@ -1771,15 +1771,15 @@ let lastObstacleTime = 0;
 let activeEffects = {}; // 현재 활성화된 효과들
 const MIN_OBSTACLE_GAP = 1500;
 
-// 아이템 종류 정의 (생성률 1/4로 줄임)
+// 아이템 종류 정의 (주사위의 절반 정도 비중)
 const RUNNER_ITEMS = {
-    dice: { icon: '🎲', name: '진화 주사위', rate: 0.0004, duration: 0 },
+    dice: { icon: '🎲', name: '진화 주사위', rate: 0.003, duration: 0 },
     jump: { icon: '🦘', name: '점프력 향상', rate: 0.0015, duration: 5000 },
-    speed: { icon: '⚡', name: '속도 증가', rate: 0.00125, duration: 4000 },
+    speed: { icon: '⚡', name: '속도 증가', rate: 0.0015, duration: 4000 },
     slow: { icon: '🐢', name: '속도 감소', rate: 0.001, duration: 4000 },
-    shield: { icon: '🛡️', name: '무적', rate: 0.00075, duration: 3000 },
+    shield: { icon: '🛡️', name: '무적', rate: 0.001, duration: 3000 },
     magnet: { icon: '🧲', name: '자석', rate: 0.001, duration: 5000 },
-    shrink: { icon: '🔻', name: '몸 축소', rate: 0.00075, duration: 4000 },
+    shrink: { icon: '🔻', name: '몸 축소', rate: 0.001, duration: 4000 },
     coin: { icon: '💎', name: '보너스 점수', rate: 0.002, duration: 0 }
 };
 
