@@ -81,7 +81,8 @@ body { background: var(--void); color: var(--text-primary); font-family: 'Noto S
 /* HUD 상단 */
 .hud-top { position: fixed; top: 0; left: 0; right: 0; z-index: 50; padding: 12px 16px; padding-top: calc(12px + var(--safe-top)); display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; pointer-events: none; }
 .hud-top > * { pointer-events: auto; }
-.hud-panel { background: rgba(10,10,26,0.92); border: 1px solid var(--border-default); border-radius: 14px; padding: 10px 12px; backdrop-filter: blur(8px); }
+.hud-panel { background: rgba(10,10,26,0.7); border: 1px solid var(--border-default); border-radius: 14px; padding: 10px 12px; backdrop-filter: blur(8px); opacity: 0.6; transition: opacity 0.2s; }
+.hud-panel:hover { opacity: 1; }
 .hud-name { font-family: 'Orbitron', monospace; font-size: 0.7rem; color: var(--neon-cyan); margin-bottom: 6px; }
 .hud-row { display: flex; align-items: center; gap: 6px; font-size: 0.8rem; margin-bottom: 3px; }
 .hud-val { font-family: 'Orbitron', monospace; font-weight: 700; color: var(--neon-yellow); }
@@ -124,12 +125,14 @@ body { background: var(--void); color: var(--text-primary); font-family: 'Noto S
 .controls { position: fixed; bottom: 0; left: 0; right: 0; z-index: 60; padding: 16px 24px; padding-bottom: calc(16px + var(--safe-bottom)); display: flex; justify-content: space-between; align-items: flex-end; }
 .controls.joy-right { flex-direction: row-reverse; }
 
-.joystick { position: relative; width: 110px; height: 110px; }
-.joy-base { position: absolute; inset: 0; background: rgba(10,10,26,0.7); border: 2px solid var(--border-default); border-radius: 50%; }
+.joystick { position: relative; width: 110px; height: 110px; opacity: 0.5; transition: opacity 0.2s; }
+.joystick:active, .joystick:hover { opacity: 0.9; }
+.joy-base { position: absolute; inset: 0; background: rgba(10,10,26,0.5); border: 2px solid var(--border-default); border-radius: 50%; }
 .joy-knob { position: absolute; top: 50%; left: 50%; width: 50px; height: 50px; margin: -25px 0 0 -25px; background: var(--gradient-energy); border-radius: 50%; box-shadow: 0 0 15px rgba(0,245,212,0.4); transition: transform 0.05s; }
 
-.action-btn { width: 70px; height: 70px; display: flex; align-items: center; justify-content: center; background: rgba(10,10,26,0.85); border: 2px solid var(--neon-cyan); border-radius: 50%; font-size: 1.5rem; cursor: pointer; box-shadow: 0 0 20px rgba(0,245,212,0.25); transition: transform 0.15s, box-shadow 0.15s; }
-.action-btn:active { transform: scale(0.92); box-shadow: 0 0 30px rgba(0,245,212,0.5); }
+.action-btn { width: 70px; height: 70px; display: flex; align-items: center; justify-content: center; background: rgba(10,10,26,0.6); border: 2px solid var(--neon-cyan); border-radius: 50%; font-size: 1.5rem; cursor: pointer; box-shadow: 0 0 20px rgba(0,245,212,0.25); transition: transform 0.15s, box-shadow 0.15s, opacity 0.2s; opacity: 0.5; }
+.action-btn:hover { opacity: 0.9; }
+.action-btn:active { transform: scale(0.92); box-shadow: 0 0 30px rgba(0,245,212,0.5); opacity: 1; }
 .action-btn.disabled { opacity: 0.3; pointer-events: none; }
 
 /* 토스트 */
@@ -245,13 +248,14 @@ const ENVS = [
     { id: 'toxic', name: '독성 늪', icon: '💀', range: [81,100], colors: { bg1: '#0a1a0a', bg2: '#1a3a1a', particle: '#88ff00', food: '#aaff44', enemy: '#ff00ff' }, desc: '독이 곧 약.', weak: '깨끗함이 불편.', creatures: ['🟢','💚','🧪','☢️'] }
 ];
 
-// 러너 스테이지 (5단계)
+// 러너 스테이지 (6단계 - 첨단 시대까지)
 const RUNNER_STAGES = [
     { id: 'forest', name: '🌲 원시의 숲', dist: CONFIG.RUNNER_STAGE_DIST, bgColors: ['#1a3a1a', '#0a2a0a'], groundColor: '#3d2817', obstacles: ['🪨', '🌳'], baseSpeed: 2 },
     { id: 'plains', name: '⚡ 번개의 평원', dist: CONFIG.RUNNER_STAGE_DIST, bgColors: ['#2a2a4a', '#1a1a3a'], groundColor: '#4a3a2a', obstacles: ['🪨', '💀'], baseSpeed: 2.5 },
     { id: 'fire', name: '🔥 불의 발견', dist: CONFIG.RUNNER_STAGE_DIST, bgColors: ['#3a1a0a', '#2a0a00'], groundColor: '#4a3020', obstacles: ['🌋'], baseSpeed: 3 },
     { id: 'tools', name: '🔧 도구의 시대', dist: CONFIG.RUNNER_STAGE_DIST, bgColors: ['#2a2a2a', '#1a1a1a'], groundColor: '#3a3a3a', obstacles: ['🗿'], baseSpeed: 3.5 },
-    { id: 'civilization', name: '🏛️ 문명의 여명', dist: CONFIG.RUNNER_STAGE_DIST, bgColors: ['#3a2a1a', '#2a1a0a'], groundColor: '#5a4a3a', obstacles: ['🗿'], baseSpeed: 4 }
+    { id: 'civilization', name: '🏛️ 문명의 여명', dist: CONFIG.RUNNER_STAGE_DIST, bgColors: ['#3a2a1a', '#2a1a0a'], groundColor: '#5a4a3a', obstacles: ['🏛️', '🏺'], baseSpeed: 4 },
+    { id: 'tech', name: '🚀 첨단 시대', dist: CONFIG.RUNNER_STAGE_DIST, bgColors: ['#0a1a3a', '#001122'], groundColor: '#2a3a4a', obstacles: ['🚗', '🏗️'], baseSpeed: 4.5 }
 ];
 
 // 헬퍼 함수들
@@ -697,11 +701,30 @@ const REGION_TRAITS = {
         { id: 't9', icon: '🫧', name: '독 주머니', desc: '독액 저장 기관', effect: '독 강화' },
         { id: 't10', icon: '🌿', name: '덩굴 촉수', desc: '감아붙는 덩굴팔', effect: '속박 효과' },
         { id: 't11', icon: '💀', name: '해골 가면', desc: '뼈로 된 얼굴판', effect: '공포 효과' }
+    ],
+    
+    // 첨단 시대 - 공통 기술 파츠 (마지막 스테이지)
+    tech: [
+        { id: 'tech1', icon: '🤖', name: '로봇 팔', desc: '기계화된 강철 팔', effect: '공격력 +50%' },
+        { id: 'tech2', icon: '🦾', name: '사이보그 다리', desc: '초고속 기계 다리', effect: '속도 +60%' },
+        { id: 'tech3', icon: '🛸', name: '반중력 장치', desc: '공중 부양 모듈', effect: '무한 점프' },
+        { id: 'tech4', icon: '📡', name: '레이더 안테나', desc: '전방위 탐지 장치', effect: '시야 +100%' },
+        { id: 'tech5', icon: '🔋', name: '플라즈마 코어', desc: '무한 에너지 심장', effect: '체력 회복 +' },
+        { id: 'tech6', icon: '💻', name: 'AI 칩', desc: '초지능 두뇌 칩', effect: '경험치 +100%' },
+        { id: 'tech7', icon: '🔫', name: '레이저 캐논', desc: '광선 발사 무기', effect: '원거리 공격' },
+        { id: 'tech8', icon: '🛡️', name: '에너지 쉴드', desc: '방어막 생성기', effect: '무적 2초' },
+        { id: 'tech9', icon: '⚙️', name: '나노 장갑', desc: '자가수복 금속 갑옷', effect: '방어력 +3' },
+        { id: 'tech10', icon: '🚀', name: '제트 부스터', desc: '등에 장착된 추진기', effect: '속도 +80%' },
+        { id: 'tech11', icon: '🧬', name: 'DNA 개조기', desc: '유전자 변형 장치', effect: '모든 효과 +20%' },
+        { id: 'tech12', icon: '👁️‍🗨️', name: '홀로그램 눈', desc: 'AR 증강현실 눈', effect: '미래 예측' }
     ]
 };
 
-// 현재 지역의 특성 가져오기
-const getRegionTraits = () => REGION_TRAITS[G.data?.dna?.origin] || REGION_TRAITS.ocean;
+// 현재 지역의 특성 가져오기 (마지막 스테이지는 tech)
+const getRegionTraits = () => {
+    if (G.data?.runnerStage >= 4) return REGION_TRAITS.tech;
+    return REGION_TRAITS[G.data?.dna?.origin] || REGION_TRAITS.ocean;
+};
 
 // ID로 특성 찾기 (모든 지역에서)
 const getTraitById = id => {
@@ -747,6 +770,7 @@ const startCellWorld = () => {
                 </div>
             </div>
             <div class="hud-btns">
+                <button class="hud-btn" id="btn-clear" title="테스트 클리어" style="background:var(--success);color:white;">✓</button>
                 <button class="hud-btn" id="btn-home">🏠</button>
                 <button class="hud-btn" id="btn-pause">⏸️</button>
             </div>
@@ -871,6 +895,13 @@ const tryDash = () => {
 };
 
 const setupCellHUD = () => {
+    document.getElementById('btn-clear').onclick = () => {
+        Audio.playClick();
+        // 테스트용 즉시 진화
+        G.data.score = CONFIG.STAGE_THRESHOLD;
+        while (totalParts() < 5) addRandomPart();
+        cellEvolve();
+    };
     document.getElementById('btn-home').onclick = () => {
         Audio.playClick();
         if (confirm('홈으로?')) { cancelAnimationFrame(gameLoop); gameLoop = null; saveGame(); renderSaves(); }
@@ -1305,6 +1336,7 @@ const startClimb = () => {
                 <div class="climb-label">현재 높이</div>
             </div>
             <div class="hud-btns">
+                <button class="hud-btn" id="btn-clear" title="테스트 클리어" style="background:var(--success);color:white;">✓</button>
                 <button class="hud-btn" id="btn-restart">🔄</button>
                 <button class="hud-btn" id="btn-home">🏠</button>
                 <button class="hud-btn" id="btn-pause">⏸️</button>
@@ -1435,6 +1467,10 @@ const setupClimbControls = () => {
 };
 
 const setupClimbHUD = () => {
+    document.getElementById('btn-clear').onclick = () => {
+        Audio.playClick();
+        climbWin(); // 테스트용 즉시 클리어
+    };
     document.getElementById('btn-restart').onclick = () => {
         Audio.playClick();
         if (confirm('처음부터?')) { cancelAnimationFrame(gameLoop); gameLoop = null; showClimbDice(); }
@@ -1735,16 +1771,16 @@ let lastObstacleTime = 0;
 let activeEffects = {}; // 현재 활성화된 효과들
 const MIN_OBSTACLE_GAP = 1500;
 
-// 아이템 종류 정의
+// 아이템 종류 정의 (생성률 1/4로 줄임)
 const RUNNER_ITEMS = {
-    dice: { icon: '🎲', name: '진화 주사위', rate: 0.0016, duration: 0 },
-    jump: { icon: '🦘', name: '점프력 향상', rate: 0.006, duration: 5000 },
-    speed: { icon: '⚡', name: '속도 증가', rate: 0.005, duration: 4000 },
-    slow: { icon: '🐢', name: '속도 감소', rate: 0.004, duration: 4000 },
-    shield: { icon: '🛡️', name: '무적', rate: 0.003, duration: 3000 },
-    magnet: { icon: '🧲', name: '자석', rate: 0.004, duration: 5000 },
-    shrink: { icon: '🔻', name: '몸 축소', rate: 0.003, duration: 4000 },
-    coin: { icon: '💎', name: '보너스 점수', rate: 0.008, duration: 0 }
+    dice: { icon: '🎲', name: '진화 주사위', rate: 0.0004, duration: 0 },
+    jump: { icon: '🦘', name: '점프력 향상', rate: 0.0015, duration: 5000 },
+    speed: { icon: '⚡', name: '속도 증가', rate: 0.00125, duration: 4000 },
+    slow: { icon: '🐢', name: '속도 감소', rate: 0.001, duration: 4000 },
+    shield: { icon: '🛡️', name: '무적', rate: 0.00075, duration: 3000 },
+    magnet: { icon: '🧲', name: '자석', rate: 0.001, duration: 5000 },
+    shrink: { icon: '🔻', name: '몸 축소', rate: 0.00075, duration: 4000 },
+    coin: { icon: '💎', name: '보너스 점수', rate: 0.002, duration: 0 }
 };
 
 const startRunner = () => {
@@ -1787,6 +1823,7 @@ const startRunner = () => {
                 <div style="font-size:0.6rem;color:var(--neon-yellow);margin-top:2px;">🧬 진화: ${G.data.evoTraits?.length || 0}개</div>
             </div>
             <div class="hud-btns">
+                <button class="hud-btn" id="btn-clear" title="테스트 클리어" style="background:var(--success);color:white;">✓</button>
                 <button class="hud-btn" id="btn-edit" title="파츠 배치">✋</button>
                 <button class="hud-btn" id="btn-home">🏠</button>
                 <button class="hud-btn" id="btn-pause">⏸️</button>
@@ -1845,6 +1882,7 @@ const resumeRunner = () => {
                 <div style="font-size:0.6rem;color:var(--neon-yellow);margin-top:2px;">🧬 진화: ${G.data.evoTraits?.length || 0}개</div>
             </div>
             <div class="hud-btns">
+                <button class="hud-btn" id="btn-clear" title="테스트 클리어" style="background:var(--success);color:white;">✓</button>
                 <button class="hud-btn" id="btn-edit" title="파츠 배치">✋</button>
                 <button class="hud-btn" id="btn-home">🏠</button>
                 <button class="hud-btn" id="btn-pause">⏸️</button>
@@ -1921,6 +1959,10 @@ const setupRunnerControls = () => {
 };
 
 const setupRunnerHUD = () => {
+    document.getElementById('btn-clear').onclick = () => {
+        Audio.playClick();
+        runnerStageComplete(); // 테스트용 즉시 클리어
+    };
     document.getElementById('btn-edit').onclick = () => {
         Audio.playClick();
         cancelAnimationFrame(gameLoop);
@@ -2599,6 +2641,302 @@ const openEvoEditor = (isNew = false) => {
     animLoop();
 };
 
+// 문명 발전 배경 그리기
+const drawCivilizationBg = (w, h, groundY, t) => {
+    const farSpeed = 0.1;
+    const midSpeed = 0.2;
+    const nearSpeed = 0.3;
+    
+    if (runnerStage === 0) {
+        // 🌲 원시의 숲 - 나무들, 덤불
+        // 먼 배경 나무
+        for (let i = 0; i < 6; i++) {
+            const tx = ((w + 200) - (bgOffset * farSpeed + i * 250) % (w + 200));
+            ctx.fillStyle = '#0d2d0d';
+            ctx.beginPath();
+            ctx.moveTo(tx, groundY);
+            ctx.lineTo(tx + 40, groundY - 150);
+            ctx.lineTo(tx + 80, groundY);
+            ctx.fill();
+        }
+        // 가까운 나무
+        for (let i = 0; i < 8; i++) {
+            const tx = ((w + 150) - (bgOffset * nearSpeed + i * 180) % (w + 150));
+            ctx.fillStyle = '#1a4a1a';
+            ctx.beginPath();
+            ctx.moveTo(tx, groundY);
+            ctx.lineTo(tx + 25, groundY - 100);
+            ctx.lineTo(tx + 50, groundY);
+            ctx.fill();
+            // 나무 줄기
+            ctx.fillStyle = '#3d2817';
+            ctx.fillRect(tx + 20, groundY - 30, 10, 30);
+        }
+        // 덤불
+        for (let i = 0; i < 5; i++) {
+            const bx = ((w + 100) - (bgOffset * midSpeed + i * 200) % (w + 100));
+            ctx.fillStyle = '#2d5a2d';
+            ctx.beginPath();
+            ctx.arc(bx, groundY - 10, 20, Math.PI, 0);
+            ctx.fill();
+        }
+    } else if (runnerStage === 1) {
+        // ⚡ 번개의 평원 - 번개, 동굴, 바위
+        // 먼 산
+        for (let i = 0; i < 4; i++) {
+            const mx = ((w + 300) - (bgOffset * farSpeed * 0.5 + i * 350) % (w + 300));
+            ctx.fillStyle = '#1a1a3a';
+            ctx.beginPath();
+            ctx.moveTo(mx, groundY);
+            ctx.lineTo(mx + 80, groundY - 180);
+            ctx.lineTo(mx + 160, groundY);
+            ctx.fill();
+        }
+        // 동굴
+        for (let i = 0; i < 2; i++) {
+            const cx = ((w + 400) - (bgOffset * midSpeed + i * 500) % (w + 400));
+            ctx.fillStyle = '#2a2a4a';
+            ctx.beginPath();
+            ctx.arc(cx + 40, groundY, 50, Math.PI, 0);
+            ctx.fill();
+            ctx.fillStyle = '#0a0a1a';
+            ctx.beginPath();
+            ctx.arc(cx + 40, groundY, 30, Math.PI, 0);
+            ctx.fill();
+        }
+        // 번개 효과 (간헐적)
+        if (Math.sin(t * 2) > 0.95) {
+            ctx.strokeStyle = '#ffff00';
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            ctx.moveTo(w * 0.7, 0);
+            ctx.lineTo(w * 0.65, h * 0.3);
+            ctx.lineTo(w * 0.72, h * 0.35);
+            ctx.lineTo(w * 0.68, groundY - 50);
+            ctx.stroke();
+        }
+    } else if (runnerStage === 2) {
+        // 🔥 불의 발견 - 모닥불, 동굴, 사람 실루엣
+        // 동굴
+        for (let i = 0; i < 2; i++) {
+            const cx = ((w + 500) - (bgOffset * midSpeed + i * 600) % (w + 500));
+            ctx.fillStyle = '#2a1a0a';
+            ctx.beginPath();
+            ctx.arc(cx + 50, groundY, 60, Math.PI, 0);
+            ctx.fill();
+            ctx.fillStyle = '#0a0500';
+            ctx.beginPath();
+            ctx.arc(cx + 50, groundY, 40, Math.PI, 0);
+            ctx.fill();
+            // 동굴 안 불빛
+            ctx.fillStyle = `rgba(255,100,0,${0.3 + Math.sin(t * 5) * 0.2})`;
+            ctx.beginPath();
+            ctx.arc(cx + 50, groundY - 20, 25, 0, Math.PI * 2);
+            ctx.fill();
+        }
+        // 모닥불
+        for (let i = 0; i < 3; i++) {
+            const fx = ((w + 300) - (bgOffset * nearSpeed + i * 350) % (w + 300));
+            // 불
+            ctx.fillStyle = `rgba(255,${100 + Math.sin(t * 8 + i) * 50},0,0.8)`;
+            ctx.beginPath();
+            ctx.moveTo(fx, groundY);
+            ctx.quadraticCurveTo(fx + 10, groundY - 30 - Math.sin(t * 10) * 10, fx + 20, groundY);
+            ctx.fill();
+            // 사람 실루엣
+            ctx.fillStyle = '#1a0a00';
+            ctx.beginPath();
+            ctx.arc(fx + 40, groundY - 35, 8, 0, Math.PI * 2); // 머리
+            ctx.fill();
+            ctx.fillRect(fx + 36, groundY - 27, 8, 27); // 몸
+        }
+    } else if (runnerStage === 3) {
+        // 🔧 도구의 시대 - 움막, 도구 들고 있는 사람들
+        // 움막
+        for (let i = 0; i < 3; i++) {
+            const hx = ((w + 350) - (bgOffset * midSpeed + i * 400) % (w + 350));
+            // 움막 구조
+            ctx.fillStyle = '#4a3a2a';
+            ctx.beginPath();
+            ctx.moveTo(hx, groundY);
+            ctx.lineTo(hx + 35, groundY - 50);
+            ctx.lineTo(hx + 70, groundY);
+            ctx.fill();
+            // 입구
+            ctx.fillStyle = '#1a1a1a';
+            ctx.beginPath();
+            ctx.arc(hx + 35, groundY, 15, Math.PI, 0);
+            ctx.fill();
+        }
+        // 사람들 (도구 사용)
+        for (let i = 0; i < 4; i++) {
+            const px = ((w + 200) - (bgOffset * nearSpeed + i * 250) % (w + 200));
+            // 사람
+            ctx.fillStyle = '#5a4a3a';
+            ctx.beginPath();
+            ctx.arc(px, groundY - 40, 10, 0, Math.PI * 2); // 머리
+            ctx.fill();
+            ctx.fillRect(px - 5, groundY - 30, 10, 30); // 몸
+            // 도구
+            ctx.strokeStyle = '#8a7a6a';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(px + 8, groundY - 25);
+            ctx.lineTo(px + 25, groundY - 40);
+            ctx.stroke();
+        }
+        // 바위 (돌도구)
+        for (let i = 0; i < 5; i++) {
+            const rx = ((w + 150) - (bgOffset * farSpeed + i * 180) % (w + 150));
+            ctx.fillStyle = '#6a6a6a';
+            ctx.beginPath();
+            ctx.ellipse(rx, groundY - 5, 12, 8, 0, 0, Math.PI * 2);
+            ctx.fill();
+        }
+    } else if (runnerStage === 4) {
+        // 🏛️ 문명의 여명 - 건물, 신전, 많은 사람들
+        // 먼 배경 건물
+        for (let i = 0; i < 4; i++) {
+            const bx = ((w + 250) - (bgOffset * farSpeed + i * 300) % (w + 250));
+            const bh = 80 + i * 20;
+            ctx.fillStyle = '#2a1a0a';
+            ctx.fillRect(bx, groundY - bh, 60, bh);
+            // 기둥
+            ctx.fillStyle = '#3a2a1a';
+            for (let j = 0; j < 3; j++) {
+                ctx.fillRect(bx + 5 + j * 20, groundY - bh, 8, bh);
+            }
+            // 지붕 (삼각형)
+            ctx.fillStyle = '#4a3a2a';
+            ctx.beginPath();
+            ctx.moveTo(bx - 5, groundY - bh);
+            ctx.lineTo(bx + 30, groundY - bh - 25);
+            ctx.lineTo(bx + 65, groundY - bh);
+            ctx.fill();
+        }
+        // 가까운 집들
+        for (let i = 0; i < 5; i++) {
+            const hx = ((w + 180) - (bgOffset * midSpeed + i * 200) % (w + 180));
+            const hh = 40 + (i % 3) * 15;
+            ctx.fillStyle = '#5a4a3a';
+            ctx.fillRect(hx, groundY - hh, 40, hh);
+            // 창문
+            ctx.fillStyle = '#ffa500';
+            ctx.fillRect(hx + 8, groundY - hh + 10, 10, 10);
+            ctx.fillRect(hx + 22, groundY - hh + 10, 10, 10);
+            // 문
+            ctx.fillStyle = '#3a2a1a';
+            ctx.fillRect(hx + 15, groundY - 20, 12, 20);
+        }
+        // 사람들
+        for (let i = 0; i < 6; i++) {
+            const px = ((w + 120) - (bgOffset * nearSpeed + i * 150) % (w + 120));
+            ctx.fillStyle = '#6a5a4a';
+            ctx.beginPath();
+            ctx.arc(px, groundY - 35, 8, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.fillRect(px - 4, groundY - 27, 8, 27);
+            // 걷는 다리
+            const legPhase = Math.sin(t * 5 + i);
+            ctx.strokeStyle = '#6a5a4a';
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            ctx.moveTo(px, groundY);
+            ctx.lineTo(px + legPhase * 5, groundY + 2);
+            ctx.stroke();
+        }
+    } else if (runnerStage === 5) {
+        // 🚀 첨단 시대 - 고층빌딩, 자동차, 드론, 네온
+        // 먼 배경 고층빌딩
+        for (let i = 0; i < 5; i++) {
+            const bx = ((w + 200) - (bgOffset * farSpeed * 0.5 + i * 220) % (w + 200));
+            const bh = 120 + (i % 3) * 40;
+            // 빌딩
+            ctx.fillStyle = '#1a2a3a';
+            ctx.fillRect(bx, groundY - bh, 45, bh);
+            // 창문 (네온)
+            for (let row = 0; row < Math.floor(bh / 20); row++) {
+                for (let col = 0; col < 3; col++) {
+                    const lit = Math.sin(t * 2 + row + col + i) > 0;
+                    ctx.fillStyle = lit ? '#00ffff' : '#0a1a2a';
+                    ctx.fillRect(bx + 5 + col * 13, groundY - bh + 10 + row * 20, 8, 12);
+                }
+            }
+        }
+        // 가까운 빌딩
+        for (let i = 0; i < 4; i++) {
+            const bx = ((w + 250) - (bgOffset * midSpeed + i * 280) % (w + 250));
+            const bh = 80 + (i % 2) * 30;
+            ctx.fillStyle = '#2a3a4a';
+            ctx.fillRect(bx, groundY - bh, 55, bh);
+            // 유리창 반사
+            ctx.fillStyle = 'rgba(100,200,255,0.3)';
+            ctx.fillRect(bx + 5, groundY - bh + 5, 45, bh - 10);
+            // 네온 간판
+            ctx.fillStyle = `hsl(${(t * 50 + i * 60) % 360}, 100%, 50%)`;
+            ctx.fillRect(bx + 10, groundY - bh - 10, 35, 8);
+        }
+        // 자동차 (움직임)
+        for (let i = 0; i < 3; i++) {
+            const cx = ((w + 300) - (bgOffset * nearSpeed * 1.5 + i * 350) % (w + 300));
+            // 차체
+            ctx.fillStyle = ['#ff4444', '#4444ff', '#44ff44'][i % 3];
+            ctx.fillRect(cx, groundY - 20, 35, 15);
+            ctx.fillRect(cx + 5, groundY - 30, 25, 10);
+            // 바퀴
+            ctx.fillStyle = '#222';
+            ctx.beginPath();
+            ctx.arc(cx + 8, groundY - 5, 6, 0, Math.PI * 2);
+            ctx.arc(cx + 27, groundY - 5, 6, 0, Math.PI * 2);
+            ctx.fill();
+            // 헤드라이트
+            ctx.fillStyle = '#ffff00';
+            ctx.fillRect(cx + 33, groundY - 18, 4, 6);
+        }
+        // 드론 (하늘)
+        for (let i = 0; i < 2; i++) {
+            const dx = ((w + 400) - (bgOffset * midSpeed * 1.2 + i * 450) % (w + 400));
+            const dy = 60 + Math.sin(t * 3 + i) * 20;
+            ctx.fillStyle = '#666';
+            ctx.fillRect(dx - 10, dy, 20, 5);
+            // 프로펠러
+            ctx.strokeStyle = '#aaa';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(dx - 15, dy);
+            ctx.lineTo(dx - 5, dy);
+            ctx.moveTo(dx + 5, dy);
+            ctx.lineTo(dx + 15, dy);
+            ctx.stroke();
+            // 불빛
+            ctx.fillStyle = Math.sin(t * 10) > 0 ? '#ff0000' : '#00ff00';
+            ctx.beginPath();
+            ctx.arc(dx, dy + 5, 3, 0, Math.PI * 2);
+            ctx.fill();
+        }
+        // 사람들 (현대 의상)
+        for (let i = 0; i < 4; i++) {
+            const px = ((w + 150) - (bgOffset * nearSpeed + i * 180) % (w + 150));
+            // 머리
+            ctx.fillStyle = '#ddd';
+            ctx.beginPath();
+            ctx.arc(px, groundY - 38, 7, 0, Math.PI * 2);
+            ctx.fill();
+            // 몸 (정장)
+            ctx.fillStyle = '#333';
+            ctx.fillRect(px - 5, groundY - 31, 10, 20);
+            // 다리
+            ctx.fillRect(px - 4, groundY - 11, 3, 11);
+            ctx.fillRect(px + 1, groundY - 11, 3, 11);
+            // 스마트폰
+            if (i % 2 === 0) {
+                ctx.fillStyle = '#00ffff';
+                ctx.fillRect(px + 6, groundY - 28, 4, 7);
+            }
+        }
+    }
+};
+
 const renderRunner = (stage, groundY) => {
     const w = canvas.width, h = canvas.height, t = Date.now() * 0.001;
     
@@ -2609,27 +2947,8 @@ const renderRunner = (stage, groundY) => {
     ctx.fillStyle = bg;
     ctx.fillRect(0, 0, w, h);
     
-    // 배경 장식
-    if (runnerStage === 0) {
-        for (let i = 0; i < 8; i++) {
-            const tx = ((w + 150) - (bgOffset * 0.3 + i * 180) % (w + 150));
-            ctx.fillStyle = '#1a4a1a';
-            ctx.beginPath();
-            ctx.moveTo(tx, groundY);
-            ctx.lineTo(tx + 25, groundY - 100);
-            ctx.lineTo(tx + 50, groundY);
-            ctx.fill();
-        }
-    } else if (runnerStage >= 4) {
-        for (let i = 0; i < 5; i++) {
-            const bx = ((w + 150) - (bgOffset * 0.15 + i * 200) % (w + 150));
-            const bh = 50 + i * 15;
-            ctx.fillStyle = '#3a2a1a';
-            ctx.fillRect(bx, groundY - bh, 50, bh);
-            ctx.fillStyle = '#ffa500';
-            ctx.fillRect(bx + 10, groundY - bh + 15, 10, 10);
-        }
-    }
+    // 배경 장식 (스테이지별 문명 발전)
+    drawCivilizationBg(w, h, groundY, t);
     
     // 땅
     ctx.fillStyle = stage.groundColor;
@@ -2875,11 +3194,9 @@ const runnerFail = () => {
     gameLoop = null;
     Audio.playDeath();
     
-    const lostTraits = G.data.evoTraits?.length || 0;
+    const currentDist = Math.floor(runnerDist);
     
-    // ★ 충돌 시 모든 진화 리셋!
-    G.data.evoTraits = [];
-    G.data.charScale = 1;
+    // ★ 충돌 시 거리만 리셋! (파츠/진화는 유지)
     G.data.runnerDist = 0;
     saveGame();
     
@@ -2887,13 +3204,13 @@ const runnerFail = () => {
         <div class="modal"><div class="modal-box">
             <div class="modal-icon">💥</div>
             <h1 class="modal-title fail">충돌!</h1>
-            <p class="modal-desc">장애물에 부딪혔습니다.<br><span style="color:var(--danger);">모든 진화가 초기화됩니다!</span></p>
+            <p class="modal-desc">장애물에 부딪혔습니다.<br><span style="color:var(--neon-yellow);">거리만 초기화됩니다!</span></p>
             <div class="modal-stats">
-                <div class="stat-row"><span class="stat-label">진행 거리</span><span class="stat-val">${Math.floor(runnerDist)}m</span></div>
-                <div class="stat-row"><span class="stat-label">잃은 특성</span><span class="stat-val" style="color:var(--danger);">${lostTraits}개</span></div>
+                <div class="stat-row"><span class="stat-label">진행 거리</span><span class="stat-val">${currentDist}m</span></div>
+                <div class="stat-row"><span class="stat-label">보유 특성</span><span class="stat-val">${G.data.evoTraits?.length || 0}개 (유지)</span></div>
             </div>
             <div style="display:flex;flex-direction:column;gap:10px;">
-                <button class="btn btn-energy btn-block" id="btn-retry">🔄 처음부터</button>
+                <button class="btn btn-energy btn-block" id="btn-retry">🔄 다시</button>
                 <button class="btn btn-outline btn-block" id="btn-home">🏠 홈</button>
             </div>
         </div></div>
