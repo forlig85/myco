@@ -231,65 +231,98 @@ const BASE_STATS = {
     speed: 3,       // 기본 이동 속도
     jump: 18,       // 기본 점프력
     defense: 0,     // 기본 방어력
+    attack: 1,      // 기본 공격력
     score: 1,       // 점수 배율
     magnet: 0,      // 자석 범위
     vision: 100     // 시야 범위 (%)
 };
 
-// 파츠별 스텟 보너스
+// 파츠별 스텟 보너스 (모든 효과)
 const TRAIT_STATS = {
     // 속도 관련
-    '속도': { speed: 0.5 },
+    '속도 +10%': { speed: 0.3 },
     '속도 +15%': { speed: 0.5 },
-    '속도 +20%': { speed: 0.7 },
-    '속도 +25%': { speed: 0.9 },
-    '속도 +30%': { speed: 1.1 },
-    '속도 +40%': { speed: 1.5 },
-    '속도 +60%': { speed: 2.0 },
-    '속도 +80%': { speed: 2.5 },
+    '속도 +20%': { speed: 0.6 },
+    '속도 +25%': { speed: 0.8 },
+    '속도 +30%': { speed: 1.0 },
+    '속도 +40%': { speed: 1.2 },
     '속도 +100%': { speed: 3.0 },
     '속도 +200%': { speed: 6.0 },
+    
     // 점프 관련
     '점프력 +20%': { jump: 4 },
     '2단점프': { jump: 6, doubleJump: true },
     '무한 점프': { jump: 10, infiniteJump: true },
-    '활공': { glide: true },
-    '활공+속도': { glide: true, speed: 0.5 },
-    '활공+방어': { glide: true, defense: 0.5 },
+    '활공': { jump: 3, glide: true },
+    '활공+속도': { jump: 3, glide: true, speed: 0.5 },
+    '활공+방어': { jump: 3, glide: true, defense: 0.5 },
+    
     // 방어 관련
     '방어력 +0.5': { defense: 0.5 },
     '방어력 +0.8': { defense: 0.8 },
-    '방어력 +1': { defense: 1 },
+    '방어력 +1': { defense: 1.0 },
     '방어력 +1.2': { defense: 1.2 },
-    '방어력 +1.3': { defense: 1.3 },
     '방어력 +1.5': { defense: 1.5 },
-    '방어력 +3': { defense: 3 },
-    '무적 1초': { invincible: 1 },
-    '무적 2초': { invincible: 2 },
-    '무적 지속': { invincible: 999 },
+    '무적 1초': { defense: 2, invincible: 1 },
+    '무적 지속': { defense: 5, invincible: 999 },
+    '무한 체력': { defense: 10 },
+    '반사 데미지': { defense: 0.5, reflect: true },
+    '회피율 +20%': { defense: 0.3, dodge: 20 },
+    
+    // 공격 관련
+    '공격력 +1': { attack: 1.0 },
+    '공격력 +1.2': { attack: 1.2 },
+    '공격력 +1.3': { attack: 1.3 },
+    '공격력 +1.5': { attack: 1.5 },
+    '범위 공격': { attack: 0.8, aoe: true },
+    '관통 공격': { attack: 1.0, pierce: true },
+    '화염 공격': { attack: 1.2, fire: true },
+    '빙결 공격': { attack: 1.0, freeze: true },
+    '감전 공격': { attack: 1.3, shock: true },
+    '적 자동 파괴': { attack: 2.0, autoDestroy: true },
+    
     // 점수/경험치
     '점수 +20%': { score: 0.2 },
     '점수 +50%': { score: 0.5 },
     '경험치 +30%': { score: 0.3 },
-    '경험치 +100%': { score: 1.0 },
+    
     // 시야
-    '시야 +20%': { vision: 20 },
     '시야 +25%': { vision: 25 },
     '시야 +30%': { vision: 30 },
     '시야 +40%': { vision: 40 },
     '시야 +50%': { vision: 50 },
-    '시야 +100%': { vision: 100 },
-    // 자석
-    '자석 효과': { magnet: 50 },
+    '적 탐지': { vision: 30, detectEnemy: true },
+    '장애물 예측': { vision: 50, predict: true },
+    
+    // 자석/수집
     '아이템 끌어당김': { magnet: 100 },
     '자동 아이템 수집': { magnet: 200 },
-    // 기타
-    '반사 데미지': { reflect: true },
-    '은신': { stealth: true },
-    '적 탐지': { detectEnemy: true },
-    '장애물 예측': { predict: true },
-    '모든 효과 +20%': { allBonus: 0.2 },
-    '파츠 2배 획득': { doubleTraits: true }
+    
+    // 특수 효과
+    '은신': { speed: 0.3, stealth: true },
+    '슬로우 모션': { speed: 0.5, slowTime: true },
+    '반응속도 +50%': { speed: 0.5, reaction: 50 },
+    '파츠 2배 획득': { score: 0.5, doubleParts: true },
+    '체력 회복': { defense: 0.5, regen: true },
+    
+    // 독 계열
+    '독 면역': { defense: 0.5, poisonImmune: true },
+    '독 오라': { attack: 0.8, poisonAura: true },
+    '독 강화': { attack: 1.0, poisonBoost: true },
+    '독+공격력': { attack: 1.5, poison: true },
+    
+    // 화염 계열
+    '화염 면역': { defense: 0.5, fireImmune: true },
+    '화염 오라': { attack: 1.0, fireAura: true },
+    '화염+공격력': { attack: 1.5, fire: true },
+    
+    // 상태이상
+    '둔화 효과': { attack: 0.5, slow: true },
+    '둔화 오라': { attack: 0.5, slowAura: true },
+    '둔화 면역': { speed: 0.3, slowImmune: true },
+    '속박 효과': { attack: 0.5, bind: true },
+    '공포 효과': { attack: 0.5, fear: true },
+    '함정 설치': { attack: 1.0, trap: true }
 };
 
 // 현재 총 스텟 계산
@@ -310,13 +343,6 @@ const calculateStats = () => {
             });
         }
     });
-    
-    // allBonus 적용
-    if (stats.allBonus) {
-        ['speed', 'jump', 'defense', 'score', 'magnet', 'vision'].forEach(key => {
-            stats[key] *= (1 + stats.allBonus);
-        });
-    }
     
     return stats;
 };
@@ -2098,6 +2124,21 @@ const showStatsPanel = () => {
     const stats = calculateStats();
     const traits = G.data.evoTraits || [];
     
+    // 스탯 이름 한글 매핑
+    const statNames = {
+        speed: '속도', jump: '점프', defense: '방어', attack: '공격',
+        score: '점수', magnet: '자석', vision: '시야',
+        doubleJump: '2단점프', infiniteJump: '무한점프', glide: '활공',
+        reflect: '반사', stealth: '은신', detectEnemy: '적탐지',
+        predict: '예측', doubleParts: '2배획득', regen: '회복',
+        invincible: '무적', dodge: '회피', aoe: '범위', pierce: '관통',
+        fire: '화염', freeze: '빙결', shock: '감전', autoDestroy: '자동파괴',
+        poison: '독', poisonImmune: '독면역', poisonAura: '독오라',
+        fireImmune: '화면역', fireAura: '화오라', slow: '둔화',
+        slowAura: '둔화오라', slowImmune: '둔화면역', bind: '속박',
+        fear: '공포', trap: '함정', slowTime: '시간감속', reaction: '반응'
+    };
+    
     // 파츠별 능력치 목록
     let partsHtml = '';
     traits.forEach(et => {
@@ -2105,9 +2146,10 @@ const showStatsPanel = () => {
         if (trait) {
             const bonus = TRAIT_STATS[trait.effect] || {};
             let bonusText = Object.entries(bonus).map(([k, v]) => {
-                if (typeof v === 'boolean') return `${k}`;
-                return `${k} +${v}`;
-            }).join(', ') || '효과 없음';
+                const name = statNames[k] || k;
+                if (typeof v === 'boolean') return name;
+                return `${name}+${v}`;
+            }).join(', ') || trait.effect;
             
             partsHtml += `<div style="display:flex;align-items:center;gap:8px;padding:8px;background:var(--void-elevated);border-radius:8px;margin:4px 0;">
                 <span style="font-size:1.5rem;">${trait.icon}</span>
@@ -2130,27 +2172,31 @@ const showStatsPanel = () => {
                 <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
                     <div style="padding:8px;background:var(--void-elevated);border-radius:8px;">
                         <div style="font-size:0.7rem;color:var(--text-muted);">🏃 속도</div>
-                        <div style="font-family:Orbitron;font-size:1.1rem;color:var(--neon-cyan);">${BASE_STATS.speed} <span style="color:var(--success);">+${(stats.speed - BASE_STATS.speed).toFixed(1)}</span></div>
+                        <div style="font-family:Orbitron;font-size:1rem;color:var(--neon-cyan);">${BASE_STATS.speed} <span style="color:var(--success);">+${(stats.speed - BASE_STATS.speed).toFixed(1)}</span></div>
                     </div>
                     <div style="padding:8px;background:var(--void-elevated);border-radius:8px;">
                         <div style="font-size:0.7rem;color:var(--text-muted);">⬆️ 점프</div>
-                        <div style="font-family:Orbitron;font-size:1.1rem;color:var(--neon-cyan);">${BASE_STATS.jump} <span style="color:var(--success);">+${(stats.jump - BASE_STATS.jump).toFixed(0)}</span></div>
+                        <div style="font-family:Orbitron;font-size:1rem;color:var(--neon-cyan);">${BASE_STATS.jump} <span style="color:var(--success);">+${(stats.jump - BASE_STATS.jump).toFixed(0)}</span></div>
                     </div>
                     <div style="padding:8px;background:var(--void-elevated);border-radius:8px;">
                         <div style="font-size:0.7rem;color:var(--text-muted);">🛡️ 방어</div>
-                        <div style="font-family:Orbitron;font-size:1.1rem;color:var(--neon-cyan);">${BASE_STATS.defense} <span style="color:var(--success);">+${(stats.defense - BASE_STATS.defense).toFixed(1)}</span></div>
+                        <div style="font-family:Orbitron;font-size:1rem;color:var(--neon-cyan);">${BASE_STATS.defense} <span style="color:var(--success);">+${(stats.defense - BASE_STATS.defense).toFixed(1)}</span></div>
+                    </div>
+                    <div style="padding:8px;background:var(--void-elevated);border-radius:8px;">
+                        <div style="font-size:0.7rem;color:var(--text-muted);">⚔️ 공격</div>
+                        <div style="font-family:Orbitron;font-size:1rem;color:var(--neon-cyan);">${BASE_STATS.attack} <span style="color:var(--success);">+${(stats.attack - BASE_STATS.attack).toFixed(1)}</span></div>
                     </div>
                     <div style="padding:8px;background:var(--void-elevated);border-radius:8px;">
                         <div style="font-size:0.7rem;color:var(--text-muted);">⭐ 점수</div>
-                        <div style="font-family:Orbitron;font-size:1.1rem;color:var(--neon-cyan);">x${BASE_STATS.score} <span style="color:var(--success);">+${(stats.score - BASE_STATS.score).toFixed(1)}</span></div>
+                        <div style="font-family:Orbitron;font-size:1rem;color:var(--neon-cyan);">x${BASE_STATS.score} <span style="color:var(--success);">+${(stats.score - BASE_STATS.score).toFixed(1)}</span></div>
                     </div>
                     <div style="padding:8px;background:var(--void-elevated);border-radius:8px;">
                         <div style="font-size:0.7rem;color:var(--text-muted);">🧲 자석</div>
-                        <div style="font-family:Orbitron;font-size:1.1rem;color:var(--neon-cyan);">${BASE_STATS.magnet} <span style="color:var(--success);">+${(stats.magnet - BASE_STATS.magnet).toFixed(0)}</span></div>
+                        <div style="font-family:Orbitron;font-size:1rem;color:var(--neon-cyan);">${BASE_STATS.magnet} <span style="color:var(--success);">+${(stats.magnet - BASE_STATS.magnet).toFixed(0)}</span></div>
                     </div>
-                    <div style="padding:8px;background:var(--void-elevated);border-radius:8px;">
+                    <div style="padding:8px;background:var(--void-elevated);border-radius:8px;grid-column:span 2;">
                         <div style="font-size:0.7rem;color:var(--text-muted);">👁️ 시야</div>
-                        <div style="font-family:Orbitron;font-size:1.1rem;color:var(--neon-cyan);">${BASE_STATS.vision}% <span style="color:var(--success);">+${(stats.vision - BASE_STATS.vision).toFixed(0)}%</span></div>
+                        <div style="font-family:Orbitron;font-size:1rem;color:var(--neon-cyan);">${BASE_STATS.vision}% <span style="color:var(--success);">+${(stats.vision - BASE_STATS.vision).toFixed(0)}%</span></div>
                     </div>
                 </div>
             </div>
@@ -2461,44 +2507,56 @@ const rollEvoDice = () => {
 // 진화 편집기 (캐릭터 + 파츠 크기/회전/삭제)
 const openEvoEditor = (isNew = false) => {
     const charScale = G.data.charScale || 1;
+    const stats = calculateStats();
     
     app.innerHTML = `
         <div style="position:fixed;inset:0;z-index:400;background:rgba(3,3,8,0.98);display:flex;flex-direction:column;">
-            <div style="padding:16px;padding-top:calc(16px + var(--safe-top));text-align:center;border-bottom:1px solid var(--border-default);">
-                <div style="font-family:Orbitron;font-size:1.2rem;color:var(--neon-cyan);">✋ 파츠 배치 & 편집</div>
-                <div style="font-size:0.75rem;color:var(--text-muted);margin-top:4px;">파츠 선택 후 드래그/버튼으로 편집</div>
+            <div style="padding:12px 16px;padding-top:calc(12px + var(--safe-top));text-align:center;border-bottom:1px solid var(--border-default);">
+                <div style="font-family:Orbitron;font-size:1.1rem;color:var(--neon-cyan);">✋ 파츠 배치 & 편집</div>
             </div>
             
-            <div style="padding:12px 16px;border-bottom:1px solid var(--border-subtle);background:var(--void-surface);">
-                <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px;">
-                    <span style="font-size:0.8rem;color:var(--text-secondary);min-width:70px;">캐릭터</span>
+            <!-- 스텟 요약 -->
+            <div id="stats-summary" style="padding:8px 16px;background:var(--void-elevated);border-bottom:1px solid var(--border-subtle);display:flex;gap:8px;flex-wrap:wrap;justify-content:center;">
+                <span style="font-size:0.7rem;color:var(--text-muted);">🏃${stats.speed.toFixed(1)}</span>
+                <span style="font-size:0.7rem;color:var(--text-muted);">⬆️${stats.jump.toFixed(0)}</span>
+                <span style="font-size:0.7rem;color:var(--text-muted);">🛡️${stats.defense.toFixed(1)}</span>
+                <span style="font-size:0.7rem;color:var(--text-muted);">⚔️${stats.attack.toFixed(1)}</span>
+                <span style="font-size:0.7rem;color:var(--text-muted);">⭐x${stats.score.toFixed(1)}</span>
+                <span style="font-size:0.7rem;color:var(--text-muted);">🧲${stats.magnet.toFixed(0)}</span>
+            </div>
+            
+            <div style="padding:10px 16px;border-bottom:1px solid var(--border-subtle);background:var(--void-surface);">
+                <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;">
+                    <span style="font-size:0.75rem;color:var(--text-secondary);min-width:55px;">캐릭터</span>
                     <input type="range" id="char-scale" min="50" max="200" value="${charScale * 100}" style="flex:1;">
-                    <span id="char-scale-val" style="font-family:Orbitron;font-size:0.75rem;color:var(--neon-cyan);min-width:35px;">${Math.round(charScale * 100)}%</span>
+                    <span id="char-scale-val" style="font-family:Orbitron;font-size:0.7rem;color:var(--neon-cyan);min-width:30px;">${Math.round(charScale * 100)}%</span>
                 </div>
-                <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px;">
-                    <span style="font-size:0.8rem;color:var(--text-secondary);min-width:70px;">파츠 크기</span>
+                <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;">
+                    <span style="font-size:0.75rem;color:var(--text-secondary);min-width:55px;">파츠크기</span>
                     <input type="range" id="part-scale" min="30" max="250" value="100" style="flex:1;">
-                    <span id="part-scale-val" style="font-family:Orbitron;font-size:0.75rem;color:var(--neon-yellow);min-width:35px;">100%</span>
+                    <span id="part-scale-val" style="font-family:Orbitron;font-size:0.7rem;color:var(--neon-yellow);min-width:30px;">100%</span>
                 </div>
-                <div style="display:flex;align-items:center;gap:12px;">
-                    <span style="font-size:0.8rem;color:var(--text-secondary);min-width:70px;">파츠 회전</span>
+                <div style="display:flex;align-items:center;gap:10px;">
+                    <span style="font-size:0.75rem;color:var(--text-secondary);min-width:55px;">회전</span>
                     <input type="range" id="part-rotation" min="-180" max="180" value="0" style="flex:1;">
-                    <span id="part-rotation-val" style="font-family:Orbitron;font-size:0.75rem;color:var(--neon-purple);min-width:35px;">0°</span>
+                    <span id="part-rotation-val" style="font-family:Orbitron;font-size:0.7rem;color:var(--neon-purple);min-width:30px;">0°</span>
                 </div>
             </div>
             
-            <div id="selected-info" style="padding:8px 16px;background:var(--void-elevated);display:none;align-items:center;justify-content:space-between;">
-                <div style="display:flex;align-items:center;gap:8px;">
-                    <span id="selected-icon" style="font-size:1.5rem;"></span>
-                    <span id="selected-name" style="font-size:0.85rem;color:var(--text-primary);"></span>
+            <div id="selected-info" style="padding:8px 16px;background:var(--void-elevated);display:none;align-items:center;gap:8px;">
+                <span id="selected-icon" style="font-size:1.3rem;"></span>
+                <div style="flex:1;">
+                    <div id="selected-name" style="font-size:0.8rem;color:var(--text-primary);"></div>
+                    <div id="selected-effect" style="font-size:0.65rem;color:var(--neon-yellow);"></div>
                 </div>
-                <button id="btn-delete-part" style="background:var(--danger);color:white;border:none;border-radius:8px;padding:6px 12px;font-size:0.75rem;cursor:pointer;">🗑️ 삭제</button>
+                <button id="btn-flip" style="background:var(--neon-purple);color:white;border:none;border-radius:6px;padding:5px 10px;font-size:0.7rem;cursor:pointer;">↔️ 반전</button>
+                <button id="btn-delete-part" style="background:var(--danger);color:white;border:none;border-radius:6px;padding:5px 10px;font-size:0.7rem;cursor:pointer;">🗑️</button>
             </div>
             
             <div style="flex:1;position:relative;overflow:hidden;" id="editor-wrap">
                 <canvas id="editor-canvas"></canvas>
             </div>
-            <div style="padding:16px;padding-bottom:calc(16px + var(--safe-bottom));display:flex;gap:10px;justify-content:center;border-top:1px solid var(--border-default);">
+            <div style="padding:12px 16px;padding-bottom:calc(12px + var(--safe-bottom));display:flex;gap:10px;justify-content:center;border-top:1px solid var(--border-default);">
                 <button class="btn btn-outline" id="btn-cancel">${isNew ? '나중에' : '취소'}</button>
                 <button class="btn btn-energy" id="btn-save">완료</button>
             </div>
@@ -2524,6 +2582,7 @@ const openEvoEditor = (isNew = false) => {
             if (trait) {
                 document.getElementById('selected-icon').textContent = trait.icon;
                 document.getElementById('selected-name').textContent = trait.name;
+                document.getElementById('selected-effect').textContent = trait.effect || '';
                 infoEl.style.display = 'flex';
                 
                 // 슬라이더 업데이트
@@ -2534,6 +2593,20 @@ const openEvoEditor = (isNew = false) => {
             }
         } else {
             infoEl.style.display = 'none';
+        }
+        
+        // 스텟 요약 업데이트
+        const stats = calculateStats();
+        const summaryEl = document.getElementById('stats-summary');
+        if (summaryEl) {
+            summaryEl.innerHTML = `
+                <span style="font-size:0.7rem;color:var(--text-muted);">🏃${stats.speed.toFixed(1)}</span>
+                <span style="font-size:0.7rem;color:var(--text-muted);">⬆️${stats.jump.toFixed(0)}</span>
+                <span style="font-size:0.7rem;color:var(--text-muted);">🛡️${stats.defense.toFixed(1)}</span>
+                <span style="font-size:0.7rem;color:var(--text-muted);">⚔️${stats.attack.toFixed(1)}</span>
+                <span style="font-size:0.7rem;color:var(--text-muted);">⭐x${stats.score.toFixed(1)}</span>
+                <span style="font-size:0.7rem;color:var(--text-muted);">🧲${stats.magnet.toFixed(0)}</span>
+            `;
         }
     };
     
@@ -2556,6 +2629,15 @@ const openEvoEditor = (isNew = false) => {
         document.getElementById('part-rotation-val').textContent = `${e.target.value}°`;
         if (selectedPart !== null && G.data.evoTraits[selectedPart]) {
             G.data.evoTraits[selectedPart].rotation = e.target.value * Math.PI / 180;
+        }
+    };
+    
+    // 좌우 반전 버튼
+    document.getElementById('btn-flip').onclick = () => {
+        if (selectedPart !== null && G.data.evoTraits[selectedPart]) {
+            const et = G.data.evoTraits[selectedPart];
+            et.flipX = !et.flipX;
+            Audio.playClick();
         }
     };
     
@@ -2582,20 +2664,18 @@ const openEvoEditor = (isNew = false) => {
         const bodySize = baseSize * (G.data.charScale || 1);
         const t = Date.now() * 0.002;
         
-        // 기본 다리 (스테이지1-2 파츠)
-        const legCnt = G.data.parts?.leg || 0;
-        if (legCnt > 0) {
-            ectx.strokeStyle = d.secondary;
-            ectx.lineWidth = 5;
-            ectx.lineCap = 'round';
-            for (let i = 0; i < Math.min(legCnt, 4); i++) {
-                const legPhase = Math.sin(t * 2 + i) * 0.3;
-                const baseAngle = Math.PI * 0.5 + (i - (legCnt - 1) / 2) * 0.25;
-                ectx.beginPath();
-                ectx.moveTo(cx + Math.cos(baseAngle) * bodySize * 0.8, cy + Math.sin(baseAngle) * bodySize * 0.8);
-                ectx.lineTo(cx + Math.cos(baseAngle + legPhase) * bodySize * 1.4, cy + bodySize * 1.2);
-                ectx.stroke();
-            }
+        // 기본 다리 (최소 2개는 항상 표시)
+        const legCnt = Math.max(2, G.data.parts?.leg || 0);
+        ectx.strokeStyle = d.secondary;
+        ectx.lineWidth = 5;
+        ectx.lineCap = 'round';
+        for (let i = 0; i < Math.min(legCnt, 4); i++) {
+            const legPhase = Math.sin(t * 2 + i) * 0.3;
+            const baseAngle = Math.PI * 0.5 + (i - (legCnt - 1) / 2) * 0.25;
+            ectx.beginPath();
+            ectx.moveTo(cx + Math.cos(baseAngle) * bodySize * 0.8, cy + Math.sin(baseAngle) * bodySize * 0.8);
+            ectx.lineTo(cx + Math.cos(baseAngle + legPhase) * bodySize * 1.4, cy + bodySize * 1.2);
+            ectx.stroke();
         }
         
         // 기본 팔
@@ -2719,11 +2799,12 @@ const openEvoEditor = (isNew = false) => {
             const px = et.x * w;
             const py = et.y * h;
             const scale = et.scale || 1;
+            const flipX = et.flipX ? -1 : 1;
             
             ectx.save();
             ectx.translate(px, py);
             ectx.rotate(et.rotation || 0);
-            ectx.scale(scale, scale);
+            ectx.scale(scale * flipX, scale);
             
             ectx.font = '40px Arial';
             ectx.textAlign = 'center';
@@ -3304,17 +3385,16 @@ const drawRunnerChar = groundY => {
         if (!trait) return;
         
         // 에디터와 동일한 좌표 계산
-        // 에디터: bodySize = min(w,h) * 0.15 * charScale, 파츠는 et.x * w 위치
-        // 캐릭터 중심 기준 비율: (et.x - 0.5) / (0.15 * charScale)
         const editorBodyRatio = 0.15;
         const px = (et.x - 0.5) / editorBodyRatio * bodyW;
         const py = (et.y - 0.5) / editorBodyRatio * bodyH;
         const scale = et.scale || 1;
+        const flipX = et.flipX ? -1 : 1;
         
         ctx.save();
         ctx.translate(px, py);
         ctx.rotate(et.rotation || 0);
-        ctx.scale(scale, scale);
+        ctx.scale(scale * flipX, scale);
         
         ctx.font = '24px Arial';
         ctx.textAlign = 'center';
