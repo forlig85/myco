@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>BOKLUCK Universe v1.1</title>
+    <title>BOKLUCK Universe v1.3</title>
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎲</text></svg>">
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Noto+Sans+KR:wght@400;700&display=swap" rel="stylesheet">
     <style>
@@ -449,6 +449,8 @@ const Save = (() => {
         parts: { eye: 0, mouth: 0, arm: 0, leg: 0, tail: 0, ear: 0, nose: 0, antenna: 0 },
         stats: { size: CONFIG.INITIAL_SIZE, speed: 3, eaten: 0, deaths: 0, maxSize: CONFIG.INITIAL_SIZE, maxH: 0 },
         runnerStage: 0,
+        runnerDist: 0,      // 러너 누적 거리
+        charScale: 1,       // 캐릭터 크기 배율
         evoTraits: [],      // 스테이지3 진화 특성 [{id, x, y, scale, rotation}]
         climbItem: null     // 스테이지2 아이템 ('tornado', 'cloud', null)
     });
@@ -602,98 +604,99 @@ const lerpCol = (a, b, t) => {
 };
 // ========================================
 // BOKLUCK Universe - Region Traits
-// 스테이지3 진화 특성 (지역별 11개씩, 총 66개)
+// 스테이지3 진화 특성 (부위 중심!)
+// 생물 전체가 아닌 특정 부위만 표현
 // ========================================
 
 const REGION_TRAITS = {
     // 원시 해양 - 수중 적응
     ocean: [
-        { id: 'o1', icon: '🦈', name: '상어 지느러미', desc: '날카로운 등지느러미', effect: '속도 +15%' },
-        { id: 'o2', icon: '🐙', name: '흡반 촉수', desc: '강력한 흡착력', effect: '점프력 +20%' },
-        { id: 'o3', icon: '🦑', name: '먹물 주머니', desc: '위기시 먹물 분사', effect: '무적 1초' },
-        { id: 'o4', icon: '🐚', name: '조개 껍데기', desc: '단단한 보호막', effect: '방어력 +1' },
-        { id: 'o5', icon: '🦐', name: '새우 꼬리', desc: '순간 도약', effect: '2단점프' },
-        { id: 'o6', icon: '🐡', name: '복어 가시', desc: '가시 방어막', effect: '반사 데미지' },
-        { id: 'o7', icon: '🪸', name: '산호 갑옷', desc: '산호로 덮인 몸', effect: '방어력 +0.5' },
-        { id: 'o8', icon: '🦪', name: '진주 코어', desc: '빛나는 핵', effect: '점수 +20%' },
-        { id: 'o9', icon: '🌊', name: '물결 무늬', desc: '위장 능력', effect: '은신' },
-        { id: 'o10', icon: '💧', name: '물방울 눈', desc: '수중 시야', effect: '시야 +25%' },
-        { id: 'o11', icon: '🐋', name: '고래 꼬리', desc: '강력한 추진력', effect: '속도 +25%' }
+        { id: 'o1', icon: '🔺', name: '상어 지느러미', desc: '날카로운 등지느러미', effect: '속도 +15%' },
+        { id: 'o2', icon: '🌀', name: '흡반 촉수', desc: '문어의 흡착 촉수', effect: '점프력 +20%' },
+        { id: 'o3', icon: '💜', name: '먹물 주머니', desc: '오징어의 먹물 기관', effect: '무적 1초' },
+        { id: 'o4', icon: '🔵', name: '조개 껍질', desc: '단단한 껍질 조각', effect: '방어력 +1' },
+        { id: 'o5', icon: '🦐', name: '새우 꼬리', desc: '탄력있는 꼬리 근육', effect: '2단점프' },
+        { id: 'o6', icon: '📍', name: '복어 가시', desc: '뾰족한 방어 가시', effect: '반사 데미지' },
+        { id: 'o7', icon: '🪨', name: '산호 갑옷', desc: '산호질 외피', effect: '방어력 +0.5' },
+        { id: 'o8', icon: '⚪', name: '진주 코어', desc: '진주로 된 핵', effect: '점수 +20%' },
+        { id: 'o9', icon: '〰️', name: '물결 비늘', desc: '물결 무늬 비늘', effect: '은신' },
+        { id: 'o10', icon: '👁️', name: '심해어 눈', desc: '크고 투명한 눈', effect: '시야 +25%' },
+        { id: 'o11', icon: '🏊', name: '고래 꼬리지느러미', desc: '강력한 꼬리 날개', effect: '속도 +25%' }
     ],
     
     // 열수구 - 극한 내열
     hydrothermal: [
-        { id: 'h1', icon: '🔥', name: '화염 입', desc: '입에서 불을 뿜는다', effect: '화염 공격' },
-        { id: 'h2', icon: '🛡️', name: '용암 껍질', desc: '뜨거운 용암 갑옷', effect: '방어력 +1.5' },
-        { id: 'h3', icon: '♨️', name: '열 배출구', desc: '증기를 뿜는다', effect: '속도 +20%' },
-        { id: 'h4', icon: '🌡️', name: '열 감지기', desc: '온도를 감지', effect: '적 탐지' },
-        { id: 'h5', icon: '⚫', name: '흑요석 발톱', desc: '날카로운 발톱', effect: '공격력 +1.5' },
-        { id: 'h6', icon: '🔴', name: '용암 눈', desc: '빛나는 붉은 눈', effect: '시야 +30%' },
-        { id: 'h7', icon: '💥', name: '폭발 꼬리', desc: '터지는 꼬리', effect: '범위 공격' },
-        { id: 'h8', icon: '🧱', name: '두꺼운 가죽', desc: '열에 강한 피부', effect: '방어력 +1' },
-        { id: 'h9', icon: '🌋', name: '화산재 날개', desc: '재로 된 날개', effect: '활공' },
-        { id: 'h10', icon: '⚡', name: '열 방전', desc: '전기 방출', effect: '감전 공격' },
-        { id: 'h11', icon: '🔶', name: '마그마 코어', desc: '뜨거운 심장', effect: '체력 회복' }
+        { id: 'h1', icon: '🔥', name: '화염 입', desc: '불을 내뿜는 입', effect: '화염 공격' },
+        { id: 'h2', icon: '🟤', name: '용암 껍질', desc: '굳은 용암 갑피', effect: '방어력 +1.5' },
+        { id: 'h3', icon: '♨️', name: '증기 분출구', desc: '뜨거운 증기 구멍', effect: '속도 +20%' },
+        { id: 'h4', icon: '🌡️', name: '열 감지 촉각', desc: '온도 감지 더듬이', effect: '적 탐지' },
+        { id: 'h5', icon: '⬛', name: '흑요석 발톱', desc: '날카로운 검은 발톱', effect: '공격력 +1.5' },
+        { id: 'h6', icon: '🔴', name: '용암 눈', desc: '붉게 빛나는 눈알', effect: '시야 +30%' },
+        { id: 'h7', icon: '💥', name: '폭발 주머니', desc: '터지는 기관', effect: '범위 공격' },
+        { id: 'h8', icon: '🟫', name: '내열 가죽', desc: '두꺼운 방열 피부', effect: '방어력 +1' },
+        { id: 'h9', icon: '🦇', name: '화산재 날개', desc: '재로 덮인 막날개', effect: '활공' },
+        { id: 'h10', icon: '⚡', name: '방전 기관', desc: '전기 발생 기관', effect: '감전 공격' },
+        { id: 'h11', icon: '🧡', name: '마그마 심장', desc: '끓는 용암 심장', effect: '체력 회복' }
     ],
     
     // 얼음 바다 - 냉기 적응
     ice: [
-        { id: 'i1', icon: '❄️', name: '얼음 갑옷', desc: '얼음으로 덮인 몸', effect: '방어력 +1.5' },
-        { id: 'i2', icon: '🧊', name: '냉기 입', desc: '얼음 브레스', effect: '빙결 공격' },
-        { id: 'i3', icon: '💎', name: '결정 뿔', desc: '빛나는 얼음 뿔', effect: '공격력 +1.5' },
-        { id: 'i4', icon: '🌨️', name: '눈꽃 날개', desc: '눈으로 된 날개', effect: '활공' },
-        { id: 'i5', icon: '🦭', name: '물범 꼬리', desc: '두꺼운 지방층', effect: '속도 +10%' },
-        { id: 'i6', icon: '🐻‍❄️', name: '북극곰 발', desc: '강력한 앞발', effect: '공격력 +1.3' },
-        { id: 'i7', icon: '💠', name: '다이아몬드 눈', desc: '빙결 시선', effect: '시야 +40%' },
-        { id: 'i8', icon: '🌬️', name: '한파 발생기', desc: '주변을 얼린다', effect: '둔화 오라' },
-        { id: 'i9', icon: '⛄', name: '눈사람 몸통', desc: '둥글고 튼튼한 몸', effect: '방어력 +1' },
-        { id: 'i10', icon: '🏔️', name: '빙산 등', desc: '뾰족한 얼음 등판', effect: '반사 데미지' },
-        { id: 'i11', icon: '🩵', name: '서리 심장', desc: '냉기를 품은 심장', effect: '둔화 면역' }
+        { id: 'i1', icon: '❄️', name: '얼음 갑피', desc: '얼음 결정 껍질', effect: '방어력 +1.5' },
+        { id: 'i2', icon: '🧊', name: '냉기 입', desc: '얼음을 내뿜는 입', effect: '빙결 공격' },
+        { id: 'i3', icon: '💎', name: '결정 뿔', desc: '투명한 얼음 뿔', effect: '공격력 +1.5' },
+        { id: 'i4', icon: '🌨️', name: '눈꽃 날개막', desc: '얼음 결정 날개', effect: '활공' },
+        { id: 'i5', icon: '🔹', name: '물범 꼬리지느러미', desc: '두꺼운 지방 꼬리', effect: '속도 +10%' },
+        { id: 'i6', icon: '🐾', name: '북극곰 발바닥', desc: '털 달린 큰 발', effect: '공격력 +1.3' },
+        { id: 'i7', icon: '💠', name: '다이아몬드 눈', desc: '빛나는 보석 눈', effect: '시야 +40%' },
+        { id: 'i8', icon: '🌬️', name: '한파 분출구', desc: '냉기 방출 구멍', effect: '둔화 오라' },
+        { id: 'i9', icon: '⚪', name: '눈덩이 몸통', desc: '둥글고 흰 몸체', effect: '방어력 +1' },
+        { id: 'i10', icon: '🔷', name: '빙산 등판', desc: '뾰족한 얼음 등', effect: '반사 데미지' },
+        { id: 'i11', icon: '🩵', name: '서리 심장', desc: '차가운 얼음 심장', effect: '둔화 면역' }
     ],
     
     // 마그마 호수 - 화염 진화
     magma: [
-        { id: 'm1', icon: '🐉', name: '용의 머리', desc: '용처럼 생긴 머리', effect: '화염+공격력' },
-        { id: 'm2', icon: '🔥', name: '불꽃 갈기', desc: '타오르는 갈기', effect: '화염 오라' },
-        { id: 'm3', icon: '⭐', name: '별의 코어', desc: '태양같은 핵', effect: '점수 +50%' },
-        { id: 'm4', icon: '🦎', name: '용암 도롱뇽', desc: '뜨거운 피부', effect: '화염 면역' },
-        { id: 'm5', icon: '💛', name: '황금 비늘', desc: '빛나는 비늘', effect: '방어력 +1.2' },
-        { id: 'm6', icon: '🏵️', name: '화염 꽃', desc: '불꽃 장식', effect: '공격력 +1' },
-        { id: 'm7', icon: '🌟', name: '태양 눈', desc: '눈부신 눈', effect: '시야 +50%' },
-        { id: 'm8', icon: '🔸', name: '루비 발톱', desc: '보석 발톱', effect: '공격력 +1.3' },
-        { id: 'm9', icon: '🧡', name: '용암 심장', desc: '끓는 심장', effect: '체력 회복' },
-        { id: 'm10', icon: '🌅', name: '새벽 날개', desc: '빛나는 날개', effect: '활공+속도' },
+        { id: 'm1', icon: '🐲', name: '용의 뿔', desc: '용처럼 생긴 머리뿔', effect: '화염+공격력' },
+        { id: 'm2', icon: '🔥', name: '불꽃 갈기', desc: '타오르는 목털', effect: '화염 오라' },
+        { id: 'm3', icon: '⭐', name: '별의 코어', desc: '태양같은 핵 기관', effect: '점수 +50%' },
+        { id: 'm4', icon: '🟠', name: '용암 피부', desc: '뜨거운 주황 피부', effect: '화염 면역' },
+        { id: 'm5', icon: '🟡', name: '황금 비늘', desc: '빛나는 금빛 비늘', effect: '방어력 +1.2' },
+        { id: 'm6', icon: '🌺', name: '화염 꽃관', desc: '불꽃 모양 장식', effect: '공격력 +1' },
+        { id: 'm7', icon: '🌟', name: '태양 눈알', desc: '눈부신 빛의 눈', effect: '시야 +50%' },
+        { id: 'm8', icon: '🔸', name: '루비 발톱', desc: '붉은 보석 발톱', effect: '공격력 +1.3' },
+        { id: 'm9', icon: '❤️‍🔥', name: '용암 심장', desc: '끓어오르는 심장', effect: '체력 회복' },
+        { id: 'm10', icon: '🔶', name: '새벽 날개막', desc: '빛나는 막 날개', effect: '활공+속도' },
         { id: 'm11', icon: '💫', name: '혜성 꼬리', desc: '불타는 긴 꼬리', effect: '속도 +30%' }
     ],
     
     // 대기 부유 - 비행 특화
     atmosphere: [
-        { id: 'a1', icon: '🦋', name: '나비 날개', desc: '아름다운 날개', effect: '활공+속도' },
-        { id: 'a2', icon: '🌈', name: '무지개 몸통', desc: '빛을 반사하는 몸', effect: '은신' },
-        { id: 'a3', icon: '☁️', name: '구름 꼬리', desc: '부드러운 꼬리', effect: '활공' },
-        { id: 'a4', icon: '💜', name: '보라 후광', desc: '신비로운 빛', effect: '경험치 +30%' },
-        { id: 'a5', icon: '🌸', name: '꽃잎 갑옷', desc: '꽃잎으로 덮인 몸', effect: '방어력 +0.8' },
-        { id: 'a6', icon: '✨', name: '별빛 눈', desc: '반짝이는 눈', effect: '시야 +40%' },
-        { id: 'a7', icon: '🎐', name: '바람 종', desc: '소리를 내는 몸', effect: '적 탐지' },
-        { id: 'a8', icon: '🌙', name: '달빛 뿔', desc: '빛나는 뿔', effect: '공격력 +1.2' },
-        { id: 'a9', icon: '💫', name: '유성 흔적', desc: '빛나는 잔상', effect: '속도 +25%' },
-        { id: 'a10', icon: '🔮', name: '수정 구슬', desc: '예지 능력', effect: '회피율 +20%' },
-        { id: 'a11', icon: '🪽', name: '천사 깃털', desc: '순백의 깃털', effect: '활공+방어' }
+        { id: 'a1', icon: '🦋', name: '나비 날개', desc: '무지개빛 박막 날개', effect: '활공+속도' },
+        { id: 'a2', icon: '🌈', name: '무지개 비늘', desc: '빛을 반사하는 비늘', effect: '은신' },
+        { id: 'a3', icon: '☁️', name: '구름 꼬리', desc: '뭉게구름 같은 꼬리', effect: '활공' },
+        { id: 'a4', icon: '💜', name: '보라 후광', desc: '신비로운 빛 고리', effect: '경험치 +30%' },
+        { id: 'a5', icon: '🌸', name: '꽃잎 갑피', desc: '꽃잎 모양 껍질', effect: '방어력 +0.8' },
+        { id: 'a6', icon: '✨', name: '별빛 눈', desc: '반짝이는 큰 눈', effect: '시야 +40%' },
+        { id: 'a7', icon: '🎐', name: '바람 종 더듬이', desc: '소리나는 더듬이', effect: '적 탐지' },
+        { id: 'a8', icon: '🌙', name: '달빛 뿔', desc: '초승달 모양 뿔', effect: '공격력 +1.2' },
+        { id: 'a9', icon: '💫', name: '유성 꼬리', desc: '빛나는 잔상 꼬리', effect: '속도 +25%' },
+        { id: 'a10', icon: '🔮', name: '수정 눈알', desc: '예지력 있는 눈', effect: '회피율 +20%' },
+        { id: 'a11', icon: '🪽', name: '천사 깃털', desc: '순백의 큰 깃털', effect: '활공+방어' }
     ],
     
     // 독성 늪 - 독/산성 특화
     toxic: [
-        { id: 't1', icon: '🐍', name: '독사 머리', desc: '독니를 가진 머리', effect: '독+공격력' },
-        { id: 't2', icon: '🦎', name: '독개구리 피부', desc: '독을 분비하는 피부', effect: '독 오라' },
-        { id: 't3', icon: '🧪', name: '산성 침', desc: '녹이는 침', effect: '관통 공격' },
-        { id: 't4', icon: '☢️', name: '방사능 눈', desc: '빛나는 눈', effect: '시야 +30%' },
-        { id: 't5', icon: '🍄', name: '버섯 갓', desc: '포자를 뿌린다', effect: '둔화 효과' },
-        { id: 't6', icon: '🐛', name: '지네 다리', desc: '수많은 다리', effect: '속도 +40%' },
-        { id: 't7', icon: '🕷️', name: '거미 다리', desc: '거미줄 생성', effect: '함정 설치' },
-        { id: 't8', icon: '💚', name: '독 심장', desc: '독을 품은 심장', effect: '독 면역' },
-        { id: 't9', icon: '🐸', name: '두꺼비 혹', desc: '독을 저장', effect: '독 강화' },
-        { id: 't10', icon: '🌿', name: '독덩굴', desc: '덩굴로 감싼다', effect: '속박 효과' },
-        { id: 't11', icon: '💀', name: '해골 가면', desc: '공포스러운 외모', effect: '공포 효과' }
+        { id: 't1', icon: '🦷', name: '독니', desc: '독이 든 송곳니', effect: '독+공격력' },
+        { id: 't2', icon: '🟢', name: '독개구리 피부', desc: '독 분비 피부', effect: '독 오라' },
+        { id: 't3', icon: '🧪', name: '산성 침샘', desc: '녹이는 침 기관', effect: '관통 공격' },
+        { id: 't4', icon: '☢️', name: '방사능 눈', desc: '형광빛 눈알', effect: '시야 +30%' },
+        { id: 't5', icon: '🍄', name: '버섯 갓', desc: '포자 방출 갓', effect: '둔화 효과' },
+        { id: 't6', icon: '🦵', name: '지네 다리', desc: '수많은 마디 다리', effect: '속도 +40%' },
+        { id: 't7', icon: '🕸️', name: '거미 실샘', desc: '거미줄 분비 기관', effect: '함정 설치' },
+        { id: 't8', icon: '💚', name: '독 심장', desc: '맹독 저장 심장', effect: '독 면역' },
+        { id: 't9', icon: '🫧', name: '독 주머니', desc: '독액 저장 기관', effect: '독 강화' },
+        { id: 't10', icon: '🌿', name: '덩굴 촉수', desc: '감아붙는 덩굴팔', effect: '속박 효과' },
+        { id: 't11', icon: '💀', name: '해골 가면', desc: '뼈로 된 얼굴판', effect: '공포 효과' }
     ]
 };
 
@@ -1209,8 +1212,8 @@ const evolveMulti = () => {
 let climber, platforms = [], climbItems = [];
 let camY = 0, curH = 0, canDblJump = false, wasOnGround = true;
 let deathLineY = 0, landY = 0, shownOvershootWarning = false;
+let landPlatform = null;
 
-// 스테이지2 시작 전 주사위
 const showClimbDice = () => {
     app.innerHTML = `
         <div class="page-center">
@@ -1292,7 +1295,7 @@ const startClimb = () => {
     cleanup();
     const env = envById(G.data.dna.origin);
     const joyRight = Settings.get('joyRight');
-    const itemType = G.data.climbItem; // 'tornado', 'cloud', null
+    const itemType = G.data.climbItem;
     
     app.innerHTML = `
         <canvas id="game-canvas"></canvas>
@@ -1337,11 +1340,10 @@ const startClimb = () => {
     
     genPlats(canvas.height - 50, landY - 200, itemType);
     
-    // 시작 발판
     platforms.push({ x: canvas.width / 2 - 70, y: canvas.height - 40, w: 140, h: 18, type: 'normal' });
     
-    // 육지 발판
-    platforms.push({ x: 0, y: landY, w: canvas.width, h: 150, type: 'land' });
+    landPlatform = { x: 0, y: landY, w: canvas.width, h: 150, type: 'land' };
+    platforms.push(landPlatform);
     
     camY = 0;
     curH = 0;
@@ -1375,17 +1377,10 @@ const genPlats = (fromY, toY, itemType) => {
                 broken: false, timer: 0
             });
             
-            // 아이템 배치 (주사위로 받은 아이템만)
             if (itemType && Math.random() < 0.12) {
-                climbItems.push({
-                    x: x + w / 2,
-                    y: y - 45,
-                    type: itemType,
-                    collected: false
-                });
+                climbItems.push({ x: x + w / 2, y: y - 45, type: itemType, collected: false });
             }
         }
-        
         y -= 45 + Math.random() * 25;
     }
 };
@@ -1442,20 +1437,11 @@ const setupClimbControls = () => {
 const setupClimbHUD = () => {
     document.getElementById('btn-restart').onclick = () => {
         Audio.playClick();
-        if (confirm('처음부터?')) {
-            cancelAnimationFrame(gameLoop);
-            gameLoop = null;
-            showClimbDice(); // 주사위부터 다시
-        }
+        if (confirm('처음부터?')) { cancelAnimationFrame(gameLoop); gameLoop = null; showClimbDice(); }
     };
     document.getElementById('btn-home').onclick = () => {
         Audio.playClick();
-        if (confirm('홈으로?')) {
-            cancelAnimationFrame(gameLoop);
-            gameLoop = null;
-            saveGame();
-            renderSaves();
-        }
+        if (confirm('홈으로?')) { cancelAnimationFrame(gameLoop); gameLoop = null; saveGame(); renderSaves(); }
     };
     document.getElementById('btn-pause').onclick = () => {
         Audio.playClick();
@@ -1469,7 +1455,6 @@ const updateClimb = () => {
     if (!canvas || !ctx) return;
     const env = envById(G.data.dna.origin);
     
-    // 이동
     let mx = joyPos.x;
     if (keys.a || keys.arrowleft) mx = -1;
     if (keys.d || keys.arrowright) mx = 1;
@@ -1485,7 +1470,12 @@ const updateClimb = () => {
     if (climber.x < 0) climber.x = 0;
     if (climber.x + climber.w > canvas.width) climber.x = canvas.width - climber.w;
     
-    // 발판 충돌
+    // ★ 육지 도달 체크 - 캐릭터가 육지 높이보다 위에 있으면 클리어!
+    if (landPlatform && climber.y + climber.h < landPlatform.y + 50) {
+        climbWin();
+        return;
+    }
+    
     const wasOnGroundBefore = climber.onGround;
     climber.onGround = false;
     
@@ -1497,7 +1487,6 @@ const updateClimb = () => {
             if (p.x <= 0 || p.x + p.w >= canvas.width) p.dir *= -1;
         }
         
-        // 발판 위에 착지
         if (climber.vy >= 0 &&
             climber.x + climber.w > p.x + 4 &&
             climber.x < p.x + p.w - 4 &&
@@ -1517,7 +1506,6 @@ const updateClimb = () => {
                 p.timer++;
                 if (p.timer > 25) p.broken = true;
             } else if (p.type === 'land') {
-                // 육지 밟으면 클리어!
                 climbWin();
                 return;
             } else if (!wasOnGroundBefore && !wasOnGround) {
@@ -1526,59 +1514,45 @@ const updateClimb = () => {
             
             if (p.type === 'moving') climber.x += p.dir * p.spd;
         }
-        
-        // 육지를 지나가면 클리어! (밟지 않아도)
-        if (p.type === 'land' && climber.y < p.y) {
-            climbWin();
-            return;
-        }
     }
     
     wasOnGround = climber.onGround;
     
-    // 아이템 수집
     for (const item of climbItems) {
         if (item.collected) continue;
-        
         const dx = (climber.x + climber.w / 2) - item.x;
         const dy = (climber.y + climber.h / 2) - item.y;
-        
         if (Math.sqrt(dx * dx + dy * dy) < 35) {
             item.collected = true;
-            
             if (item.type === 'tornado') {
                 Audio.playWind();
                 climber.vy = -48;
                 toast('🌪️ 토네이도의 힘!', 'success');
             } else if (item.type === 'cloud') {
                 Audio.playCloud();
-                climber.vy = -24; // 토네이도의 절반
+                climber.vy = -24;
                 toast('☁️ 구름의 힘!', 'success');
             }
         }
     }
     
-    // 카메라
     const targetCam = -climber.y + canvas.height * 0.6;
     camY += (targetCam - camY) * 0.1;
     
     curH = Math.max(0, Math.floor(-climber.y / 10));
     G.data.stats.maxH = Math.max(G.data.stats.maxH, curH);
     
-    // 너무 높이 올라갔을 때 경고
     if (climber.y < landY - 200 && !shownOvershootWarning) {
         shownOvershootWarning = true;
         toast('⚠️ 너무 올라왔다! 육지로 내려가자!', 'warning');
     }
     if (climber.y > landY - 100) shownOvershootWarning = false;
     
-    // 발판 추가 생성
     const highest = Math.min(...platforms.filter(p => p.type !== 'land').map(p => p.y));
     if (-camY - canvas.height < highest + 400) {
         genPlats(highest, highest - canvas.height * 2, G.data.climbItem);
     }
     
-    // 추락 체크
     if (climber.y > deathLineY || climber.y > -camY + canvas.height + 80) {
         climbFail();
         return;
@@ -1595,7 +1569,6 @@ const renderClimb = env => {
     const hr = Math.min(1, curH / CONFIG.LAND_HEIGHT);
     const t = Date.now() * 0.005;
     
-    // 배경
     const bg = ctx.createLinearGradient(0, 0, 0, h);
     if (hr < 0.5) {
         bg.addColorStop(0, lerpCol(env.colors.bg1, '#1a3a5e', hr * 2));
@@ -1610,7 +1583,6 @@ const renderClimb = env => {
     ctx.save();
     ctx.translate(0, camY);
     
-    // 발판
     for (const p of platforms) {
         if (p.broken) continue;
         const sy = p.y + camY;
@@ -1623,7 +1595,6 @@ const renderClimb = env => {
             ctx.fillRect(p.x, p.y, p.w, p.h);
             ctx.fillStyle = '#228B22';
             ctx.fillRect(p.x, p.y, p.w, 20);
-            // 나무
             for (let i = 0; i < 6; i++) {
                 const tx = 30 + i * (p.w / 6);
                 ctx.fillStyle = '#654321';
@@ -1640,7 +1611,6 @@ const renderClimb = env => {
         }
     }
     
-    // 아이템
     for (const item of climbItems) {
         if (item.collected) continue;
         const sy = item.y + camY;
@@ -1648,7 +1618,7 @@ const renderClimb = env => {
         
         ctx.save();
         ctx.translate(item.x, item.y + Math.sin(t) * 5);
-        ctx.rotate(-Math.PI / 2); // 토네이도 회전 수정
+        ctx.rotate(-Math.PI / 2);
         ctx.font = '28px Arial';
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
@@ -1656,12 +1626,9 @@ const renderClimb = env => {
         ctx.restore();
     }
     
-    // 플레이어
     drawClimber();
-    
     ctx.restore();
     
-    // 진행 게이지
     const gH = h - 90, gX = w - 25;
     const prog = Math.min(1, curH / CONFIG.LAND_HEIGHT);
     ctx.fillStyle = 'rgba(0,0,0,0.25)';
@@ -1688,7 +1655,6 @@ const drawClimber = () => {
     
     ctx.save();
     ctx.translate(climber.x + climber.w / 2, climber.y + climber.h / 2);
-    
     ctx.shadowColor = d.primary;
     ctx.shadowBlur = 12;
     
@@ -1708,7 +1674,6 @@ const drawClimber = () => {
     ctx.fill();
     ctx.shadowBlur = 0;
     
-    // 눈
     const eyeCnt = Math.max(1, p.eye || 1);
     for (let i = 0; i < eyeCnt; i++) {
         const eA = (i - (eyeCnt - 1) / 2) * 0.35;
@@ -1754,36 +1719,61 @@ const climbWin = () => {
     G.data.stage = 3;
     G.data.runnerStage = 0;
     G.data.evoTraits = [];
+    G.data.runnerDist = 0;
+    G.data.charScale = 1;
     saveGame();
     renderStory('runner');
 };
 // ========================================
 // BOKLUCK Universe - Runner Game (Stage 3)
-// 주사위 아이템 진화 (51+ 성공, 50- 꽝)
-// 드래그로 파츠 배치
+// 다양한 아이템 + 주사위 진화 + 크기 조절
 // ========================================
 
 let runner, runnerDist, runnerStage, obstacles, items, runnerParticles;
 let runnerSpeed, bgOffset;
 let lastObstacleTime = 0;
+let activeEffects = {}; // 현재 활성화된 효과들
 const MIN_OBSTACLE_GAP = 1500;
+
+// 아이템 종류 정의
+const RUNNER_ITEMS = {
+    dice: { icon: '🎲', name: '진화 주사위', rate: 0.0016, duration: 0 },
+    jump: { icon: '🦘', name: '점프력 향상', rate: 0.006, duration: 5000 },
+    speed: { icon: '⚡', name: '속도 증가', rate: 0.005, duration: 4000 },
+    slow: { icon: '🐢', name: '속도 감소', rate: 0.004, duration: 4000 },
+    shield: { icon: '🛡️', name: '무적', rate: 0.003, duration: 3000 },
+    magnet: { icon: '🧲', name: '자석', rate: 0.004, duration: 5000 },
+    shrink: { icon: '🔻', name: '몸 축소', rate: 0.003, duration: 4000 },
+    coin: { icon: '💎', name: '보너스 점수', rate: 0.008, duration: 0 }
+};
 
 const startRunner = () => {
     cleanup();
     const joyRight = Settings.get('joyRight');
     
     if (!G.data.evoTraits) G.data.evoTraits = [];
+    if (!G.data.charScale) G.data.charScale = 1;
+    if (!G.data.runnerDist) G.data.runnerDist = 0;
     
     runnerStage = G.data.runnerStage || 0;
-    runnerDist = 0;
+    runnerDist = G.data.runnerDist || 0; // 저장된 거리부터 시작
     bgOffset = 0;
     lastObstacleTime = 0;
+    activeEffects = {};
     
     const stage = RUNNER_STAGES[runnerStage];
     runnerSpeed = stage.baseSpeed;
     
-    const evoScale = 1 + (G.data.evoTraits?.length || 0) * 0.05;
-    runner = { x: 100, y: 0, w: 45 * evoScale, h: 55 * evoScale, vy: 0, onGround: true, ducking: false };
+    const charScale = G.data.charScale || 1;
+    const evoBonus = (G.data.evoTraits?.length || 0) * 0.02;
+    const totalScale = charScale + evoBonus;
+    
+    runner = { 
+        x: 100, y: 0, 
+        w: 45 * totalScale, h: 55 * totalScale, 
+        baseW: 45, baseH: 55,
+        vy: 0, onGround: true, ducking: false 
+    };
     obstacles = [];
     items = [];
     runnerParticles = [];
@@ -1793,7 +1783,7 @@ const startRunner = () => {
         <div class="runner-hud">
             <div class="runner-stage">
                 <div class="runner-stage-name">${stage.name}</div>
-                <div class="runner-dist" id="r-dist">0m / ${stage.dist}m</div>
+                <div class="runner-dist" id="r-dist">${Math.floor(runnerDist)}m / ${stage.dist}m</div>
                 <div style="font-size:0.6rem;color:var(--neon-yellow);margin-top:2px;">🧬 진화: ${G.data.evoTraits?.length || 0}개</div>
             </div>
             <div class="hud-btns">
@@ -1802,6 +1792,65 @@ const startRunner = () => {
                 <button class="hud-btn" id="btn-pause">⏸️</button>
             </div>
         </div>
+        <div id="effect-icons" style="position:fixed;top:80px;left:16px;display:flex;gap:6px;flex-wrap:wrap;max-width:150px;z-index:50;"></div>
+        <div class="controls ${joyRight ? 'joy-right' : ''}">
+            <button class="action-btn" id="btn-duck" style="font-size:1rem;">⬇️</button>
+            <button class="action-btn" id="btn-jump">⬆️</button>
+        </div>
+    `;
+    
+    canvas = document.getElementById('game-canvas');
+    ctx = canvas.getContext('2d');
+    resize();
+    
+    window.addEventListener('resize', resize);
+    addCleanup(() => window.removeEventListener('resize', resize));
+    
+    setupRunnerControls();
+    setupRunnerHUD();
+    
+    gameLoop = requestAnimationFrame(updateRunner);
+};
+
+// 러너 재개 (주사위 먹은 후)
+const resumeRunner = () => {
+    const joyRight = Settings.get('joyRight');
+    
+    runnerStage = G.data.runnerStage || 0;
+    // runnerDist는 유지!
+    
+    const stage = RUNNER_STAGES[runnerStage];
+    runnerSpeed = stage.baseSpeed + runnerDist * 0.002;
+    runnerSpeed = Math.min(runnerSpeed, stage.baseSpeed + 3);
+    
+    const charScale = G.data.charScale || 1;
+    const evoBonus = (G.data.evoTraits?.length || 0) * 0.02;
+    const totalScale = charScale + evoBonus;
+    
+    runner = { 
+        x: 100, y: 0, 
+        w: 45 * totalScale, h: 55 * totalScale, 
+        baseW: 45, baseH: 55,
+        vy: 0, onGround: true, ducking: false 
+    };
+    obstacles = [];
+    items = [];
+    
+    app.innerHTML = `
+        <canvas id="game-canvas"></canvas>
+        <div class="runner-hud">
+            <div class="runner-stage">
+                <div class="runner-stage-name">${stage.name}</div>
+                <div class="runner-dist" id="r-dist">${Math.floor(runnerDist)}m / ${stage.dist}m</div>
+                <div style="font-size:0.6rem;color:var(--neon-yellow);margin-top:2px;">🧬 진화: ${G.data.evoTraits?.length || 0}개</div>
+            </div>
+            <div class="hud-btns">
+                <button class="hud-btn" id="btn-edit" title="파츠 배치">✋</button>
+                <button class="hud-btn" id="btn-home">🏠</button>
+                <button class="hud-btn" id="btn-pause">⏸️</button>
+            </div>
+        </div>
+        <div id="effect-icons" style="position:fixed;top:80px;left:16px;display:flex;gap:6px;flex-wrap:wrap;max-width:150px;z-index:50;"></div>
         <div class="controls ${joyRight ? 'joy-right' : ''}">
             <button class="action-btn" id="btn-duck" style="font-size:1rem;">⬇️</button>
             <button class="action-btn" id="btn-jump">⬆️</button>
@@ -1822,18 +1871,30 @@ const startRunner = () => {
 };
 
 const setupRunnerControls = () => {
-    const evoScale = 1 + (G.data.evoTraits?.length || 0) * 0.05;
+    const charScale = G.data.charScale || 1;
+    const evoBonus = (G.data.evoTraits?.length || 0) * 0.02;
+    const totalScale = charScale + evoBonus;
     
     const jump = () => {
         if (runner.onGround && !runner.ducking) {
-            runner.vy = -18;
+            let jumpPower = -18;
+            if (activeEffects.jump) jumpPower = -25;
+            runner.vy = jumpPower;
             runner.onGround = false;
             Audio.playJump();
         }
     };
     
-    const duckStart = () => { if (runner.onGround) { runner.ducking = true; runner.h = 25 * evoScale; } };
-    const duckEnd = () => { runner.ducking = false; runner.h = 55 * evoScale; };
+    const duckStart = () => { 
+        if (runner.onGround) { 
+            runner.ducking = true; 
+            runner.h = 25 * totalScale; 
+        } 
+    };
+    const duckEnd = () => { 
+        runner.ducking = false; 
+        runner.h = runner.baseH * totalScale; 
+    };
     
     document.getElementById('btn-jump').onclick = jump;
     document.getElementById('btn-jump').ontouchstart = e => { e.preventDefault(); jump(); };
@@ -1864,6 +1925,8 @@ const setupRunnerHUD = () => {
         Audio.playClick();
         cancelAnimationFrame(gameLoop);
         gameLoop = null;
+        G.data.runnerDist = runnerDist; // 거리 저장
+        saveGame();
         openEvoEditor();
     };
     document.getElementById('btn-home').onclick = () => {
@@ -1871,6 +1934,7 @@ const setupRunnerHUD = () => {
         if (confirm('홈으로?')) {
             cancelAnimationFrame(gameLoop);
             gameLoop = null;
+            G.data.runnerDist = runnerDist;
             saveGame();
             renderSaves();
         }
@@ -1890,6 +1954,14 @@ const updateRunner = () => {
     const groundY = canvas.height - 80;
     const now = Date.now();
     
+    // 효과 만료 체크
+    Object.keys(activeEffects).forEach(key => {
+        if (activeEffects[key] && now > activeEffects[key]) {
+            delete activeEffects[key];
+            updateEffectIcons();
+        }
+    });
+    
     // 중력
     runner.vy += 0.8;
     runner.y += runner.vy;
@@ -1901,11 +1973,15 @@ const updateRunner = () => {
     }
     
     // 거리 증가
-    runnerDist += runnerSpeed * 0.08;
+    let speedMod = 1;
+    if (activeEffects.speed) speedMod = 1.5;
+    if (activeEffects.slow) speedMod = 0.6;
+    
+    runnerDist += runnerSpeed * 0.08 * speedMod;
     runnerSpeed = stage.baseSpeed + runnerDist * 0.002;
     runnerSpeed = Math.min(runnerSpeed, stage.baseSpeed + 3);
     
-    bgOffset += runnerSpeed;
+    bgOffset += runnerSpeed * speedMod;
     
     // 장애물 생성
     if (now - lastObstacleTime > MIN_OBSTACLE_GAP && Math.random() < 0.012) {
@@ -1922,51 +1998,66 @@ const updateRunner = () => {
         lastObstacleTime = now;
     }
     
-    // 🎲 주사위 아이템 생성
-    if (Math.random() < 0.008) {
-        items.push({
-            x: canvas.width + 50,
-            y: groundY - 90 - Math.random() * 40,
-            type: 'dice',
-            collected: false
-        });
-    }
+    // 아이템 생성 (다양한 아이템)
+    Object.entries(RUNNER_ITEMS).forEach(([key, item]) => {
+        if (Math.random() < item.rate) {
+            items.push({
+                x: canvas.width + 50,
+                y: groundY - 90 - Math.random() * 40,
+                type: key,
+                collected: false
+            });
+        }
+    });
     
     // 장애물 처리
     for (let i = obstacles.length - 1; i >= 0; i--) {
         const o = obstacles[i];
-        o.x -= runnerSpeed * 1.5;
+        o.x -= runnerSpeed * 1.5 * speedMod;
         
         if (o.x < -60) { obstacles.splice(i, 1); continue; }
         
-        const hs = 10;
-        if (runner.x + runner.w - hs > o.x + hs &&
-            runner.x + hs < o.x + o.w - hs &&
-            runner.y + runner.h > o.y + hs &&
-            runner.y < o.y + o.h - hs) {
-            runnerFail();
-            return;
+        // 무적이 아닐 때만 충돌 체크
+        if (!activeEffects.shield) {
+            // 축소 효과 적용
+            const hitScale = activeEffects.shrink ? 0.5 : 1;
+            const hs = 10;
+            if (runner.x + runner.w * hitScale - hs > o.x + hs &&
+                runner.x + hs < o.x + o.w - hs &&
+                runner.y + runner.h > o.y + hs &&
+                runner.y < o.y + o.h - hs) {
+                runnerFail();
+                return;
+            }
         }
     }
     
-    // 🎲 주사위 아이템 수집
+    // 아이템 수집
     for (let i = items.length - 1; i >= 0; i--) {
         const item = items[i];
-        item.x -= runnerSpeed * 1.5;
+        item.x -= runnerSpeed * 1.5 * speedMod;
         
         if (item.x < -50) { items.splice(i, 1); continue; }
         
         if (!item.collected) {
+            let collectRange = 45;
+            if (activeEffects.magnet) collectRange = 120;
+            
             const dx = (runner.x + runner.w / 2) - item.x;
             const dy = (runner.y + runner.h / 2) - item.y;
-            if (Math.sqrt(dx * dx + dy * dy) < 45) {
+            const dist = Math.sqrt(dx * dx + dy * dy);
+            
+            // 자석 효과: 아이템이 플레이어에게 끌려옴
+            if (activeEffects.magnet && dist < collectRange) {
+                item.x += dx * 0.1;
+                item.y += dy * 0.1;
+            }
+            
+            if (dist < 45) {
                 item.collected = true;
                 items.splice(i, 1);
-                // 주사위 굴리기!
-                cancelAnimationFrame(gameLoop);
-                gameLoop = null;
-                rollEvoDice();
-                return;
+                collectItem(item.type);
+                if (item.type === 'dice') return; // 주사위는 화면 전환
             }
         }
     }
@@ -1990,7 +2081,78 @@ const updateRunner = () => {
     gameLoop = requestAnimationFrame(updateRunner);
 };
 
-// 🎲 진화 주사위 (51+ 진화, 1-50 꽝)
+// 아이템 수집 처리
+const collectItem = type => {
+    const item = RUNNER_ITEMS[type];
+    const now = Date.now();
+    
+    switch (type) {
+        case 'dice':
+            // 주사위: 진화 주사위 화면으로
+            cancelAnimationFrame(gameLoop);
+            gameLoop = null;
+            G.data.runnerDist = runnerDist; // 거리 저장!
+            saveGame();
+            rollEvoDice();
+            break;
+        case 'jump':
+            activeEffects.jump = now + item.duration;
+            Audio.playCollect();
+            toast('🦘 점프력 향상!', 'success');
+            break;
+        case 'speed':
+            activeEffects.speed = now + item.duration;
+            delete activeEffects.slow;
+            Audio.playCollect();
+            toast('⚡ 속도 증가!', 'success');
+            break;
+        case 'slow':
+            activeEffects.slow = now + item.duration;
+            delete activeEffects.speed;
+            Audio.playCollect();
+            toast('🐢 천천히...', 'info');
+            break;
+        case 'shield':
+            activeEffects.shield = now + item.duration;
+            Audio.playCollect();
+            toast('🛡️ 무적!', 'success');
+            break;
+        case 'magnet':
+            activeEffects.magnet = now + item.duration;
+            Audio.playCollect();
+            toast('🧲 자석 활성화!', 'success');
+            break;
+        case 'shrink':
+            activeEffects.shrink = now + item.duration;
+            Audio.playCollect();
+            toast('🔻 몸이 작아졌다!', 'info');
+            break;
+        case 'coin':
+            G.data.score = (G.data.score || 0) + 100;
+            Audio.playEatBig();
+            toast('💎 +100점!', 'success');
+            break;
+    }
+    
+    updateEffectIcons();
+};
+
+const updateEffectIcons = () => {
+    const el = document.getElementById('effect-icons');
+    if (!el) return;
+    
+    let html = '';
+    Object.keys(activeEffects).forEach(key => {
+        const item = RUNNER_ITEMS[key];
+        if (item) {
+            const remaining = Math.ceil((activeEffects[key] - Date.now()) / 1000);
+            html += `<div style="background:rgba(0,0,0,0.7);border-radius:8px;padding:4px 8px;font-size:0.8rem;">${item.icon} ${remaining}s</div>`;
+        }
+    });
+    el.innerHTML = html;
+};
+
+// 🎲 진화 주사위
 const rollEvoDice = () => {
     const traits = getRegionTraits();
     
@@ -2023,7 +2185,6 @@ const rollEvoDice = () => {
         dice.textContent = roll;
         
         if (roll >= 51) {
-            // 진화 성공!
             dice.style.cssText = 'font-size:3rem;font-family:Orbitron;font-weight:900;color:var(--success);text-shadow:0 0 25px var(--success);';
             Audio.playEvolve();
             
@@ -2055,10 +2216,9 @@ const rollEvoDice = () => {
                 document.getElementById('btn-continue').onclick = () => { Audio.playClick(); openEvoEditor(true); };
             } else {
                 result.innerHTML = `<p style="color:var(--text-secondary);margin:16px 0;">이미 모든 특성을 획득!</p><button class="btn btn-energy btn-block" id="btn-continue">계속</button>`;
-                document.getElementById('btn-continue').onclick = () => { Audio.playClick(); startRunner(); };
+                document.getElementById('btn-continue').onclick = () => { Audio.playClick(); resumeRunner(); };
             }
         } else {
-            // 꽝!
             dice.style.cssText = 'font-size:3rem;font-family:Orbitron;font-weight:900;color:var(--danger);text-shadow:0 0 25px var(--danger);';
             Audio.playFail();
             
@@ -2070,19 +2230,48 @@ const rollEvoDice = () => {
                 </div>
                 <button class="btn btn-outline btn-block" id="btn-continue">계속 달리기</button>
             `;
-            document.getElementById('btn-continue').onclick = () => { Audio.playClick(); startRunner(); };
+            document.getElementById('btn-continue').onclick = () => { Audio.playClick(); resumeRunner(); };
         }
     }, 1500);
 };
 
-// 진화 편집기 (드래그로 파츠 배치)
+// 진화 편집기 (캐릭터 + 파츠 크기/회전/삭제)
 const openEvoEditor = (isNew = false) => {
+    const charScale = G.data.charScale || 1;
+    
     app.innerHTML = `
         <div style="position:fixed;inset:0;z-index:400;background:rgba(3,3,8,0.98);display:flex;flex-direction:column;">
             <div style="padding:16px;padding-top:calc(16px + var(--safe-top));text-align:center;border-bottom:1px solid var(--border-default);">
-                <div style="font-family:Orbitron;font-size:1.2rem;color:var(--neon-cyan);">✋ 파츠 배치</div>
-                <div style="font-size:0.75rem;color:var(--text-muted);margin-top:4px;">파츠를 드래그해서 원하는 위치로!</div>
+                <div style="font-family:Orbitron;font-size:1.2rem;color:var(--neon-cyan);">✋ 파츠 배치 & 편집</div>
+                <div style="font-size:0.75rem;color:var(--text-muted);margin-top:4px;">파츠 선택 후 드래그/버튼으로 편집</div>
             </div>
+            
+            <div style="padding:12px 16px;border-bottom:1px solid var(--border-subtle);background:var(--void-surface);">
+                <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px;">
+                    <span style="font-size:0.8rem;color:var(--text-secondary);min-width:70px;">캐릭터</span>
+                    <input type="range" id="char-scale" min="50" max="200" value="${charScale * 100}" style="flex:1;">
+                    <span id="char-scale-val" style="font-family:Orbitron;font-size:0.75rem;color:var(--neon-cyan);min-width:35px;">${Math.round(charScale * 100)}%</span>
+                </div>
+                <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px;">
+                    <span style="font-size:0.8rem;color:var(--text-secondary);min-width:70px;">파츠 크기</span>
+                    <input type="range" id="part-scale" min="30" max="250" value="100" style="flex:1;">
+                    <span id="part-scale-val" style="font-family:Orbitron;font-size:0.75rem;color:var(--neon-yellow);min-width:35px;">100%</span>
+                </div>
+                <div style="display:flex;align-items:center;gap:12px;">
+                    <span style="font-size:0.8rem;color:var(--text-secondary);min-width:70px;">파츠 회전</span>
+                    <input type="range" id="part-rotation" min="-180" max="180" value="0" style="flex:1;">
+                    <span id="part-rotation-val" style="font-family:Orbitron;font-size:0.75rem;color:var(--neon-purple);min-width:35px;">0°</span>
+                </div>
+            </div>
+            
+            <div id="selected-info" style="padding:8px 16px;background:var(--void-elevated);display:none;align-items:center;justify-content:space-between;">
+                <div style="display:flex;align-items:center;gap:8px;">
+                    <span id="selected-icon" style="font-size:1.5rem;"></span>
+                    <span id="selected-name" style="font-size:0.85rem;color:var(--text-primary);"></span>
+                </div>
+                <button id="btn-delete-part" style="background:var(--danger);color:white;border:none;border-radius:8px;padding:6px 12px;font-size:0.75rem;cursor:pointer;">🗑️ 삭제</button>
+            </div>
+            
             <div style="flex:1;position:relative;overflow:hidden;" id="editor-wrap">
                 <canvas id="editor-canvas"></canvas>
             </div>
@@ -2101,6 +2290,63 @@ const openEvoEditor = (isNew = false) => {
     
     let selectedPart = null;
     let dragOffset = { x: 0, y: 0 };
+    let isDragging = false;
+    
+    const updateSelectedInfo = () => {
+        const infoEl = document.getElementById('selected-info');
+        if (selectedPart !== null && G.data.evoTraits[selectedPart]) {
+            const et = G.data.evoTraits[selectedPart];
+            const traits = getRegionTraits();
+            const trait = traits.find(t => t.id === et.id) || getTraitById(et.id);
+            if (trait) {
+                document.getElementById('selected-icon').textContent = trait.icon;
+                document.getElementById('selected-name').textContent = trait.name;
+                infoEl.style.display = 'flex';
+                
+                // 슬라이더 업데이트
+                document.getElementById('part-scale').value = (et.scale || 1) * 100;
+                document.getElementById('part-scale-val').textContent = `${Math.round((et.scale || 1) * 100)}%`;
+                document.getElementById('part-rotation').value = ((et.rotation || 0) * 180 / Math.PI);
+                document.getElementById('part-rotation-val').textContent = `${Math.round((et.rotation || 0) * 180 / Math.PI)}°`;
+            }
+        } else {
+            infoEl.style.display = 'none';
+        }
+    };
+    
+    // 캐릭터 크기 슬라이더
+    document.getElementById('char-scale').oninput = e => {
+        G.data.charScale = e.target.value / 100;
+        document.getElementById('char-scale-val').textContent = `${e.target.value}%`;
+    };
+    
+    // 파츠 크기 슬라이더
+    document.getElementById('part-scale').oninput = e => {
+        document.getElementById('part-scale-val').textContent = `${e.target.value}%`;
+        if (selectedPart !== null && G.data.evoTraits[selectedPart]) {
+            G.data.evoTraits[selectedPart].scale = e.target.value / 100;
+        }
+    };
+    
+    // 파츠 회전 슬라이더
+    document.getElementById('part-rotation').oninput = e => {
+        document.getElementById('part-rotation-val').textContent = `${e.target.value}°`;
+        if (selectedPart !== null && G.data.evoTraits[selectedPart]) {
+            G.data.evoTraits[selectedPart].rotation = e.target.value * Math.PI / 180;
+        }
+    };
+    
+    // 삭제 버튼
+    document.getElementById('btn-delete-part').onclick = () => {
+        if (selectedPart !== null && G.data.evoTraits[selectedPart]) {
+            if (confirm('이 파츠를 삭제하시겠습니까?')) {
+                G.data.evoTraits.splice(selectedPart, 1);
+                selectedPart = null;
+                updateSelectedInfo();
+                Audio.playClick();
+            }
+        }
+    };
     
     const drawEditor = () => {
         const w = cvs.width, h = cvs.height;
@@ -2109,8 +2355,52 @@ const openEvoEditor = (isNew = false) => {
         
         const d = G.data.design;
         const cx = w / 2, cy = h / 2;
-        const bodySize = Math.min(w, h) * 0.2;
+        const baseSize = Math.min(w, h) * 0.15;
+        const bodySize = baseSize * (G.data.charScale || 1);
         const t = Date.now() * 0.002;
+        
+        // 기본 다리 (스테이지1-2 파츠)
+        const legCnt = G.data.parts?.leg || 0;
+        if (legCnt > 0) {
+            ectx.strokeStyle = d.secondary;
+            ectx.lineWidth = 5;
+            ectx.lineCap = 'round';
+            for (let i = 0; i < Math.min(legCnt, 4); i++) {
+                const legPhase = Math.sin(t * 2 + i) * 0.3;
+                const baseAngle = Math.PI * 0.5 + (i - (legCnt - 1) / 2) * 0.25;
+                ectx.beginPath();
+                ectx.moveTo(cx + Math.cos(baseAngle) * bodySize * 0.8, cy + Math.sin(baseAngle) * bodySize * 0.8);
+                ectx.lineTo(cx + Math.cos(baseAngle + legPhase) * bodySize * 1.4, cy + bodySize * 1.2);
+                ectx.stroke();
+            }
+        }
+        
+        // 기본 팔
+        const armCnt = G.data.parts?.arm || 0;
+        if (armCnt > 0) {
+            ectx.strokeStyle = d.primary;
+            ectx.lineWidth = 4;
+            for (let i = 0; i < Math.min(armCnt, 4); i++) {
+                const side = i % 2 === 0 ? 1 : -1;
+                const armWave = Math.sin(t * 2 + i) * 0.2;
+                ectx.beginPath();
+                ectx.moveTo(cx + side * bodySize * 0.7, cy);
+                ectx.quadraticCurveTo(cx + side * bodySize * 1.2, cy + armWave * bodySize, cx + side * bodySize * 1.5, cy + bodySize * 0.3);
+                ectx.stroke();
+            }
+        }
+        
+        // 꼬리
+        const tailCnt = G.data.parts?.tail || 0;
+        if (tailCnt > 0) {
+            ectx.strokeStyle = d.primary;
+            ectx.lineWidth = 4;
+            const tailWave = Math.sin(t * 3) * bodySize * 0.3;
+            ectx.beginPath();
+            ectx.moveTo(cx - bodySize * 0.8, cy);
+            ectx.bezierCurveTo(cx - bodySize * 1.3, cy + tailWave, cx - bodySize * 1.6, cy - tailWave * 0.5, cx - bodySize * 2, cy + tailWave * 0.3);
+            ectx.stroke();
+        }
         
         // 몸통
         ectx.shadowColor = d.primary;
@@ -2130,17 +2420,74 @@ const openEvoEditor = (isNew = false) => {
         ectx.fill();
         ectx.shadowBlur = 0;
         
-        // 기본 눈
-        ectx.beginPath();
-        ectx.arc(cx + bodySize * 0.25, cy - bodySize * 0.15, bodySize * 0.15, 0, Math.PI * 2);
-        ectx.fillStyle = 'white';
-        ectx.fill();
-        ectx.beginPath();
-        ectx.arc(cx + bodySize * 0.28, cy - bodySize * 0.15, bodySize * 0.07, 0, Math.PI * 2);
-        ectx.fillStyle = '#222';
-        ectx.fill();
+        // 귀
+        const earCnt = G.data.parts?.ear || 0;
+        if (earCnt > 0) {
+            for (let i = 0; i < Math.min(earCnt, 2); i++) {
+                const side = i === 0 ? 1 : -1;
+                ectx.beginPath();
+                ectx.ellipse(cx + side * bodySize * 0.7, cy - bodySize * 0.5, bodySize * 0.15, bodySize * 0.25, side * 0.3, 0, Math.PI * 2);
+                ectx.fillStyle = d.primary;
+                ectx.fill();
+            }
+        }
         
-        // 진화 파츠들
+        // 기본 눈
+        const eyeCnt = Math.max(1, G.data.parts?.eye || 1);
+        for (let i = 0; i < eyeCnt; i++) {
+            const ex = cx + (i - (eyeCnt - 1) / 2) * bodySize * 0.4;
+            const ey = cy - bodySize * 0.2;
+            ectx.beginPath();
+            ectx.arc(ex, ey, bodySize * 0.18, 0, Math.PI * 2);
+            ectx.fillStyle = 'white';
+            ectx.fill();
+            ectx.beginPath();
+            ectx.arc(ex + bodySize * 0.03, ey, bodySize * 0.08, 0, Math.PI * 2);
+            ectx.fillStyle = '#222';
+            ectx.fill();
+        }
+        
+        // 코
+        if (G.data.parts?.nose > 0) {
+            ectx.fillStyle = '#ffcc99';
+            ectx.beginPath();
+            ectx.moveTo(cx, cy + bodySize * 0.1);
+            ectx.lineTo(cx - bodySize * 0.08, cy + bodySize * 0.25);
+            ectx.lineTo(cx + bodySize * 0.08, cy + bodySize * 0.25);
+            ectx.closePath();
+            ectx.fill();
+        }
+        
+        // 입
+        if (G.data.parts?.mouth > 0) {
+            ectx.strokeStyle = d.secondary;
+            ectx.lineWidth = 3;
+            ectx.lineCap = 'round';
+            ectx.beginPath();
+            ectx.arc(cx, cy + bodySize * 0.35, bodySize * 0.15, 0.2, Math.PI - 0.2);
+            ectx.stroke();
+        }
+        
+        // 더듬이
+        const antCnt = G.data.parts?.antenna || 0;
+        if (antCnt > 0) {
+            ectx.strokeStyle = d.primary;
+            ectx.lineWidth = 2;
+            for (let i = 0; i < Math.min(antCnt, 2); i++) {
+                const side = i === 0 ? 1 : -1;
+                const wave = Math.sin(t * 3) * 0.1;
+                ectx.beginPath();
+                ectx.moveTo(cx + side * bodySize * 0.3, cy - bodySize * 0.8);
+                ectx.quadraticCurveTo(cx + side * bodySize * 0.5, cy - bodySize * 1.3, cx + side * bodySize * 0.7, cy - bodySize * 1.2 + wave * bodySize);
+                ectx.stroke();
+                ectx.beginPath();
+                ectx.arc(cx + side * bodySize * 0.7, cy - bodySize * 1.2 + wave * bodySize, 5, 0, Math.PI * 2);
+                ectx.fillStyle = d.primary;
+                ectx.fill();
+            }
+        }
+        
+        // 진화 파츠들 (스테이지3)
         const traits = getRegionTraits();
         (G.data.evoTraits || []).forEach((et, idx) => {
             const trait = traits.find(t => t.id === et.id) || getTraitById(et.id);
@@ -2148,31 +2495,35 @@ const openEvoEditor = (isNew = false) => {
             
             const px = et.x * w;
             const py = et.y * h;
+            const scale = et.scale || 1;
             
             ectx.save();
             ectx.translate(px, py);
             ectx.rotate(et.rotation || 0);
-            ectx.scale(et.scale || 1, et.scale || 1);
+            ectx.scale(scale, scale);
             
             ectx.font = '40px Arial';
             ectx.textAlign = 'center';
             ectx.textBaseline = 'middle';
             ectx.fillText(trait.icon, 0, 0);
             
+            // 선택된 파츠 강조
             if (selectedPart === idx) {
                 ectx.strokeStyle = '#00f5d4';
-                ectx.lineWidth = 3;
-                ectx.strokeRect(-25, -25, 50, 50);
+                ectx.lineWidth = 3 / scale;
+                ectx.setLineDash([5 / scale, 5 / scale]);
+                ectx.strokeRect(-28, -28, 56, 56);
+                ectx.setLineDash([]);
             }
             
             ectx.restore();
         });
         
         // 안내
-        ectx.font = '12px Arial';
+        ectx.font = '11px Arial';
         ectx.fillStyle = 'rgba(255,255,255,0.4)';
         ectx.textAlign = 'center';
-        ectx.fillText('파츠를 터치/드래그해서 이동', w / 2, h - 20);
+        ectx.fillText('파츠 터치 → 드래그로 이동 / 상단 슬라이더로 크기·회전', w / 2, h - 15);
     };
     
     const getPartAt = (x, y) => {
@@ -2181,7 +2532,8 @@ const openEvoEditor = (isNew = false) => {
             const et = traits[i];
             const px = et.x * cvs.width;
             const py = et.y * cvs.height;
-            if (Math.abs(x - px) < 30 && Math.abs(y - py) < 30) return i;
+            const scale = et.scale || 1;
+            if (Math.abs(x - px) < 30 * scale && Math.abs(y - py) < 30 * scale) return i;
         }
         return null;
     };
@@ -2194,41 +2546,50 @@ const openEvoEditor = (isNew = false) => {
         const idx = getPartAt(x, y);
         if (idx !== null) {
             selectedPart = idx;
+            isDragging = true;
             const et = G.data.evoTraits[idx];
             dragOffset.x = x - et.x * cvs.width;
             dragOffset.y = y - et.y * cvs.height;
-            drawEditor();
+            updateSelectedInfo();
+        } else {
+            selectedPart = null;
+            isDragging = false;
+            updateSelectedInfo();
         }
     };
     
     const onPointerMove = e => {
-        if (selectedPart === null) return;
+        if (!isDragging || selectedPart === null) return;
         const rect = cvs.getBoundingClientRect();
         const x = (e.touches ? e.touches[0].clientX : e.clientX) - rect.left;
         const y = (e.touches ? e.touches[0].clientY : e.clientY) - rect.top;
         
         const et = G.data.evoTraits[selectedPart];
-        et.x = Math.max(0.05, Math.min(0.95, (x - dragOffset.x) / cvs.width));
-        et.y = Math.max(0.05, Math.min(0.95, (y - dragOffset.y) / cvs.height));
-        drawEditor();
+        if (et) {
+            et.x = Math.max(0.05, Math.min(0.95, (x - dragOffset.x) / cvs.width));
+            et.y = Math.max(0.05, Math.min(0.95, (y - dragOffset.y) / cvs.height));
+        }
     };
     
     const onPointerUp = () => {
-        selectedPart = null;
-        drawEditor();
+        isDragging = false;
     };
     
     cvs.addEventListener('mousedown', onPointerDown);
     cvs.addEventListener('mousemove', onPointerMove);
     cvs.addEventListener('mouseup', onPointerUp);
+    cvs.addEventListener('mouseleave', onPointerUp);
     cvs.addEventListener('touchstart', e => { e.preventDefault(); onPointerDown(e); }, { passive: false });
     cvs.addEventListener('touchmove', e => { e.preventDefault(); onPointerMove(e); }, { passive: false });
     cvs.addEventListener('touchend', onPointerUp);
     
-    document.getElementById('btn-cancel').onclick = () => { startRunner(); };
-    document.getElementById('btn-save').onclick = () => { Audio.playClick(); saveGame(); startRunner(); };
+    document.getElementById('btn-cancel').onclick = () => { resumeRunner(); };
+    document.getElementById('btn-save').onclick = () => { 
+        Audio.playClick(); 
+        saveGame(); 
+        resumeRunner(); 
+    };
     
-    drawEditor();
     const animLoop = () => {
         if (document.getElementById('editor-canvas')) {
             drawEditor();
@@ -2274,7 +2635,6 @@ const renderRunner = (stage, groundY) => {
     ctx.fillStyle = stage.groundColor;
     ctx.fillRect(0, groundY, w, h - groundY);
     
-    // 땅 디테일
     ctx.strokeStyle = 'rgba(255,255,255,0.2)';
     ctx.lineWidth = 2;
     ctx.setLineDash([20, 15]);
@@ -2293,21 +2653,26 @@ const renderRunner = (stage, groundY) => {
         ctx.fillText(o.type, o.x + o.w / 2, o.y + o.h);
     });
     
-    // 🎲 주사위 아이템
+    // 아이템
     items.forEach(item => {
         if (item.collected) return;
+        const itemData = RUNNER_ITEMS[item.type];
         ctx.save();
         ctx.translate(item.x, item.y + Math.sin(t * 5) * 5);
-        ctx.rotate(t * 2);
-        ctx.font = '36px Arial';
+        if (item.type === 'dice') ctx.rotate(t * 2);
+        ctx.font = '32px Arial';
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
-        ctx.fillText('🎲', 0, 0);
-        ctx.strokeStyle = 'rgba(254,228,64,0.6)';
-        ctx.lineWidth = 3;
-        ctx.beginPath();
-        ctx.arc(0, 0, 25 + Math.sin(t * 8) * 3, 0, Math.PI * 2);
-        ctx.stroke();
+        ctx.fillText(itemData.icon, 0, 0);
+        
+        // 주사위는 특별히 반짝임
+        if (item.type === 'dice') {
+            ctx.strokeStyle = 'rgba(254,228,64,0.6)';
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            ctx.arc(0, 0, 25 + Math.sin(t * 8) * 3, 0, Math.PI * 2);
+            ctx.stroke();
+        }
         ctx.restore();
     });
     
@@ -2323,25 +2688,79 @@ const renderRunner = (stage, groundY) => {
     
     // 캐릭터
     drawRunnerChar(groundY);
+    
+    // 무적 효과
+    if (activeEffects.shield) {
+        ctx.strokeStyle = 'rgba(0,245,212,0.5)';
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.arc(runner.x + runner.w / 2, runner.y + runner.h / 2, runner.w * 0.8, 0, Math.PI * 2);
+        ctx.stroke();
+    }
 };
 
 const drawRunnerChar = groundY => {
     const d = G.data.design, t = Date.now() * 0.01;
     const evoTraits = G.data.evoTraits || [];
-    const evoCount = evoTraits.length;
-    const bodyScale = 1 + evoCount * 0.03;
+    const charScale = G.data.charScale || 1;
+    const evoBonus = evoTraits.length * 0.02;
+    const totalScale = charScale + evoBonus;
+    
+    // 축소 효과
+    const shrinkMod = activeEffects.shrink ? 0.5 : 1;
     
     ctx.save();
     ctx.translate(runner.x + runner.w / 2, runner.y + runner.h / 2);
+    ctx.scale(shrinkMod, shrinkMod);
     
     const legPhase = Math.sin(t * 2) * 0.4;
+    const bodyW = runner.baseW / 2 * totalScale;
+    const bodyH = runner.baseH / 2 * totalScale;
+    
+    // 기본 다리
+    const legCnt = G.data.parts?.leg || 0;
+    ctx.strokeStyle = d.secondary;
+    ctx.lineWidth = 5;
+    ctx.lineCap = 'round';
+    
+    // 최소 2개 다리는 기본으로
+    for (let i = 0; i < Math.max(2, legCnt); i++) {
+        const baseX = (i % 2 === 0 ? -1 : 1) * bodyW * 0.4;
+        const phase = i % 2 === 0 ? legPhase : -legPhase;
+        ctx.beginPath();
+        ctx.moveTo(baseX, bodyH * 0.6);
+        ctx.lineTo(baseX + Math.sin(phase) * 15, bodyH + 10);
+        ctx.stroke();
+    }
+    
+    // 꼬리
+    if (G.data.parts?.tail > 0) {
+        ctx.strokeStyle = d.primary;
+        ctx.lineWidth = 4;
+        const tailWave = Math.sin(t * 3) * bodyW * 0.3;
+        ctx.beginPath();
+        ctx.moveTo(-bodyW * 0.8, 0);
+        ctx.bezierCurveTo(-bodyW * 1.2, tailWave, -bodyW * 1.4, -tailWave * 0.5, -bodyW * 1.8, tailWave * 0.3);
+        ctx.stroke();
+    }
+    
+    // 팔
+    if (G.data.parts?.arm > 0) {
+        ctx.strokeStyle = d.primary;
+        ctx.lineWidth = 4;
+        for (let i = 0; i < Math.min(G.data.parts.arm, 4); i++) {
+            const side = i % 2 === 0 ? 1 : -1;
+            const wave = Math.sin(t * 2 + i) * 0.2;
+            ctx.beginPath();
+            ctx.moveTo(side * bodyW * 0.7, -bodyH * 0.2);
+            ctx.quadraticCurveTo(side * bodyW * 1.2, wave * bodyH, side * bodyW * 1.4, bodyH * 0.2);
+            ctx.stroke();
+        }
+    }
     
     // 몸통
     ctx.shadowColor = d.primary;
     ctx.shadowBlur = 15;
-    
-    const bodyW = runner.w / 2 * bodyScale;
-    const bodyH = runner.h / 2 * bodyScale;
     
     ctx.beginPath();
     for (let i = 0; i < 10; i++) {
@@ -2360,30 +2779,72 @@ const drawRunnerChar = groundY => {
     ctx.fill();
     ctx.shadowBlur = 0;
     
+    // 귀
+    if (G.data.parts?.ear > 0) {
+        for (let i = 0; i < Math.min(G.data.parts.ear, 2); i++) {
+            const side = i === 0 ? 1 : -1;
+            ctx.beginPath();
+            ctx.ellipse(side * bodyW * 0.7, -bodyH * 0.5, bodyW * 0.12, bodyH * 0.2, side * 0.3, 0, Math.PI * 2);
+            ctx.fillStyle = d.primary;
+            ctx.fill();
+        }
+    }
+    
     // 기본 눈
-    ctx.beginPath();
-    ctx.arc(bodyW * 0.3, -bodyH * 0.2, bodyW * 0.25, 0, Math.PI * 2);
-    ctx.fillStyle = 'white';
-    ctx.fill();
-    ctx.beginPath();
-    ctx.arc(bodyW * 0.35, -bodyH * 0.2, bodyW * 0.12, 0, Math.PI * 2);
-    ctx.fillStyle = '#222';
-    ctx.fill();
+    const eyeCnt = Math.max(1, G.data.parts?.eye || 1);
+    for (let i = 0; i < eyeCnt; i++) {
+        const ex = (i - (eyeCnt - 1) / 2) * bodyW * 0.5;
+        const ey = -bodyH * 0.2;
+        ctx.beginPath();
+        ctx.arc(ex, ey, bodyW * 0.2, 0, Math.PI * 2);
+        ctx.fillStyle = 'white';
+        ctx.fill();
+        ctx.beginPath();
+        ctx.arc(ex + bodyW * 0.04, ey, bodyW * 0.1, 0, Math.PI * 2);
+        ctx.fillStyle = '#222';
+        ctx.fill();
+    }
     
-    // 기본 다리
-    ctx.strokeStyle = d.secondary;
-    ctx.lineWidth = 5;
-    ctx.lineCap = 'round';
-    ctx.beginPath();
-    ctx.moveTo(-bodyW * 0.3, bodyH * 0.7);
-    ctx.lineTo(-bodyW * 0.3 + Math.sin(legPhase) * 15, bodyH + 10);
-    ctx.stroke();
-    ctx.beginPath();
-    ctx.moveTo(bodyW * 0.3, bodyH * 0.7);
-    ctx.lineTo(bodyW * 0.3 - Math.sin(legPhase) * 15, bodyH + 10);
-    ctx.stroke();
+    // 코
+    if (G.data.parts?.nose > 0) {
+        ctx.fillStyle = '#ffcc99';
+        ctx.beginPath();
+        ctx.moveTo(0, bodyH * 0.05);
+        ctx.lineTo(-bodyW * 0.08, bodyH * 0.2);
+        ctx.lineTo(bodyW * 0.08, bodyH * 0.2);
+        ctx.closePath();
+        ctx.fill();
+    }
     
-    // 진화 파츠들
+    // 입
+    if (G.data.parts?.mouth > 0) {
+        ctx.strokeStyle = d.secondary;
+        ctx.lineWidth = 2.5;
+        ctx.lineCap = 'round';
+        ctx.beginPath();
+        ctx.arc(0, bodyH * 0.3, bodyW * 0.12, 0.2, Math.PI - 0.2);
+        ctx.stroke();
+    }
+    
+    // 더듬이
+    if (G.data.parts?.antenna > 0) {
+        ctx.strokeStyle = d.primary;
+        ctx.lineWidth = 2;
+        for (let i = 0; i < Math.min(G.data.parts.antenna, 2); i++) {
+            const side = i === 0 ? 1 : -1;
+            const wave = Math.sin(t * 3) * 0.1;
+            ctx.beginPath();
+            ctx.moveTo(side * bodyW * 0.3, -bodyH * 0.9);
+            ctx.quadraticCurveTo(side * bodyW * 0.5, -bodyH * 1.3, side * bodyW * 0.6, -bodyH * 1.2);
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.arc(side * bodyW * 0.6, -bodyH * 1.2, 4, 0, Math.PI * 2);
+            ctx.fillStyle = d.primary;
+            ctx.fill();
+        }
+    }
+    
+    // 진화 파츠들 (스테이지3)
     const traits = getRegionTraits();
     evoTraits.forEach(et => {
         const trait = traits.find(t => t.id === et.id) || getTraitById(et.id);
@@ -2391,11 +2852,12 @@ const drawRunnerChar = groundY => {
         
         const px = (et.x - 0.5) * runner.w * 2;
         const py = (et.y - 0.5) * runner.h * 2;
+        const scale = et.scale || 1;
         
         ctx.save();
         ctx.translate(px, py);
         ctx.rotate(et.rotation || 0);
-        ctx.scale(et.scale || 1, et.scale || 1);
+        ctx.scale(scale, scale);
         
         ctx.font = '24px Arial';
         ctx.textAlign = 'center';
@@ -2413,17 +2875,25 @@ const runnerFail = () => {
     gameLoop = null;
     Audio.playDeath();
     
+    const lostTraits = G.data.evoTraits?.length || 0;
+    
+    // ★ 충돌 시 모든 진화 리셋!
+    G.data.evoTraits = [];
+    G.data.charScale = 1;
+    G.data.runnerDist = 0;
+    saveGame();
+    
     app.innerHTML = `
         <div class="modal"><div class="modal-box">
             <div class="modal-icon">💥</div>
             <h1 class="modal-title fail">충돌!</h1>
-            <p class="modal-desc">장애물에 부딪혔습니다.</p>
+            <p class="modal-desc">장애물에 부딪혔습니다.<br><span style="color:var(--danger);">모든 진화가 초기화됩니다!</span></p>
             <div class="modal-stats">
                 <div class="stat-row"><span class="stat-label">진행 거리</span><span class="stat-val">${Math.floor(runnerDist)}m</span></div>
-                <div class="stat-row"><span class="stat-label">획득 특성</span><span class="stat-val">${G.data.evoTraits?.length || 0}개</span></div>
+                <div class="stat-row"><span class="stat-label">잃은 특성</span><span class="stat-val" style="color:var(--danger);">${lostTraits}개</span></div>
             </div>
             <div style="display:flex;flex-direction:column;gap:10px;">
-                <button class="btn btn-energy btn-block" id="btn-retry">🔄 다시</button>
+                <button class="btn btn-energy btn-block" id="btn-retry">🔄 처음부터</button>
                 <button class="btn btn-outline btn-block" id="btn-home">🏠 홈</button>
             </div>
         </div></div>
@@ -2443,6 +2913,7 @@ const runnerStageComplete = () => {
     
     if (!isLast) {
         G.data.runnerStage = runnerStage + 1;
+        G.data.runnerDist = 0; // 다음 스테이지는 0부터
         saveGame();
         showEvo('🧬', '스테이지 클리어!', `${stage.name} 완료!`, `${runnerStage + 2}단계로...`);
         setTimeout(() => startRunner(), 2500);
