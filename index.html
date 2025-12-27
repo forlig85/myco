@@ -2367,6 +2367,8 @@ let camY = 0, curHeight = 0, canDoubleJump = false, wasOnGround = true;
 let p2GameRunning = false, p2Time = 0;
 let climbItem = null; // 'tornado', 'cloud', null
 let landPlatform = null;
+let lowestY = 0; // 플레이어가 도달한 최저점 (가장 높이 올라간 위치)
+let deathLineY = 0; // 게임오버 라인 (시작 위치 + 여유)
 const LAND_HEIGHT = 3000; // 육지 높이
 
 function showPhase2Intro() {
@@ -2577,9 +2579,12 @@ function startPhase2() {
         onGround: true
     };
     
-    // 플랫폼 생성
+    // 게임오버 라인 설정 (시작 위치 + 200px 아래)
+    lowestY = climber.y;
+    deathLineY = pixiApp.screen.height + 150;
+    
+    // 육지 y 위치 (고정)
     const landY = -LAND_HEIGHT * 10;
-    generatePlatforms(pixiApp.screen.height - 50, landY - 200);
     
     // 시작 플랫폼
     platforms.push({
@@ -2589,6 +2594,9 @@ function startPhase2() {
         h: 18,
         type: 'start'
     });
+    
+    // 초기 플랫폼 생성 (화면 위쪽으로 5화면 정도)
+    generatePlatforms(pixiApp.screen.height - 50, -pixiApp.screen.height * 5);
     
     // 육지 플랫폼
     landPlatform = {
@@ -2848,14 +2856,22 @@ function updateClimb(delta) {
         GameState.maxHeight = curHeight;
     }
     
-    // 새 플랫폼 생성
-    const highest = Math.min(...platforms.filter(p => p.type !== 'land').map(p => p.y));
-    if (-camY - pixiApp.screen.height < highest + 400) {
-        generatePlatforms(highest, highest - pixiApp.screen.height * 2);
+    // 새 플랫폼 생성 - 단순화
+    const landY = -LAND_HEIGHT * 10;
+    let highestPlatY = pixiApp.screen.height;
+    for (const p of platforms) {
+        if (p.type !== 'land' && p.y < highestPlatY) {
+            highestPlatY = p.y;
+        }
     }
     
-    // 게임오버 체크 (화면 아래로 떨어짐)
-    if (climber.y > -camY + pixiApp.screen.height + 80) {
+    // 플레이어 위에 플랫폼이 부족하면 생성
+    if (climber.y - pixiApp.screen.height * 2 < highestPlatY && highestPlatY > landY + 500) {
+        generatePlatforms(highestPlatY - 30, highestPlatY - pixiApp.screen.height * 4);
+    }
+    
+    // 게임오버 체크 (시작 위치 아래로 떨어짐)
+    if (climber.y > deathLineY) {
         climbFail();
         return;
     }
@@ -2877,22 +2893,29 @@ function renderClimb() {
     const heightRatio = Math.min(1, curHeight / LAND_HEIGHT);
     const t = p2Time;
     
-    const envColors = currentEnv.colors || { bg1: '#001a33', primary: '#00b4d8', secondary: '#0077b6' };
+    // 기본 배경색 (안전한 기본값)
+    const defaultBg = 0x001a33;
+    const defaultPrimary = 0x00b4d8;
+    
+    let envBg = defaultBg;
+    let envPrimary = defaultPrimary;
+    
+    try {
+        if (currentEnv && currentEnv.colors) {
+            envBg = parseInt(currentEnv.colors.bg1.replace('#', ''), 16) || defaultBg;
+            envPrimary = parseInt(currentEnv.colors.primary.replace('#', ''), 16) || defaultPrimary;
+        }
+    } catch (e) {
+        envBg = defaultBg;
+        envPrimary = defaultPrimary;
+    }
     
     // 배경 그라데이션 (높이에 따라 변화)
     let bgColor;
     if (heightRatio < 0.5) {
-        bgColor = lerpColor(
-            parseInt(envColors.bg1.replace('#', '0x')),
-            0x1a3a5e,
-            heightRatio * 2
-        );
+        bgColor = lerpColor(envBg, 0x1a3a5e, heightRatio * 2);
     } else {
-        bgColor = lerpColor(
-            0x1a3a5e,
-            0x87CEEB,
-            (heightRatio - 0.5) * 2
-        );
+        bgColor = lerpColor(0x1a3a5e, 0x87CEEB, (heightRatio - 0.5) * 2);
     }
     pixiApp.renderer.background.color = bgColor;
     
@@ -2927,8 +2950,7 @@ function renderClimb() {
                 graphics.endFill();
             }
         } else if (p.type === 'start') {
-            const primary = parseInt(envColors.primary.replace('#', '0x'));
-            graphics.beginFill(primary, 0.8);
+            graphics.beginFill(envPrimary, 0.8);
             graphics.drawRoundedRect(p.x, screenY, p.w, p.h, 5);
             graphics.endFill();
         } else if (p.type === 'moving') {
@@ -2946,7 +2968,7 @@ function renderClimb() {
         } else {
             // 일반 플랫폼
             const platColor = heightRatio < 0.5 
-                ? lerpColor(parseInt(envColors.primary.replace('#', '0x')), 0x48cae4, heightRatio * 2)
+                ? lerpColor(envPrimary, 0x48cae4, heightRatio * 2)
                 : lerpColor(0x48cae4, 0xcaf0f8, (heightRatio - 0.5) * 2);
             graphics.beginFill(platColor);
             graphics.drawRoundedRect(p.x, screenY, p.w, p.h, 5);
@@ -2987,6 +3009,23 @@ function renderClimb() {
     graphics.beginFill(0x228B22);
     graphics.drawRect(barX - 6, 55, 20, 8);
     graphics.endFill();
+    
+    // 데스라인 표시 (빨간 점선)
+    const deathScreenY = deathLineY + camY;
+    if (deathScreenY > 0 && deathScreenY < h + 50) {
+        graphics.lineStyle(3, 0xff4444, 0.6);
+        for (let dx = 0; dx < w; dx += 20) {
+            graphics.moveTo(dx, deathScreenY);
+            graphics.lineTo(dx + 10, deathScreenY);
+        }
+        graphics.lineStyle(0);
+        
+        // 경고 텍스트
+        const warnText = new PIXI.Text('☠️', { fontSize: 20 });
+        warnText.x = 10;
+        warnText.y = deathScreenY - 25;
+        pixiApp.stage.addChild(warnText);
+    }
 }
 
 function drawClimber(graphics) {
