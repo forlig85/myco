@@ -6,7 +6,6 @@
     <title>BOKLUCK Universe v1.5</title>
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎲</text></svg>">
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Noto+Sans+KR:wght@400;700&display=swap" rel="stylesheet">
-    <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
@@ -343,6 +342,8 @@ if (auth) {
 }
 
 const CONFIG = {
+    // Safari 이모지 호환 폰트
+    EMOJI_FONT: '"Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", Arial',
     GROWTH_THRESHOLD: 15,
     STAGE_THRESHOLD: 2000,
     LAND_HEIGHT: 3000,
@@ -1304,7 +1305,7 @@ const renderCell = env => {
     ctx.fillRect(0, 0, w, h);
     
     foods.forEach(f => {
-        ctx.font = `${f.size * 1.6}px Arial`;
+        ctx.font = `${f.size * 1.6}px ${CONFIG.EMOJI_FONT}`;
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
         ctx.fillText(f.type, f.x, f.y);
@@ -1911,7 +1912,7 @@ const renderClimb = env => {
         ctx.save();
         ctx.translate(item.x, item.y + Math.sin(t) * 5);
         ctx.rotate(-Math.PI / 2);
-        ctx.font = '28px Arial';
+        ctx.font = `28px ${CONFIG.EMOJI_FONT}`;
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
         ctx.fillText(item.type === 'tornado' ? '🌪️' : '☁️', 0, 0);
@@ -2955,7 +2956,7 @@ const openEvoEditor = (isNew = false) => {
             ectx.rotate(et.rotation || 0);
             ectx.scale(scale * flipX, scale);
             
-            ectx.font = '40px Arial';
+            ectx.font = `40px ${CONFIG.EMOJI_FONT}`;
             ectx.textAlign = 'center';
             ectx.textBaseline = 'middle';
             ectx.fillText(trait.icon, 0, 0);
@@ -3372,7 +3373,7 @@ const renderRunner = (stage, groundY) => {
     
     // 장애물
     obstacles.forEach(o => {
-        ctx.font = `${o.h}px Arial`;
+        ctx.font = `${o.h}px ${CONFIG.EMOJI_FONT}`;
         ctx.textAlign = 'center';
         ctx.textBaseline = 'bottom';
         ctx.fillText(o.type, o.x + o.w / 2, o.y + o.h);
@@ -3385,7 +3386,7 @@ const renderRunner = (stage, groundY) => {
         ctx.save();
         ctx.translate(item.x, item.y + Math.sin(t * 5) * 5);
         if (item.type === 'dice') ctx.rotate(t * 2);
-        ctx.font = '32px Arial';
+        ctx.font = `32px ${CONFIG.EMOJI_FONT}`;
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
         ctx.fillText(itemData.icon, 0, 0);
@@ -3597,7 +3598,7 @@ const drawRunnerChar = groundY => {
         ctx.rotate(et.rotation || 0);
         ctx.scale(scale * flipX, scale);
         
-        ctx.font = '24px Arial';
+        ctx.font = `24px ${CONFIG.EMOJI_FONT}`;
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
         ctx.fillText(trait.icon, 0, 0);
