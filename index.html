@@ -1042,11 +1042,16 @@ const TRANSLATIONS = {
             { icon: '🏔️', title: '陸へ！', text: '海を超えて<br><span class="hl">広大な陸地</span>が待っている。' },
             { icon: '🦎', title: '新たな挑戦', text: '<span class="danger">重力</span>という新たな敵！<br><span class="gold">ジャンプ</span>して<span class="hl">登れ</span>。' }
         ],
+        p2DiceTitle: 'ジャンプ力',
+        p2DiceDesc: 'サイコロがジャンプ力を決める',
+        p2Go: '登攀開始！',
         p2Start: '登攀開始！',
         p2Gameover: '落下！',
         p2GameoverDesc: '落ちすぎました。',
         p2Clear: '空へ！',
         p2ClearDesc: '陸地を征服しました！',
+        p2Retry: 'リトライ',
+        p2Restart: '最初からやり直しますか？',
         // 共通UI
         height: '高さ',
         score: 'スコア',
@@ -2352,6 +2357,489 @@ function stageClear() {
     document.getElementById('modal-clear').classList.add('show');
 }
 
+
+// ========================================
+// Phase 2 - Climb Game (세포 → 육지 진화)
+// 시작 전 주사위: 80+ 토네이도, 60-79 구름, 59- 없음
+// ========================================
+let climber = null, platforms = [], climbItems = [];
+let camY = 0, curHeight = 0, canDoubleJump = false, wasOnGround = true;
+let p2GameRunning = false, p2Time = 0;
+let climbItem = null; // 'tornado', 'cloud', null
+let landPlatform = null;
+const LAND_HEIGHT = 3000; // 육지 높이
+
+function showPhase2Intro() {
+    currentEnv = getEnvById(GameState.envId);
+    initPixi(parseInt(currentEnv.colors.bg1.replace('#', '0x')));
+    createStarBackground(currentEnv.colors);
+    
+    const appEl = document.getElementById('app');
+    const t = GameState.t.bind(GameState);
+    const intro = TRANSLATIONS[GameState.currentLang].p2Intro;
+    let idx = 0;
+    
+    function render() {
+        const s = intro[idx];
+        const isLast = idx === intro.length - 1;
+        
+        appEl.innerHTML = `
+            <button class="skip-btn" id="skip-btn">${t('skip')}</button>
+            <div class="page-center">
+                <div class="page-content">
+                    <div class="page-icon">${s.icon}</div>
+                    <h2 class="page-title">${s.title}</h2>
+                    <p class="page-text">${s.text}</p>
+                    <div class="dots">
+                        ${intro.map((_, i) => `<div class="dot ${i < idx ? 'done' : ''} ${i === idx ? 'active' : ''}"></div>`).join('')}
+                    </div>
+                    <button class="btn btn-primary btn-block" id="btn-next">${isLast ? '🎲 ' + t('p2Start') : t('next')}</button>
+                </div>
+            </div>
+        `;
+        
+        document.getElementById('btn-next').onclick = () => {
+            if (isLast) showClimbDice();
+            else { idx++; render(); }
+        };
+        document.getElementById('skip-btn').onclick = showClimbDice;
+    }
+    render();
+}
+
+// Phase 2 주사위 - 아이템 결정
+function showClimbDice() {
+    currentEnv = getEnvById(GameState.envId);
+    initPixi(parseInt(currentEnv.colors.bg1.replace('#', '0x')));
+    createStarBackground(currentEnv.colors);
+    
+    const appEl = document.getElementById('app');
+    const t = GameState.t.bind(GameState);
+    
+    appEl.innerHTML = `
+        <div class="page-center">
+            <div class="page-content">
+                <h2 class="page-title">🎲 ${t('p2DiceTitle')}</h2>
+                <p class="page-text">
+                    80+ 🌪️ 토네이도<br>
+                    60-79 ☁️ 구름<br>
+                    59- 없음
+                </p>
+                <div class="dice-box" id="dice-box">🎲</div>
+                <div id="dice-result" style="min-height: 60px; margin: 15px 0;"></div>
+                <button class="btn btn-primary btn-block" id="btn-roll">🎲 ${t('roll')}</button>
+            </div>
+        </div>
+    `;
+    
+    const diceBox = document.getElementById('dice-box');
+    const result = document.getElementById('dice-result');
+    const btn = document.getElementById('btn-roll');
+    
+    btn.onclick = () => {
+        btn.disabled = true;
+        btn.textContent = t('rolling');
+        diceBox.classList.add('rolling');
+        
+        let count = 0;
+        const anim = setInterval(() => {
+            diceBox.textContent = Math.floor(Math.random() * 100) + 1;
+            count++;
+        }, 50);
+        
+        setTimeout(() => {
+            clearInterval(anim);
+            diceBox.classList.remove('rolling');
+            
+            const roll = Math.floor(Math.random() * 100) + 1;
+            diceBox.textContent = roll;
+            
+            let item = null, icon = '', msg = '';
+            
+            if (roll >= 80) {
+                item = 'tornado';
+                icon = '🌪️';
+                msg = '토네이도의 힘을 얻었다!';
+                diceBox.style.color = '#ff6b6b';
+                diceBox.style.textShadow = '0 0 20px #ff6b6b';
+            } else if (roll >= 60) {
+                item = 'cloud';
+                icon = '☁️';
+                msg = '구름의 힘을 얻었다!';
+                diceBox.style.color = '#87CEEB';
+                diceBox.style.textShadow = '0 0 20px #87CEEB';
+            } else {
+                item = null;
+                icon = '😢';
+                msg = '아무것도 얻지 못했다...';
+                diceBox.style.color = '#ff4444';
+                diceBox.style.textShadow = '0 0 15px #ff4444';
+            }
+            
+            climbItem = item;
+            
+            result.innerHTML = `
+                <div style="text-align: center;">
+                    <div style="font-size: 3rem; margin-bottom: 8px;">${icon}</div>
+                    <div style="color: #ffd700; font-size: 1rem;">${msg}</div>
+                </div>
+            `;
+            
+            btn.disabled = false;
+            btn.textContent = '🏔️ ' + t('p2Go');
+            btn.onclick = startPhase2;
+        }, 1500);
+    };
+}
+
+function startPhase2() {
+    GameState.resetP2();
+    currentEnv = getEnvById(GameState.envId);
+    
+    const bgColor = parseInt(currentEnv.colors.bg1.replace('#', '0x'));
+    initPixi(bgColor);
+    
+    const appEl = document.getElementById('app');
+    const t = GameState.t.bind(GameState);
+    
+    const itemIcon = climbItem === 'tornado' ? '🌪️' : climbItem === 'cloud' ? '☁️' : '🦎';
+    const itemText = climbItem === 'tornado' ? '토네이도' : climbItem === 'cloud' ? '구름' : '없음';
+    
+    appEl.innerHTML = `
+        <div class="hud-top">
+            <div class="hud-panel" style="min-width: 100px; text-align: center;">
+                <div style="font-size: 1.8rem; font-weight: 900; color: #00f5d4;" id="h2-height">0m</div>
+                <div style="font-size: 0.65rem; color: #666;">현재 높이</div>
+            </div>
+            <div class="hud-panel" style="min-width: 90px; text-align: center;">
+                <div style="font-size: 0.65rem; color: #666;">🏔️ 육지</div>
+                <div style="font-size: 1rem; font-weight: 700; color: #10b981;">${LAND_HEIGHT}m</div>
+                ${climbItem ? `<div style="font-size: 0.6rem; color: #ffd700; margin-top: 4px;">${itemIcon} ${itemText}</div>` : ''}
+            </div>
+            <div class="hud-btns">
+                <button class="hud-btn" id="btn-skip-p2" title="테스트: 클리어" style="background: linear-gradient(135deg, #10b981, #059669);">✓</button>
+                <button class="hud-btn" id="btn-restart-p2" title="다시 시작">🔄</button>
+                <button class="hud-btn" id="btn-home-p2" title="${t('home')}">🏠</button>
+                <button class="hud-btn" id="btn-pause-p2" title="Pause">⏸️</button>
+            </div>
+        </div>
+        <div class="controls">
+            <div class="joystick" id="joystick"><div class="joy-base"></div><div class="joy-knob" id="joy-knob"></div></div>
+            <button class="action-btn" id="btn-jump" title="Jump">⬆️</button>
+        </div>
+        <div class="modal" id="modal-p2-gameover">
+            <div class="modal-box">
+                <div class="modal-icon">💧</div>
+                <h2 class="modal-title fail">${t('p2Gameover')}</h2>
+                <p class="modal-desc">${t('p2GameoverDesc')}</p>
+                <div class="modal-stats">
+                    <div class="stat-row"><span class="stat-label">${t('maxHeight')}</span><span class="stat-val" id="p2go-height">0</span></div>
+                </div>
+                <div class="modal-btns">
+                    <button class="btn btn-primary btn-block" id="btn-p2-retry">🔄 ${t('p2Retry')}</button>
+                </div>
+            </div>
+        </div>
+        <div class="modal" id="modal-p2-clear">
+            <div class="modal-box">
+                <div class="modal-icon">🏝️</div>
+                <h2 class="modal-title win">${t('p2Clear')}</h2>
+                <p class="modal-desc">${t('p2ClearDesc')}</p>
+                <div class="modal-stats">
+                    <div class="stat-row"><span class="stat-label">${t('maxHeight')}</span><span class="stat-val" id="p2cl-height">0</span></div>
+                </div>
+                <div class="modal-btns">
+                    <button class="btn btn-primary btn-block" id="btn-p2-next">🦖 Phase 3!</button>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    // 게임 초기화
+    platforms = [];
+    climbItems = [];
+    camY = 0;
+    curHeight = 0;
+    wasOnGround = true;
+    p2Time = 0;
+    GameState.height = 0;
+    GameState.maxHeight = 0;
+    
+    // 플레이어 생성
+    const pSize = 28 + totalP1Parts() * 2;
+    climber = {
+        x: pixiApp.screen.width / 2,
+        y: pixiApp.screen.height - 80,
+        w: pSize,
+        h: pSize,
+        vx: 0,
+        vy: 0,
+        onGround: true
+    };
+    
+    // 플랫폼 생성
+    const landY = -LAND_HEIGHT * 10;
+    generatePlatforms(pixiApp.screen.height - 50, landY - 200);
+    
+    // 시작 플랫폼
+    platforms.push({
+        x: pixiApp.screen.width / 2 - 70,
+        y: pixiApp.screen.height - 40,
+        w: 140,
+        h: 18,
+        type: 'start'
+    });
+    
+    // 육지 플랫폼
+    landPlatform = {
+        x: 0,
+        y: landY,
+        w: pixiApp.screen.width,
+        h: 150,
+        type: 'land'
+    };
+    platforms.push(landPlatform);
+    
+    setupClimbControls();
+    setupClimbHUD();
+    
+    gameLoop = delta => updateClimb(delta);
+    pixiApp.ticker.add(gameLoop);
+    p2GameRunning = true;
+}
+
+function totalP1Parts() {
+    const p1PartKeys = ['eye', 'mouth', 'arm', 'leg', 'tail', 'antenna'];
+    return p1PartKeys.reduce((sum, k) => sum + (GameState.parts[k] || 0), 0);
+}
+
+function generatePlatforms(fromY, toY) {
+    let y = fromY - 50;
+    
+    while (y > toY) {
+        const num = 1 + Math.floor(Math.random() * 2);
+        
+        for (let i = 0; i < num; i++) {
+            const w = 70 + Math.random() * 50;
+            const x = Math.random() * (pixiApp.screen.width - w);
+            let type = 'normal';
+            
+            const heightRatio = Math.abs(y) / (LAND_HEIGHT * 10);
+            if (heightRatio > 0.3 && Math.random() < 0.1) type = 'moving';
+            if (heightRatio > 0.5 && Math.random() < 0.06) type = 'breaking';
+            if (heightRatio > 0.6 && Math.random() < 0.1) type = 'bouncy';
+            
+            platforms.push({
+                x, y, w, h: 14, type,
+                dir: Math.random() < 0.5 ? 1 : -1,
+                speed: 1 + Math.random() * 1.2,
+                broken: false,
+                timer: 0
+            });
+            
+            // 아이템 생성 (주사위 결과에 따라)
+            if (climbItem && Math.random() < 0.12) {
+                climbItems.push({
+                    x: x + w / 2,
+                    y: y - 45,
+                    type: climbItem,
+                    collected: false
+                });
+            }
+        }
+        y -= 45 + Math.random() * 25;
+    }
+}
+
+function setupClimbControls() {
+    const joy = document.getElementById('joystick');
+    const knob = document.getElementById('joy-knob');
+    
+    if (!joy || !knob) return;
+    
+    const handleMove = (clientX) => {
+        const rect = joy.getBoundingClientRect();
+        const centerX = rect.left + rect.width / 2;
+        const maxDist = rect.width / 2 - 25;
+        
+        let dx = clientX - centerX;
+        if (Math.abs(dx) > maxDist) dx = dx > 0 ? maxDist : -maxDist;
+        
+        knob.style.transform = `translate(${dx}px, 0)`;
+        joyPos = { x: dx / maxDist, y: 0 };
+    };
+    
+    const handleEnd = () => {
+        joyActive = false;
+        joy.classList.remove('active');
+        knob.style.transform = '';
+        joyPos = { x: 0, y: 0 };
+    };
+    
+    const jump = () => {
+        if (!p2GameRunning) return;
+        if (climber.onGround) {
+            climber.vy = -16;
+            climber.onGround = false;
+            wasOnGround = false;
+            canDoubleJump = GameState.parts.leg >= 2;
+        } else if (canDoubleJump) {
+            climber.vy = -13;
+            canDoubleJump = false;
+        }
+    };
+    
+    joy.addEventListener('touchstart', e => { e.preventDefault(); joyActive = true; joy.classList.add('active'); handleMove(e.touches[0].clientX); }, { passive: false });
+    joy.addEventListener('touchmove', e => { e.preventDefault(); if (joyActive) handleMove(e.touches[0].clientX); }, { passive: false });
+    joy.addEventListener('touchend', handleEnd);
+    joy.addEventListener('mousedown', e => { joyActive = true; joy.classList.add('active'); handleMove(e.clientX); });
+    window.addEventListener('mousemove', e => { if (joyActive) handleMove(e.clientX); });
+    window.addEventListener('mouseup', handleEnd);
+    
+    keys = {};
+    window.addEventListener('keydown', e => { 
+        keys[e.key.toLowerCase()] = true;
+        if (e.key === ' ' || e.key === 'ArrowUp' || e.key.toLowerCase() === 'w') {
+            e.preventDefault();
+            jump();
+        }
+    });
+    window.addEventListener('keyup', e => { keys[e.key.toLowerCase()] = false; });
+    
+    document.getElementById('btn-jump').onclick = jump;
+    document.getElementById('btn-jump').ontouchstart = e => { e.preventDefault(); jump(); };
+}
+
+function setupClimbHUD() {
+    const t = GameState.t.bind(GameState);
+    
+    document.getElementById('btn-skip-p2').onclick = () => {
+        climbWin();
+    };
+    
+    document.getElementById('btn-restart-p2').onclick = () => {
+        if (confirm(t('p2Restart'))) {
+            p2GameRunning = false;
+            if (gameLoop && pixiApp) pixiApp.ticker.remove(gameLoop);
+            showClimbDice();
+        }
+    };
+    
+    document.getElementById('btn-home-p2').onclick = () => {
+        if (confirm(t('confirmHome'))) {
+            p2GameRunning = false;
+            if (gameLoop && pixiApp) pixiApp.ticker.remove(gameLoop);
+            showTitle();
+        }
+    };
+    
+    document.getElementById('btn-pause-p2').onclick = () => {
+        p2GameRunning = !p2GameRunning;
+        document.getElementById('btn-pause-p2').textContent = p2GameRunning ? '⏸️' : '▶️';
+    };
+    
+    document.getElementById('btn-p2-retry').onclick = () => {
+        document.getElementById('modal-p2-gameover').classList.remove('show');
+        if (gameLoop && pixiApp) pixiApp.ticker.remove(gameLoop);
+        showClimbDice();
+    };
+    
+    document.getElementById('btn-p2-next').onclick = () => {
+        alert('Phase 3 Coming Soon!');
+    };
+}
+
+function updateClimb(delta) {
+    if (!p2GameRunning || !climber) return;
+    
+    p2Time += delta * 0.016;
+    
+    // 좌우 이동
+    let mx = joyPos.x;
+    if (keys.a || keys.arrowleft) mx = -1;
+    if (keys.d || keys.arrowright) mx = 1;
+    
+    const speed = 5 + (GameState.parts.leg || 0) * 0.4;
+    climber.vx = mx * speed;
+    
+    // 중력
+    climber.vy += 0.55;
+    if (climber.vy > 14) climber.vy = 14;
+    
+    // 위치 업데이트
+    climber.x += climber.vx;
+    climber.y += climber.vy;
+    
+    // 좌우 경계
+    if (climber.x < 0) climber.x = 0;
+    if (climber.x + climber.w > pixiApp.screen.width) climber.x = pixiApp.screen.width - climber.w;
+    
+    // 육지 도달 체크
+    if (landPlatform && climber.y + climber.h < landPlatform.y + 50) {
+        climbWin();
+        return;
+    }
+    
+    const wasOnGroundBefore = climber.onGround;
+    climber.onGround = false;
+    
+    // 플랫폼 충돌
+    for (const p of platforms) {
+        if (p.broken) continue;
+        
+        // 움직이는 플랫폼
+        if (p.type === 'moving') {
+            p.x += p.dir * p.speed;
+            if (p.x <= 0 || p.x + p.w >= pixiApp.screen.width) p.dir *= -1;
+        }
+        
+        // 충돌 체크 (위에서 아래로 떨어질 때)
+        if (climber.vy >= 0 &&
+            climber.x + climber.w > p.x + 4 &&
+            climber.x < p.x + p.w - 4 &&
+            climber.y + climber.h >= p.y &&
+            climber.y + climber.h <= p.y + p.h + 16) {
+            
+            climber.y = p.y - climber.h;
+            climber.vy = 0;
+            climber.onGround = true;
+            canDoubleJump = GameState.parts.leg >= 2;
+            
+            if (p.type === 'bouncy') {
+                climber.vy = -20;
+                climber.onGround = false;
+            } else if (p.type === 'breaking') {
+                p.timer++;
+                if (p.timer > 25) p.broken = true;
+            } else if (p.type === 'land') {
+                climbWin();
+                return;
+            }
+            
+            if (p.type === 'moving') climber.x += p.dir * p.speed;
+        }
+    }
+    
+    wasOnGround = climber.onGround;
+    
+    // 아이템 수집
+    for (const item of climbItems) {
+        if (item.collected) continue;
+        const dx = (climber.x + climber.w / 2) - item.x;
+        const dy = (climber.y + climber.h / 2) - item.y;
+        if (Math.sqrt(dx * dx + dy * dy) < 35) {
+            item.collected = true;
+            if (item.type === 'tornado') {
+                climber.vy = -48;
+            } else if (item.type === 'cloud') {
+                climber.vy = -24;
+            }
+        }
+    }
+    
+    // 카메라 추적
+    const targetCam = -climber.y + pixiApp.screen.height * 0.6;
+    camY += (targetCam - camY) * 0.1;
     
     // 높이 계산
     curHeight = Math.max(0, Math.floor(-climber.y / 10));
@@ -2380,16 +2868,22 @@ function stageClear() {
 }
 
 function renderClimb() {
+    if (!currentEnv || !currentEnv.colors) {
+        currentEnv = getEnvById(GameState.envId) || ENVIRONMENTS[0];
+    }
+    
     const w = pixiApp.screen.width;
     const h = pixiApp.screen.height;
     const heightRatio = Math.min(1, curHeight / LAND_HEIGHT);
     const t = p2Time;
     
+    const envColors = currentEnv.colors || { bg1: '#001a33', primary: '#00b4d8', secondary: '#0077b6' };
+    
     // 배경 그라데이션 (높이에 따라 변화)
     let bgColor;
     if (heightRatio < 0.5) {
         bgColor = lerpColor(
-            parseInt(currentEnv.colors.bg1.replace('#', '0x')),
+            parseInt(envColors.bg1.replace('#', '0x')),
             0x1a3a5e,
             heightRatio * 2
         );
@@ -2433,7 +2927,7 @@ function renderClimb() {
                 graphics.endFill();
             }
         } else if (p.type === 'start') {
-            const primary = parseInt(currentEnv.colors.primary.replace('#', '0x'));
+            const primary = parseInt(envColors.primary.replace('#', '0x'));
             graphics.beginFill(primary, 0.8);
             graphics.drawRoundedRect(p.x, screenY, p.w, p.h, 5);
             graphics.endFill();
@@ -2452,7 +2946,7 @@ function renderClimb() {
         } else {
             // 일반 플랫폼
             const platColor = heightRatio < 0.5 
-                ? lerpColor(parseInt(currentEnv.colors.primary.replace('#', '0x')), 0x48cae4, heightRatio * 2)
+                ? lerpColor(parseInt(envColors.primary.replace('#', '0x')), 0x48cae4, heightRatio * 2)
                 : lerpColor(0x48cae4, 0xcaf0f8, (heightRatio - 0.5) * 2);
             graphics.beginFill(platColor);
             graphics.drawRoundedRect(p.x, screenY, p.w, p.h, 5);
@@ -2496,8 +2990,8 @@ function renderClimb() {
 }
 
 function drawClimber(graphics) {
-    const d = GameState.design;
-    const p = GameState.parts;
+    const d = GameState.design || { primary: '#00b4d8', secondary: '#0077b6' };
+    const p = GameState.parts || {};
     const t = p2Time;
     const s = climber.w / 2;
     const screenY = climber.y + camY;
