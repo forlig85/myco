@@ -1,1 +1,448 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BOKLUCK Admin Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Noto+Sans+KR:wght@400;700&display=swap" rel="stylesheet">
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <style>
+        :root {
+            --bg-primary: #0a0a1a;
+            --bg-secondary: #12122a;
+            --bg-card: #1a1a3a;
+            --text-primary: #ffffff;
+            --text-secondary: #a0a0c0;
+            --text-muted: #606080;
+            --neon-cyan: #00f5d4;
+            --neon-pink: #f72585;
+            --neon-purple: #7b2cbf;
+            --border: #2a2a4a;
+        }
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+        }
+        
+        .header {
+            background: var(--bg-secondary);
+            padding: 16px 24px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .header h1 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.3rem;
+            background: linear-gradient(135deg, var(--neon-cyan), var(--neon-pink));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .header-info {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 24px;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 32px;
+        }
+        
+        .stat-card {
+            background: var(--bg-card);
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid var(--border);
+        }
+        
+        .stat-card .label {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+        }
+        
+        .stat-card .value {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--neon-cyan);
+        }
+        
+        .stat-card .sub {
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+            margin-top: 4px;
+        }
+        
+        .section {
+            background: var(--bg-card);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 24px;
+            border: 1px solid var(--border);
+        }
+        
+        .section-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1rem;
+            color: var(--text-primary);
+            margin-bottom: 16px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        th {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            font-weight: 600;
+        }
+        
+        td {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+        
+        .user-row {
+            transition: background 0.2s;
+        }
+        
+        .user-row:hover {
+            background: rgba(0, 245, 212, 0.05);
+        }
+        
+        .user-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            margin-right: 10px;
+            vertical-align: middle;
+        }
+        
+        .stage-badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 0.7rem;
+            font-weight: 600;
+        }
+        
+        .stage-1 { background: #1a3a1a; color: #4ade80; }
+        .stage-2 { background: #2a1a1a; color: #f87171; }
+        .stage-3 { background: #1a2a3a; color: #60a5fa; }
+        .stage-4 { background: #2a1a3a; color: #c084fc; }
+        
+        .online-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 6px;
+        }
+        
+        .online { background: #22c55e; }
+        .offline { background: #6b7280; }
+        
+        .btn {
+            padding: 10px 20px;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+        
+        .btn-primary {
+            background: var(--neon-cyan);
+            color: #000;
+        }
+        
+        .btn-primary:hover {
+            filter: brightness(1.2);
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: var(--text-muted);
+        }
+        
+        .chart-placeholder {
+            background: var(--bg-secondary);
+            border-radius: 8px;
+            padding: 40px;
+            text-align: center;
+            color: var(--text-muted);
+        }
+        
+        .progress-bar {
+            height: 8px;
+            background: var(--bg-secondary);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 8px;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--neon-cyan), var(--neon-pink));
+            border-radius: 4px;
+            transition: width 0.3s;
+        }
+        
+        .login-box {
+            max-width: 400px;
+            margin: 100px auto;
+            text-align: center;
+            padding: 40px;
+        }
+        
+        .login-box h2 {
+            font-family: 'Orbitron', sans-serif;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <div class="loading">로딩 중...</div>
+    </div>
 
+<script>
+// Firebase 초기화
+const firebaseConfig = {
+    apiKey: "AIzaSyBwQjuqgWM4YKnqu_gzNbeCg5alrC-jVcQ",
+    authDomain: "myco-737a0.firebaseapp.com",
+    projectId: "myco-737a0",
+    storageBucket: "myco-737a0.firebasestorage.app",
+    messagingSenderId: "942571332540",
+    appId: "1:942571332540:web:be0bb6fbdd32655501c1b9"
+};
+
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db = firebase.firestore();
+
+// 관리자 이메일 목록 (여기에 본인 이메일 추가)
+const ADMIN_EMAILS = [
+    'admin@bokluck.com',
+    // 여기에 관리자 이메일 추가
+];
+
+const app = document.getElementById('app');
+
+// 로그인 화면
+const renderLogin = () => {
+    app.innerHTML = `
+        <div class="login-box">
+            <h2>🔐 관리자 로그인</h2>
+            <p style="color:var(--text-secondary);margin-bottom:24px;">관리자 계정으로 로그인하세요</p>
+            <button class="btn btn-primary" id="btn-login" style="width:100%;">
+                Google로 로그인
+            </button>
+        </div>
+    `;
+    
+    document.getElementById('btn-login').onclick = async () => {
+        const provider = new firebase.auth.GoogleAuthProvider();
+        try {
+            await auth.signInWithPopup(provider);
+        } catch (e) {
+            alert('로그인 실패: ' + e.message);
+        }
+    };
+};
+
+// 대시보드
+const renderDashboard = async (user) => {
+    app.innerHTML = `
+        <div class="header">
+            <h1>🎲 BOKLUCK Admin</h1>
+            <div class="header-info">
+                ${user.displayName} | <a href="#" id="logout" style="color:var(--neon-pink);">로그아웃</a>
+            </div>
+        </div>
+        <div class="container">
+            <div class="stats-grid" id="stats-grid">
+                <div class="stat-card">
+                    <div class="label">총 사용자</div>
+                    <div class="value" id="stat-users">-</div>
+                </div>
+                <div class="stat-card">
+                    <div class="label">오늘 접속</div>
+                    <div class="value" id="stat-today">-</div>
+                </div>
+                <div class="stat-card">
+                    <div class="label">클리어 유저</div>
+                    <div class="value" id="stat-cleared">-</div>
+                </div>
+                <div class="stat-card">
+                    <div class="label">평균 스테이지</div>
+                    <div class="value" id="stat-avg">-</div>
+                </div>
+            </div>
+            
+            <div class="section">
+                <div class="section-title">📊 스테이지별 진행률</div>
+                <div id="stage-progress"></div>
+            </div>
+            
+            <div class="section">
+                <div class="section-title">👥 최근 접속 사용자</div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>사용자</th>
+                            <th>스테이지</th>
+                            <th>점수</th>
+                            <th>마지막 접속</th>
+                        </tr>
+                    </thead>
+                    <tbody id="user-list">
+                        <tr><td colspan="4" class="loading">데이터 로딩 중...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    `;
+    
+    document.getElementById('logout').onclick = async (e) => {
+        e.preventDefault();
+        await auth.signOut();
+    };
+    
+    // 데이터 로드
+    await loadDashboardData();
+};
+
+// 대시보드 데이터 로드
+const loadDashboardData = async () => {
+    try {
+        // 모든 사용자 가져오기
+        const usersSnap = await db.collection('users').orderBy('lastLogin', 'desc').limit(100).get();
+        const users = [];
+        usersSnap.forEach(doc => users.push({ id: doc.id, ...doc.data() }));
+        
+        // 통계 계산
+        const totalUsers = users.length;
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        const todayUsers = users.filter(u => u.lastLogin?.toDate() >= today).length;
+        const clearedUsers = users.filter(u => u.lastStage >= 4).length;
+        const avgStage = users.length ? (users.reduce((sum, u) => sum + (u.lastStage || 0), 0) / users.length).toFixed(1) : 0;
+        
+        // 스테이지별 분포
+        const stageCounts = [0, 0, 0, 0, 0];
+        users.forEach(u => {
+            const stage = u.lastStage || 0;
+            if (stage >= 0 && stage <= 4) stageCounts[stage]++;
+        });
+        
+        // 통계 표시
+        document.getElementById('stat-users').textContent = totalUsers;
+        document.getElementById('stat-today').textContent = todayUsers;
+        document.getElementById('stat-cleared').textContent = clearedUsers;
+        document.getElementById('stat-avg').textContent = avgStage;
+        
+        // 스테이지 진행률
+        const stageNames = ['시작 전', '세포', '점프', '러너', '클리어'];
+        const stageColors = ['#6b7280', '#4ade80', '#f87171', '#60a5fa', '#c084fc'];
+        document.getElementById('stage-progress').innerHTML = stageNames.map((name, i) => {
+            const pct = totalUsers ? (stageCounts[i] / totalUsers * 100).toFixed(1) : 0;
+            return `
+                <div style="margin-bottom:16px;">
+                    <div style="display:flex;justify-content:space-between;font-size:0.85rem;">
+                        <span>${name}</span>
+                        <span style="color:var(--text-muted);">${stageCounts[i]}명 (${pct}%)</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width:${pct}%;background:${stageColors[i]};"></div>
+                    </div>
+                </div>
+            `;
+        }).join('');
+        
+        // 사용자 목록
+        const stageLabels = ['시작전', '세포', '점프', '러너', '클리어'];
+        document.getElementById('user-list').innerHTML = users.slice(0, 20).map(u => {
+            const stage = u.lastStage || 0;
+            const lastLogin = u.lastLogin?.toDate();
+            const timeAgo = lastLogin ? getTimeAgo(lastLogin) : '-';
+            const isOnline = lastLogin && (Date.now() - lastLogin.getTime() < 10 * 60 * 1000);
+            
+            return `
+                <tr class="user-row">
+                    <td>
+                        <span class="online-dot ${isOnline ? 'online' : 'offline'}"></span>
+                        ${u.photoURL ? `<img src="${u.photoURL}" class="user-avatar">` : ''}
+                        ${u.displayName || '익명'}
+                    </td>
+                    <td><span class="stage-badge stage-${stage}">${stageLabels[stage]}</span></td>
+                    <td>${(u.totalScore || 0).toLocaleString()}</td>
+                    <td style="color:var(--text-muted);">${timeAgo}</td>
+                </tr>
+            `;
+        }).join('') || '<tr><td colspan="4">데이터 없음</td></tr>';
+        
+    } catch (e) {
+        console.error('데이터 로드 실패:', e);
+        document.getElementById('user-list').innerHTML = `<tr><td colspan="4" style="color:#f87171;">데이터 로드 실패: ${e.message}</td></tr>`;
+    }
+};
+
+// 시간 경과 표시
+const getTimeAgo = (date) => {
+    const diff = Date.now() - date.getTime();
+    const mins = Math.floor(diff / 60000);
+    const hours = Math.floor(diff / 3600000);
+    const days = Math.floor(diff / 86400000);
+    
+    if (mins < 1) return '방금 전';
+    if (mins < 60) return `${mins}분 전`;
+    if (hours < 24) return `${hours}시간 전`;
+    return `${days}일 전`;
+};
+
+// 인증 상태 감시
+auth.onAuthStateChanged(user => {
+    if (user) {
+        // 관리자 확인 (일단 모든 로그인 사용자 허용, 나중에 ADMIN_EMAILS로 제한 가능)
+        renderDashboard(user);
+    } else {
+        renderLogin();
+    }
+});
+</script>
+</body>
+</html>
