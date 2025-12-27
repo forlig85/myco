@@ -934,11 +934,27 @@ const TRANSLATIONS = {
             { icon: '🏔️', title: '육지로!', text: '바다의 한계를 넘어<br><span class="hl">광활한 육지</span>가 펼쳐진다.' },
             { icon: '🦎', title: '새로운 도전', text: '<span class="danger">중력</span>이라는 새로운 적!<br><span class="gold">점프</span>하고 <span class="hl">올라가라</span>.' }
         ],
+        p2DiceTitle: '점프력 결정',
+        p2DiceDesc: '주사위가 당신의 점프력을 결정합니다',
+        p2Go: '등반 시작!',
         p2Start: '등반 시작!',
         p2Gameover: '추락했다!',
         p2GameoverDesc: '너무 아래로 떨어졌습니다.',
-        p2Clear: '하늘을 향해!',
-        p2ClearDesc: '육지를 정복했습니다!'
+        p2Clear: '육지 도달!',
+        p2ClearDesc: '드디어 육지에 도착했습니다!',
+        p2Retry: '다시 시작',
+        p2Restart: '처음부터 다시 시작하시겠습니까?',
+        goal: '목표',
+        // 공통 UI
+        height: '높이',
+        score: '점수',
+        parts: '신체 파츠',
+        stage2: 'Stage 2: 도마뱀',
+        sky: '하늘',
+        maxHeight: '최대 높이',
+        none: '없음',
+        acquired: '획득!',
+        confirmHome: '홈으로 돌아가시겠습니까?'
     },
     en: {
         title: 'AROA',
@@ -972,11 +988,27 @@ const TRANSLATIONS = {
             { icon: '🏔️', title: 'To Land!', text: 'Beyond the sea,<br><span class="hl">vast land</span> awaits.' },
             { icon: '🦎', title: 'New Challenge', text: '<span class="danger">Gravity</span> is the new enemy!<br><span class="gold">Jump</span> and <span class="hl">climb</span>.' }
         ],
+        p2DiceTitle: 'Jump Power',
+        p2DiceDesc: 'The dice determines your jump power',
+        p2Go: 'Start Climbing!',
         p2Start: 'Start Climbing!',
         p2Gameover: 'Fell!',
         p2GameoverDesc: 'You fell too far down.',
-        p2Clear: 'Towards the Sky!',
-        p2ClearDesc: 'You conquered the land!'
+        p2Clear: 'Land Reached!',
+        p2ClearDesc: 'You finally reached the land!',
+        p2Retry: 'Retry',
+        p2Restart: 'Restart from beginning?',
+        goal: 'Goal',
+        // Common UI
+        height: 'Height',
+        score: 'Score',
+        parts: 'Body Parts',
+        stage2: 'Stage 2: Lizard',
+        sky: 'Sky',
+        maxHeight: 'Max Height',
+        none: 'None',
+        acquired: 'Acquired!',
+        confirmHome: 'Return to home?'
     },
     ja: {
         title: 'AROA',
@@ -1014,7 +1046,17 @@ const TRANSLATIONS = {
         p2Gameover: '落下！',
         p2GameoverDesc: '落ちすぎました。',
         p2Clear: '空へ！',
-        p2ClearDesc: '陸地を征服しました！'
+        p2ClearDesc: '陸地を征服しました！',
+        // 共通UI
+        height: '高さ',
+        score: 'スコア',
+        parts: '体パーツ',
+        stage2: 'Stage 2: トカゲ',
+        sky: '空',
+        maxHeight: '最大高さ',
+        none: 'なし',
+        acquired: '獲得！',
+        confirmHome: 'ホームに戻りますか？'
     },
     zh: {
         title: 'AROA',
@@ -1052,7 +1094,17 @@ const TRANSLATIONS = {
         p2Gameover: '坠落！',
         p2GameoverDesc: '掉得太深了。',
         p2Clear: '向天空！',
-        p2ClearDesc: '征服了陆地！'
+        p2ClearDesc: '征服了陆地！',
+        // 通用UI
+        height: '高度',
+        score: '分数',
+        parts: '身体部件',
+        stage2: 'Stage 2: 蜥蜴',
+        sky: '天空',
+        maxHeight: '最大高度',
+        none: '无',
+        acquired: '获得！',
+        confirmHome: '返回主页？'
     }
 };
 
@@ -1071,9 +1123,9 @@ const GameState = {
     eaten: 0,
     maxSize: CONFIG.INITIAL_SIZE,
     parts: { eye: 0, mouth: 0, arm: 0, leg: 0, tail: 0, antenna: 0, wing: 0, shell: 0, claw: 0, lung: 0 },
-    p2Score: 0,
-    p2Height: 0,
-    p2MaxHeight: 0,
+    // Phase 2 전용 상태
+    height: 0,
+    maxHeight: 0,
     
     save() {
         localStorage.setItem('aroa-lang', this.currentLang);
@@ -1099,9 +1151,12 @@ const GameState = {
         this.score = 0;
         this.eaten = 0;
         this.maxSize = CONFIG.INITIAL_SIZE;
-        this.p2Score = 0;
-        this.p2Height = 0;
-        this.p2MaxHeight = 0;
+    },
+    
+    resetP2() {
+        this.score = 0;
+        this.height = 0;
+        this.maxHeight = 0;
     },
     
     resetParts() {
@@ -1708,6 +1763,7 @@ function startPhase1() {
                 </div>
             </div>
             <div class="hud-btns">
+                <button class="hud-btn" id="btn-skip-phase" title="테스트: 다음 Phase" style="background: linear-gradient(135deg, #ff6b6b, #feca57); font-size: 0.7rem;">⏭️</button>
                 <button class="hud-btn" id="btn-home" title="홈">🏠</button>
                 <button class="hud-btn" id="btn-pause" title="일시정지">⏸️</button>
             </div>
@@ -1908,6 +1964,7 @@ function spawnFoods(count) {
         food.y = Math.random() * pixiApp.screen.height;
         food.vx = (Math.random() - 0.5) * 0.5;
         food.vy = (Math.random() - 0.5) * 0.5;
+        food.glowPhase = Math.random() * Math.PI * 2;
         
         if (Math.random() > 0.5) {
             const emoji = new PIXI.Text(currentEnv.creatures[Math.floor(Math.random() * currentEnv.creatures.length)], { fontSize: food.size * 2 });
@@ -1915,7 +1972,7 @@ function spawnFoods(count) {
             food.addChild(emoji);
         } else {
             const gfx = new PIXI.Graphics();
-            gfx.beginFill(parseInt(currentEnv.colors.primary.replace('#', '0x')), 0.8);
+            gfx.beginFill(parseInt(currentEnv.colors.primary.replace('#', '0x')), 0.9);
             gfx.drawCircle(0, 0, food.size);
             gfx.endFill();
             food.addChild(gfx);
@@ -1962,15 +2019,29 @@ function drawEnemy(enemy) {
     const t = time + enemy.wobble * 10;
     
     const canEat = enemy.size < player.size;
-    const bodyColor = canEat ? 0x44ff88 : 0xff4466;
-    const shadowColor = canEat ? 0x22aa55 : 0xcc2244;
-    const glowColor = canEat ? 0x88ffaa : 0xff8888;
     
     gfx.clear();
     
-    gfx.beginFill(glowColor, 0.15);
-    gfx.drawCircle(0, 0, size * 1.3);
-    gfx.endFill();
+    // 먹을 수 있는 적에만 화려한 글로우 효과 (흰색+금색 펄스)
+    if (canEat) {
+        const pulse = Math.sin(t * 4) * 0.3 + 0.7;
+        // 외부 글로우
+        gfx.beginFill(0xffffff, 0.2 * pulse);
+        gfx.drawCircle(0, 0, size * 1.6);
+        gfx.endFill();
+        // 중간 글로우
+        gfx.beginFill(0xffdd00, 0.3 * pulse);
+        gfx.drawCircle(0, 0, size * 1.35);
+        gfx.endFill();
+        // 테두리 링
+        gfx.lineStyle(3, 0xffdd00, 0.8 * pulse);
+        gfx.drawCircle(0, 0, size * 1.15);
+        gfx.lineStyle(0);
+    }
+    
+    // 몸체 - 먹을 수 있으면 밝은 초록, 아니면 빨간색
+    const bodyColor = canEat ? 0x44ff88 : 0xff4466;
+    const shadowColor = canEat ? 0x22aa55 : 0xcc2244;
     
     gfx.beginFill(bodyColor, 0.85);
     for (let i = 0; i < 10; i++) {
@@ -1983,21 +2054,32 @@ function drawEnemy(enemy) {
     gfx.closePath();
     gfx.endFill();
     
+    // 내부 그림자
     gfx.beginFill(shadowColor, 0.4);
     gfx.drawCircle(0, 0, size * 0.6);
     gfx.endFill();
     
+    // 하이라이트
     gfx.beginFill(0xffffff, 0.3);
     gfx.drawCircle(-size * 0.2, -size * 0.2, size * 0.25);
     gfx.endFill();
     
+    // 눈
     gfx.beginFill(0xffffff);
     gfx.drawCircle(size * 0.15, -size * 0.15, size * 0.2);
     gfx.endFill();
     
+    // 동공 - 먹을 수 있으면 검정, 위험하면 빨강
     gfx.beginFill(canEat ? 0x333333 : 0xff0000);
     gfx.drawCircle(size * 0.2, -size * 0.15, size * 0.1);
     gfx.endFill();
+    
+    // 위험한 적에는 경고 표시
+    if (!canEat) {
+        gfx.lineStyle(2, 0xff0000, 0.6);
+        gfx.drawCircle(0, 0, size * 1.2);
+        gfx.lineStyle(0);
+    }
 }
 
 function setupControls() {
@@ -2070,6 +2152,15 @@ function setupGameHUD() {
     document.getElementById('btn-pause').onclick = () => {
         gameRunning = !gameRunning;
         document.getElementById('btn-pause').textContent = gameRunning ? '⏸️' : '▶️';
+    };
+    
+    // 테스트용: 다음 Phase로 스킵
+    document.getElementById('btn-skip-phase').onclick = () => {
+        gameRunning = false;
+        if (gameLoop) pixiApp.ticker.remove(gameLoop);
+        GameState.phase1Clear = true;
+        GameState.save();
+        showPhase2Intro();
     };
     
     // 게임오버 시 다시 시작 -> 주사위 화면으로 (새로운 출생지 선택)
@@ -2261,614 +2352,281 @@ function stageClear() {
     document.getElementById('modal-clear').classList.add('show');
 }
 
-// ========================================
-// Phase 2 - Land Platformer
-// ========================================
-let p2Player = null, platforms = [], p2Obstacles = [];
-let p2GameRunning = false, p2Time = 0;
-let cameraY = 0, highestY = 0;
-let canDoubleJump = false, hasDoubleJumped = false;
-let onGround = false;
-
-function showPhase2Intro() {
-    initPixi(0x1a3a1a);
-    createStarBackground({ bg1: '#1a3a1a', bg2: '#2a4a2a', particle: '#88ff88' });
     
-    const app = getAppElement();
-    const t = GameState.t.bind(GameState);
-    const intro = TRANSLATIONS[GameState.currentLang].p2Intro;
-    let idx = 0;
-    
-    function render() {
-        const s = intro[idx];
-        const isLast = idx === intro.length - 1;
-        
-        app.innerHTML = `
-            <button class="skip-btn" id="skip-btn">${t('skip')}</button>
-            <div class="page-center">
-                <div class="page-content">
-                    <div class="page-icon">${s.icon}</div>
-                    <h2 class="page-title">${s.title}</h2>
-                    <p class="page-text">${s.text}</p>
-                    <div class="dots">
-                        ${intro.map((_, i) => `<div class="dot ${i < idx ? 'done' : ''} ${i === idx ? 'active' : ''}"></div>`).join('')}
-                    </div>
-                    <button class="btn btn-primary btn-block" id="btn-next">${isLast ? '🦎 ' + t('p2Start') : t('next')}</button>
-                </div>
-            </div>
-        `;
-        
-        document.getElementById('btn-next').onclick = () => {
-            if (isLast) startPhase2();
-            else { idx++; render(); }
-        };
-        document.getElementById('skip-btn').onclick = startPhase2;
+    // 높이 계산
+    curHeight = Math.max(0, Math.floor(-climber.y / 10));
+    GameState.height = curHeight;
+    if (curHeight > GameState.maxHeight) {
+        GameState.maxHeight = curHeight;
     }
-    
-    render();
-}
-
-function startPhase2() {
-    GameState.resetP2();
-    currentEnv = getEnvById(GameState.envId);
-    
-    initPixi(0x87CEEB); // 하늘색 배경
-    
-    const app = getAppElement();
-    const t = GameState.t.bind(GameState);
-    const lang = GameState.currentLang;
-    
-    app.innerHTML = `
-        <div class="hud-top">
-            <div class="hud-panel" style="min-width: 130px;">
-                <div class="hud-name">🦎 ${currentEnv.name[lang]}</div>
-                <div class="hud-row"><span>📏</span><span class="hud-val" id="h2-height">0</span><span class="hud-label">${t('height')}</span></div>
-                <div class="hud-row"><span>⚡</span><span class="hud-val" id="h2-score">0</span><span class="hud-label">${t('score')}</span></div>
-            </div>
-            <div class="hud-panel parts-panel">
-                <div class="parts-title">🧬 ${t('parts')}</div>
-                <div class="parts-grid" id="h2-parts"><span style="font-size: 0.65rem; color: #666;">${t('none')}</span></div>
-            </div>
-            <div class="hud-btns">
-                <button class="hud-btn" id="btn-home-p2" title="${t('home')}">🏠</button>
-                <button class="hud-btn" id="btn-pause-p2" title="Pause">⏸️</button>
-            </div>
-        </div>
-        <div class="hud-bottom">
-            <div class="stage-bar">
-                <div class="stage-row">
-                    <span class="stage-cur">🦎 ${t('stage2')}</span>
-                    <span class="stage-next">${t('sky')}: <span id="h2-stageP">0/3000</span></span>
-                </div>
-                <div class="progress-track"><div class="progress-fill stage" id="h2-stageB" style="width: 0%;"></div></div>
-            </div>
-        </div>
-        <div class="controls">
-            <div class="joystick" id="joystick"><div class="joy-base"></div><div class="joy-knob" id="joy-knob"></div></div>
-            <button class="action-btn" id="btn-jump" title="Jump">🦘</button>
-        </div>
-        <div class="modal" id="modal-p2-gameover">
-            <div class="modal-box">
-                <div class="modal-icon">💀</div>
-                <h2 class="modal-title fail">${t('p2Gameover')}</h2>
-                <p class="modal-desc">${t('p2GameoverDesc')}</p>
-                <div class="modal-stats">
-                    <div class="stat-row"><span class="stat-label">${t('maxHeight')}</span><span class="stat-val" id="p2go-height">0</span></div>
-                    <div class="stat-row"><span class="stat-label">${t('score')}</span><span class="stat-val" id="p2go-score">0</span></div>
-                </div>
-                <div class="modal-btns">
-                    <button class="btn btn-primary btn-block" id="btn-p2-retry">🔄 ${t('retry')}</button>
-                    <button class="btn btn-outline btn-block" id="btn-p2-home">🏠 ${t('home')}</button>
-                </div>
-            </div>
-        </div>
-        <div class="modal" id="modal-p2-clear">
-            <div class="modal-box">
-                <div class="modal-icon">🎉</div>
-                <h2 class="modal-title win">${t('p2Clear')}</h2>
-                <p class="modal-desc">${t('p2ClearDesc')}</p>
-                <div class="modal-stats">
-                    <div class="stat-row"><span class="stat-label">${t('maxHeight')}</span><span class="stat-val" id="p2cl-height">0</span></div>
-                    <div class="stat-row"><span class="stat-label">${t('parts')}</span><span class="stat-val" id="p2cl-parts">0</span></div>
-                </div>
-                <div class="modal-btns">
-                    <button class="btn btn-primary btn-block" id="btn-p2-next">🦖 Phase 3! (Coming Soon)</button>
-                </div>
-            </div>
-        </div>
-    `;
-    
-    // 게임 초기화
-    platforms = [];
-    p2Obstacles = [];
-    cameraY = 0;
-    highestY = 0;
-    p2Time = 0;
-    canDoubleJump = false;
-    hasDoubleJumped = false;
-    onGround = false;
-    
-    createP2Player();
-    generateInitialPlatforms();
-    setupP2Controls();
-    setupP2HUD();
-    
-    gameLoop = delta => updateP2Game(delta);
-    pixiApp.ticker.add(gameLoop);
-    p2GameRunning = true;
-}
-
-function createP2Player() {
-    p2Player = new PIXI.Container();
-    p2Player.x = pixiApp.screen.width / 2;
-    p2Player.y = pixiApp.screen.height - 150;
-    p2Player.width_val = 30;
-    p2Player.height_val = 40;
-    p2Player.vx = 0;
-    p2Player.vy = 0;
-    p2Player.worldY = 0;
-    
-    const body = new PIXI.Graphics();
-    p2Player.body = body;
-    p2Player.addChild(body);
-    
-    drawP2Player();
-    pixiApp.stage.addChild(p2Player);
-}
-
-function drawP2Player() {
-    const gfx = p2Player.body;
-    const w = p2Player.width_val;
-    const h = p2Player.height_val;
-    const primary = parseInt(currentEnv.colors.primary.replace('#', '0x'));
-    const secondary = parseInt(currentEnv.colors.secondary.replace('#', '0x'));
-    const t = p2Time;
-    
-    gfx.clear();
-    
-    // 몸통
-    gfx.beginFill(primary, 0.9);
-    gfx.drawRoundedRect(-w/2, -h/2, w, h, 8);
-    gfx.endFill();
-    
-    // 배
-    gfx.beginFill(secondary, 0.5);
-    gfx.drawRoundedRect(-w/3, -h/4, w*0.6, h*0.6, 5);
-    gfx.endFill();
-    
-    // 눈
-    gfx.beginFill(0xffffff);
-    gfx.drawCircle(-w*0.15, -h*0.2, 6);
-    gfx.drawCircle(w*0.15, -h*0.2, 6);
-    gfx.endFill();
-    
-    gfx.beginFill(0x000000);
-    gfx.drawCircle(-w*0.12, -h*0.2, 3);
-    gfx.drawCircle(w*0.18, -h*0.2, 3);
-    gfx.endFill();
-    
-    // 다리 (애니메이션)
-    const legWave = Math.sin(t * 8) * 3;
-    gfx.beginFill(primary);
-    gfx.drawRoundedRect(-w*0.4, h*0.3 + legWave, 10, 15, 3);
-    gfx.drawRoundedRect(w*0.2, h*0.3 - legWave, 10, 15, 3);
-    gfx.endFill();
-    
-    // 발톱 (파츠가 있으면) - 다리 끝에 날카로운 발톱
-    if (GameState.parts.claw > 0) {
-        gfx.beginFill(0xffcc00);
-        // 왼쪽 발톱
-        gfx.moveTo(-w*0.4, h*0.45 + legWave);
-        gfx.lineTo(-w*0.5, h*0.55 + legWave);
-        gfx.lineTo(-w*0.35, h*0.45 + legWave);
-        gfx.closePath();
-        // 오른쪽 발톱
-        gfx.moveTo(w*0.3, h*0.45 - legWave);
-        gfx.lineTo(w*0.4, h*0.55 - legWave);
-        gfx.lineTo(w*0.25, h*0.45 - legWave);
-        gfx.closePath();
-        gfx.endFill();
-    }
-    
-    // 날개 (파츠가 있으면)
-    if (GameState.parts.wing > 0) {
-        gfx.beginFill(0xffffff, 0.7);
-        const wingFlap = Math.sin(t * 10) * 10;
-        gfx.moveTo(-w*0.5, 0);
-        gfx.lineTo(-w - 10, -10 + wingFlap);
-        gfx.lineTo(-w*0.5, -15);
-        gfx.closePath();
-        gfx.moveTo(w*0.5, 0);
-        gfx.lineTo(w + 10, -10 - wingFlap);
-        gfx.lineTo(w*0.5, -15);
-        gfx.closePath();
-        gfx.endFill();
-    }
-    
-    // 껍질 (파츠가 있으면)
-    if (GameState.parts.shell > 0) {
-        gfx.lineStyle(3, 0x8B4513);
-        gfx.drawRoundedRect(-w/2 - 3, -h/2 - 3, w + 6, h + 6, 10);
-        gfx.lineStyle(0);
-    }
-    
-    // 허파 (파츠가 있으면) - 몸에 숨쉬는 효과
-    if (GameState.parts.lung > 0) {
-        const breathe = Math.sin(t * 2) * 2;
-        gfx.beginFill(0xff9999, 0.3);
-        gfx.drawEllipse(0, 0, w*0.3 + breathe, h*0.25 + breathe);
-        gfx.endFill();
-    }
-}
-
-function generateInitialPlatforms() {
-    // 시작 플랫폼
-    const startPlatform = createPlatform(pixiApp.screen.width / 2, pixiApp.screen.height - 100, 200);
-    platforms.push(startPlatform);
-    pixiApp.stage.addChild(startPlatform);
-    
-    // 위로 플랫폼 생성
-    let lastY = pixiApp.screen.height - 100;
-    for (let i = 0; i < 15; i++) {
-        const gap = CONFIG.P2_PLATFORM_MIN_GAP + Math.random() * (CONFIG.P2_PLATFORM_MAX_GAP - CONFIG.P2_PLATFORM_MIN_GAP);
-        lastY -= gap;
-        const x = 50 + Math.random() * (pixiApp.screen.width - 100);
-        const width = 60 + Math.random() * 100;
-        const platform = createPlatform(x, lastY, width);
-        platforms.push(platform);
-        pixiApp.stage.addChild(platform);
-    }
-}
-
-function createPlatform(x, y, width) {
-    const platform = new PIXI.Container();
-    platform.x = x;
-    platform.worldY = y;
-    platform.width_val = width;
-    platform.height_val = 20;
-    
-    const gfx = new PIXI.Graphics();
-    
-    // 메인 플랫폼
-    gfx.beginFill(0x8B4513);
-    gfx.drawRoundedRect(-width/2, 0, width, 20, 5);
-    gfx.endFill();
-    
-    // 잔디
-    gfx.beginFill(0x228B22);
-    gfx.drawRoundedRect(-width/2, -5, width, 10, 5);
-    gfx.endFill();
-    
-    platform.addChild(gfx);
-    return platform;
-}
-
-function setupP2Controls() {
-    const joy = document.getElementById('joystick');
-    const knob = document.getElementById('joy-knob');
-    
-    if (!joy || !knob) return;
-    
-    const handleMove = (clientX, clientY) => {
-        const rect = joy.getBoundingClientRect();
-        const centerX = rect.left + rect.width / 2;
-        const maxDist = rect.width / 2 - 25;
-        
-        let dx = clientX - centerX;
-        if (Math.abs(dx) > maxDist) dx = dx > 0 ? maxDist : -maxDist;
-        
-        knob.style.transform = `translate(${dx}px, 0)`;
-        joyPos = { x: dx / maxDist, y: 0 };
-    };
-    
-    const handleEnd = () => {
-        joyActive = false;
-        joy.classList.remove('active');
-        knob.style.transform = '';
-        joyPos = { x: 0, y: 0 };
-    };
-    
-    joy.addEventListener('touchstart', e => { e.preventDefault(); joyActive = true; joy.classList.add('active'); handleMove(e.touches[0].clientX, e.touches[0].clientY); }, { passive: false });
-    joy.addEventListener('touchmove', e => { e.preventDefault(); if (joyActive) handleMove(e.touches[0].clientX, e.touches[0].clientY); }, { passive: false });
-    joy.addEventListener('touchend', handleEnd);
-    joy.addEventListener('mousedown', e => { joyActive = true; joy.classList.add('active'); handleMove(e.clientX, e.clientY); });
-    window.addEventListener('mousemove', e => { if (joyActive) handleMove(e.clientX, e.clientY); });
-    window.addEventListener('mouseup', handleEnd);
-    
-    keys = {};
-    window.addEventListener('keydown', e => { 
-        keys[e.key.toLowerCase()] = true; 
-        if (e.key === ' ' || e.key === 'w' || e.key === 'ArrowUp') {
-            e.preventDefault();
-            tryJump();
-        }
-    });
-    window.addEventListener('keyup', e => { keys[e.key.toLowerCase()] = false; });
-    
-    const jumpBtn = document.getElementById('btn-jump');
-    if (jumpBtn) jumpBtn.onclick = tryJump;
-}
-
-function tryJump() {
-    if (!p2GameRunning) return;
-    
-    canDoubleJump = GameState.parts.wing > 0;
-    
-    if (onGround) {
-        p2Player.vy = -CONFIG.P2_JUMP_POWER;
-        onGround = false;
-        hasDoubleJumped = false;
-    } else if (canDoubleJump && !hasDoubleJumped) {
-        p2Player.vy = -CONFIG.P2_JUMP_POWER * 0.8;
-        hasDoubleJumped = true;
-    }
-}
-
-function setupP2HUD() {
-    const t = GameState.t.bind(GameState);
-    
-    document.getElementById('btn-home-p2').onclick = () => {
-        if (confirm(t('confirmHome'))) {
-            p2GameRunning = false;
-            if (gameLoop && pixiApp) pixiApp.ticker.remove(gameLoop);
-            showTitle();
-        }
-    };
-    
-    document.getElementById('btn-pause-p2').onclick = () => {
-        p2GameRunning = !p2GameRunning;
-        document.getElementById('btn-pause-p2').textContent = p2GameRunning ? '⏸️' : '▶️';
-    };
-    
-    document.getElementById('btn-p2-retry').onclick = () => {
-        document.getElementById('modal-p2-gameover').classList.remove('show');
-        startPhase2();
-    };
-    
-    document.getElementById('btn-p2-home').onclick = () => {
-        document.getElementById('modal-p2-gameover').classList.remove('show');
-        if (gameLoop && pixiApp) pixiApp.ticker.remove(gameLoop);
-        showTitle();
-    };
-    
-    document.getElementById('btn-p2-next').onclick = () => {
-        alert('Phase 3 Coming Soon!');
-    };
-}
-
-function updateP2HUD() {
-    const t = GameState.t.bind(GameState);
-    const lang = GameState.currentLang;
-    
-    document.getElementById('h2-height').textContent = Math.floor(GameState.height);
-    document.getElementById('h2-score').textContent = GameState.score;
-    document.getElementById('h2-stageB').style.width = `${Math.min(100, (GameState.score / CONFIG.P2_STAGE_THRESHOLD) * 100)}%`;
-    document.getElementById('h2-stageP').textContent = `${GameState.score}/${CONFIG.P2_STAGE_THRESHOLD}`;
-    
-    // Phase 2 파츠만 표시 (wing, shell, claw, lung)
-    const p2PartKeys = ['wing', 'shell', 'claw', 'lung'];
-    let partsHtml = '';
-    p2PartKeys.forEach(k => {
-        if (GameState.parts[k] > 0) {
-            partsHtml += `<div class="part-badge active"><span>${BODY_PARTS[k].icon}</span><span class="part-cnt">×${GameState.parts[k]}</span></div>`;
-        }
-    });
-    document.getElementById('h2-parts').innerHTML = partsHtml || `<span style="font-size: 0.65rem; color: #666;">${t('none')}</span>`;
-}
-
-function updateP2Game(delta) {
-    if (!p2GameRunning || !p2Player) return;
-    
-    p2Time += delta * 0.016;
-    
-    // 좌우 이동
-    let ix = joyPos.x;
-    if (keys.a || keys.arrowleft) ix = -1;
-    if (keys.d || keys.arrowright) ix = 1;
-    
-    p2Player.vx = ix * CONFIG.P2_MOVE_SPEED;
-    
-    // 중력 적용
-    p2Player.vy += CONFIG.P2_GRAVITY;
-    if (p2Player.vy > 15) p2Player.vy = 15;
-    
-    // 위치 업데이트
-    p2Player.x += p2Player.vx;
-    p2Player.worldY += p2Player.vy;
-    
-    // 화면 경계
-    if (p2Player.x < p2Player.width_val/2) p2Player.x = p2Player.width_val/2;
-    if (p2Player.x > pixiApp.screen.width - p2Player.width_val/2) p2Player.x = pixiApp.screen.width - p2Player.width_val/2;
-    
-    // 카메라 추적 (플레이어가 화면 상단 40%에 있을 때)
-    const targetScreenY = pixiApp.screen.height * 0.4;
-    if (p2Player.worldY < cameraY + targetScreenY) {
-        cameraY = p2Player.worldY - targetScreenY;
-    }
-    
-    // 높이 계산 (시작점 기준)
-    const startY = pixiApp.screen.height - 150;
-    GameState.height = Math.max(0, Math.floor((startY - p2Player.worldY) / 10));
-    if (GameState.height > GameState.maxHeight) {
-        const diff = GameState.height - GameState.maxHeight;
-        GameState.score += diff * 2;
-        GameState.maxHeight = GameState.height;
-        
-        // 파츠 획득 체크
-        checkP2PartEvolution();
-    }
-    
-    // 플레이어 화면 위치
-    p2Player.y = p2Player.worldY - cameraY;
-    
-    // 플랫폼 업데이트
-    onGround = false;
-    platforms.forEach(platform => {
-        platform.y = platform.worldY - cameraY;
-        
-        // 충돌 체크 (위에서 아래로 떨어질 때만)
-        if (p2Player.vy > 0) {
-            const playerBottom = p2Player.worldY + p2Player.height_val/2;
-            const playerTop = p2Player.worldY - p2Player.height_val/2;
-            const platformTop = platform.worldY;
-            
-            if (playerBottom >= platformTop && playerTop < platformTop) {
-                if (p2Player.x > platform.x - platform.width_val/2 - 10 && 
-                    p2Player.x < platform.x + platform.width_val/2 + 10) {
-                    p2Player.worldY = platformTop - p2Player.height_val/2;
-                    p2Player.vy = 0;
-                    onGround = true;
-                    hasDoubleJumped = false;
-                }
-            }
-        }
-    });
     
     // 새 플랫폼 생성
-    const topPlatformY = Math.min(...platforms.map(p => p.worldY));
-    while (topPlatformY > cameraY - pixiApp.screen.height) {
-        const lastY = Math.min(...platforms.map(p => p.worldY));
-        const gap = CONFIG.P2_PLATFORM_MIN_GAP + Math.random() * (CONFIG.P2_PLATFORM_MAX_GAP - CONFIG.P2_PLATFORM_MIN_GAP);
-        const newY = lastY - gap;
-        const x = 50 + Math.random() * (pixiApp.screen.width - 100);
-        const width = 60 + Math.random() * 100;
-        const platform = createPlatform(x, newY, width);
-        platforms.push(platform);
-        pixiApp.stage.addChild(platform);
-        break;
+    const highest = Math.min(...platforms.filter(p => p.type !== 'land').map(p => p.y));
+    if (-camY - pixiApp.screen.height < highest + 400) {
+        generatePlatforms(highest, highest - pixiApp.screen.height * 2);
     }
     
-    // 화면 아래로 벗어난 플랫폼 제거
-    for (let i = platforms.length - 1; i >= 0; i--) {
-        if (platforms[i].worldY > cameraY + pixiApp.screen.height + 100) {
-            pixiApp.stage.removeChild(platforms[i]);
-            platforms.splice(i, 1);
+    // 게임오버 체크 (화면 아래로 떨어짐)
+    if (climber.y > -camY + pixiApp.screen.height + 80) {
+        climbFail();
+        return;
+    }
+    
+    // 렌더링
+    renderClimb();
+    
+    // HUD 업데이트
+    document.getElementById('h2-height').textContent = curHeight + 'm';
+}
+
+function renderClimb() {
+    const w = pixiApp.screen.width;
+    const h = pixiApp.screen.height;
+    const heightRatio = Math.min(1, curHeight / LAND_HEIGHT);
+    const t = p2Time;
+    
+    // 배경 그라데이션 (높이에 따라 변화)
+    let bgColor;
+    if (heightRatio < 0.5) {
+        bgColor = lerpColor(
+            parseInt(currentEnv.colors.bg1.replace('#', '0x')),
+            0x1a3a5e,
+            heightRatio * 2
+        );
+    } else {
+        bgColor = lerpColor(
+            0x1a3a5e,
+            0x87CEEB,
+            (heightRatio - 0.5) * 2
+        );
+    }
+    pixiApp.renderer.background.color = bgColor;
+    
+    // 기존 그래픽 클리어
+    pixiApp.stage.removeChildren();
+    
+    const graphics = new PIXI.Graphics();
+    pixiApp.stage.addChild(graphics);
+    
+    // 플랫폼 그리기
+    for (const p of platforms) {
+        if (p.broken) continue;
+        const screenY = p.y + camY;
+        if (screenY < -40 || screenY > h + 40) continue;
+        
+        if (p.type === 'land') {
+            // 육지
+            graphics.beginFill(0x8B4513);
+            graphics.drawRect(p.x, screenY, p.w, p.h);
+            graphics.endFill();
+            graphics.beginFill(0x228B22);
+            graphics.drawRect(p.x, screenY, p.w, 20);
+            graphics.endFill();
+            // 나무들
+            for (let i = 0; i < 6; i++) {
+                const tx = 30 + i * (p.w / 6);
+                graphics.beginFill(0x654321);
+                graphics.drawRect(tx, screenY - 40, 10, 40);
+                graphics.endFill();
+                graphics.beginFill(0x228B22);
+                graphics.drawCircle(tx + 5, screenY - 50, 25);
+                graphics.endFill();
+            }
+        } else if (p.type === 'start') {
+            const primary = parseInt(currentEnv.colors.primary.replace('#', '0x'));
+            graphics.beginFill(primary, 0.8);
+            graphics.drawRoundedRect(p.x, screenY, p.w, p.h, 5);
+            graphics.endFill();
+        } else if (p.type === 'moving') {
+            graphics.beginFill(0x9d4edd);
+            graphics.drawRoundedRect(p.x, screenY, p.w, p.h, 5);
+            graphics.endFill();
+        } else if (p.type === 'breaking') {
+            graphics.beginFill(0xef4444);
+            graphics.drawRoundedRect(p.x, screenY, p.w, p.h, 5);
+            graphics.endFill();
+        } else if (p.type === 'bouncy') {
+            graphics.beginFill(0x10b981);
+            graphics.drawRoundedRect(p.x, screenY, p.w, p.h, 5);
+            graphics.endFill();
+        } else {
+            // 일반 플랫폼
+            const platColor = heightRatio < 0.5 
+                ? lerpColor(parseInt(currentEnv.colors.primary.replace('#', '0x')), 0x48cae4, heightRatio * 2)
+                : lerpColor(0x48cae4, 0xcaf0f8, (heightRatio - 0.5) * 2);
+            graphics.beginFill(platColor);
+            graphics.drawRoundedRect(p.x, screenY, p.w, p.h, 5);
+            graphics.endFill();
         }
     }
     
-    // 배경 그라데이션 (높이에 따라)
-    const heightRatio = Math.min(1, GameState.height / 300);
-    const r = Math.floor(135 - heightRatio * 80);
-    const g = Math.floor(206 - heightRatio * 100);
-    const b = Math.floor(235 - heightRatio * 50);
-    pixiApp.renderer.background.color = (r << 16) | (g << 8) | b;
-    
-    // 게임오버 체크 (화면 아래로 떨어짐)
-    if (p2Player.y > pixiApp.screen.height + 100) {
-        p2GameOver();
-        return;
+    // 아이템 그리기
+    for (const item of climbItems) {
+        if (item.collected) continue;
+        const screenY = item.y + camY;
+        if (screenY < -40 || screenY > h + 40) continue;
+        
+        const itemText = new PIXI.Text(item.type === 'tornado' ? '🌪️' : '☁️', { fontSize: 28 });
+        itemText.anchor.set(0.5);
+        itemText.x = item.x;
+        itemText.y = screenY + Math.sin(t * 3) * 5;
+        itemText.rotation = item.type === 'tornado' ? t * 2 : 0;
+        pixiApp.stage.addChild(itemText);
     }
     
-    // 클리어 체크
-    if (GameState.score >= CONFIG.P2_STAGE_THRESHOLD) {
-        p2StageClear();
-        return;
-    }
+    // 플레이어 그리기
+    drawClimber(graphics);
     
-    drawP2Player();
-    updateP2HUD();
+    // 진행 바 (오른쪽)
+    const barH = h - 120;
+    const barX = w - 25;
+    const progress = Math.min(1, curHeight / LAND_HEIGHT);
+    
+    graphics.beginFill(0x000000, 0.25);
+    graphics.drawRect(barX - 4, 60, 16, barH);
+    graphics.endFill();
+    
+    graphics.beginFill(0x00f5d4);
+    graphics.drawRect(barX - 2, 60 + barH * (1 - progress), 12, barH * progress);
+    graphics.endFill();
+    
+    graphics.beginFill(0x228B22);
+    graphics.drawRect(barX - 6, 55, 20, 8);
+    graphics.endFill();
 }
 
-function checkP2PartEvolution() {
-    const lang = GameState.currentLang;
-    const thresholds = [50, 100, 150, 200]; // 높이 기준
-    const p2PartKeys = ['wing', 'shell', 'claw', 'lung'];
-    const totalP2Parts = p2PartKeys.reduce((sum, k) => sum + GameState.parts[k], 0);
+function drawClimber(graphics) {
+    const d = GameState.design;
+    const p = GameState.parts;
+    const t = p2Time;
+    const s = climber.w / 2;
+    const screenY = climber.y + camY;
     
-    if (totalP2Parts < 4 && GameState.maxHeight >= thresholds[totalP2Parts]) {
-        const available = p2PartKeys.filter(k => GameState.parts[k] < BODY_PARTS[k].max);
-        if (available.length === 0) return;
-        
-        const key = available[Math.floor(Math.random() * available.length)];
-        GameState.parts[key]++;
-        
-        const part = BODY_PARTS[key];
-        showEvolution(part.icon, `${part.name} ${GameState.t('acquired')}`, `${part.name} ×${GameState.parts[key]}`, part.fx);
+    const cx = climber.x + climber.w / 2;
+    const cy = screenY + climber.h / 2;
+    
+    const primary = parseInt(d.primary.replace('#', '0x'));
+    const secondary = parseInt(d.secondary.replace('#', '0x'));
+    
+    // 꼬리
+    if (p.tail > 0) {
+        graphics.lineStyle(Math.max(3, s * 0.08), secondary);
+        const tailWave = Math.sin(t * 3) * s * 0.3;
+        graphics.moveTo(cx - s * 0.8, cy);
+        graphics.bezierCurveTo(cx - s * 1.2, cy + tailWave, cx - s * 1.5, cy - tailWave * 0.5, cx - s * 1.8, cy + tailWave * 0.3);
+        graphics.lineStyle(0);
+    }
+    
+    // 팔
+    if (p.arm > 0) {
+        graphics.lineStyle(Math.max(2, s * 0.06), primary);
+        for (let i = 0; i < Math.min(p.arm, 4); i++) {
+            const side = i % 2 === 0 ? 1 : -1;
+            const wave = Math.sin(t * 2.5 + i) * 0.15;
+            graphics.moveTo(cx + side * s * 0.7, cy);
+            graphics.lineTo(cx + side * s * 1.4, cy + wave * s);
+        }
+        graphics.lineStyle(0);
+    }
+    
+    // 다리
+    if (p.leg > 0) {
+        graphics.lineStyle(Math.max(2, s * 0.05), secondary);
+        const legWave = Math.sin(t * 4) * 0.2;
+        for (let i = 0; i < Math.min(p.leg, 4); i++) {
+            const baseAngle = Math.PI * 0.5 + (i - 1.5) * 0.25;
+            graphics.moveTo(cx + Math.cos(baseAngle) * s * 0.6, cy + Math.sin(baseAngle) * s * 0.6);
+            graphics.lineTo(cx + Math.cos(baseAngle + legWave) * s * 1.2, cy + s * 1.0);
+        }
+        graphics.lineStyle(0);
+    }
+    
+    // 더듬이
+    if (p.antenna > 0) {
+        graphics.lineStyle(2, primary);
+        for (let i = 0; i < Math.min(p.antenna, 2); i++) {
+            const aa = -Math.PI * 0.4 + i * 0.4;
+            const wave = Math.sin(t * 3) * 0.1;
+            graphics.moveTo(cx + Math.cos(aa) * s * 0.5, cy + Math.sin(aa) * s * 0.5);
+            graphics.lineTo(cx + Math.cos(aa + wave) * s * 1.3, cy + Math.sin(aa + wave) * s * 1.0);
+            graphics.lineStyle(0);
+            graphics.beginFill(primary);
+            graphics.drawCircle(cx + Math.cos(aa + wave) * s * 1.3, cy + Math.sin(aa + wave) * s * 1.0, 3);
+            graphics.endFill();
+            graphics.lineStyle(2, primary);
+        }
+        graphics.lineStyle(0);
+    }
+    
+    // 몸통
+    graphics.beginFill(primary, 0.9);
+    graphics.moveTo(cx + s, cy);
+    for (let i = 0; i < 10; i++) {
+        const ang = (i / 10) * Math.PI * 2;
+        const wobble = Math.sin(t + i) * 2;
+        const r = s + wobble;
+        graphics.lineTo(cx + Math.cos(ang) * r, cy + Math.sin(ang) * r);
+    }
+    graphics.closePath();
+    graphics.endFill();
+    
+    // 내부
+    graphics.beginFill(secondary, 0.4);
+    graphics.drawCircle(cx, cy, s * 0.65);
+    graphics.endFill();
+    
+    // 하이라이트
+    graphics.beginFill(0xffffff, 0.35);
+    graphics.drawCircle(cx - s * 0.2, cy - s * 0.2, s * 0.25);
+    graphics.endFill();
+    
+    // 눈
+    const eyeCount = Math.max(1, p.eye || 1);
+    for (let i = 0; i < eyeCount; i++) {
+        const ex = cx + (i - (eyeCount - 1) / 2) * s * 0.35;
+        const ey = cy - s * 0.15;
+        graphics.beginFill(0xffffff);
+        graphics.drawCircle(ex, ey, s * 0.2);
+        graphics.endFill();
+        graphics.beginFill(0x222222);
+        graphics.drawCircle(ex + s * 0.03, ey, s * 0.1);
+        graphics.endFill();
+    }
+    
+    // 입
+    if (p.mouth > 0) {
+        graphics.lineStyle(2, secondary);
+        graphics.arc(cx, cy + s * 0.25, s * 0.12, 0.2, Math.PI - 0.2);
+        graphics.lineStyle(0);
     }
 }
 
-function p2GameOver() {
+function lerpColor(c1, c2, t) {
+    const r1 = (c1 >> 16) & 0xff, g1 = (c1 >> 8) & 0xff, b1 = c1 & 0xff;
+    const r2 = (c2 >> 16) & 0xff, g2 = (c2 >> 8) & 0xff, b2 = c2 & 0xff;
+    const r = Math.round(r1 + (r2 - r1) * t);
+    const g = Math.round(g1 + (g2 - g1) * t);
+    const b = Math.round(b1 + (b2 - b1) * t);
+    return (r << 16) | (g << 8) | b;
+}
+
+function climbFail() {
     p2GameRunning = false;
-    document.getElementById('p2go-height').textContent = GameState.maxHeight;
-    document.getElementById('p2go-score').textContent = GameState.score;
+    if (gameLoop && pixiApp) pixiApp.ticker.remove(gameLoop);
+    
+    document.getElementById('p2go-height').textContent = GameState.maxHeight + 'm';
     document.getElementById('modal-p2-gameover').classList.add('show');
 }
 
-function p2StageClear() {
+function climbWin() {
     p2GameRunning = false;
+    if (gameLoop && pixiApp) pixiApp.ticker.remove(gameLoop);
+    
     GameState.phase2Clear = true;
     GameState.save();
     
-    const p2PartKeys = ['wing', 'shell', 'claw', 'lung'];
-    const totalP2Parts = p2PartKeys.reduce((sum, k) => sum + GameState.parts[k], 0);
-    document.getElementById('p2cl-height').textContent = GameState.maxHeight;
-    document.getElementById('p2cl-parts').textContent = totalP2Parts;
+    document.getElementById('p2cl-height').textContent = GameState.maxHeight + 'm';
     document.getElementById('modal-p2-clear').classList.add('show');
-}
-
-// ========================================
-// Initialize
-// ========================================
-document.addEventListener('DOMContentLoaded', () => {
-    setTimeout(() => {
-        document.getElementById('loading').classList.add('fade-out');
-        setTimeout(showTitle, 500);
-    }, 800);
-});
-    </script>
-</body>
-</html> += (Math.random() - 0.5) * 0.1;
-        enemy.x += Math.cos(enemy.angle) * enemy.speed * 0.3;
-        enemy.y += Math.sin(enemy.angle) * enemy.speed * 0.3;
-        
-        if (enemy.x < -200 || enemy.x > pixiApp.screen.width + 200 || enemy.y < -200 || enemy.y > pixiApp.screen.height + 200) {
-            pixiApp.stage.removeChild(enemy);
-            enemies.splice(i, 1);
-            continue;
-        }
-        
-        if (dist < player.size + enemy.size * 0.6) {
-            if (canEat) {
-                player.size = Math.min(CONFIG.MAX_SIZE, player.size + enemy.size * 0.15);
-                GameState.eaten++;
-                GameState.score += Math.floor(enemy.size * 5 * (1 + GameState.parts.mouth * 0.15));
-                GameState.maxSize = Math.max(GameState.maxSize, player.size);
-                checkPartEvolution();
-                pixiApp.stage.removeChild(enemy);
-                enemies.splice(i, 1);
-            } else {
-                gameOver();
-                return;
-            }
-        }
-    }
-    
-    drawPlayerBody();
-    updateHUD();
-    
-    const totalParts = Object.values(GameState.parts).reduce((a, b) => a + b, 0);
-    if (GameState.score >= CONFIG.STAGE_THRESHOLD && totalParts >= 5) {
-        stageClear();
-    }
-}
-
-function gameOver() {
-    gameRunning = false;
-    document.getElementById('go-score').textContent = GameState.score;
-    document.getElementById('go-eaten').textContent = GameState.eaten;
-    document.getElementById('go-maxsize').textContent = Math.round(GameState.maxSize);
-    document.getElementById('modal-gameover').classList.add('show');
-}
-
-function stageClear() {
-    gameRunning = false;
-    GameState.phase1Clear = true;
-    GameState.save();
-    
-    const totalParts = Object.values(GameState.parts).reduce((a, b) => a + b, 0);
-    document.getElementById('cl-score').textContent = GameState.score;
-    document.getElementById('cl-parts').textContent = totalParts;
-    document.getElementById('modal-clear').classList.add('show');
 }
 
 // ========================================
