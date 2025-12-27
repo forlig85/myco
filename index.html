@@ -51,6 +51,7 @@ html, body {
     position: fixed;
     inset: 0;
     overflow: hidden;
+    z-index: 100;
 }
 
 #game-container {
@@ -104,9 +105,9 @@ html, body {
 
 /* Page Layout */
 .page-center {
-    position: fixed;
-    inset: 0;
-    z-index: 100;
+    position: relative;
+    width: 100%;
+    height: 100%;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -129,6 +130,408 @@ html, body {
     0%, 100% { transform: translateY(0); }
     50% { transform: translateY(-10px); }
 }
+
+/* ========================================
+   Title Screen Styles
+======================================== */
+.title-screen {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    padding-top: env(safe-area-inset-top, 20px);
+    padding-bottom: env(safe-area-inset-bottom, 20px);
+}
+
+.logo-section {
+    text-align: center;
+    margin-bottom: 50px;
+}
+
+.logo-icon {
+    font-size: 60px;
+    margin-bottom: 10px;
+    animation: float 3s ease-in-out infinite;
+}
+
+.logo-title {
+    font-size: 52px;
+    font-weight: bold;
+    background: linear-gradient(135deg, #4fc3f7 0%, #ab47bc 50%, #ff6b9d 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    letter-spacing: 8px;
+    margin-bottom: 8px;
+    animation: glow 2s ease-in-out infinite alternate;
+}
+
+@keyframes glow {
+    from { filter: drop-shadow(0 0 10px rgba(79, 195, 247, 0.5)); }
+    to { filter: drop-shadow(0 0 20px rgba(171, 71, 188, 0.8)); }
+}
+
+.logo-subtitle {
+    font-size: 14px;
+    color: #888;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+}
+
+.button-section {
+    width: 100%;
+    max-width: 300px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-bottom: 40px;
+}
+
+.login-btn {
+    width: 100%;
+    padding: 16px 24px;
+    border: none;
+    border-radius: 12px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+    font-family: inherit;
+}
+
+.login-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+    transition: left 0.5s ease;
+}
+
+.login-btn:hover::before {
+    left: 100%;
+}
+
+.login-btn:active {
+    transform: scale(0.98);
+}
+
+.btn-google {
+    background: #ffffff;
+    color: #333;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+}
+
+.btn-google:hover {
+    box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+    transform: translateY(-2px);
+}
+
+.google-icon {
+    width: 20px;
+    height: 20px;
+}
+
+.btn-guest {
+    background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%);
+    color: #fff;
+    border: 1px solid rgba(255,255,255,0.2);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+}
+
+.btn-guest:hover {
+    background: linear-gradient(135deg, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0.08) 100%);
+    border-color: rgba(255,255,255,0.3);
+    transform: translateY(-2px);
+}
+
+.settings-section {
+    position: absolute;
+    bottom: calc(env(safe-area-inset-bottom, 20px) + 60px);
+    left: 0;
+    right: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 30px;
+}
+
+.setting-btn {
+    background: rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.2);
+    color: #fff;
+    padding: 10px 16px;
+    border-radius: 25px;
+    font-size: 14px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.3s ease;
+    font-family: inherit;
+}
+
+.setting-btn:hover {
+    background: rgba(255,255,255,0.15);
+    border-color: rgba(255,255,255,0.3);
+}
+
+.setting-btn:active {
+    transform: scale(0.95);
+}
+
+.version-info {
+    position: absolute;
+    bottom: calc(env(safe-area-inset-bottom, 10px) + 20px);
+    left: 50%;
+    transform: translateX(-50%);
+    color: #444;
+    font-size: 11px;
+}
+
+/* Guest Warning Modal */
+.guest-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.7);
+    z-index: 200;
+    display: none;
+    justify-content: center;
+    align-items: center;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.guest-modal-overlay.show {
+    display: flex;
+    opacity: 1;
+}
+
+.guest-modal-content {
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 20px;
+    padding: 30px;
+    width: 90%;
+    max-width: 320px;
+    text-align: center;
+    transform: scale(0.9);
+    transition: transform 0.3s ease;
+}
+
+.guest-modal-overlay.show .guest-modal-content {
+    transform: scale(1);
+}
+
+.warning-icon {
+    font-size: 50px;
+    margin-bottom: 15px;
+    animation: shake 0.5s ease-in-out;
+}
+
+@keyframes shake {
+    0%, 100% { transform: rotate(0deg); }
+    25% { transform: rotate(-10deg); }
+    75% { transform: rotate(10deg); }
+}
+
+.warning-title {
+    color: #ffcc00;
+    font-size: 20px;
+    font-weight: 600;
+    margin-bottom: 20px;
+}
+
+.warning-text {
+    color: #ccc;
+    font-size: 14px;
+    line-height: 1.8;
+    margin-bottom: 25px;
+}
+
+.warning-text strong {
+    color: #ff6b6b;
+}
+
+.warning-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.warning-btn {
+    width: 100%;
+    padding: 14px 20px;
+    border: none;
+    border-radius: 10px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-family: inherit;
+}
+
+.warning-btn:active {
+    transform: scale(0.98);
+}
+
+.btn-recommend {
+    background: linear-gradient(135deg, #4fc3f7 0%, #2196f3 100%);
+    color: #fff;
+    box-shadow: 0 4px 15px rgba(33, 150, 243, 0.4);
+}
+
+.btn-recommend:hover {
+    box-shadow: 0 6px 20px rgba(33, 150, 243, 0.6);
+    transform: translateY(-2px);
+}
+
+.btn-continue {
+    background: rgba(255,255,255,0.1);
+    color: #888;
+    border: 1px solid rgba(255,255,255,0.1);
+}
+
+.btn-continue:hover {
+    background: rgba(255,255,255,0.15);
+    color: #aaa;
+}
+
+/* Language Modal */
+.lang-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.7);
+    z-index: 200;
+    display: none;
+    justify-content: center;
+    align-items: center;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.lang-modal-overlay.show {
+    display: flex;
+    opacity: 1;
+}
+
+.lang-modal-content {
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 20px;
+    padding: 30px;
+    width: 90%;
+    max-width: 320px;
+    transform: scale(0.9);
+    transition: transform 0.3s ease;
+}
+
+.lang-modal-overlay.show .lang-modal-content {
+    transform: scale(1);
+}
+
+.lang-modal-title {
+    color: #fff;
+    font-size: 20px;
+    font-weight: 600;
+    text-align: center;
+    margin-bottom: 25px;
+}
+
+.language-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.language-btn {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+    color: #fff;
+    padding: 14px 20px;
+    border-radius: 10px;
+    font-size: 16px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    transition: all 0.3s ease;
+    font-family: inherit;
+}
+
+.language-btn:hover {
+    background: rgba(79, 195, 247, 0.2);
+    border-color: rgba(79, 195, 247, 0.5);
+}
+
+.language-btn.active {
+    background: linear-gradient(135deg, rgba(79, 195, 247, 0.3) 0%, rgba(171, 71, 188, 0.3) 100%);
+    border-color: #4fc3f7;
+}
+
+.language-btn .flag {
+    font-size: 24px;
+}
+
+.lang-modal-close {
+    margin-top: 20px;
+    width: 100%;
+    padding: 14px;
+    background: rgba(255,255,255,0.1);
+    border: none;
+    border-radius: 10px;
+    color: #888;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-family: inherit;
+}
+
+.lang-modal-close:hover {
+    background: rgba(255,255,255,0.15);
+    color: #fff;
+}
+
+/* PC 반응형 */
+@media (min-width: 769px) {
+    .logo-title {
+        font-size: 72px;
+        letter-spacing: 12px;
+    }
+    .logo-subtitle {
+        font-size: 16px;
+        letter-spacing: 5px;
+    }
+    .logo-icon {
+        font-size: 80px;
+    }
+    .button-section {
+        max-width: 350px;
+    }
+    .login-btn {
+        padding: 18px 28px;
+        font-size: 17px;
+    }
+}
+
 .page-title {
     font-size: 1.5rem;
     font-weight: bold;
@@ -136,6 +539,7 @@ html, body {
     background: linear-gradient(135deg, var(--primary), var(--secondary));
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
+    background-clip: text;
 }
 .page-text {
     font-size: 1rem;
@@ -433,6 +837,7 @@ html, body {
 // AROA - Configuration
 // ========================================
 const CONFIG = {
+    // Phase 1
     GROWTH_THRESHOLD: 15,
     STAGE_THRESHOLD: 2000,
     INITIAL_SIZE: 12,
@@ -442,7 +847,15 @@ const CONFIG = {
     ENEMY_SPAWN_INTERVAL: 3000,
     DASH_COOLDOWN: 2500,
     DASH_DURATION: 200,
-    DASH_SPEED: 18
+    DASH_SPEED: 18,
+    
+    // Phase 2
+    P2_GRAVITY: 0.6,
+    P2_JUMP_FORCE: -14,
+    P2_MOVE_SPEED: 5,
+    P2_PLATFORM_SPEED: 2,
+    P2_STAGE_THRESHOLD: 3000,
+    P2_PART_THRESHOLD: 500
 };
 
 // 환경 정의
@@ -472,12 +885,18 @@ const getEnvById = id => ENVIRONMENTS.find(e => e.id === id) || ENVIRONMENTS[0];
 
 // 파츠 정의
 const BODY_PARTS = {
+    // Phase 1
     eye: { icon: '👁️', name: '눈', max: 3, fx: '시야 +20%' },
     mouth: { icon: '👄', name: '입', max: 2, fx: '점수 +15%' },
     arm: { icon: '🦾', name: '팔', max: 4, fx: '자석 효과' },
     leg: { icon: '🦿', name: '다리', max: 4, fx: '속도 +10%' },
     tail: { icon: '🐍', name: '꼬리', max: 2, fx: '대시 사용' },
-    antenna: { icon: '📡', name: '더듬이', max: 2, fx: '범위 +15%' }
+    antenna: { icon: '📡', name: '더듬이', max: 2, fx: '범위 +15%' },
+    // Phase 2
+    wing: { icon: '🪽', name: '날개', max: 2, fx: '더블점프' },
+    shell: { icon: '🛡️', name: '껍질', max: 2, fx: '피해 감소' },
+    claw: { icon: '🦀', name: '발톱', max: 2, fx: '벽타기' },
+    lung: { icon: '🫁', name: '허파', max: 1, fx: '육상 적응' }
 };
 
 // 다국어
@@ -505,11 +924,21 @@ const TRANSLATIONS = {
         start: '모험 시작하기',
         gameover: '잡아먹혔다!',
         gameoverDesc: '더 큰 존재에게 포식당했습니다.',
-        retry: '다시 시작',
+        retry: '다시 태어나기',
         home: '홈으로',
         clear: '다세포 진화!',
         clearDesc: '단일 세포의 한계를 넘어섰습니다!',
-        nextPhase: 'Phase 2로!'
+        nextPhase: 'Phase 2로!',
+        // Phase 2
+        p2Intro: [
+            { icon: '🏔️', title: '육지로!', text: '바다의 한계를 넘어<br><span class="hl">광활한 육지</span>가 펼쳐진다.' },
+            { icon: '🦎', title: '새로운 도전', text: '<span class="danger">중력</span>이라는 새로운 적!<br><span class="gold">점프</span>하고 <span class="hl">올라가라</span>.' }
+        ],
+        p2Start: '등반 시작!',
+        p2Gameover: '추락했다!',
+        p2GameoverDesc: '너무 아래로 떨어졌습니다.',
+        p2Clear: '하늘을 향해!',
+        p2ClearDesc: '육지를 정복했습니다!'
     },
     en: {
         title: 'AROA',
@@ -534,11 +963,20 @@ const TRANSLATIONS = {
         start: 'Start Adventure',
         gameover: 'Eaten!',
         gameoverDesc: 'You were consumed by a larger creature.',
-        retry: 'Retry',
+        retry: 'Be Reborn',
         home: 'Home',
         clear: 'Multicellular Evolution!',
         clearDesc: 'You have transcended the limits of a single cell!',
-        nextPhase: 'To Phase 2!'
+        nextPhase: 'To Phase 2!',
+        p2Intro: [
+            { icon: '🏔️', title: 'To Land!', text: 'Beyond the sea,<br><span class="hl">vast land</span> awaits.' },
+            { icon: '🦎', title: 'New Challenge', text: '<span class="danger">Gravity</span> is the new enemy!<br><span class="gold">Jump</span> and <span class="hl">climb</span>.' }
+        ],
+        p2Start: 'Start Climbing!',
+        p2Gameover: 'Fell!',
+        p2GameoverDesc: 'You fell too far down.',
+        p2Clear: 'Towards the Sky!',
+        p2ClearDesc: 'You conquered the land!'
     },
     ja: {
         title: 'AROA',
@@ -567,7 +1005,16 @@ const TRANSLATIONS = {
         home: 'ホーム',
         clear: '多細胞進化！',
         clearDesc: '単細胞の限界を超えました！',
-        nextPhase: 'Phase 2へ！'
+        nextPhase: 'Phase 2へ！',
+        p2Intro: [
+            { icon: '🏔️', title: '陸へ！', text: '海を超えて<br><span class="hl">広大な陸地</span>が待っている。' },
+            { icon: '🦎', title: '新たな挑戦', text: '<span class="danger">重力</span>という新たな敵！<br><span class="gold">ジャンプ</span>して<span class="hl">登れ</span>。' }
+        ],
+        p2Start: '登攀開始！',
+        p2Gameover: '落下！',
+        p2GameoverDesc: '落ちすぎました。',
+        p2Clear: '空へ！',
+        p2ClearDesc: '陸地を征服しました！'
     },
     zh: {
         title: 'AROA',
@@ -596,7 +1043,16 @@ const TRANSLATIONS = {
         home: '主页',
         clear: '多细胞进化！',
         clearDesc: '超越了单细胞的极限！',
-        nextPhase: '前往Phase 2！'
+        nextPhase: '前往Phase 2！',
+        p2Intro: [
+            { icon: '🏔️', title: '向陆地！', text: '超越大海<br><span class="hl">广阔的陆地</span>在等待。' },
+            { icon: '🦎', title: '新挑战', text: '<span class="danger">重力</span>是新的敌人！<br><span class="gold">跳跃</span>并<span class="hl">攀登</span>。' }
+        ],
+        p2Start: '开始攀登！',
+        p2Gameover: '坠落！',
+        p2GameoverDesc: '掉得太深了。',
+        p2Clear: '向天空！',
+        p2ClearDesc: '征服了陆地！'
     }
 };
 
@@ -609,10 +1065,15 @@ const GameState = {
     prologueDone: localStorage.getItem('aroa-prologue-done') === 'true',
     envId: localStorage.getItem('aroa-env') || null,
     phase1Clear: localStorage.getItem('aroa-phase1-clear') === 'true',
+    phase2Clear: localStorage.getItem('aroa-phase2-clear') === 'true',
+    currentPhase: 1,
     score: 0,
     eaten: 0,
     maxSize: CONFIG.INITIAL_SIZE,
-    parts: { eye: 0, mouth: 0, arm: 0, leg: 0, tail: 0, antenna: 0 },
+    parts: { eye: 0, mouth: 0, arm: 0, leg: 0, tail: 0, antenna: 0, wing: 0, shell: 0, claw: 0, lung: 0 },
+    p2Score: 0,
+    p2Height: 0,
+    p2MaxHeight: 0,
     
     save() {
         localStorage.setItem('aroa-lang', this.currentLang);
@@ -620,13 +1081,31 @@ const GameState = {
         localStorage.setItem('aroa-prologue-done', this.prologueDone);
         if (this.envId) localStorage.setItem('aroa-env', this.envId);
         localStorage.setItem('aroa-phase1-clear', this.phase1Clear);
+        localStorage.setItem('aroa-phase2-clear', this.phase2Clear);
+        localStorage.setItem('aroa-parts', JSON.stringify(this.parts));
+    },
+    
+    load() {
+        const savedParts = localStorage.getItem('aroa-parts');
+        if (savedParts) {
+            try {
+                const parsed = JSON.parse(savedParts);
+                Object.assign(this.parts, parsed);
+            } catch(e) {}
+        }
     },
     
     reset() {
         this.score = 0;
         this.eaten = 0;
         this.maxSize = CONFIG.INITIAL_SIZE;
-        this.parts = { eye: 0, mouth: 0, arm: 0, leg: 0, tail: 0, antenna: 0 };
+        this.p2Score = 0;
+        this.p2Height = 0;
+        this.p2MaxHeight = 0;
+    },
+    
+    resetParts() {
+        this.parts = { eye: 0, mouth: 0, arm: 0, leg: 0, tail: 0, antenna: 0, wing: 0, shell: 0, claw: 0, lung: 0 };
     },
     
     t(key) {
@@ -669,13 +1148,14 @@ function createStarBackground(envColors = null) {
     const colors = envColors ? [
         parseInt(envColors.bg1.replace('#', '0x')),
         parseInt(envColors.bg2.replace('#', '0x'))
-    ] : [0x1a0030, 0x000830, 0x100020];
+    ] : [0x1a0030, 0x000830, 0x100020, 0x001040, 0x200040, 0x0a0025];
     
-    // Nebula
-    for (let i = 0; i < 6; i++) {
+    // Nebula (더 많이, 더 화려하게)
+    for (let i = 0; i < 8; i++) {
         const nebula = new PIXI.Graphics();
-        nebula.beginFill(colors[i % colors.length], 0.4);
-        nebula.drawCircle(0, 0, 100 + Math.random() * 150);
+        const color = colors[i % colors.length];
+        nebula.beginFill(color, 0.4);
+        nebula.drawCircle(0, 0, 100 + Math.random() * 200);
         nebula.endFill();
         nebula.x = Math.random() * pixiApp.screen.width;
         nebula.y = Math.random() * pixiApp.screen.height;
@@ -683,19 +1163,99 @@ function createStarBackground(envColors = null) {
         pixiApp.stage.addChild(nebula);
     }
     
-    // Stars
-    const starColor = envColors ? parseInt(envColors.particle.replace('#', '0x')) : 0xffffff;
-    for (let i = 0; i < 100; i++) {
+    // Stars (더 많이, 다양한 색상, 반짝임 효과)
+    const starColors = envColors ? 
+        [parseInt(envColors.particle.replace('#', '0x'))] : 
+        [0xffffff, 0xfff8dc, 0xadd8e6, 0xffb6c1, 0xe6e6fa, 0xffd700];
+    
+    const stars = [];
+    for (let i = 0; i < 200; i++) {
         const star = new PIXI.Graphics();
         const size = Math.random() * 2 + 0.5;
-        star.beginFill(starColor, 0.5 + Math.random() * 0.5);
+        const color = starColors[Math.floor(Math.random() * starColors.length)];
+        const isBright = Math.random() > 0.85;
+        
+        // 밝은 별은 글로우 효과
+        if (isBright) {
+            star.beginFill(color, 0.2);
+            star.drawCircle(0, 0, size * 4);
+            star.endFill();
+            star.beginFill(color, 0.4);
+            star.drawCircle(0, 0, size * 2);
+            star.endFill();
+        }
+        
+        star.beginFill(color, 1);
         star.drawCircle(0, 0, size);
         star.endFill();
+        
         star.x = Math.random() * pixiApp.screen.width;
         star.y = Math.random() * pixiApp.screen.height;
-        star.alpha = 0.3 + Math.random() * 0.7;
+        star.baseAlpha = 0.3 + Math.random() * 0.7;
+        star.alpha = star.baseAlpha;
+        star.twinkleSpeed = 1.5 + Math.random() * 3;
+        star.twinkleOffset = Math.random() * Math.PI * 2;
+        star.isBright = isBright;
+        
         pixiApp.stage.addChild(star);
+        stars.push(star);
     }
+    
+    // 별 반짝임 애니메이션
+    let time = 0;
+    const twinkleLoop = (delta) => {
+        time += delta * 0.02;
+        stars.forEach(star => {
+            const twinkle = Math.sin(time * star.twinkleSpeed + star.twinkleOffset);
+            star.alpha = star.baseAlpha + twinkle * 0.4;
+            if (star.isBright) {
+                star.scale.set(1 + twinkle * 0.2);
+            }
+        });
+    };
+    pixiApp.ticker.add(twinkleLoop);
+    
+    // 유성 생성 함수
+    function createShootingStar() {
+        const shootingStar = new PIXI.Graphics();
+        
+        // 유성 꼬리
+        for (let i = 0; i < 20; i++) {
+            const alpha = 1 - (i / 20);
+            shootingStar.beginFill(0xffffff, alpha * 0.6);
+            shootingStar.drawCircle(-i * 3, i * 1.2, 2.5 - i * 0.1);
+            shootingStar.endFill();
+        }
+        
+        // 유성 머리
+        shootingStar.beginFill(0xffffff, 1);
+        shootingStar.drawCircle(0, 0, 3);
+        shootingStar.endFill();
+        
+        shootingStar.x = Math.random() * pixiApp.screen.width * 0.6;
+        shootingStar.y = -30;
+        shootingStar.rotation = Math.PI / 4;
+        
+        pixiApp.stage.addChild(shootingStar);
+        
+        const speed = 6 + Math.random() * 4;
+        const animate = () => {
+            shootingStar.x += speed;
+            shootingStar.y += speed * 0.4;
+            shootingStar.alpha -= 0.01;
+            
+            if (shootingStar.y > pixiApp.screen.height || shootingStar.alpha <= 0) {
+                pixiApp.stage.removeChild(shootingStar);
+                pixiApp.ticker.remove(animate);
+            }
+        };
+        pixiApp.ticker.add(animate);
+    }
+    
+    // 유성 주기적 생성
+    setInterval(() => {
+        if (Math.random() > 0.6) createShootingStar();
+    }, 2000);
 }
 
 // ========================================
@@ -721,52 +1281,168 @@ function showTitle() {
     createStarBackground();
     
     const t = GameState.t.bind(GameState);
-    const hasSave = GameState.prologueDone;
+    const lang = GameState.currentLang;
+    
+    // 다국어 텍스트
+    const titleTexts = {
+        ko: {
+            google: 'Google로 시작하기',
+            guest: '게스트로 시작하기',
+            langName: '한국어',
+            guestTitle: '잠깐!',
+            guestText: '게스트 모드는 <strong>저장되지 않습니다.</strong><br><br>앱을 종료하면 처음부터 다시 시작해야 해요.<br><br>가능하면 <strong>Google 로그인</strong>을 추천드려요! 🙏',
+            guestToGoogle: '🔵 Google로 시작하기',
+            guestContinue: '그래도 게스트로 시작',
+            close: '닫기'
+        },
+        en: {
+            google: 'Continue with Google',
+            guest: 'Continue as Guest',
+            langName: 'English',
+            guestTitle: 'Wait!',
+            guestText: 'Guest mode <strong>does not save progress.</strong><br><br>If you close the app, you\'ll have to start over.<br><br>We recommend <strong>Google login</strong> if possible! 🙏',
+            guestToGoogle: '🔵 Continue with Google',
+            guestContinue: 'Continue as Guest anyway',
+            close: 'Close'
+        }
+    };
+    const txt = titleTexts[lang] || titleTexts.ko;
     
     app.innerHTML = `
-        <div class="page-center">
-            <div class="page-content">
-                <div class="page-icon">🚀</div>
-                <h1 style="font-size: 3rem; font-weight: 900; background: linear-gradient(135deg, var(--primary), var(--accent)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 8px;">
-                    ${t('title')}
-                </h1>
-                <p style="color: var(--text-muted); margin-bottom: 40px; font-size: 0.9rem;">
-                    ${t('subtitle')}
-                </p>
-                <div style="display: flex; flex-direction: column; gap: 12px; max-width: 280px; margin: 0 auto;">
-                    ${hasSave ? `<button class="btn btn-primary btn-block" id="btn-continue">${t('continueGame')}</button>` : ''}
-                    <button class="btn ${hasSave ? 'btn-outline' : 'btn-primary'} btn-block" id="btn-start">${t('startGame')}</button>
-                    <button class="btn btn-ghost btn-block" id="btn-settings">⚙️ ${t('settings')}</button>
+        <div class="title-screen">
+            <!-- 로고 -->
+            <div class="logo-section">
+                <div class="logo-icon">🚀</div>
+                <h1 class="logo-title">AROA</h1>
+                <p class="logo-subtitle">A Road Of Adventure</p>
+            </div>
+            
+            <!-- 로그인 버튼 -->
+            <div class="button-section">
+                <button class="login-btn btn-google" id="btn-google">
+                    <svg class="google-icon" viewBox="0 0 24 24">
+                        <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                        <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                        <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+                        <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+                    </svg>
+                    <span>${txt.google}</span>
+                </button>
+                
+                <button class="login-btn btn-guest" id="btn-guest">
+                    <span>👤</span>
+                    <span>${txt.guest}</span>
+                </button>
+            </div>
+            
+            <!-- 하단 설정 -->
+            <div class="settings-section">
+                <button class="setting-btn" id="btn-language">
+                    <span class="icon">🌍</span>
+                    <span>${txt.langName}</span>
+                </button>
+                <button class="setting-btn" id="btn-sound">
+                    <span class="icon">${GameState.soundOn ? '🔊' : '🔇'}</span>
+                    <span>${GameState.soundOn ? 'ON' : 'OFF'}</span>
+                </button>
+            </div>
+            
+            <!-- 버전 -->
+            <div class="version-info">v1.0.0 | © 2025 BOKLUCK</div>
+        </div>
+        
+        <!-- 게스트 경고 모달 -->
+        <div class="guest-modal-overlay" id="guest-modal">
+            <div class="guest-modal-content">
+                <div class="warning-icon">⚠️</div>
+                <h2 class="warning-title">${txt.guestTitle}</h2>
+                <p class="warning-text">${txt.guestText}</p>
+                <div class="warning-buttons">
+                    <button class="warning-btn btn-recommend" id="guest-to-google">${txt.guestToGoogle}</button>
+                    <button class="warning-btn btn-continue" id="guest-continue">${txt.guestContinue}</button>
                 </div>
-                <div style="margin-top: 30px; font-size: 0.7rem; color: var(--text-muted);">
-                    v0.1.0 | © 2024 AROA
+            </div>
+        </div>
+        
+        <!-- 언어 선택 모달 -->
+        <div class="lang-modal-overlay" id="lang-modal">
+            <div class="lang-modal-content">
+                <h2 class="lang-modal-title">🌍 Language</h2>
+                <div class="language-list">
+                    <button class="language-btn ${lang === 'ko' ? 'active' : ''}" data-lang="ko">
+                        <span class="flag">🇰🇷</span>
+                        <span>한국어</span>
+                    </button>
+                    <button class="language-btn ${lang === 'en' ? 'active' : ''}" data-lang="en">
+                        <span class="flag">🇺🇸</span>
+                        <span>English</span>
+                    </button>
                 </div>
+                <button class="lang-modal-close" id="lang-modal-close">${txt.close}</button>
             </div>
         </div>
     `;
     
-    document.getElementById('btn-start').onclick = () => {
+    // 이벤트 리스너
+    document.getElementById('btn-google').onclick = () => {
+        alert('Google 로그인 (Firebase 연동 예정)');
+    };
+    
+    document.getElementById('btn-guest').onclick = () => {
+        document.getElementById('guest-modal').classList.add('show');
+    };
+    
+    document.getElementById('guest-to-google').onclick = () => {
+        document.getElementById('guest-modal').classList.remove('show');
+        alert('Google 로그인 (Firebase 연동 예정)');
+    };
+    
+    document.getElementById('guest-continue').onclick = () => {
+        document.getElementById('guest-modal').classList.remove('show');
+        // 게스트로 시작 - 프롤로그로 이동
         GameState.prologueDone = false;
         GameState.envId = null;
         GameState.phase1Clear = false;
+        GameState.phase2Clear = false;
         GameState.reset();
         GameState.save();
         showPrologueIntro();
     };
     
-    if (hasSave) {
-        document.getElementById('btn-continue').onclick = () => {
-            if (GameState.phase1Clear) {
-                alert('Phase 2 구현 예정!');
-            } else if (GameState.envId) {
-                startPhase1();
-            } else {
-                showPrologueIntro();
-            }
-        };
-    }
+    document.getElementById('guest-modal').onclick = (e) => {
+        if (e.target.id === 'guest-modal') {
+            document.getElementById('guest-modal').classList.remove('show');
+        }
+    };
     
-    document.getElementById('btn-settings').onclick = showSettings;
+    document.getElementById('btn-language').onclick = () => {
+        document.getElementById('lang-modal').classList.add('show');
+    };
+    
+    document.getElementById('lang-modal-close').onclick = () => {
+        document.getElementById('lang-modal').classList.remove('show');
+    };
+    
+    document.getElementById('lang-modal').onclick = (e) => {
+        if (e.target.id === 'lang-modal') {
+            document.getElementById('lang-modal').classList.remove('show');
+        }
+    };
+    
+    document.querySelectorAll('.language-btn').forEach(btn => {
+        btn.onclick = () => {
+            GameState.currentLang = btn.dataset.lang;
+            GameState.save();
+            document.getElementById('lang-modal').classList.remove('show');
+            showTitle(); // 화면 새로고침
+        };
+    });
+    
+    document.getElementById('btn-sound').onclick = () => {
+        GameState.soundOn = !GameState.soundOn;
+        GameState.save();
+        showTitle(); // 화면 새로고침
+    };
 }
 
 // ========================================
@@ -1060,8 +1736,7 @@ function startPhase1() {
                     <div class="stat-row"><span class="stat-label">최대 크기</span><span class="stat-val" id="go-maxsize">0</span></div>
                 </div>
                 <div class="modal-btns">
-                    <button class="btn btn-primary btn-block" id="btn-retry">🔄 ${t('retry')}</button>
-                    <button class="btn btn-outline btn-block" id="btn-home2">🏠 ${t('home')}</button>
+                    <button class="btn btn-primary btn-block" id="btn-retry">🎲 ${t('retry')}</button>
                 </div>
             </div>
         </div>
@@ -1397,19 +2072,19 @@ function setupGameHUD() {
         document.getElementById('btn-pause').textContent = gameRunning ? '⏸️' : '▶️';
     };
     
+    // 게임오버 시 다시 시작 -> 주사위 화면으로 (새로운 출생지 선택)
     document.getElementById('btn-retry').onclick = () => {
         document.getElementById('modal-gameover').classList.remove('show');
-        startPhase1();
-    };
-    
-    document.getElementById('btn-home2').onclick = () => {
-        document.getElementById('modal-gameover').classList.remove('show');
         if (gameLoop) pixiApp.ticker.remove(gameLoop);
-        showTitle();
+        GameState.reset();
+        GameState.envId = null; // 출생지 초기화
+        showDice(); // 주사위 화면으로 이동
     };
     
     document.getElementById('btn-next').onclick = () => {
-        alert('🏔️ Phase 2 구현 예정!');
+        document.getElementById('modal-clear').classList.remove('show');
+        if (gameLoop) pixiApp.ticker.remove(gameLoop);
+        showPhase2Intro();
     };
 }
 
@@ -1525,6 +2200,589 @@ function updateGame(delta) {
         }
         
         enemy.angle += (Math.random() - 0.5) * 0.1;
+        enemy.x += Math.cos(enemy.angle) * enemy.speed * 0.3;
+        enemy.y += Math.sin(enemy.angle) * enemy.speed * 0.3;
+        
+        if (enemy.x < -200 || enemy.x > pixiApp.screen.width + 200 || enemy.y < -200 || enemy.y > pixiApp.screen.height + 200) {
+            pixiApp.stage.removeChild(enemy);
+            enemies.splice(i, 1);
+            continue;
+        }
+        
+        if (dist < player.size + enemy.size * 0.6) {
+            if (canEat) {
+                player.size = Math.min(CONFIG.MAX_SIZE, player.size + enemy.size * 0.15);
+                GameState.eaten++;
+                GameState.score += Math.floor(enemy.size * 5 * (1 + GameState.parts.mouth * 0.15));
+                GameState.maxSize = Math.max(GameState.maxSize, player.size);
+                checkPartEvolution();
+                pixiApp.stage.removeChild(enemy);
+                enemies.splice(i, 1);
+            } else {
+                gameOver();
+                return;
+            }
+        }
+    }
+    
+    drawPlayerBody();
+    updateHUD();
+    
+    const totalParts = Object.values(GameState.parts).reduce((a, b) => a + b, 0);
+    if (GameState.score >= CONFIG.STAGE_THRESHOLD && totalParts >= 5) {
+        stageClear();
+    }
+}
+
+function gameOver() {
+    gameRunning = false;
+    const t = GameState.t.bind(GameState);
+    document.getElementById('go-score').textContent = GameState.score;
+    document.getElementById('go-eaten').textContent = GameState.eaten;
+    document.getElementById('go-maxsize').textContent = Math.round(GameState.maxSize);
+    document.getElementById('modal-gameover').classList.add('show');
+}
+
+function stageClear() {
+    gameRunning = false;
+    GameState.phase1Clear = true;
+    GameState.save();
+    
+    const totalParts = Object.values(GameState.parts).reduce((a, b) => a + b, 0);
+    document.getElementById('cl-score').textContent = GameState.score;
+    document.getElementById('cl-parts').textContent = totalParts;
+    document.getElementById('modal-clear').classList.add('show');
+}
+
+// ========================================
+// Phase 2 - Land Platformer
+// ========================================
+let p2Player = null, platforms = [], p2Obstacles = [];
+let p2GameRunning = false, p2Time = 0;
+let cameraY = 0, highestY = 0;
+let canDoubleJump = false, hasDoubleJumped = false;
+let onGround = false;
+
+function showPhase2Intro() {
+    initPixi(0x1a3a1a);
+    createStarBackground({ bg1: '#1a3a1a', bg2: '#2a4a2a', particle: '#88ff88' });
+    
+    const app = getAppElement();
+    const t = GameState.t.bind(GameState);
+    const intro = TRANSLATIONS[GameState.currentLang].p2Intro;
+    let idx = 0;
+    
+    function render() {
+        const s = intro[idx];
+        const isLast = idx === intro.length - 1;
+        
+        app.innerHTML = `
+            <button class="skip-btn" id="skip-btn">${t('skip')}</button>
+            <div class="page-center">
+                <div class="page-content">
+                    <div class="page-icon">${s.icon}</div>
+                    <h2 class="page-title">${s.title}</h2>
+                    <p class="page-text">${s.text}</p>
+                    <div class="dots">
+                        ${intro.map((_, i) => `<div class="dot ${i < idx ? 'done' : ''} ${i === idx ? 'active' : ''}"></div>`).join('')}
+                    </div>
+                    <button class="btn btn-primary btn-block" id="btn-next">${isLast ? '🦎 ' + t('p2Start') : t('next')}</button>
+                </div>
+            </div>
+        `;
+        
+        document.getElementById('btn-next').onclick = () => {
+            if (isLast) startPhase2();
+            else { idx++; render(); }
+        };
+        document.getElementById('skip-btn').onclick = startPhase2;
+    }
+    
+    render();
+}
+
+function startPhase2() {
+    GameState.resetP2();
+    currentEnv = getEnvById(GameState.envId);
+    
+    initPixi(0x87CEEB); // 하늘색 배경
+    
+    const app = getAppElement();
+    const t = GameState.t.bind(GameState);
+    const lang = GameState.currentLang;
+    
+    app.innerHTML = `
+        <div class="hud-top">
+            <div class="hud-panel" style="min-width: 130px;">
+                <div class="hud-name">🦎 ${currentEnv.name[lang]}</div>
+                <div class="hud-row"><span>📏</span><span class="hud-val" id="h2-height">0</span><span class="hud-label">${t('height')}</span></div>
+                <div class="hud-row"><span>⚡</span><span class="hud-val" id="h2-score">0</span><span class="hud-label">${t('score')}</span></div>
+            </div>
+            <div class="hud-panel parts-panel">
+                <div class="parts-title">🧬 ${t('parts')}</div>
+                <div class="parts-grid" id="h2-parts"><span style="font-size: 0.65rem; color: #666;">${t('none')}</span></div>
+            </div>
+            <div class="hud-btns">
+                <button class="hud-btn" id="btn-home-p2" title="${t('home')}">🏠</button>
+                <button class="hud-btn" id="btn-pause-p2" title="Pause">⏸️</button>
+            </div>
+        </div>
+        <div class="hud-bottom">
+            <div class="stage-bar">
+                <div class="stage-row">
+                    <span class="stage-cur">🦎 ${t('stage2')}</span>
+                    <span class="stage-next">${t('sky')}: <span id="h2-stageP">0/3000</span></span>
+                </div>
+                <div class="progress-track"><div class="progress-fill stage" id="h2-stageB" style="width: 0%;"></div></div>
+            </div>
+        </div>
+        <div class="controls">
+            <div class="joystick" id="joystick"><div class="joy-base"></div><div class="joy-knob" id="joy-knob"></div></div>
+            <button class="action-btn" id="btn-jump" title="Jump">🦘</button>
+        </div>
+        <div class="modal" id="modal-p2-gameover">
+            <div class="modal-box">
+                <div class="modal-icon">💀</div>
+                <h2 class="modal-title fail">${t('p2Gameover')}</h2>
+                <p class="modal-desc">${t('p2GameoverDesc')}</p>
+                <div class="modal-stats">
+                    <div class="stat-row"><span class="stat-label">${t('maxHeight')}</span><span class="stat-val" id="p2go-height">0</span></div>
+                    <div class="stat-row"><span class="stat-label">${t('score')}</span><span class="stat-val" id="p2go-score">0</span></div>
+                </div>
+                <div class="modal-btns">
+                    <button class="btn btn-primary btn-block" id="btn-p2-retry">🔄 ${t('retry')}</button>
+                    <button class="btn btn-outline btn-block" id="btn-p2-home">🏠 ${t('home')}</button>
+                </div>
+            </div>
+        </div>
+        <div class="modal" id="modal-p2-clear">
+            <div class="modal-box">
+                <div class="modal-icon">🎉</div>
+                <h2 class="modal-title win">${t('p2Clear')}</h2>
+                <p class="modal-desc">${t('p2ClearDesc')}</p>
+                <div class="modal-stats">
+                    <div class="stat-row"><span class="stat-label">${t('maxHeight')}</span><span class="stat-val" id="p2cl-height">0</span></div>
+                    <div class="stat-row"><span class="stat-label">${t('parts')}</span><span class="stat-val" id="p2cl-parts">0</span></div>
+                </div>
+                <div class="modal-btns">
+                    <button class="btn btn-primary btn-block" id="btn-p2-next">🦖 Phase 3! (Coming Soon)</button>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    // 게임 초기화
+    platforms = [];
+    p2Obstacles = [];
+    cameraY = 0;
+    highestY = 0;
+    p2Time = 0;
+    canDoubleJump = false;
+    hasDoubleJumped = false;
+    onGround = false;
+    
+    createP2Player();
+    generateInitialPlatforms();
+    setupP2Controls();
+    setupP2HUD();
+    
+    gameLoop = delta => updateP2Game(delta);
+    pixiApp.ticker.add(gameLoop);
+    p2GameRunning = true;
+}
+
+function createP2Player() {
+    p2Player = new PIXI.Container();
+    p2Player.x = pixiApp.screen.width / 2;
+    p2Player.y = pixiApp.screen.height - 150;
+    p2Player.width_val = 30;
+    p2Player.height_val = 40;
+    p2Player.vx = 0;
+    p2Player.vy = 0;
+    p2Player.worldY = 0;
+    
+    const body = new PIXI.Graphics();
+    p2Player.body = body;
+    p2Player.addChild(body);
+    
+    drawP2Player();
+    pixiApp.stage.addChild(p2Player);
+}
+
+function drawP2Player() {
+    const gfx = p2Player.body;
+    const w = p2Player.width_val;
+    const h = p2Player.height_val;
+    const primary = parseInt(currentEnv.colors.primary.replace('#', '0x'));
+    const secondary = parseInt(currentEnv.colors.secondary.replace('#', '0x'));
+    const t = p2Time;
+    
+    gfx.clear();
+    
+    // 몸통
+    gfx.beginFill(primary, 0.9);
+    gfx.drawRoundedRect(-w/2, -h/2, w, h, 8);
+    gfx.endFill();
+    
+    // 배
+    gfx.beginFill(secondary, 0.5);
+    gfx.drawRoundedRect(-w/3, -h/4, w*0.6, h*0.6, 5);
+    gfx.endFill();
+    
+    // 눈
+    gfx.beginFill(0xffffff);
+    gfx.drawCircle(-w*0.15, -h*0.2, 6);
+    gfx.drawCircle(w*0.15, -h*0.2, 6);
+    gfx.endFill();
+    
+    gfx.beginFill(0x000000);
+    gfx.drawCircle(-w*0.12, -h*0.2, 3);
+    gfx.drawCircle(w*0.18, -h*0.2, 3);
+    gfx.endFill();
+    
+    // 다리 (애니메이션)
+    const legWave = Math.sin(t * 8) * 3;
+    gfx.beginFill(primary);
+    gfx.drawRoundedRect(-w*0.4, h*0.3 + legWave, 10, 15, 3);
+    gfx.drawRoundedRect(w*0.2, h*0.3 - legWave, 10, 15, 3);
+    gfx.endFill();
+    
+    // 날개 (파츠가 있으면)
+    if (GameState.p2Parts.wing > 0) {
+        gfx.beginFill(0xffffff, 0.7);
+        const wingFlap = Math.sin(t * 10) * 10;
+        gfx.moveTo(-w*0.5, 0);
+        gfx.lineTo(-w - 10, -10 + wingFlap);
+        gfx.lineTo(-w*0.5, -15);
+        gfx.closePath();
+        gfx.moveTo(w*0.5, 0);
+        gfx.lineTo(w + 10, -10 - wingFlap);
+        gfx.lineTo(w*0.5, -15);
+        gfx.closePath();
+        gfx.endFill();
+    }
+    
+    // 껍질 (파츠가 있으면)
+    if (GameState.p2Parts.shell > 0) {
+        gfx.lineStyle(3, 0x8B4513);
+        gfx.drawRoundedRect(-w/2 - 3, -h/2 - 3, w + 6, h + 6, 10);
+        gfx.lineStyle(0);
+    }
+}
+
+function generateInitialPlatforms() {
+    // 시작 플랫폼
+    const startPlatform = createPlatform(pixiApp.screen.width / 2, pixiApp.screen.height - 100, 200);
+    platforms.push(startPlatform);
+    pixiApp.stage.addChild(startPlatform);
+    
+    // 위로 플랫폼 생성
+    let lastY = pixiApp.screen.height - 100;
+    for (let i = 0; i < 15; i++) {
+        const gap = CONFIG.P2_PLATFORM_MIN_GAP + Math.random() * (CONFIG.P2_PLATFORM_MAX_GAP - CONFIG.P2_PLATFORM_MIN_GAP);
+        lastY -= gap;
+        const x = 50 + Math.random() * (pixiApp.screen.width - 100);
+        const width = 60 + Math.random() * 100;
+        const platform = createPlatform(x, lastY, width);
+        platforms.push(platform);
+        pixiApp.stage.addChild(platform);
+    }
+}
+
+function createPlatform(x, y, width) {
+    const platform = new PIXI.Container();
+    platform.x = x;
+    platform.worldY = y;
+    platform.width_val = width;
+    platform.height_val = 20;
+    
+    const gfx = new PIXI.Graphics();
+    
+    // 메인 플랫폼
+    gfx.beginFill(0x8B4513);
+    gfx.drawRoundedRect(-width/2, 0, width, 20, 5);
+    gfx.endFill();
+    
+    // 잔디
+    gfx.beginFill(0x228B22);
+    gfx.drawRoundedRect(-width/2, -5, width, 10, 5);
+    gfx.endFill();
+    
+    platform.addChild(gfx);
+    return platform;
+}
+
+function setupP2Controls() {
+    const joy = document.getElementById('joystick');
+    const knob = document.getElementById('joy-knob');
+    
+    if (!joy || !knob) return;
+    
+    const handleMove = (clientX, clientY) => {
+        const rect = joy.getBoundingClientRect();
+        const centerX = rect.left + rect.width / 2;
+        const maxDist = rect.width / 2 - 25;
+        
+        let dx = clientX - centerX;
+        if (Math.abs(dx) > maxDist) dx = dx > 0 ? maxDist : -maxDist;
+        
+        knob.style.transform = `translate(${dx}px, 0)`;
+        joyPos = { x: dx / maxDist, y: 0 };
+    };
+    
+    const handleEnd = () => {
+        joyActive = false;
+        joy.classList.remove('active');
+        knob.style.transform = '';
+        joyPos = { x: 0, y: 0 };
+    };
+    
+    joy.addEventListener('touchstart', e => { e.preventDefault(); joyActive = true; joy.classList.add('active'); handleMove(e.touches[0].clientX, e.touches[0].clientY); }, { passive: false });
+    joy.addEventListener('touchmove', e => { e.preventDefault(); if (joyActive) handleMove(e.touches[0].clientX, e.touches[0].clientY); }, { passive: false });
+    joy.addEventListener('touchend', handleEnd);
+    joy.addEventListener('mousedown', e => { joyActive = true; joy.classList.add('active'); handleMove(e.clientX, e.clientY); });
+    window.addEventListener('mousemove', e => { if (joyActive) handleMove(e.clientX, e.clientY); });
+    window.addEventListener('mouseup', handleEnd);
+    
+    keys = {};
+    window.addEventListener('keydown', e => { 
+        keys[e.key.toLowerCase()] = true; 
+        if (e.key === ' ' || e.key === 'w' || e.key === 'ArrowUp') {
+            e.preventDefault();
+            tryJump();
+        }
+    });
+    window.addEventListener('keyup', e => { keys[e.key.toLowerCase()] = false; });
+    
+    const jumpBtn = document.getElementById('btn-jump');
+    if (jumpBtn) jumpBtn.onclick = tryJump;
+}
+
+function tryJump() {
+    if (!p2GameRunning) return;
+    
+    canDoubleJump = GameState.p2Parts.wing > 0;
+    
+    if (onGround) {
+        p2Player.vy = -CONFIG.P2_JUMP_POWER;
+        onGround = false;
+        hasDoubleJumped = false;
+    } else if (canDoubleJump && !hasDoubleJumped) {
+        p2Player.vy = -CONFIG.P2_JUMP_POWER * 0.8;
+        hasDoubleJumped = true;
+    }
+}
+
+function setupP2HUD() {
+    const t = GameState.t.bind(GameState);
+    
+    document.getElementById('btn-home-p2').onclick = () => {
+        if (confirm(t('confirmHome'))) {
+            p2GameRunning = false;
+            if (gameLoop && pixiApp) pixiApp.ticker.remove(gameLoop);
+            showTitle();
+        }
+    };
+    
+    document.getElementById('btn-pause-p2').onclick = () => {
+        p2GameRunning = !p2GameRunning;
+        document.getElementById('btn-pause-p2').textContent = p2GameRunning ? '⏸️' : '▶️';
+    };
+    
+    document.getElementById('btn-p2-retry').onclick = () => {
+        document.getElementById('modal-p2-gameover').classList.remove('show');
+        startPhase2();
+    };
+    
+    document.getElementById('btn-p2-home').onclick = () => {
+        document.getElementById('modal-p2-gameover').classList.remove('show');
+        if (gameLoop && pixiApp) pixiApp.ticker.remove(gameLoop);
+        showTitle();
+    };
+    
+    document.getElementById('btn-p2-next').onclick = () => {
+        alert('Phase 3 Coming Soon!');
+    };
+}
+
+function updateP2HUD() {
+    const t = GameState.t.bind(GameState);
+    const lang = GameState.currentLang;
+    
+    document.getElementById('h2-height').textContent = Math.floor(GameState.height);
+    document.getElementById('h2-score').textContent = GameState.score;
+    document.getElementById('h2-stageB').style.width = `${Math.min(100, (GameState.score / CONFIG.P2_STAGE_THRESHOLD) * 100)}%`;
+    document.getElementById('h2-stageP').textContent = `${GameState.score}/${CONFIG.P2_STAGE_THRESHOLD}`;
+    
+    let partsHtml = '';
+    Object.keys(BODY_PARTS_P2).forEach(k => {
+        if (GameState.p2Parts[k] > 0) {
+            partsHtml += `<div class="part-badge active"><span>${BODY_PARTS_P2[k].icon}</span><span class="part-cnt">×${GameState.p2Parts[k]}</span></div>`;
+        }
+    });
+    document.getElementById('h2-parts').innerHTML = partsHtml || `<span style="font-size: 0.65rem; color: #666;">${t('none')}</span>`;
+}
+
+function updateP2Game(delta) {
+    if (!p2GameRunning || !p2Player) return;
+    
+    p2Time += delta * 0.016;
+    
+    // 좌우 이동
+    let ix = joyPos.x;
+    if (keys.a || keys.arrowleft) ix = -1;
+    if (keys.d || keys.arrowright) ix = 1;
+    
+    p2Player.vx = ix * CONFIG.P2_MOVE_SPEED;
+    
+    // 중력 적용
+    p2Player.vy += CONFIG.P2_GRAVITY;
+    if (p2Player.vy > 15) p2Player.vy = 15;
+    
+    // 위치 업데이트
+    p2Player.x += p2Player.vx;
+    p2Player.worldY += p2Player.vy;
+    
+    // 화면 경계
+    if (p2Player.x < p2Player.width_val/2) p2Player.x = p2Player.width_val/2;
+    if (p2Player.x > pixiApp.screen.width - p2Player.width_val/2) p2Player.x = pixiApp.screen.width - p2Player.width_val/2;
+    
+    // 카메라 추적 (플레이어가 화면 상단 40%에 있을 때)
+    const targetScreenY = pixiApp.screen.height * 0.4;
+    if (p2Player.worldY < cameraY + targetScreenY) {
+        cameraY = p2Player.worldY - targetScreenY;
+    }
+    
+    // 높이 계산 (시작점 기준)
+    const startY = pixiApp.screen.height - 150;
+    GameState.height = Math.max(0, Math.floor((startY - p2Player.worldY) / 10));
+    if (GameState.height > GameState.maxHeight) {
+        const diff = GameState.height - GameState.maxHeight;
+        GameState.score += diff * 2;
+        GameState.maxHeight = GameState.height;
+        
+        // 파츠 획득 체크
+        checkP2PartEvolution();
+    }
+    
+    // 플레이어 화면 위치
+    p2Player.y = p2Player.worldY - cameraY;
+    
+    // 플랫폼 업데이트
+    onGround = false;
+    platforms.forEach(platform => {
+        platform.y = platform.worldY - cameraY;
+        
+        // 충돌 체크 (위에서 아래로 떨어질 때만)
+        if (p2Player.vy > 0) {
+            const playerBottom = p2Player.worldY + p2Player.height_val/2;
+            const playerTop = p2Player.worldY - p2Player.height_val/2;
+            const platformTop = platform.worldY;
+            
+            if (playerBottom >= platformTop && playerTop < platformTop) {
+                if (p2Player.x > platform.x - platform.width_val/2 - 10 && 
+                    p2Player.x < platform.x + platform.width_val/2 + 10) {
+                    p2Player.worldY = platformTop - p2Player.height_val/2;
+                    p2Player.vy = 0;
+                    onGround = true;
+                    hasDoubleJumped = false;
+                }
+            }
+        }
+    });
+    
+    // 새 플랫폼 생성
+    const topPlatformY = Math.min(...platforms.map(p => p.worldY));
+    while (topPlatformY > cameraY - pixiApp.screen.height) {
+        const lastY = Math.min(...platforms.map(p => p.worldY));
+        const gap = CONFIG.P2_PLATFORM_MIN_GAP + Math.random() * (CONFIG.P2_PLATFORM_MAX_GAP - CONFIG.P2_PLATFORM_MIN_GAP);
+        const newY = lastY - gap;
+        const x = 50 + Math.random() * (pixiApp.screen.width - 100);
+        const width = 60 + Math.random() * 100;
+        const platform = createPlatform(x, newY, width);
+        platforms.push(platform);
+        pixiApp.stage.addChild(platform);
+        break;
+    }
+    
+    // 화면 아래로 벗어난 플랫폼 제거
+    for (let i = platforms.length - 1; i >= 0; i--) {
+        if (platforms[i].worldY > cameraY + pixiApp.screen.height + 100) {
+            pixiApp.stage.removeChild(platforms[i]);
+            platforms.splice(i, 1);
+        }
+    }
+    
+    // 배경 그라데이션 (높이에 따라)
+    const heightRatio = Math.min(1, GameState.height / 300);
+    const r = Math.floor(135 - heightRatio * 80);
+    const g = Math.floor(206 - heightRatio * 100);
+    const b = Math.floor(235 - heightRatio * 50);
+    pixiApp.renderer.background.color = (r << 16) | (g << 8) | b;
+    
+    // 게임오버 체크 (화면 아래로 떨어짐)
+    if (p2Player.y > pixiApp.screen.height + 100) {
+        p2GameOver();
+        return;
+    }
+    
+    // 클리어 체크
+    if (GameState.score >= CONFIG.P2_STAGE_THRESHOLD) {
+        p2StageClear();
+        return;
+    }
+    
+    drawP2Player();
+    updateP2HUD();
+}
+
+function checkP2PartEvolution() {
+    const lang = GameState.currentLang;
+    const thresholds = [50, 100, 150, 200]; // 높이 기준
+    const totalParts = Object.values(GameState.p2Parts).reduce((a, b) => a + b, 0);
+    
+    if (totalParts < 4 && GameState.maxHeight >= thresholds[totalParts]) {
+        const available = Object.keys(BODY_PARTS_P2).filter(k => GameState.p2Parts[k] < BODY_PARTS_P2[k].max);
+        if (available.length === 0) return;
+        
+        const key = available[Math.floor(Math.random() * available.length)];
+        GameState.p2Parts[key]++;
+        
+        const part = BODY_PARTS_P2[key];
+        showEvolution(part.icon, `${part.name[lang]} ${GameState.t('acquired')}`, `${part.name[lang]} ×${GameState.p2Parts[key]}`, part.fx[lang]);
+    }
+}
+
+function p2GameOver() {
+    p2GameRunning = false;
+    document.getElementById('p2go-height').textContent = GameState.maxHeight;
+    document.getElementById('p2go-score').textContent = GameState.score;
+    document.getElementById('modal-p2-gameover').classList.add('show');
+}
+
+function p2StageClear() {
+    p2GameRunning = false;
+    GameState.phase2Clear = true;
+    GameState.save();
+    
+    const totalParts = Object.values(GameState.p2Parts).reduce((a, b) => a + b, 0);
+    document.getElementById('p2cl-height').textContent = GameState.maxHeight;
+    document.getElementById('p2cl-parts').textContent = totalParts;
+    document.getElementById('modal-p2-clear').classList.add('show');
+}
+
+// ========================================
+// Initialize
+// ========================================
+document.addEventListener('DOMContentLoaded', () => {
+    setTimeout(() => {
+        document.getElementById('loading').classList.add('fade-out');
+        setTimeout(showTitle, 500);
+    }, 800);
+});
+    </script>
+</body>
+</html> += (Math.random() - 0.5) * 0.1;
         enemy.x += Math.cos(enemy.angle) * enemy.speed * 0.3;
         enemy.y += Math.sin(enemy.angle) * enemy.speed * 0.3;
         
