@@ -3,9 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>BOKLUCK Universe v1.4</title>
+    <title>BOKLUCK Universe v1.5</title>
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎲</text></svg>">
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Noto+Sans+KR:wght@400;700&display=swap" rel="stylesheet">
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
     <style>
 /* ========================================
    BOKLUCK Universe - Styles
@@ -213,6 +217,131 @@ body { background: var(--void); color: var(--text-primary); font-family: 'Noto S
 // BOKLUCK Universe - Configuration
 // ========================================
 
+// Firebase 초기화
+const firebaseConfig = {
+    apiKey: "AIzaSyBwQjuqgWM4YKnqu_gzNbeCg5alrC-jVcQ",
+    authDomain: "myco-737a0.firebaseapp.com",
+    projectId: "myco-737a0",
+    storageBucket: "myco-737a0.firebasestorage.app",
+    messagingSenderId: "942571332540",
+    appId: "1:942571332540:web:be0bb6fbdd32655501c1b9"
+};
+
+// Firebase 앱 초기화
+let firebaseApp, auth, db;
+try {
+    firebaseApp = firebase.initializeApp(firebaseConfig);
+    auth = firebase.auth();
+    db = firebase.firestore();
+    console.log('🔥 Firebase 초기화 완료');
+} catch (e) {
+    console.warn('Firebase 초기화 실패:', e);
+}
+
+// 현재 사용자 상태
+const Auth = {
+    user: null,
+    isGuest: false,
+    
+    // 구글 로그인
+    async loginWithGoogle() {
+        try {
+            const provider = new firebase.auth.GoogleAuthProvider();
+            const result = await auth.signInWithPopup(provider);
+            this.user = result.user;
+            this.isGuest = false;
+            await this.saveUserToFirestore();
+            return { success: true, user: this.user };
+        } catch (e) {
+            console.error('구글 로그인 실패:', e);
+            return { success: false, error: e.message };
+        }
+    },
+    
+    // 게스트 로그인
+    loginAsGuest() {
+        this.user = { 
+            uid: 'guest_' + Date.now(),
+            displayName: '게스트',
+            isGuest: true
+        };
+        this.isGuest = true;
+        return { success: true, user: this.user };
+    },
+    
+    // 로그아웃
+    async logout() {
+        try {
+            if (!this.isGuest) await auth.signOut();
+            this.user = null;
+            this.isGuest = false;
+            return { success: true };
+        } catch (e) {
+            return { success: false, error: e.message };
+        }
+    },
+    
+    // Firestore에 사용자 정보 저장
+    async saveUserToFirestore() {
+        if (!this.user || this.isGuest || !db) return;
+        try {
+            await db.collection('users').doc(this.user.uid).set({
+                uid: this.user.uid,
+                displayName: this.user.displayName,
+                email: this.user.email,
+                photoURL: this.user.photoURL,
+                lastLogin: firebase.firestore.FieldValue.serverTimestamp(),
+                createdAt: firebase.firestore.FieldValue.serverTimestamp()
+            }, { merge: true });
+        } catch (e) {
+            console.error('사용자 정보 저장 실패:', e);
+        }
+    },
+    
+    // 게임 진행상황 저장
+    async saveProgress(data) {
+        if (!this.user || this.isGuest || !db) return;
+        try {
+            await db.collection('users').doc(this.user.uid).collection('saves').doc('current').set({
+                ...data,
+                updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+            });
+            // 통계 업데이트
+            await db.collection('users').doc(this.user.uid).update({
+                lastStage: data.stage,
+                lastRunnerStage: data.runnerStage || 0,
+                totalScore: data.score || 0,
+                lastPlayed: firebase.firestore.FieldValue.serverTimestamp()
+            });
+        } catch (e) {
+            console.error('진행상황 저장 실패:', e);
+        }
+    },
+    
+    // 게임 진행상황 불러오기
+    async loadProgress() {
+        if (!this.user || this.isGuest || !db) return null;
+        try {
+            const doc = await db.collection('users').doc(this.user.uid).collection('saves').doc('current').get();
+            return doc.exists ? doc.data() : null;
+        } catch (e) {
+            console.error('진행상황 불러오기 실패:', e);
+            return null;
+        }
+    }
+};
+
+// 인증 상태 감시
+if (auth) {
+    auth.onAuthStateChanged(user => {
+        if (user) {
+            Auth.user = user;
+            Auth.isGuest = false;
+            console.log('🔐 로그인됨:', user.displayName);
+        }
+    });
+}
+
 const CONFIG = {
     GROWTH_THRESHOLD: 15,
     STAGE_THRESHOLD: 2000,
@@ -371,13 +500,13 @@ const ENVS = [
 
 // 러너 스테이지 (7단계)
 const RUNNER_STAGES = [
-    { id: 'forest', name: '🌲 원시의 숲', dist: CONFIG.RUNNER_STAGE_DIST, bgColors: ['#1a3a1a', '#0a2a0a'], groundColor: '#3d2817', obstacles: ['🪨', '🌳'], baseSpeed: 2 },
-    { id: 'fire', name: '🔥 불의 발견', dist: CONFIG.RUNNER_STAGE_DIST, bgColors: ['#2a1a1a', '#1a0a0a'], groundColor: '#4a3020', obstacles: ['🌋', '💀'], baseSpeed: 2.5 },
-    { id: 'tools', name: '🔧 도구의 시대', dist: CONFIG.RUNNER_STAGE_DIST, bgColors: ['#2a2a2a', '#1a1a1a'], groundColor: '#3a3a3a', obstacles: ['🗿', '🪨'], baseSpeed: 3 },
-    { id: 'civilization', name: '🏛️ 고대 문명', dist: CONFIG.RUNNER_STAGE_DIST, bgColors: ['#3a2a1a', '#2a1a0a'], groundColor: '#5a4a3a', obstacles: ['🏛️', '🏺'], baseSpeed: 3.5 },
-    { id: 'industry', name: '🏭 산업 혁명', dist: CONFIG.RUNNER_STAGE_DIST, bgColors: ['#2a2a3a', '#1a1a2a'], groundColor: '#4a4a5a', obstacles: ['⚙️', '🏗️'], baseSpeed: 4 },
-    { id: 'modern', name: '🌆 현대 사회', dist: CONFIG.RUNNER_STAGE_DIST, bgColors: ['#1a2a3a', '#0a1a2a'], groundColor: '#3a4a5a', obstacles: ['🚗', '🚧'], baseSpeed: 4.5 },
-    { id: 'future', name: '🛸 초첨단 미래', dist: CONFIG.RUNNER_STAGE_DIST, bgColors: ['#0a0a2a', '#050515'], groundColor: '#1a1a3a', obstacles: ['🤖', '⚡'], baseSpeed: 5 }
+    { id: 'forest', name: '🌲 원시의 숲', dist: 350, bgColors: ['#1a3a1a', '#0a2a0a'], groundColor: '#3d2817', obstacles: ['🪨', '🌳'], baseSpeed: 2 },
+    { id: 'fire', name: '🔥 불의 발견', dist: 400, bgColors: ['#2a1a1a', '#1a0a0a'], groundColor: '#4a3020', obstacles: ['🌋', '💀'], baseSpeed: 2.5 },
+    { id: 'tools', name: '🔧 도구의 시대', dist: 450, bgColors: ['#2a2a2a', '#1a1a1a'], groundColor: '#3a3a3a', obstacles: ['🗿', '🪨'], baseSpeed: 3 },
+    { id: 'civilization', name: '🏛️ 고대 문명', dist: 500, bgColors: ['#3a2a1a', '#2a1a0a'], groundColor: '#5a4a3a', obstacles: ['🏛️', '🏺'], baseSpeed: 3.5 },
+    { id: 'industry', name: '🏭 산업 혁명', dist: 550, bgColors: ['#2a2a3a', '#1a1a2a'], groundColor: '#4a4a5a', obstacles: ['⚙️', '🏗️'], baseSpeed: 4 },
+    { id: 'modern', name: '🌆 현대 사회', dist: 600, bgColors: ['#1a2a3a', '#0a1a2a'], groundColor: '#3a4a5a', obstacles: ['🚗', '🚧'], baseSpeed: 4.5 },
+    { id: 'future', name: '🛸 초첨단 미래', dist: 650, bgColors: ['#0a0a2a', '#050515'], groundColor: '#1a1a3a', obstacles: ['🤖', '⚡'], baseSpeed: 5 }
 ];
 
 // 헬퍼 함수들
@@ -616,6 +745,11 @@ const saveGame = () => {
         G.data.playTime += Date.now() - G.start;
         G.start = Date.now();
         Save.set(G.slot, G.data);
+        
+        // Firebase에도 저장 (로그인 사용자만)
+        if (Auth && Auth.user && !Auth.isGuest) {
+            Auth.saveProgress(G.data);
+        }
     }
 };
 
@@ -2804,8 +2938,15 @@ const openEvoEditor = (isNew = false) => {
             const trait = traits.find(t => t.id === et.id) || getTraitById(et.id);
             if (!trait) return;
             
-            const px = et.x * w;
-            const py = et.y * h;
+            // relX, relY가 있으면 bodySize 기준 좌표 사용 (캐릭터 크기 변해도 정확)
+            let px, py;
+            if (et.relX !== undefined && et.relY !== undefined) {
+                px = cx + et.relX * bodySize;
+                py = cy + et.relY * bodySize;
+            } else {
+                px = et.x * w;
+                py = et.y * h;
+            }
             const scale = et.scale || 1;
             const flipX = et.flipX ? -1 : 1;
             
@@ -2840,10 +2981,21 @@ const openEvoEditor = (isNew = false) => {
     
     const getPartAt = (x, y) => {
         const traits = G.data.evoTraits || [];
+        const cx = cvs.width / 2;
+        const cy = cvs.height / 2;
+        const bodySize = getEditorBodySize();
+        
         for (let i = traits.length - 1; i >= 0; i--) {
             const et = traits[i];
-            const px = et.x * cvs.width;
-            const py = et.y * cvs.height;
+            // relX, relY 우선 사용
+            let px, py;
+            if (et.relX !== undefined && et.relY !== undefined) {
+                px = cx + et.relX * bodySize;
+                py = cy + et.relY * bodySize;
+            } else {
+                px = et.x * cvs.width;
+                py = et.y * cvs.height;
+            }
             const scale = et.scale || 1;
             if (Math.abs(x - px) < 30 * scale && Math.abs(y - py) < 30 * scale) return i;
         }
@@ -2860,8 +3012,20 @@ const openEvoEditor = (isNew = false) => {
             selectedPart = idx;
             isDragging = true;
             const et = G.data.evoTraits[idx];
-            dragOffset.x = x - et.x * cvs.width;
-            dragOffset.y = y - et.y * cvs.height;
+            const cx = cvs.width / 2;
+            const cy = cvs.height / 2;
+            const bodySize = getEditorBodySize();
+            // relX, relY 기준으로 오프셋 계산
+            let px, py;
+            if (et.relX !== undefined && et.relY !== undefined) {
+                px = cx + et.relX * bodySize;
+                py = cy + et.relY * bodySize;
+            } else {
+                px = et.x * cvs.width;
+                py = et.y * cvs.height;
+            }
+            dragOffset.x = x - px;
+            dragOffset.y = y - py;
             updateSelectedInfo();
         } else {
             selectedPart = null;
@@ -3412,13 +3576,18 @@ const drawRunnerChar = groundY => {
         const trait = traits.find(t => t.id === et.id) || getTraitById(et.id);
         if (!trait) return;
         
-        // 에디터와 동일한 좌표 계산
-        // 에디터: bodySize = min(w,h) * 0.15 * charScale
-        // 게임: bodyW = baseW/2 * totalScale (totalScale = charScale + evoBonus)
-        // 따라서 게임에서는 totalScale을 사용해야 정확함
-        const editorBodyRatio = 0.15;
-        const px = (et.x - 0.5) / (editorBodyRatio * totalScale) * bodyW;
-        const py = (et.y - 0.5) / (editorBodyRatio * totalScale) * bodyH;
+        // relX, relY가 있으면 bodySize 기준 상대좌표 사용 (정확함)
+        // 없으면 기존 캔버스 비율 방식 사용 (호환성)
+        let px, py;
+        if (et.relX !== undefined && et.relY !== undefined) {
+            px = et.relX * bodyW;
+            py = et.relY * bodyH;
+        } else {
+            // 기존 방식 (호환성)
+            const editorBodyRatio = 0.15;
+            px = (et.x - 0.5) / (editorBodyRatio * totalScale) * bodyW;
+            py = (et.y - 0.5) / (editorBodyRatio * totalScale) * bodyH;
+        }
         
         const scale = et.scale || 1;
         const flipX = et.flipX ? -1 : 1;
@@ -3539,22 +3708,10 @@ const runnerStageComplete = () => {
         showEvo('🧬', '스테이지 클리어!', `${stage.name} 완료!`, `${runnerStage + 2}단계로...`);
         setTimeout(() => startRunner(), 2500);
     } else {
-        G.data.stage = 4;
+        // 마지막 스테이지 클리어 - 엔딩 스토리로
         saveGame();
-        
-        app.innerHTML = `
-            <div class="modal"><div class="modal-box">
-                <div class="modal-icon">🎉</div>
-                <h1 class="modal-title win">문명 완성!</h1>
-                <p class="modal-desc">당신은 미생물에서 시작하여<br>마침내 문명을 이루었습니다!</p>
-                <div class="modal-stats">
-                    <div class="stat-row"><span class="stat-label">최종 점수</span><span class="stat-val">${G.data.score}</span></div>
-                    <div class="stat-row"><span class="stat-label">획득 특성</span><span class="stat-val">${G.data.evoTraits?.length || 0}개</span></div>
-                </div>
-                <button class="btn btn-energy btn-block" id="btn-home">🏠 홈으로</button>
-            </div></div>
-        `;
-        document.getElementById('btn-home').onclick = () => { Audio.playClick(); renderSaves(); };
+        showEvo('🎉', '문명 완성!', '모든 진화를 마쳤습니다!', '');
+        setTimeout(() => renderStory('ending'), 2500);
     }
 };
 // ========================================
@@ -3582,6 +3739,13 @@ const STORIES = {
         { icon: '🏃', title: '육지 도착!', text: '마침내 <span class="hl">육지</span>에 도착했다!' },
         { icon: '🎲', title: '진화의 주사위', text: '달리면서 <span class="gold">🎲 주사위</span>를 모아라!<br>51 이상이면 <span class="hl">새로운 특성</span>을 얻는다!' },
         { icon: '✋', title: '커스터마이즈', text: '획득한 파츠는 <span class="gold">드래그</span>해서<br>원하는 위치에 배치할 수 있다!' }
+    ],
+    ending: [
+        { icon: '🛸', title: '초첨단 문명 달성!', text: '당신은 <span class="hl">하나의 세포</span>에서 시작해<br><span class="gold">별을 넘나드는 문명</span>을 이룩했다.' },
+        { icon: '📖', title: '프롤로그의 끝', text: '하지만 지금까지의 여정은...<br><span class="hl">진짜 시작을 위한 이야기</span>에 불과했다.' },
+        { icon: '🚀', title: '우주선 탑승', text: '이제 <span class="gold">우주선</span>을 타고<br>광활한 우주로 나아갈 시간.' },
+        { icon: '✨', title: '당신의 이야기', text: '앞으로의 여행은<br><span class="hl">여러분이 직접</span> 만들어 나갑니다.' },
+        { icon: '🌌', title: 'BOKLUCK Universe', text: '<span class="gold">운</span>과 <span class="hl">복</span>이 함께하는<br>당신만의 우주 이야기가 시작됩니다.' }
     ]
 };
 
@@ -3596,6 +3760,7 @@ const renderStory = (id, done = null) => {
         if (last) {
             if (id === 'multi') btnText = '🎲 아이템 주사위!';
             else if (id === 'runner') btnText = '🏃 달리기!';
+            else if (id === 'ending') btnText = '🚀 우주로 출발!';
             else btnText = '시작하기 →';
         }
         
@@ -3617,6 +3782,7 @@ const renderStory = (id, done = null) => {
                 else if (id === 'afterBirth') { G.data.tutDone = true; saveGame(); startCellWorld(); }
                 else if (id === 'multi') showClimbDice(); // 스테이지2 주사위
                 else if (id === 'runner') startRunner();
+                else if (id === 'ending') { G.data.stage = 4; G.data.endingCleared = true; saveGame(); renderSpaceHub(); }
             } else {
                 idx++;
                 render();
@@ -3851,7 +4017,7 @@ window.handleLoad = i => {
     else if (G.data.stage === 1) startCellWorld();
     else if (G.data.stage === 2) showClimbDice();
     else if (G.data.stage === 3) startRunner();
-    else if (G.data.stage === 4) { toast('이미 클리어한 세이브입니다!', 'success'); renderSaves(); }
+    else if (G.data.stage === 4) renderSpaceHub();
     else renderDice();
 };
 window.handleDel = i => { Audio.playClick(); if (confirm('정말 삭제?')) { Save.del(i); renderSaves(); } };
@@ -3899,13 +4065,146 @@ const renderSettings = () => {
     document.getElementById('btn-close').onclick = () => { Audio.playClick(); renderTitle(); };
 };
 
+// 우주 기지 (엔딩 후 메인 페이지)
+const renderSpaceHub = () => {
+    const points = G.data.points || 0;
+    const name = G.data.name || '탐험가';
+    
+    app.innerHTML = `
+        <div style="position:fixed;inset:0;display:flex;flex-direction:column;overflow:hidden;">
+            <!-- 상단 바 -->
+            <div style="padding:calc(12px + var(--safe-top)) 16px 12px;background:linear-gradient(180deg, rgba(0,0,0,0.8) 0%, transparent 100%);display:flex;justify-content:space-between;align-items:center;">
+                <div>
+                    <div style="font-family:Orbitron;font-size:0.9rem;color:var(--neon-cyan);">${name}</div>
+                    <div style="font-size:0.7rem;color:var(--text-muted);">우주 탐험가</div>
+                </div>
+                <div style="text-align:right;">
+                    <div style="font-family:Orbitron;font-size:1.1rem;color:var(--neon-pink);">💎 ${points.toLocaleString()}</div>
+                    <div style="font-size:0.65rem;color:var(--text-muted);">포인트</div>
+                </div>
+            </div>
+            
+            <!-- 우주 기지 이미지 영역 -->
+            <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px;">
+                <div style="font-size:5rem;margin-bottom:16px;filter:drop-shadow(0 0 30px rgba(0,245,212,0.5));">🛸</div>
+                <h1 style="font-family:Orbitron;font-size:1.5rem;color:var(--text-primary);margin-bottom:8px;">우주 정거장</h1>
+                <p style="color:var(--text-secondary);font-size:0.85rem;text-align:center;max-width:280px;line-height:1.6;">
+                    프롤로그를 완료했습니다!<br>
+                    <span style="color:var(--neon-cyan);">본편 콘텐츠</span>가 곧 업데이트됩니다.
+                </p>
+            </div>
+            
+            <!-- 메뉴 버튼들 -->
+            <div style="padding:16px;padding-bottom:calc(16px + var(--safe-bottom));display:flex;flex-direction:column;gap:10px;max-width:320px;margin:0 auto;width:100%;">
+                <button class="btn btn-energy btn-block" id="btn-minigame" style="opacity:0.5;" disabled>🎮 미니게임 (준비중)</button>
+                <button class="btn btn-outline btn-block" id="btn-invite" style="opacity:0.5;" disabled>👥 친구 초대 (준비중)</button>
+                <button class="btn btn-outline btn-block" id="btn-shop" style="opacity:0.5;" disabled>🏪 상점 (준비중)</button>
+                <button class="btn btn-ghost btn-block" id="btn-back">← 타이틀로</button>
+            </div>
+            
+            <!-- 하단 안내 -->
+            <div style="text-align:center;padding:12px;font-size:0.7rem;color:var(--text-muted);">
+                🚧 우주선 탑승, 함대 지휘, PvP 등 본편 콘텐츠 개발 중
+            </div>
+        </div>
+    `;
+    
+    document.getElementById('btn-back').onclick = () => { Audio.playClick(); renderTitle(); };
+};
+
+// 로그인 화면
+const renderLogin = () => {
+    app.innerHTML = `
+        <div class="page-center"><div class="page-content" style="max-width:320px;">
+            <div class="page-icon">🎲</div>
+            <h1 style="font-family:Orbitron;font-size:clamp(2rem,8vw,2.5rem);font-weight:900;background:var(--gradient-energy);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:4px;">BOKLUCK</h1>
+            <h2 style="font-family:Orbitron;font-size:0.9rem;color:var(--text-secondary);margin-bottom:32px;">Universe</h2>
+            
+            <div style="display:flex;flex-direction:column;gap:12px;width:100%;">
+                <button class="btn btn-block" id="btn-google" style="background:#4285f4;border:none;display:flex;align-items:center;justify-content:center;gap:10px;padding:14px;">
+                    <svg width="20" height="20" viewBox="0 0 24 24"><path fill="#fff" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#fff" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#fff" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#fff" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+                    Google로 시작하기
+                </button>
+                
+                <button class="btn btn-outline btn-block" id="btn-guest" style="padding:14px;">
+                    👤 게스트로 시작하기
+                </button>
+            </div>
+            
+            <div style="margin-top:24px;padding:16px;background:rgba(255,255,255,0.05);border-radius:12px;border:1px solid var(--border-subtle);">
+                <div style="font-size:0.75rem;color:var(--text-muted);line-height:1.6;">
+                    <div style="margin-bottom:8px;color:var(--neon-cyan);">✨ Google 로그인</div>
+                    • 진행 상황 클라우드 저장<br>
+                    • 다른 기기에서 이어하기<br>
+                    • 랭킹 참여 가능
+                </div>
+                <div style="font-size:0.75rem;color:var(--text-muted);line-height:1.6;margin-top:12px;">
+                    <div style="margin-bottom:8px;color:var(--neon-pink);">👤 게스트 모드</div>
+                    • 로그인 없이 바로 시작<br>
+                    • ⚠️ 진행 상황 저장 안됨<br>
+                    • 브라우저 데이터 삭제 시 초기화
+                </div>
+            </div>
+            
+            <div style="margin-top:20px;font-size:0.65rem;color:var(--text-muted);text-align:center;">
+                v1.5 | © 2024 BOKLUCK Universe
+            </div>
+        </div></div>
+    `;
+    
+    document.getElementById('btn-google').onclick = async () => {
+        Audio.init();
+        Audio.playClick();
+        const btn = document.getElementById('btn-google');
+        btn.disabled = true;
+        btn.innerHTML = '로그인 중...';
+        
+        const result = await Auth.loginWithGoogle();
+        if (result.success) {
+            toast(`환영합니다, ${result.user.displayName}님!`, 'success');
+            renderTitle();
+        } else {
+            toast('로그인 실패: ' + result.error, 'error');
+            btn.disabled = false;
+            btn.innerHTML = `<svg width="20" height="20" viewBox="0 0 24 24"><path fill="#fff" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#fff" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#fff" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#fff" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg> Google로 시작하기`;
+        }
+    };
+    
+    document.getElementById('btn-guest').onclick = () => {
+        Audio.init();
+        Audio.playClick();
+        Auth.loginAsGuest();
+        toast('게스트 모드로 시작합니다', 'info');
+        renderTitle();
+    };
+};
+
 // 초기화
 document.addEventListener('DOMContentLoaded', () => {
     createStars();
-    renderTitle();
+    
+    // 이미 로그인되어 있으면 타이틀로, 아니면 로그인 화면
+    if (auth) {
+        auth.onAuthStateChanged(user => {
+            if (user) {
+                Auth.user = user;
+                Auth.isGuest = false;
+                renderTitle();
+            } else if (!Auth.user) {
+                renderLogin();
+            }
+        });
+        // 1초 후에도 상태 변화 없으면 로그인 화면
+        setTimeout(() => {
+            if (!Auth.user) renderLogin();
+        }, 1000);
+    } else {
+        renderLogin();
+    }
+    
     setInterval(saveGame, CONFIG.SAVE_INTERVAL);
     window.addEventListener('beforeunload', saveGame);
-    console.log('🎲 BOKLUCK Universe v1.1.0 (Modular)');
+    console.log('🎲 BOKLUCK Universe v1.5.0');
 });
 </script>
 </body>
