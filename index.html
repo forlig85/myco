@@ -938,6 +938,7 @@ const TRANSLATIONS = {
         p2DiceDesc: '주사위가 당신의 점프력을 결정합니다',
         p2Go: '등반 시작!',
         p2Start: '등반 시작!',
+        roll: '주사위 던지기',
         p2Gameover: '추락했다!',
         p2GameoverDesc: '너무 아래로 떨어졌습니다.',
         p2Clear: '육지 도달!',
@@ -992,6 +993,7 @@ const TRANSLATIONS = {
         p2DiceDesc: 'The dice determines your jump power',
         p2Go: 'Start Climbing!',
         p2Start: 'Start Climbing!',
+        roll: 'Rolling...',
         p2Gameover: 'Fell!',
         p2GameoverDesc: 'You fell too far down.',
         p2Clear: 'Land Reached!',
@@ -1967,8 +1969,12 @@ function spawnFoods(count) {
         food.size = 4 + Math.random() * 10;
         food.x = Math.random() * pixiApp.screen.width;
         food.y = Math.random() * pixiApp.screen.height;
-        food.vx = (Math.random() - 0.5) * 0.5;
-        food.vy = (Math.random() - 0.5) * 0.5;
+        
+        // 항상 움직이도록 최소 속도 보장
+        const angle = Math.random() * Math.PI * 2;
+        const speed = 0.3 + Math.random() * 0.5; // 최소 0.3 속도
+        food.vx = Math.cos(angle) * speed;
+        food.vy = Math.sin(angle) * speed;
         food.glowPhase = Math.random() * Math.PI * 2;
         
         if (Math.random() > 0.5) {
@@ -2440,7 +2446,7 @@ function showClimbDice() {
     
     btn.onclick = () => {
         btn.disabled = true;
-        btn.textContent = t('rolling');
+        btn.textContent = t('roll');
         diceBox.classList.add('rolling');
         
         let count = 0;
@@ -2522,7 +2528,6 @@ function startPhase2() {
                 <button class="hud-btn" id="btn-skip-p2" title="테스트: 클리어" style="background: linear-gradient(135deg, #10b981, #059669);">✓</button>
                 <button class="hud-btn" id="btn-restart-p2" title="다시 시작">🔄</button>
                 <button class="hud-btn" id="btn-home-p2" title="${t('home')}">🏠</button>
-                <button class="hud-btn" id="btn-pause-p2" title="Pause">⏸️</button>
             </div>
         </div>
         <div class="controls">
@@ -2741,11 +2746,6 @@ function setupClimbHUD() {
         }
     };
     
-    document.getElementById('btn-pause-p2').onclick = () => {
-        p2GameRunning = !p2GameRunning;
-        document.getElementById('btn-pause-p2').textContent = p2GameRunning ? '⏸️' : '▶️';
-    };
-    
     document.getElementById('btn-p2-retry').onclick = () => {
         document.getElementById('modal-p2-gameover').classList.remove('show');
         if (gameLoop && pixiApp) pixiApp.ticker.remove(gameLoop);
@@ -2912,10 +2912,15 @@ function renderClimb() {
     
     // 배경 그라데이션 (높이에 따라 변화)
     let bgColor;
-    if (heightRatio < 0.5) {
-        bgColor = lerpColor(envBg, 0x1a3a5e, heightRatio * 2);
+    if (heightRatio < 0.3) {
+        // 깊은 바다 -> 얕은 바다
+        bgColor = lerpColor(0x000428, 0x004e92, heightRatio / 0.3);
+    } else if (heightRatio < 0.6) {
+        // 얕은 바다 -> 하늘
+        bgColor = lerpColor(0x004e92, 0x2193b0, (heightRatio - 0.3) / 0.3);
     } else {
-        bgColor = lerpColor(0x1a3a5e, 0x87CEEB, (heightRatio - 0.5) * 2);
+        // 하늘 -> 우주
+        bgColor = lerpColor(0x2193b0, 0x6dd5ed, (heightRatio - 0.6) / 0.4);
     }
     pixiApp.renderer.background.color = bgColor;
     
@@ -2924,6 +2929,80 @@ function renderClimb() {
     
     const graphics = new PIXI.Graphics();
     pixiApp.stage.addChild(graphics);
+    
+    // ====== 배경 효과 ======
+    
+    // 1. 별/파티클 (높이에 따라 변화)
+    const starCount = Math.floor(20 + heightRatio * 30);
+    for (let i = 0; i < starCount; i++) {
+        const seed = i * 12345.6789;
+        const sx = ((seed * 9.8) % w);
+        const sy = ((seed * 7.3 + camY * 0.1 * (1 + (i % 3) * 0.5)) % (h * 2)) - h * 0.5;
+        const starSize = 1 + (i % 3);
+        const twinkle = Math.sin(t * 2 + i) * 0.3 + 0.7;
+        
+        if (heightRatio < 0.4) {
+            // 바다: 기포/플랑크톤
+            graphics.beginFill(0x88ddff, twinkle * 0.5);
+            graphics.drawCircle(sx, sy, starSize * 1.5);
+            graphics.endFill();
+        } else if (heightRatio < 0.7) {
+            // 하늘: 빛나는 파티클
+            graphics.beginFill(0xffffff, twinkle * 0.6);
+            graphics.drawCircle(sx, sy, starSize);
+            graphics.endFill();
+        } else {
+            // 높은 하늘: 별
+            graphics.beginFill(0xffffee, twinkle);
+            graphics.drawCircle(sx, sy, starSize);
+            graphics.endFill();
+        }
+    }
+    
+    // 2. 구름 (중간 높이에서)
+    if (heightRatio > 0.3 && heightRatio < 0.9) {
+        const cloudAlpha = heightRatio < 0.5 ? (heightRatio - 0.3) * 2.5 : (0.9 - heightRatio) * 2.5;
+        for (let i = 0; i < 5; i++) {
+            const cx = ((i * 137 + t * 5) % (w + 200)) - 100;
+            const cy = ((i * 97 + camY * 0.05) % h);
+            const cloudScale = 0.5 + (i % 3) * 0.3;
+            
+            graphics.beginFill(0xffffff, cloudAlpha * 0.15);
+            graphics.drawEllipse(cx, cy, 60 * cloudScale, 25 * cloudScale);
+            graphics.drawEllipse(cx + 30 * cloudScale, cy - 10, 40 * cloudScale, 20 * cloudScale);
+            graphics.drawEllipse(cx - 25 * cloudScale, cy + 5, 35 * cloudScale, 18 * cloudScale);
+            graphics.endFill();
+        }
+    }
+    
+    // 3. 빛줄기 (위에서 아래로)
+    if (heightRatio > 0.2) {
+        const rayAlpha = Math.min(0.08, heightRatio * 0.1);
+        for (let i = 0; i < 3; i++) {
+            const rx = w * 0.2 + i * w * 0.3;
+            graphics.beginFill(0xffffff, rayAlpha);
+            graphics.moveTo(rx - 30, -50);
+            graphics.lineTo(rx + 30, -50);
+            graphics.lineTo(rx + 80, h + 50);
+            graphics.lineTo(rx - 80, h + 50);
+            graphics.closePath();
+            graphics.endFill();
+        }
+    }
+    
+    // 4. 물결 효과 (낮은 높이)
+    if (heightRatio < 0.4) {
+        const waveAlpha = (0.4 - heightRatio) * 0.5;
+        for (let i = 0; i < 3; i++) {
+            graphics.lineStyle(2, 0x00d4ff, waveAlpha * (0.3 + i * 0.2));
+            graphics.moveTo(0, h * (0.3 + i * 0.2));
+            for (let x = 0; x <= w; x += 20) {
+                const waveY = h * (0.3 + i * 0.2) + Math.sin(x * 0.02 + t * 2 + i) * 15;
+                graphics.lineTo(x, waveY);
+            }
+            graphics.lineStyle(0);
+        }
+    }
     
     // 플랫폼 그리기
     for (const p of platforms) {
