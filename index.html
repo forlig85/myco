@@ -2054,6 +2054,14 @@ function showTitle() {
     
     app.innerHTML = `
         <div class="title-screen">
+            <!-- 디버그: 스테이지 선택 (최상단) -->
+            <div style="position: fixed; top: calc(10px + var(--safe-top)); left: 50%; transform: translateX(-50%); display: flex; gap: 8px; z-index: 100;">
+                <button id="btn-phase1" style="background: rgba(0,180,216,0.5); border: 1px solid rgba(0,180,216,0.8); border-radius: 8px; padding: 6px 12px; color: #fff; font-size: 0.75rem;">🦠 P1</button>
+                <button id="btn-phase2" style="background: rgba(16,185,129,0.5); border: 1px solid rgba(16,185,129,0.8); border-radius: 8px; padding: 6px 12px; color: #fff; font-size: 0.75rem;">🏔️ P2</button>
+                <button id="btn-phase3" style="background: rgba(157,78,221,0.5); border: 1px solid rgba(157,78,221,0.8); border-radius: 8px; padding: 6px 12px; color: #fff; font-size: 0.75rem;">🏃 P3</button>
+                <button id="btn-phase4" style="background: rgba(100,100,200,0.5); border: 1px solid rgba(100,100,200,0.8); border-radius: 8px; padding: 6px 12px; color: #fff; font-size: 0.75rem;">🚀 P4</button>
+            </div>
+            
             <!-- 로고 -->
             <div class="logo-section">
                 <div class="logo-icon">🚀</div>
@@ -2088,22 +2096,6 @@ function showTitle() {
                 <button class="setting-btn" id="btn-sound">
                     <span class="icon">${GameState.soundOn ? '🔊' : '🔇'}</span>
                     <span>${GameState.soundOn ? 'ON' : 'OFF'}</span>
-                </button>
-            </div>
-            
-            <!-- 디버그: 스테이지 선택 -->
-            <div class="settings-section" style="margin-top: 10px;">
-                <button class="setting-btn" id="btn-phase1" style="background: rgba(0,180,216,0.3);">
-                    <span>🦠</span><span>P1</span>
-                </button>
-                <button class="setting-btn" id="btn-phase2" style="background: rgba(16,185,129,0.3);">
-                    <span>🏔️</span><span>P2</span>
-                </button>
-                <button class="setting-btn" id="btn-phase3" style="background: rgba(157,78,221,0.3);">
-                    <span>🏃</span><span>P3</span>
-                </button>
-                <button class="setting-btn" id="btn-phase4" style="background: rgba(100,100,200,0.3);">
-                    <span>🚀</span><span>P4</span>
                 </button>
             </div>
             
@@ -5978,38 +5970,73 @@ const CL_COLORS = {
     broomHandle: 0x8B4513, broomHead: 0xDEB887, broomBristles: 0xC4A060
 };
 
-// 청소 중 말풍선 대사들
+// 청소 대사 변수들
+const TRASH_NAMES = ['쓰레기', '휴지', '캔', '똥', '오물', '먼지', '세균', '곰팡이'];
+const ACTIONS = ['치워야겠다', '싫어!', '왜 있어?', '어디서 났지?', '또야?', '그만!'];
+const FEELINGS = ['더럽다', '힘들다', '지친다', '피곤해', '귀찮아', '졸려'];
+const EXCLAMATIONS = ['윽!', '에잇!', '하...', '흠...', '어?', '뭐야!', '헉!'];
+
+// 청소 중 말풍선 대사들 (변수 활용)
 const CLEANING_QUOTES = {
     start: [
         "또 청소야...", "오늘도 힘내자!", "깨끗하게 만들어야지",
         "누가 이렇게 어질렀어?", "청소는 명상이야...", "빗자루 준비 완료!"
     ],
     collect: [
-        "이거 뭐야!", "으엑...", "누가 버린 거야?", "하나 치웠다!",
-        "깔끔~", "이건 또 뭐지?", "쓰레기는 쓰레기통으로!", "하...",
-        "점점 깨끗해지네", "이게 여기 왜 있어?", "분리수거 해야하나?"
+        () => `${EXCLAMATIONS[Math.floor(Math.random()*EXCLAMATIONS.length)]} ${TRASH_NAMES[Math.floor(Math.random()*TRASH_NAMES.length)]}!`,
+        () => `${TRASH_NAMES[Math.floor(Math.random()*TRASH_NAMES.length)]} ${ACTIONS[Math.floor(Math.random()*ACTIONS.length)]}`,
+        () => `이 ${TRASH_NAMES[Math.floor(Math.random()*TRASH_NAMES.length)]} 누가 버렸어?`,
+        () => `${TRASH_NAMES[Math.floor(Math.random()*TRASH_NAMES.length)]}... ${FEELINGS[Math.floor(Math.random()*FEELINGS.length)]}`,
+        "하나 치웠다!", "깔끔~", "분리수거 해야하나?", "점점 깨끗해지네"
     ],
     combo: [
         "연속이다!", "오 잘되네!", "손이 빨라졌어!", "콤보!",
-        "내가 청소의 신?", "멈출 수 없어!", "달인의 경지..."
+        "내가 청소의 신?", "멈출 수 없어!", "달인의 경지...",
+        () => `${Math.floor(Math.random()*5)+3}연속! 대박!`
     ],
     bacteria: [
-        "세균이다 도망쳐!", "움직이는 게 있어!!", "저건 뭐야?!",
-        "잡아야 해!", "빨리빨리!", "도망가지 마!"
+        () => `${EXCLAMATIONS[Math.floor(Math.random()*EXCLAMATIONS.length)]} 세균이다!`,
+        "움직이는 게 있어!!", "저건 뭐야?!", "잡아야 해!",
+        "빨리빨리!", "도망가지 마!", "징그러워!"
     ],
     floorClear: [
         "한 층 끝!", "다음 층으로!", "점점 더러워지겠지...",
-        "아직 갈 길이 멀어", "휴~ 잠깐 쉬자", "거의 다 왔어!"
+        "아직 갈 길이 멀어", "휴~ 잠깐 쉬자", "거의 다 왔어!",
+        () => `${Math.floor(Math.random()*3)+1}층 남았다!`
     ],
     tired: [
-        "힘들다...", "언제 끝나?", "허리 아파...", "다리가...",
-        "청소 로봇이나 사야하나", "월급 올려줘..."
+        () => `${FEELINGS[Math.floor(Math.random()*FEELINGS.length)]}...`,
+        "언제 끝나?", "허리 아파...", "다리가...",
+        "청소 로봇이나 사야하나", "월급 올려줘...", "쉬고 싶다..."
     ]
 };
 
+// NPC 직원 대사 (변수 활용)
+const NPC_TRASH_WORDS = ['쓰레기', '휴지', '캔', '세균', '먼지', '오물'];
+const NPC_PLACES = ['여기', '저기', '복도', '3층', '화장실', '창고'];
+const NPC_WARNINGS = ['조심해', '비켜', '지나갈게', '잠깐만', '급해'];
+const NPC_COMPLAINTS = ['바빠 죽겠어', '오늘 야근이야', '점심도 못 먹었어', '커피 마시고 싶다'];
+
+const NPC_QUOTES = [
+    () => `${NPC_PLACES[Math.floor(Math.random()*NPC_PLACES.length)]}에 ${NPC_TRASH_WORDS[Math.floor(Math.random()*NPC_TRASH_WORDS.length)]} 좀 치워줘!`,
+    () => `${NPC_WARNINGS[Math.floor(Math.random()*NPC_WARNINGS.length)]}! 지나간다!`,
+    () => `${NPC_COMPLAINTS[Math.floor(Math.random()*NPC_COMPLAINTS.length)]}...`,
+    () => `${NPC_TRASH_WORDS[Math.floor(Math.random()*NPC_TRASH_WORDS.length)]} 저리 치워!`,
+    "길 막지 마!", "뭘 봐?", "일하는 중이야!", "청소부님 화이팅!",
+    "아 깜짝이야!", "어디 가?", "열심히 하네~", "수고해요!",
+    () => `${NPC_PLACES[Math.floor(Math.random()*NPC_PLACES.length)]}도 청소해야 해!`,
+    "배고파...", "퇴근하고 싶다", "오늘 몇 층까지야?"
+];
+
 function getRandomQuote(category) {
     const quotes = CLEANING_QUOTES[category];
-    return quotes[Math.floor(Math.random() * quotes.length)];
+    const selected = quotes[Math.floor(Math.random() * quotes.length)];
+    return typeof selected === 'function' ? selected() : selected;
+}
+
+function getRandomNPCQuote() {
+    const selected = NPC_QUOTES[Math.floor(Math.random() * NPC_QUOTES.length)];
+    return typeof selected === 'function' ? selected() : selected;
 }
 
 function startCleaningGame(timeBonus, rewardMultiplier) {
@@ -6031,16 +6058,20 @@ function startCleaningGame(timeBonus, rewardMultiplier) {
         player: { x: gameW / 2, y: gameH / 2 },
         trash: [],
         walls: [],
+        npcs: [],
         combo: 0,
         gameOver: false,
         paused: false,
+        frozen: false,  // NPC와 충돌 시 이동 불가
+        frozenTimer: 0,
         gameW: gameW,
         gameH: gameH,
         keys: { up: false, down: false, left: false, right: false },
         joyPos: { x: 0, y: 0 },
         speechBubble: null,
         speechTimer: 0,
-        lastQuoteTime: 0
+        lastQuoteTime: 0,
+        npcContainer: null
     };
     
     renderCleaningUI();
@@ -6113,12 +6144,14 @@ function initCleaningPixi() {
     s.bgContainer = new PIXI.Container();
     s.wallContainer = new PIXI.Container();
     s.trashContainer = new PIXI.Container();
+    s.npcContainer = new PIXI.Container();
     s.playerContainer = new PIXI.Container();
     s.particleContainer = new PIXI.Container();
     
     cleaningApp.stage.addChild(s.bgContainer);
     cleaningApp.stage.addChild(s.wallContainer);
     cleaningApp.stage.addChild(s.trashContainer);
+    cleaningApp.stage.addChild(s.npcContainer);
     cleaningApp.stage.addChild(s.playerContainer);
     cleaningApp.stage.addChild(s.particleContainer);
     
@@ -6339,10 +6372,119 @@ function generateFloor(floorNum) {
         }
     }
     
+    // NPC 생성 (층별 1~3명)
+    s.npcContainer.removeChildren();
+    s.npcs = [];
+    const npcCount = Math.min(1 + Math.floor(floorNum / 4), 3);
+    
+    for (let i = 0; i < npcCount; i++) {
+        let nx, ny, valid = false, attempts = 0;
+        while (!valid && attempts < 50) {
+            nx = playArea.x + 30 + Math.random() * (playArea.w - 60);
+            ny = playArea.y + 30 + Math.random() * (playArea.h - 60);
+            // 플레이어와 거리 체크, 벽 체크
+            const distToPlayer = Math.sqrt((nx - px) * (nx - px) + (ny - py) * (ny - py));
+            valid = !isInWallCL(nx, ny, 25) && distToPlayer > 80;
+            attempts++;
+        }
+        
+        if (valid) {
+            const npc = createNPCSprite(nx, ny, i);
+            s.npcs.push(npc);
+            s.npcContainer.addChild(npc);
+        }
+    }
+    
+    // 플레이어 시작 위치 검증 - 벽에 끼었으면 이동
+    if (isInWallCL(s.player.x, s.player.y, 15)) {
+        // 안전한 위치 찾기
+        let found = false;
+        for (let r = 30; r < 150 && !found; r += 20) {
+            for (let a = 0; a < Math.PI * 2; a += Math.PI / 4) {
+                const testX = px + Math.cos(a) * r;
+                const testY = py + Math.sin(a) * r;
+                if (!isInWallCL(testX, testY, 15) && 
+                    testX > playArea.x && testX < playArea.x + playArea.w &&
+                    testY > playArea.y && testY < playArea.y + playArea.h) {
+                    s.player.x = testX;
+                    s.player.y = testY;
+                    found = true;
+                    break;
+                }
+            }
+        }
+    }
+    
     updateCleaningHUD();
     
     // 시작 말풍선 (강제 표시)
     showSpeechBubble(getRandomQuote('start'), true);
+}
+
+// NPC 스프라이트 생성
+function createNPCSprite(x, y, index) {
+    const container = new PIXI.Container();
+    container.x = x;
+    container.y = y;
+    container.npcBubble = null;
+    
+    const g = new PIXI.Graphics();
+    
+    // NPC 색상 (인덱스별로 다르게)
+    const colors = [0x4169E1, 0x32CD32, 0xFF6347];
+    const color = colors[index % colors.length];
+    
+    // 다리
+    g.beginFill(0x333355);
+    g.drawRect(-8, 12, 6, 12);
+    g.drawRect(2, 12, 6, 12);
+    g.endFill();
+    
+    // 신발
+    g.beginFill(0x222222);
+    g.drawRect(-9, 22, 8, 4);
+    g.drawRect(1, 22, 8, 4);
+    g.endFill();
+    
+    // 몸통 (작업복)
+    g.beginFill(color);
+    g.drawRoundedRect(-12, -8, 24, 22, 4);
+    g.endFill();
+    
+    // 작업복 디테일
+    g.beginFill(0x000000, 0.2);
+    g.drawRect(-2, -5, 4, 18);
+    g.endFill();
+    
+    // 머리
+    g.beginFill(0xFFDBB4);
+    g.drawCircle(0, -18, 12);
+    g.endFill();
+    
+    // 헬멧
+    g.beginFill(0xFFFFFF);
+    g.drawEllipse(0, -22, 14, 10);
+    g.endFill();
+    g.beginFill(color);
+    g.drawEllipse(0, -25, 12, 6);
+    g.endFill();
+    
+    // 눈
+    g.beginFill(0x000000);
+    g.drawCircle(-4, -18, 2);
+    g.drawCircle(4, -18, 2);
+    g.endFill();
+    
+    // ID 카드
+    g.beginFill(0xFFFFFF);
+    g.drawRect(-10, -2, 8, 10);
+    g.endFill();
+    g.beginFill(0x4444FF);
+    g.drawRect(-9, 0, 6, 4);
+    g.endFill();
+    
+    container.addChild(g);
+    return container;
 }
 
 // 랜덤 벽 생성 헬퍼
@@ -6626,15 +6768,49 @@ function setupCleaningControls() {
     document.addEventListener('mouseup', handleEnd);
     document.addEventListener('touchend', handleEnd);
     
-    // 나가기
+    // 나가기 (부분 보상)
     document.getElementById('btn-quit-cleaning').onclick = () => {
-        if (confirm('정말 포기하시겠습니까?')) endCleaningGame(false);
+        if (confirm('포기하시겠습니까?\n현재까지 번 점수의 50%를 받습니다.')) {
+            endCleaningGame(false, true); // 두번째 인자: 부분 보상 여부
+        }
     };
 }
 
 function cleaningGameLoop(delta) {
     const s = cleaningState;
     if (s.paused || s.gameOver) return;
+    
+    // frozen 타이머 감소
+    if (s.frozenTimer > 0) {
+        s.frozenTimer--;
+        if (s.frozenTimer <= 0) {
+            s.frozen = false;
+        }
+    }
+    
+    // frozen 상태면 이동 불가 (NPC 말풍선 업데이트만)
+    if (s.frozen) {
+        // NPC 말풍선 위치 업데이트
+        s.npcs.forEach(npc => {
+            if (npc.npcBubble) {
+                npc.npcBubble.x = npc.x - npc.npcBubble.width / 2;
+                npc.npcBubble.y = npc.y - 55;
+            }
+        });
+        
+        // 말풍선 위치 업데이트
+        if (s.speechBubble) {
+            s.speechBubble.x = s.player.x - s.speechBubble.width / 2;
+            s.speechBubble.y = s.player.y - 55;
+            s.speechTimer--;
+            if (s.speechTimer <= 20) s.speechBubble.alpha = s.speechTimer / 20;
+            if (s.speechTimer <= 0) {
+                s.particleContainer.removeChild(s.speechBubble);
+                s.speechBubble = null;
+            }
+        }
+        return;
+    }
     
     // 입력 처리
     let kx = 0, ky = 0;
@@ -6748,6 +6924,71 @@ function cleaningGameLoop(delta) {
         }
     }
     
+    // NPC 충돌 체크
+    for (const npc of s.npcs) {
+        const dx = s.player.x - npc.x;
+        const dy = s.player.y - npc.y;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        
+        if (dist < 35 && !s.frozen && !npc.npcBubble) {
+            // NPC와 충돌! frozen 상태로
+            s.frozen = true;
+            s.frozenTimer = 120; // 2초간 멈춤
+            
+            // NPC 말풍선 생성
+            const npcText = getRandomNPCQuote();
+            npc.npcBubble = createNPCBubble(npcText);
+            npc.npcBubble.x = npc.x - npc.npcBubble.width / 2;
+            npc.npcBubble.y = npc.y - 55;
+            s.particleContainer.addChild(npc.npcBubble);
+            
+            // 2초 후 NPC 말풍선 제거
+            setTimeout(() => {
+                if (npc.npcBubble && s.particleContainer) {
+                    s.particleContainer.removeChild(npc.npcBubble);
+                    npc.npcBubble = null;
+                }
+            }, 2000);
+            
+            // 플레이어 안전하게 밀어내기 (벽 체크)
+            if (dist > 0) {
+                const pushDist = 20;
+                const pushX = (dx / dist) * pushDist;
+                const pushY = (dy / dist) * pushDist;
+                
+                // 여러 방향 시도해서 안전한 곳으로 밀어내기
+                const directions = [
+                    { x: pushX, y: pushY },           // 원래 방향
+                    { x: pushX, y: 0 },               // X만
+                    { x: 0, y: pushY },               // Y만
+                    { x: -pushX, y: pushY },          // 반대 X
+                    { x: pushX, y: -pushY },          // 반대 Y
+                    { x: -pushX, y: 0 },              // 반대 X만
+                    { x: 0, y: -pushY },              // 반대 Y만
+                    { x: -pushX, y: -pushY }          // 완전 반대
+                ];
+                
+                for (const dir of directions) {
+                    const newX = s.player.x + dir.x;
+                    const newY = s.player.y + dir.y;
+                    if (!isInWallCL(newX, newY, 15) && 
+                        newX > 40 && newX < s.gameW - 40 &&
+                        newY > 40 && newY < s.gameH - 40) {
+                        s.player.x = newX;
+                        s.player.y = newY;
+                        break;
+                    }
+                }
+            }
+            
+            // 플레이어 스프라이트 위치 즉시 업데이트
+            s.playerSprite.x = s.player.x;
+            s.playerSprite.y = s.player.y;
+            
+            break;
+        }
+    }
+    
     // 파티클 업데이트 (말풍선 제외)
     for (let i = s.particleContainer.children.length - 1; i >= 0; i--) {
         const p = s.particleContainer.children[i];
@@ -6768,6 +7009,41 @@ function createCleaningParticle(x, y, points) {
     text.anchor.set(0.5);
     text.vy = -2;
     s.particleContainer.addChild(text);
+}
+
+// NPC 말풍선 생성
+function createNPCBubble(text) {
+    const bubble = new PIXI.Container();
+    
+    const bg = new PIXI.Graphics();
+    const padding = 6;
+    const textObj = new PIXI.Text(text, {
+        fontFamily: 'Arial', fontSize: 10, fill: 0x333333, fontWeight: 'bold'
+    });
+    const bw = textObj.width + padding * 2;
+    const bh = textObj.height + padding * 2;
+    
+    // 말풍선 배경 (연한 노란색)
+    bg.beginFill(0xFFF8DC, 0.95);
+    bg.lineStyle(2, 0x666666);
+    bg.drawRoundedRect(0, 0, bw, bh, 6);
+    bg.endFill();
+    
+    // 말풍선 꼬리
+    bg.beginFill(0xFFF8DC, 0.95);
+    bg.lineStyle(2, 0x666666);
+    bg.moveTo(bw / 2 - 4, bh);
+    bg.lineTo(bw / 2, bh + 6);
+    bg.lineTo(bw / 2 + 4, bh);
+    bg.endFill();
+    
+    textObj.x = padding;
+    textObj.y = padding;
+    
+    bubble.addChild(bg);
+    bubble.addChild(textObj);
+    
+    return bubble;
 }
 
 function nextCleaningFloor() {
@@ -6823,7 +7099,7 @@ function updateCleaningHUD() {
     }
 }
 
-function endCleaningGame(success) {
+function endCleaningGame(success, partialReward = false) {
     const s = cleaningState;
     s.gameOver = true;
     
@@ -6859,6 +7135,18 @@ function endCleaningGame(success) {
             totalReward, timeRating,
             floor: s.floor,
             score: s.score
+        });
+    } else if (partialReward && s.score > 0) {
+        // 포기 시 부분 보상 (점수의 50%를 LUCK으로)
+        const partialLuck = Math.floor(s.score * 0.5 * 0.1); // 점수 * 50% * 0.1
+        if (partialLuck > 0) {
+            GameState.spaceLuck = (GameState.spaceLuck || 0) + partialLuck;
+            GameState.save();
+        }
+        showMiniGameResult(false, { 
+            floor: s.floor, 
+            score: s.score, 
+            partialReward: partialLuck 
         });
     } else {
         showMiniGameResult(false, { floor: s.floor, score: s.score });
@@ -7594,8 +7882,14 @@ function showMiniGameResult(success, data) {
                     <div style="color: #888; font-size: 0.85rem; margin-bottom: 15px;">현재 보유: ${GameState.spaceLuck.toLocaleString()} LUCK</div>
                 ` : `
                     <div style="color: #888; font-size: 0.9rem; margin: 20px 0;">
-                        시간 초과 또는 포기했습니다.<br>
-                        다시 도전해보세요!
+                        ${data.partialReward > 0 ? `
+                            포기했습니다.<br>
+                            <div style="margin-top: 10px; color: #ffd700;">💰 +${data.partialReward} LUCK 획득</div>
+                            <div style="font-size: 0.8rem; color: #666; margin-top: 5px;">현재 보유: ${GameState.spaceLuck.toLocaleString()} LUCK</div>
+                        ` : `
+                            시간 초과 또는 포기했습니다.<br>
+                            다시 도전해보세요!
+                        `}
                     </div>
                 `}
                 
