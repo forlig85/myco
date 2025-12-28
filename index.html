@@ -6091,13 +6091,13 @@ function renderCleaningUI() {
             <!-- HUD -->
             <div style="width: 100%; max-width: 420px; padding: 10px 15px; padding-top: calc(10px + var(--safe-top)); background: linear-gradient(180deg, rgba(0,0,0,0.9), rgba(0,0,0,0.5)); display: flex; justify-content: space-between; align-items: center; z-index: 100;">
                 <div style="display: flex; gap: 12px; align-items: center; font-size: 0.85rem;">
-                    <div>🏢 <span id="cl-floor">${s.floor}</span>/${s.maxFloor}</div>
-                    <div>🗑️ <span id="cl-trash">0</span></div>
+                    <div>🏢 층 <span id="cl-floor">${s.floor}</span>/${s.maxFloor}</div>
+                    <div>🗑️ 쓰레기 <span id="cl-trash">0</span></div>
                 </div>
                 <div style="display: flex; gap: 12px; align-items: center; font-size: 0.85rem;">
-                    <div id="cl-combo-wrap" style="color: #fff;">🔥 <span id="cl-combo">0</span></div>
+                    <div id="cl-combo-wrap" style="color: #fff;">🔥 콤보 <span id="cl-combo">0</span></div>
                     <div>⏱️ <span id="cl-time">${Math.floor(s.time / 60)}:${(s.time % 60).toString().padStart(2, '0')}</span></div>
-                    <div style="color: #ffd700;">💰 <span id="cl-score">0</span></div>
+                    <div style="color: #44ff88;">⭐ <span id="cl-score">0</span>점</div>
                 </div>
             </div>
             
