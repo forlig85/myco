@@ -855,8 +855,588 @@ const CONFIG = {
     P2_MOVE_SPEED: 5,
     P2_PLATFORM_SPEED: 2,
     P2_STAGE_THRESHOLD: 3000,
-    P2_PART_THRESHOLD: 500
+    P2_PART_THRESHOLD: 500,
+    
+    // Phase 3
+    P3_STAGE_DIST: [300, 350, 400, 450, 500], // 각 스테이지별 목표 거리
+    P3_BASE_SPEED: 2.5,
+    P3_GRAVITY: 0.7,
+    P3_JUMP_POWER: -15,
+    P3_OBSTACLE_GAP: 1800,
+    P3_GOAL_DIST: 1500 // 최종 목표 거리
 };
+
+// ========================================
+// 효과음 시스템 (Web Audio API)
+// ========================================
+const SFX = {
+    ctx: null,
+    enabled: true,
+    
+    init() {
+        if (this.ctx) return;
+        try {
+            this.ctx = new (window.AudioContext || window.webkitAudioContext)();
+        } catch (e) {
+            console.log('Web Audio not supported');
+            this.enabled = false;
+        }
+    },
+    
+    resume() {
+        if (this.ctx && this.ctx.state === 'suspended') {
+            this.ctx.resume();
+        }
+    },
+    
+    play(type) {
+        if (!this.enabled || !this.ctx) return;
+        this.resume();
+        
+        const now = this.ctx.currentTime;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        
+        switch(type) {
+            case 'jump':
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(300, now);
+                osc.frequency.exponentialRampToValueAtTime(600, now + 0.1);
+                gain.gain.setValueAtTime(0.15, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.15);
+                osc.start(now);
+                osc.stop(now + 0.15);
+                break;
+                
+            case 'land':
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(200, now);
+                osc.frequency.exponentialRampToValueAtTime(80, now + 0.08);
+                gain.gain.setValueAtTime(0.12, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
+                osc.start(now);
+                osc.stop(now + 0.1);
+                break;
+                
+            case 'eat':
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(400, now);
+                osc.frequency.exponentialRampToValueAtTime(800, now + 0.05);
+                gain.gain.setValueAtTime(0.1, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.08);
+                osc.start(now);
+                osc.stop(now + 0.08);
+                break;
+                
+            case 'hit':
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(150, now);
+                osc.frequency.exponentialRampToValueAtTime(50, now + 0.15);
+                gain.gain.setValueAtTime(0.15, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.2);
+                osc.start(now);
+                osc.stop(now + 0.2);
+                break;
+                
+            case 'coin':
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(880, now);
+                osc.frequency.setValueAtTime(1100, now + 0.05);
+                gain.gain.setValueAtTime(0.1, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.15);
+                osc.start(now);
+                osc.stop(now + 0.15);
+                break;
+                
+            case 'evolve':
+                // 진화 사운드 (상승음)
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(300, now);
+                osc.frequency.exponentialRampToValueAtTime(900, now + 0.3);
+                gain.gain.setValueAtTime(0.12, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.4);
+                osc.start(now);
+                osc.stop(now + 0.4);
+                // 추가 화음
+                const osc2 = this.ctx.createOscillator();
+                const gain2 = this.ctx.createGain();
+                osc2.connect(gain2);
+                gain2.connect(this.ctx.destination);
+                osc2.type = 'sine';
+                osc2.frequency.setValueAtTime(450, now + 0.1);
+                osc2.frequency.exponentialRampToValueAtTime(1200, now + 0.4);
+                gain2.gain.setValueAtTime(0.08, now + 0.1);
+                gain2.gain.exponentialRampToValueAtTime(0.01, now + 0.5);
+                osc2.start(now + 0.1);
+                osc2.stop(now + 0.5);
+                break;
+                
+            case 'clear':
+                // 클리어 팡파레
+                [0, 0.1, 0.2, 0.3].forEach((delay, i) => {
+                    const o = this.ctx.createOscillator();
+                    const g = this.ctx.createGain();
+                    o.connect(g);
+                    g.connect(this.ctx.destination);
+                    o.type = 'sine';
+                    const freqs = [523, 659, 784, 1047]; // C5, E5, G5, C6
+                    o.frequency.setValueAtTime(freqs[i], now + delay);
+                    g.gain.setValueAtTime(0.12, now + delay);
+                    g.gain.exponentialRampToValueAtTime(0.01, now + delay + 0.3);
+                    o.start(now + delay);
+                    o.stop(now + delay + 0.3);
+                });
+                break;
+                
+            case 'gameover':
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(300, now);
+                osc.frequency.exponentialRampToValueAtTime(100, now + 0.4);
+                gain.gain.setValueAtTime(0.12, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.5);
+                osc.start(now);
+                osc.stop(now + 0.5);
+                break;
+                
+            case 'bounce':
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(250, now);
+                osc.frequency.exponentialRampToValueAtTime(500, now + 0.08);
+                osc.frequency.exponentialRampToValueAtTime(300, now + 0.15);
+                gain.gain.setValueAtTime(0.12, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.18);
+                osc.start(now);
+                osc.stop(now + 0.18);
+                break;
+                
+            case 'dash':
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(200, now);
+                osc.frequency.exponentialRampToValueAtTime(400, now + 0.1);
+                gain.gain.setValueAtTime(0.1, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.15);
+                osc.start(now);
+                osc.stop(now + 0.15);
+                break;
+                
+            case 'powerup':
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(400, now);
+                osc.frequency.exponentialRampToValueAtTime(800, now + 0.1);
+                osc.frequency.exponentialRampToValueAtTime(1200, now + 0.2);
+                gain.gain.setValueAtTime(0.12, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.25);
+                osc.start(now);
+                osc.stop(now + 0.25);
+                break;
+                
+            case 'click':
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(600, now);
+                gain.gain.setValueAtTime(0.08, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.05);
+                osc.start(now);
+                osc.stop(now + 0.05);
+                break;
+                
+            case 'dice':
+                // 주사위 굴리는 소리 (랜덤한 딸깍딸깍)
+                for (let i = 0; i < 8; i++) {
+                    const o = this.ctx.createOscillator();
+                    const g = this.ctx.createGain();
+                    o.connect(g);
+                    g.connect(this.ctx.destination);
+                    o.type = 'square';
+                    const delay = i * 0.06;
+                    const freq = 200 + Math.random() * 300;
+                    o.frequency.setValueAtTime(freq, now + delay);
+                    g.gain.setValueAtTime(0.08, now + delay);
+                    g.gain.exponentialRampToValueAtTime(0.01, now + delay + 0.04);
+                    o.start(now + delay);
+                    o.stop(now + delay + 0.05);
+                }
+                break;
+                
+            case 'fall':
+                // 추락 소리
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(600, now);
+                osc.frequency.exponentialRampToValueAtTime(100, now + 0.5);
+                gain.gain.setValueAtTime(0.12, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.5);
+                osc.start(now);
+                osc.stop(now + 0.5);
+                break;
+        }
+    }
+};
+
+// 페이지 로드 시 오디오 컨텍스트 초기화
+document.addEventListener('click', () => SFX.init(), { once: true });
+document.addEventListener('touchstart', () => SFX.init(), { once: true });
+
+// 배경 전환 구간 정의 (연속 진행)
+const BG_ZONES = [
+    { start: 0, end: 300, id: 'primitive', name: '🦎 원시 육지',
+      sky: ['#87CEEB', '#E0F7FA'], ground: '#8B7355' },
+    { start: 300, end: 600, id: 'dinosaur', name: '🦖 공룡 시대',
+      sky: ['#FF8C00', '#FFD700'], ground: '#8B4513' },
+    { start: 600, end: 900, id: 'ice', name: '🧊 빙하기',
+      sky: ['#B0E0E6', '#E6F3FF'], ground: '#E8E8E8' },
+    { start: 900, end: 1200, id: 'human', name: '🧍 원시인',
+      sky: ['#87CEEB', '#F0E68C'], ground: '#D2B48C' },
+    { start: 1200, end: 9999, id: 'modern', name: '🏙️ 현대',
+      sky: ['#1a1a2e', '#16213e'], ground: '#2d2d2d' }
+];
+
+// 진화 이벤트 거리 (1200m에 현대 문명 진화 추가)
+const EVOLUTION_POINTS = [100, 300, 600, 1000, 1200];
+
+// 현재 구간 가져오기
+function getCurrentZone(distance) {
+    for (const zone of BG_ZONES) {
+        if (distance >= zone.start && distance < zone.end) return zone;
+    }
+    return BG_ZONES[BG_ZONES.length - 1];
+}
+
+// ========================================
+// 모듈식 캐릭터 시스템
+// ========================================
+const CREATURE_PARTS = {
+    // 머리 형태
+    heads: [
+        { id: 'round', name: '둥근형', draw: (g, x, y, s, c) => { g.beginFill(c); g.drawCircle(x, y, s * 0.4); g.endFill(); } },
+        { id: 'oval', name: '타원형', draw: (g, x, y, s, c) => { g.beginFill(c); g.drawEllipse(x, y, s * 0.35, s * 0.45); g.endFill(); } },
+        { id: 'triangle', name: '삼각형', draw: (g, x, y, s, c) => { g.beginFill(c); g.moveTo(x, y - s * 0.45); g.lineTo(x + s * 0.35, y + s * 0.3); g.lineTo(x - s * 0.35, y + s * 0.3); g.closePath(); g.endFill(); } },
+        { id: 'square', name: '사각형', draw: (g, x, y, s, c) => { g.beginFill(c); g.drawRoundedRect(x - s * 0.3, y - s * 0.35, s * 0.6, s * 0.7, s * 0.1); g.endFill(); } },
+        { id: 'diamond', name: '마름모', draw: (g, x, y, s, c) => { g.beginFill(c); g.moveTo(x, y - s * 0.45); g.lineTo(x + s * 0.3, y); g.lineTo(x, y + s * 0.45); g.lineTo(x - s * 0.3, y); g.closePath(); g.endFill(); } },
+        { id: 'crescent', name: '초승달', draw: (g, x, y, s, c) => { g.beginFill(c); g.arc(x, y, s * 0.4, -Math.PI * 0.7, Math.PI * 0.7); g.arc(x + s * 0.15, y, s * 0.35, Math.PI * 0.7, -Math.PI * 0.7, true); g.endFill(); } },
+    ],
+    // 눈 스타일
+    eyes: [
+        { id: 'round', name: '둥근눈', draw: (g, x, y, s) => { g.beginFill(0xffffff); g.drawCircle(x - s * 0.12, y - s * 0.05, s * 0.12); g.drawCircle(x + s * 0.12, y - s * 0.05, s * 0.12); g.endFill(); g.beginFill(0x111111); g.drawCircle(x - s * 0.1, y - s * 0.05, s * 0.06); g.drawCircle(x + s * 0.14, y - s * 0.05, s * 0.06); g.endFill(); } },
+        { id: 'big', name: '큰눈', draw: (g, x, y, s) => { g.beginFill(0xffffff); g.drawCircle(x - s * 0.15, y - s * 0.08, s * 0.18); g.drawCircle(x + s * 0.15, y - s * 0.08, s * 0.18); g.endFill(); g.beginFill(0x000000); g.drawCircle(x - s * 0.12, y - s * 0.06, s * 0.1); g.drawCircle(x + s * 0.18, y - s * 0.06, s * 0.1); g.endFill(); g.beginFill(0xffffff); g.drawCircle(x - s * 0.14, y - s * 0.1, s * 0.04); g.drawCircle(x + s * 0.16, y - s * 0.1, s * 0.04); g.endFill(); } },
+        { id: 'slit', name: '가는눈', draw: (g, x, y, s) => { g.beginFill(0xFFD700); g.drawEllipse(x - s * 0.12, y - s * 0.05, s * 0.1, s * 0.06); g.drawEllipse(x + s * 0.12, y - s * 0.05, s * 0.1, s * 0.06); g.endFill(); g.beginFill(0x000000); g.drawEllipse(x - s * 0.12, y - s * 0.05, s * 0.03, s * 0.06); g.drawEllipse(x + s * 0.12, y - s * 0.05, s * 0.03, s * 0.06); g.endFill(); } },
+        { id: 'alien', name: '외계인눈', draw: (g, x, y, s) => { g.beginFill(0x000000); g.drawEllipse(x - s * 0.18, y - s * 0.05, s * 0.15, s * 0.22); g.drawEllipse(x + s * 0.18, y - s * 0.05, s * 0.15, s * 0.22); g.endFill(); g.beginFill(0x00ff88, 0.3); g.drawEllipse(x - s * 0.18, y - s * 0.08, s * 0.08, s * 0.12); g.drawEllipse(x + s * 0.18, y - s * 0.08, s * 0.08, s * 0.12); g.endFill(); } },
+        { id: 'cyclops', name: '외눈', draw: (g, x, y, s) => { g.beginFill(0xffffff); g.drawCircle(x, y - s * 0.05, s * 0.2); g.endFill(); g.beginFill(0xff3333); g.drawCircle(x, y - s * 0.05, s * 0.12); g.endFill(); g.beginFill(0x000000); g.drawCircle(x, y - s * 0.05, s * 0.06); g.endFill(); } },
+        { id: 'multi', name: '복눈', draw: (g, x, y, s) => { const cols = [0xff6666, 0x66ff66, 0x6666ff, 0xffff66]; for (let i = 0; i < 4; i++) { const ox = (i % 2 - 0.5) * s * 0.25; const oy = (Math.floor(i / 2) - 0.5) * s * 0.2 - s * 0.05; g.beginFill(cols[i]); g.drawCircle(x + ox, y + oy, s * 0.08); g.endFill(); } } },
+    ],
+    // 몸통 형태
+    bodies: [
+        { id: 'blob', name: '물방울', draw: (g, x, y, s, c) => { g.beginFill(c); g.drawEllipse(x, y + s * 0.3, s * 0.35, s * 0.5); g.endFill(); } },
+        { id: 'humanoid', name: '인간형', draw: (g, x, y, s, c) => { g.beginFill(c); g.drawRoundedRect(x - s * 0.25, y + s * 0.05, s * 0.5, s * 0.7, s * 0.1); g.endFill(); } },
+        { id: 'reptile', name: '파충류', draw: (g, x, y, s, c) => { g.beginFill(c); g.drawEllipse(x, y + s * 0.35, s * 0.45, s * 0.35); g.endFill(); } },
+        { id: 'bird', name: '조류', draw: (g, x, y, s, c) => { g.beginFill(c); g.moveTo(x, y); g.quadraticCurveTo(x + s * 0.4, y + s * 0.3, x, y + s * 0.7); g.quadraticCurveTo(x - s * 0.4, y + s * 0.3, x, y); g.endFill(); } },
+        { id: 'fish', name: '어류', draw: (g, x, y, s, c) => { g.beginFill(c); g.drawEllipse(x, y + s * 0.35, s * 0.5, s * 0.25); g.endFill(); } },
+        { id: 'insect', name: '곤충', draw: (g, x, y, s, c) => { g.beginFill(c); g.drawEllipse(x, y + s * 0.15, s * 0.2, s * 0.2); g.drawEllipse(x, y + s * 0.45, s * 0.25, s * 0.3); g.endFill(); } },
+    ],
+    // 팔/앞다리
+    arms: [
+        { id: 'none', name: '없음', draw: () => {} },
+        { id: 'human', name: '인간팔', draw: (g, x, y, s, c, t) => { g.lineStyle(s * 0.08, c); const swing = Math.sin(t * 8) * 0.3; g.moveTo(x - s * 0.25, y + s * 0.15); g.lineTo(x - s * 0.5, y + s * 0.4 + swing * s * 0.2); g.moveTo(x + s * 0.25, y + s * 0.15); g.lineTo(x + s * 0.5, y + s * 0.4 - swing * s * 0.2); g.lineStyle(0); } },
+        { id: 'wing', name: '날개', draw: (g, x, y, s, c, t) => { g.beginFill(c, 0.7); const flap = Math.sin(t * 12) * 0.2; g.moveTo(x - s * 0.25, y + s * 0.1); g.lineTo(x - s * 0.7, y - s * 0.1 + flap * s); g.lineTo(x - s * 0.6, y + s * 0.3); g.closePath(); g.moveTo(x + s * 0.25, y + s * 0.1); g.lineTo(x + s * 0.7, y - s * 0.1 + flap * s); g.lineTo(x + s * 0.6, y + s * 0.3); g.closePath(); g.endFill(); } },
+        { id: 'tentacle', name: '촉수', draw: (g, x, y, s, c, t) => { g.lineStyle(s * 0.06, c); for (let i = 0; i < 3; i++) { const wave = Math.sin(t * 6 + i) * 0.15; g.moveTo(x - s * 0.2 - i * s * 0.05, y + s * 0.2); g.quadraticCurveTo(x - s * 0.4, y + s * 0.4 + wave * s, x - s * 0.3 - i * s * 0.1, y + s * 0.6); g.moveTo(x + s * 0.2 + i * s * 0.05, y + s * 0.2); g.quadraticCurveTo(x + s * 0.4, y + s * 0.4 - wave * s, x + s * 0.3 + i * s * 0.1, y + s * 0.6); } g.lineStyle(0); } },
+        { id: 'claw', name: '집게', draw: (g, x, y, s, c, t) => { g.beginFill(c); const snap = Math.sin(t * 4) * 0.1; [-1, 1].forEach(dir => { const bx = x + dir * s * 0.35; g.drawCircle(bx, y + s * 0.25, s * 0.12); g.moveTo(bx, y + s * 0.2); g.lineTo(bx + dir * s * 0.15, y + s * 0.05 - snap * s * dir); g.lineTo(bx + dir * s * 0.05, y + s * 0.15); g.lineTo(bx + dir * s * 0.2, y + s * 0.25 + snap * s * dir); g.lineTo(bx, y + s * 0.2); }); g.endFill(); } },
+        { id: 'fin', name: '지느러미', draw: (g, x, y, s, c, t) => { g.beginFill(c, 0.8); const wave = Math.sin(t * 6) * 0.1; g.moveTo(x - s * 0.3, y + s * 0.2); g.quadraticCurveTo(x - s * 0.6, y + s * 0.1 + wave * s, x - s * 0.5, y + s * 0.4); g.lineTo(x - s * 0.3, y + s * 0.35); g.moveTo(x + s * 0.3, y + s * 0.2); g.quadraticCurveTo(x + s * 0.6, y + s * 0.1 - wave * s, x + s * 0.5, y + s * 0.4); g.lineTo(x + s * 0.3, y + s * 0.35); g.endFill(); } },
+    ],
+    // 다리
+    legs: [
+        { id: 'none', name: '없음', draw: () => {} },
+        { id: 'biped', name: '두발', draw: (g, x, y, s, c, t) => { g.lineStyle(s * 0.1, c); const walk = Math.sin(t * 10); g.moveTo(x - s * 0.1, y + s * 0.7); g.lineTo(x - s * 0.15 + walk * s * 0.1, y + s * 1.1); g.moveTo(x + s * 0.1, y + s * 0.7); g.lineTo(x + s * 0.15 - walk * s * 0.1, y + s * 1.1); g.lineStyle(0); } },
+        { id: 'quadruped', name: '네발', draw: (g, x, y, s, c, t) => { g.lineStyle(s * 0.07, c); const walk = Math.sin(t * 10); g.moveTo(x - s * 0.2, y + s * 0.6); g.lineTo(x - s * 0.25 + walk * s * 0.08, y + s * 0.95); g.moveTo(x + s * 0.2, y + s * 0.6); g.lineTo(x + s * 0.25 - walk * s * 0.08, y + s * 0.95); g.moveTo(x - s * 0.1, y + s * 0.65); g.lineTo(x - s * 0.12 - walk * s * 0.08, y + s * 0.95); g.moveTo(x + s * 0.1, y + s * 0.65); g.lineTo(x + s * 0.12 + walk * s * 0.08, y + s * 0.95); g.lineStyle(0); } },
+        { id: 'tail', name: '꼬리', draw: (g, x, y, s, c, t) => { g.lineStyle(s * 0.12, c); const wave = Math.sin(t * 5) * 0.3; g.moveTo(x, y + s * 0.7); g.quadraticCurveTo(x + wave * s * 0.5, y + s * 0.9, x + wave * s * 0.3, y + s * 1.1); g.lineStyle(0); } },
+        { id: 'multi', name: '다리多', draw: (g, x, y, s, c, t) => { g.lineStyle(s * 0.04, c); for (let i = 0; i < 6; i++) { const phase = t * 12 + i * 0.5; const swing = Math.sin(phase) * 0.1; const ox = (i % 2 === 0 ? -1 : 1) * (s * 0.15 + (i % 3) * s * 0.08); g.moveTo(x + ox * 0.5, y + s * 0.4 + (i % 3) * s * 0.15); g.lineTo(x + ox + swing * s, y + s * 0.95); } g.lineStyle(0); } },
+        { id: 'hover', name: '부유', draw: (g, x, y, s, c, t) => { g.beginFill(c, 0.4); for (let i = 0; i < 3; i++) { const pulse = Math.sin(t * 8 + i) * 0.05; g.drawEllipse(x, y + s * 0.85 + i * s * 0.08, s * (0.3 - i * 0.08) * (1 + pulse), s * 0.04); } g.endFill(); } },
+    ],
+    // 장식 (뿔, 귀, 안테나 등)
+    decorations: [
+        { id: 'none', name: '없음', draw: () => {} },
+        { id: 'horns', name: '뿔', draw: (g, x, y, s, c) => { g.beginFill(c); g.moveTo(x - s * 0.2, y - s * 0.3); g.lineTo(x - s * 0.3, y - s * 0.6); g.lineTo(x - s * 0.1, y - s * 0.35); g.moveTo(x + s * 0.2, y - s * 0.3); g.lineTo(x + s * 0.3, y - s * 0.6); g.lineTo(x + s * 0.1, y - s * 0.35); g.endFill(); } },
+        { id: 'antenna', name: '더듬이', draw: (g, x, y, s, c, t) => { g.lineStyle(s * 0.03, c); const sway = Math.sin(t * 4) * 0.1; g.moveTo(x - s * 0.1, y - s * 0.35); g.quadraticCurveTo(x - s * 0.15 + sway * s, y - s * 0.55, x - s * 0.2, y - s * 0.65); g.moveTo(x + s * 0.1, y - s * 0.35); g.quadraticCurveTo(x + s * 0.15 - sway * s, y - s * 0.55, x + s * 0.2, y - s * 0.65); g.lineStyle(0); g.beginFill(0xffff00); g.drawCircle(x - s * 0.2, y - s * 0.65, s * 0.05); g.drawCircle(x + s * 0.2, y - s * 0.65, s * 0.05); g.endFill(); } },
+        { id: 'ears', name: '귀', draw: (g, x, y, s, c) => { g.beginFill(c); g.moveTo(x - s * 0.25, y - s * 0.2); g.lineTo(x - s * 0.35, y - s * 0.5); g.lineTo(x - s * 0.15, y - s * 0.25); g.moveTo(x + s * 0.25, y - s * 0.2); g.lineTo(x + s * 0.35, y - s * 0.5); g.lineTo(x + s * 0.15, y - s * 0.25); g.endFill(); } },
+        { id: 'crest', name: '볏', draw: (g, x, y, s, c) => { g.beginFill(0xff4444); for (let i = 0; i < 5; i++) { g.drawCircle(x + (i - 2) * s * 0.08, y - s * 0.4 - Math.abs(i - 2) * s * 0.05, s * 0.06); } g.endFill(); } },
+        { id: 'halo', name: '후광', draw: (g, x, y, s, c, t) => { g.lineStyle(s * 0.03, 0xffd700, 0.6 + Math.sin(t * 6) * 0.3); g.drawEllipse(x, y - s * 0.55, s * 0.3, s * 0.08); g.lineStyle(0); } },
+        { id: 'shell', name: '등껍질', draw: (g, x, y, s, c) => { g.beginFill(c, 0.8); g.drawEllipse(x, y + s * 0.25, s * 0.4, s * 0.35); g.endFill(); g.lineStyle(s * 0.02, 0x000000, 0.3); for (let i = 0; i < 3; i++) { g.drawEllipse(x, y + s * 0.25, s * (0.35 - i * 0.1), s * (0.3 - i * 0.08)); } g.lineStyle(0); } },
+        // 현대 문명 장식
+        { id: 'cyber_antenna', name: '기계안테나', draw: (g, x, y, s, c, t) => { g.beginFill(0x444444); g.drawRect(x - s * 0.08, y - s * 0.5, s * 0.04, s * 0.2); g.drawRect(x + s * 0.04, y - s * 0.55, s * 0.04, s * 0.25); g.endFill(); const blink = Math.sin(t * 10) > 0.5; g.beginFill(blink ? 0x00ff00 : 0xff0000); g.drawCircle(x - s * 0.06, y - s * 0.52, s * 0.03); g.drawCircle(x + s * 0.06, y - s * 0.57, s * 0.03); g.endFill(); } },
+        { id: 'headphones', name: '헤드폰', draw: (g, x, y, s, c) => { g.lineStyle(s * 0.04, 0x333333); g.arc(x, y - s * 0.35, s * 0.32, Math.PI * 1.2, Math.PI * 1.8); g.lineStyle(0); g.beginFill(0x333333); g.drawEllipse(x - s * 0.32, y - s * 0.15, s * 0.1, s * 0.15); g.drawEllipse(x + s * 0.32, y - s * 0.15, s * 0.1, s * 0.15); g.endFill(); g.beginFill(0x666666); g.drawEllipse(x - s * 0.32, y - s * 0.15, s * 0.06, s * 0.1); g.drawEllipse(x + s * 0.32, y - s * 0.15, s * 0.06, s * 0.1); g.endFill(); } },
+        { id: 'visor', name: '바이저', draw: (g, x, y, s, c, t) => { const scan = (t * 2) % 1; g.beginFill(0x111111, 0.9); g.drawRoundedRect(x - s * 0.35, y - s * 0.15, s * 0.7, s * 0.18, s * 0.05); g.endFill(); g.beginFill(0x00ffff, 0.8); g.drawRect(x - s * 0.32 + scan * s * 0.5, y - s * 0.12, s * 0.12, s * 0.12); g.endFill(); } },
+    ],
+    // 패턴/무늬
+    patterns: [
+        { id: 'none', name: '없음', draw: () => {} },
+        { id: 'stripes', name: '줄무늬', draw: (g, x, y, s, c) => { g.lineStyle(s * 0.04, 0x000000, 0.3); for (let i = 0; i < 4; i++) { g.moveTo(x - s * 0.3, y + s * 0.1 + i * s * 0.15); g.lineTo(x + s * 0.3, y + s * 0.1 + i * s * 0.15); } g.lineStyle(0); } },
+        { id: 'spots', name: '점무늬', draw: (g, x, y, s) => { g.beginFill(0x000000, 0.2); const spots = [[0, 0.2], [-0.15, 0.35], [0.15, 0.4], [0, 0.55], [-0.1, 0.65]]; spots.forEach(([ox, oy]) => g.drawCircle(x + ox * s, y + oy * s, s * 0.06)); g.endFill(); } },
+        { id: 'scales', name: '비늘', draw: (g, x, y, s) => { g.lineStyle(s * 0.02, 0x000000, 0.2); for (let row = 0; row < 4; row++) { for (let col = 0; col < 3; col++) { const sx = x + (col - 1) * s * 0.2 + (row % 2) * s * 0.1; const sy = y + s * 0.15 + row * s * 0.12; g.drawEllipse(sx, sy, s * 0.08, s * 0.05); } } g.lineStyle(0); } },
+        { id: 'glow', name: '발광', draw: (g, x, y, s, c, t) => { const pulse = 0.3 + Math.sin(t * 6) * 0.2; g.beginFill(0xffffff, pulse); g.drawCircle(x, y + s * 0.3, s * 0.15); g.endFill(); } },
+        // 현대 문명 패턴
+        { id: 'circuit', name: '회로', draw: (g, x, y, s, c, t) => { g.lineStyle(s * 0.02, 0x00ff88, 0.6); g.moveTo(x - s * 0.2, y + s * 0.1); g.lineTo(x - s * 0.1, y + s * 0.1); g.lineTo(x - s * 0.1, y + s * 0.3); g.lineTo(x + s * 0.1, y + s * 0.3); g.lineTo(x + s * 0.1, y + s * 0.5); g.lineTo(x + s * 0.2, y + s * 0.5); g.moveTo(x, y + s * 0.3); g.lineTo(x, y + s * 0.6); g.lineStyle(0); const blink = Math.sin(t * 8) > 0; g.beginFill(blink ? 0x00ff88 : 0x004422, 0.8); g.drawCircle(x - s * 0.1, y + s * 0.1, s * 0.04); g.drawCircle(x + s * 0.1, y + s * 0.5, s * 0.04); g.drawCircle(x, y + s * 0.6, s * 0.04); g.endFill(); } },
+        { id: 'hologram', name: '홀로그램', draw: (g, x, y, s, c, t) => { const shift = Math.sin(t * 4) * s * 0.02; g.beginFill(0x00ffff, 0.2); g.drawRect(x - s * 0.25 + shift, y + s * 0.1, s * 0.5, s * 0.5); g.endFill(); g.beginFill(0xff00ff, 0.15); g.drawRect(x - s * 0.25 - shift, y + s * 0.15, s * 0.5, s * 0.5); g.endFill(); } },
+        { id: 'digital', name: '디지털', draw: (g, x, y, s, c, t) => { const pixels = [[0,0],[1,0],[0,1],[1,1],[2,1],[0,2],[2,2],[1,3],[2,3]]; pixels.forEach(([px, py], i) => { const on = Math.sin(t * 5 + i) > 0; g.beginFill(on ? 0x00ff00 : 0x003300, on ? 0.8 : 0.3); g.drawRect(x - s * 0.15 + px * s * 0.1, y + s * 0.15 + py * s * 0.12, s * 0.08, s * 0.1); g.endFill(); }); } },
+    ]
+};
+
+// 환경 기반 크리처 생성 (다양성 확대)
+function generateCreatureFromEnv(envId) {
+    const env = getEnvById(envId);
+    const seed = Date.now();
+    const rng = seededRandom(seed);
+    
+    // 환경별 색상 팔레트 (여러 변형)
+    const envPalettes = {
+        ocean: [
+            { primary: 0x00b4d8, secondary: 0x0077b6, accent: 0x90e0ef },
+            { primary: 0x0077b6, secondary: 0x023e8a, accent: 0x48cae4 },
+            { primary: 0x00f5d4, secondary: 0x00bbf9, accent: 0x9ef01a },
+            { primary: 0x4cc9f0, secondary: 0x3a0ca3, accent: 0x7209b7 },
+        ],
+        hydrothermal: [
+            { primary: 0xff6b35, secondary: 0xd62828, accent: 0xff9f1c },
+            { primary: 0xf72585, secondary: 0x7209b7, accent: 0xff006e },
+            { primary: 0xff4800, secondary: 0x9d0208, accent: 0xffba08 },
+            { primary: 0xdc2f02, secondary: 0x6a040f, accent: 0xfaa307 },
+        ],
+        ice: [
+            { primary: 0xa8dadc, secondary: 0x457b9d, accent: 0xf1faee },
+            { primary: 0xcaf0f8, secondary: 0x90e0ef, accent: 0xffffff },
+            { primary: 0xade8f4, secondary: 0x00b4d8, accent: 0xe0fbfc },
+            { primary: 0xbde0fe, secondary: 0xa2d2ff, accent: 0xcdb4db },
+        ],
+        magma: [
+            { primary: 0xff4800, secondary: 0xff8500, accent: 0xffd60a },
+            { primary: 0xef233c, secondary: 0xd90429, accent: 0xffbe0b },
+            { primary: 0xff5400, secondary: 0xff6d00, accent: 0xff9e00 },
+            { primary: 0xf72585, secondary: 0xb5179e, accent: 0xffd60a },
+        ],
+        atmosphere: [
+            { primary: 0xe0aaff, secondary: 0x9d4edd, accent: 0xc77dff },
+            { primary: 0xb8c0ff, secondary: 0x7b2cbf, accent: 0xe7c6ff },
+            { primary: 0xc8b6ff, secondary: 0x5a189a, accent: 0xff6d00 },
+            { primary: 0xd8bbff, secondary: 0x7400b8, accent: 0x80ffdb },
+        ],
+        toxic: [
+            { primary: 0x70e000, secondary: 0x38b000, accent: 0xccff33 },
+            { primary: 0xaaff00, secondary: 0x80b918, accent: 0xd4ff00 },
+            { primary: 0x55a630, secondary: 0x2b9348, accent: 0xbfd200 },
+            { primary: 0x9ef01a, secondary: 0x70e000, accent: 0xffff3f },
+        ]
+    };
+    
+    // 환경별 선호 파츠 (다양성 확대)
+    const envBodies = {
+        ocean: [0, 1, 4], // blob, humanoid, fish
+        hydrothermal: [0, 2, 5], // blob, reptile, insect
+        ice: [0, 1, 3], // blob, humanoid, bird
+        magma: [2, 3, 5], // reptile, bird, insect
+        atmosphere: [0, 3, 4], // blob, bird, fish
+        toxic: [0, 2, 5] // blob, reptile, insect
+    };
+    
+    const envHeads = {
+        ocean: [0, 1, 3], // round, oval, square
+        hydrothermal: [2, 4, 5], // triangle, diamond, crescent
+        ice: [0, 1, 3], // round, oval, square
+        magma: [2, 3, 4], // triangle, square, diamond
+        atmosphere: [0, 1, 5], // round, oval, crescent
+        toxic: [0, 2, 4] // round, triangle, diamond
+    };
+    
+    const envEyes = {
+        ocean: [0, 1, 3], // round, big, alien
+        hydrothermal: [2, 4, 5], // slit, cyclops, multi
+        ice: [0, 1, 2], // round, big, slit
+        magma: [2, 3, 4], // slit, alien, cyclops
+        atmosphere: [0, 1, 3], // round, big, alien
+        toxic: [2, 3, 5] // slit, alien, multi
+    };
+    
+    const envArms = {
+        ocean: [0, 3, 5], // none, tentacle, fin
+        hydrothermal: [1, 3, 4], // human, tentacle, claw
+        ice: [0, 1, 2], // none, human, wing
+        magma: [1, 2, 4], // human, wing, claw
+        atmosphere: [0, 2, 3], // none, wing, tentacle
+        toxic: [1, 3, 4] // human, tentacle, claw
+    };
+    
+    const envLegs = {
+        ocean: [0, 3, 5], // none, tail, hover
+        hydrothermal: [1, 2, 4], // biped, quadruped, multi
+        ice: [1, 2, 5], // biped, quadruped, hover
+        magma: [2, 3, 4], // quadruped, tail, multi
+        atmosphere: [0, 1, 5], // none, biped, hover
+        toxic: [1, 3, 4] // biped, tail, multi
+    };
+    
+    const envDecorations = {
+        ocean: [0, 2, 5], // none, antenna, halo
+        hydrothermal: [1, 3, 6], // horns, ears, shell
+        ice: [0, 4, 5], // none, crest, halo
+        magma: [1, 3, 4], // horns, ears, crest
+        atmosphere: [2, 4, 5], // antenna, crest, halo
+        toxic: [1, 2, 6] // horns, antenna, shell
+    };
+    
+    const envPatterns = {
+        ocean: [0, 1, 4], // none, stripes, glow
+        hydrothermal: [2, 3, 4], // spots, scales, glow
+        ice: [0, 1, 4], // none, stripes, glow
+        magma: [2, 3, 4], // spots, scales, glow
+        atmosphere: [0, 1, 4], // none, stripes, glow
+        toxic: [1, 2, 4] // stripes, spots, glow
+    };
+    
+    const palettes = envPalettes[envId] || envPalettes.ocean;
+    const palette = palettes[Math.floor(rng() * palettes.length)];
+    
+    const bodies = envBodies[envId] || [0];
+    const heads = envHeads[envId] || [0];
+    const eyes = envEyes[envId] || [0];
+    const arms = envArms[envId] || [0];
+    const legs = envLegs[envId] || [0];
+    const decorations = envDecorations[envId] || [0];
+    const patterns = envPatterns[envId] || [0];
+    
+    return {
+        head: heads[Math.floor(rng() * heads.length)],
+        eyes: eyes[Math.floor(rng() * eyes.length)],
+        body: bodies[Math.floor(rng() * bodies.length)],
+        arms: arms[Math.floor(rng() * arms.length)],
+        legs: legs[Math.floor(rng() * legs.length)],
+        decoration: decorations[Math.floor(rng() * decorations.length)],
+        pattern: patterns[Math.floor(rng() * patterns.length)],
+        // 현대 문명 진화용 (1200m에서 적용)
+        modernDeco: 7 + Math.floor(rng() * 3), // cyber_antenna, headphones, visor
+        modernPattern: 5 + Math.floor(rng() * 3), // circuit, hologram, digital
+        colors: palette,
+        envId: envId
+    };
+}
+
+// 시드 기반 랜덤
+function seededRandom(seed) {
+    let s = seed;
+    return function() {
+        s = (s * 9301 + 49297) % 233280;
+        return s / 233280;
+    };
+}
+
+// 거리 기반 크리처 진화 (연속 진화)
+// 0~100m: 기본 (머리+몸통+눈)
+// 100~300m: +다리
+// 300~600m: +팔
+// 600~1000m: +장식
+// 1000m+: +패턴 (완성형)
+function evolveCreatureByLevel(creature, level) {
+    if (!creature) return creature;
+    const evolved = JSON.parse(JSON.stringify(creature));
+    
+    // 레벨 0: 기본형 (머리, 몸통, 눈만)
+    // 레벨 1: 다리 추가
+    // 레벨 2: 팔 추가
+    // 레벨 3: 장식 추가
+    // 레벨 4: 완전 진화 (패턴 추가)
+    // 레벨 5: 기계 융합 (최종)
+    
+    if (level <= 0) {
+        evolved.arms = 0;
+        evolved.legs = 0;
+        evolved.decoration = 0;
+        evolved.pattern = 0;
+    } else if (level === 1) {
+        // 다리만 추가
+        evolved.arms = 0;
+        evolved.decoration = 0;
+        evolved.pattern = 0;
+    } else if (level === 2) {
+        // 팔 추가 (다리 유지)
+        evolved.decoration = 0;
+        evolved.pattern = 0;
+    } else if (level === 3) {
+        // 장식 추가
+        evolved.pattern = 0;
+    } else if (level === 4) {
+        // 완전 진화 - 모든 기본 파츠 유지 (패턴 포함)
+        // decoration과 pattern 모두 원래 값 유지
+    } else if (level >= 5) {
+        // 기계 융합 - 기계 파츠 적용
+        if (evolved.modernDeco) {
+            evolved.decoration = evolved.modernDeco;
+        }
+        if (evolved.modernPattern) {
+            evolved.pattern = evolved.modernPattern;
+        }
+    }
+    
+    return evolved;
+}
+
+// 이전 버전 호환용 (거리 기반)
+function evolveCreatureByDistance(creature, distance) {
+    let level = 0;
+    if (distance >= 1200) level = 5;
+    else if (distance >= 1000) level = 4;
+    else if (distance >= 600) level = 3;
+    else if (distance >= 300) level = 2;
+    else if (distance >= 100) level = 1;
+    return evolveCreatureByLevel(creature, level);
+}
+
+// 훈장 파츠 정의 (6개 슬롯)
+const BADGE_PARTS = [
+    { id: 'speed', icon: '⚡', name: '속도', effect: '속도 +10%', color: 0xFFD700 },
+    { id: 'jump', icon: '🦘', name: '점프', effect: '점프력 +15%', color: 0x00FF88 },
+    { id: 'shield', icon: '🛡️', name: '방어', effect: 'HP +1', color: 0x4488FF },
+    { id: 'magnet', icon: '🧲', name: '자석', effect: '코인 자석', color: 0xFF4488 },
+    { id: 'luck', icon: '🍀', name: '행운', effect: '주사위 +5', color: 0x44FF44 },
+    { id: 'star', icon: '⭐', name: '별', effect: '점수 +20%', color: 0xFFFF00 },
+    { id: 'heart', icon: '❤️', name: '생명', effect: '부활 1회', color: 0xFF4444 },
+    { id: 'bolt', icon: '🔥', name: '화염', effect: '장애물 파괴', color: 0xFF6600 },
+];
+
+// 크리처 그리기
+function drawCreature(graphics, creature, x, y, size, time) {
+    const c = creature.colors;
+    const t = time;
+    const s = size;
+    
+    // 그림자
+    graphics.beginFill(0x000000, 0.2);
+    graphics.drawEllipse(x, y + s * 1.05, s * 0.4, s * 0.1);
+    graphics.endFill();
+    
+    // 몸통 (먼저)
+    CREATURE_PARTS.bodies[creature.body]?.draw(graphics, x, y, s, c.primary);
+    
+    // 패턴
+    CREATURE_PARTS.patterns[creature.pattern]?.draw(graphics, x, y, s, c.secondary, t);
+    
+    // 다리
+    CREATURE_PARTS.legs[creature.legs]?.draw(graphics, x, y, s, c.secondary, t);
+    
+    // 팔
+    CREATURE_PARTS.arms[creature.arms]?.draw(graphics, x, y, s, c.secondary, t);
+    
+    // 장식 (뒤)
+    if (creature.decoration === CREATURE_PARTS.decorations.findIndex(d => d.id === 'shell')) {
+        CREATURE_PARTS.decorations[creature.decoration]?.draw(graphics, x, y, s, c.accent, t);
+    }
+    
+    // 머리
+    CREATURE_PARTS.heads[creature.head]?.draw(graphics, x, y, s, c.primary);
+    
+    // 눈
+    CREATURE_PARTS.eyes[creature.eyes]?.draw(graphics, x, y, s);
+    
+    // 장식 (앞)
+    if (creature.decoration !== CREATURE_PARTS.decorations.findIndex(d => d.id === 'shell')) {
+        CREATURE_PARTS.decorations[creature.decoration]?.draw(graphics, x, y, s, c.accent, t);
+    }
+}
 
 // 환경 정의
 const ENVIRONMENTS = [
@@ -946,6 +1526,31 @@ const TRANSLATIONS = {
         p2Retry: '다시 시작',
         p2Restart: '처음부터 다시 시작하시겠습니까?',
         goal: '목표',
+        // Phase 3
+        p3Intro: [
+            { icon: '🌍', title: '문명의 여정!', text: '달리며 변하는 <span class="hl">문명의 세계</span>를 느껴라!' },
+            { icon: '🧬', title: '진화의 흔적', text: '<span class="gold">✨ 진화 게이지</span>를 모아<br>새로운 모습으로 <span class="hl">진화</span>하라!' },
+            { icon: '👀', title: '진화의 결과', text: '환경에 따라 달라지는<br><span class="hl">진화의 결과</span>를 지켜봐라!' }
+        ],
+        p3Start: '달리기 시작!',
+        p3Gameover: '추락!',
+        p3GameoverDesc: '갈라진 틈에 빠졌습니다.',
+        p3Clear: '스테이지 클리어!',
+        p3ClearDesc: '다음 시대로 진화합니다!',
+        p3Final: '🎉 현대 도달!',
+        p3FinalDesc: '모든 진화를 완료했습니다!',
+        p3Distance: '거리',
+        p3Evolution: '진화',
+        p3SelectRemove: '제거할 파츠 선택',
+        p3LosePart: '파츠 하나를 잃습니다.',
+        p3EvoDice: '진화 주사위!',
+        p3EvoSuccess: '진화 성공!',
+        p3EvoFail: '아쉽다!',
+        p3EvoNext: '다음 주사위를 노려보자',
+        p3PlacePart: '파츠 배치하기',
+        p3Continue: '계속 달리기',
+        p3Stats: '스텟 보기',
+        p3Edit: '파츠 편집',
         // 공통 UI
         height: '높이',
         score: '점수',
@@ -1125,6 +1730,7 @@ const GameState = {
     envId: localStorage.getItem('aroa-env') || null,
     phase1Clear: localStorage.getItem('aroa-phase1-clear') === 'true',
     phase2Clear: localStorage.getItem('aroa-phase2-clear') === 'true',
+    phase3Clear: localStorage.getItem('aroa-phase3-clear') === 'true',
     currentPhase: 1,
     score: 0,
     eaten: 0,
@@ -1133,6 +1739,12 @@ const GameState = {
     // Phase 2 전용 상태
     height: 0,
     maxHeight: 0,
+    // Phase 3 전용 상태
+    runnerStage: parseInt(localStorage.getItem('aroa-runner-stage')) || 0,
+    runnerDist: parseFloat(localStorage.getItem('aroa-runner-dist')) || 0,
+    creature: JSON.parse(localStorage.getItem('aroa-creature') || 'null'),
+    evolutionGauge: parseInt(localStorage.getItem('aroa-evo-gauge')) || 0,
+    evolutionLevel: parseInt(localStorage.getItem('aroa-evo-level')) || 0,
     
     save() {
         localStorage.setItem('aroa-lang', this.currentLang);
@@ -1141,7 +1753,13 @@ const GameState = {
         if (this.envId) localStorage.setItem('aroa-env', this.envId);
         localStorage.setItem('aroa-phase1-clear', this.phase1Clear);
         localStorage.setItem('aroa-phase2-clear', this.phase2Clear);
+        localStorage.setItem('aroa-phase3-clear', this.phase3Clear);
         localStorage.setItem('aroa-parts', JSON.stringify(this.parts));
+        localStorage.setItem('aroa-runner-stage', this.runnerStage);
+        localStorage.setItem('aroa-runner-dist', this.runnerDist);
+        localStorage.setItem('aroa-evo-gauge', this.evolutionGauge);
+        localStorage.setItem('aroa-evo-level', this.evolutionLevel);
+        if (this.creature) localStorage.setItem('aroa-creature', JSON.stringify(this.creature));
     },
     
     load() {
@@ -1152,6 +1770,12 @@ const GameState = {
                 Object.assign(this.parts, parsed);
             } catch(e) {}
         }
+        const savedCreature = localStorage.getItem('aroa-creature');
+        if (savedCreature) {
+            try { this.creature = JSON.parse(savedCreature); } catch(e) { this.creature = null; }
+        }
+        this.evolutionGauge = parseInt(localStorage.getItem('aroa-evo-gauge')) || 0;
+        this.evolutionLevel = parseInt(localStorage.getItem('aroa-evo-level')) || 0;
     },
     
     reset() {
@@ -1166,12 +1790,30 @@ const GameState = {
         this.maxHeight = 0;
     },
     
+    resetP3() {
+        // 진화 상태 유지 - 리셋하지 않음
+    },
+    
     resetParts() {
         this.parts = { eye: 0, mouth: 0, arm: 0, leg: 0, tail: 0, antenna: 0, wing: 0, shell: 0, claw: 0, lung: 0 };
     },
     
     t(key) {
         return TRANSLATIONS[this.currentLang]?.[key] || TRANSLATIONS.ko[key] || key;
+    },
+    
+    // 현재 환경의 진화 파츠 가져오기
+    getRegionTraits() {
+        return EVOLUTION_TRAITS[this.envId] || EVOLUTION_TRAITS.ocean;
+    },
+    
+    // ID로 파츠 찾기
+    getTraitById(id) {
+        for (const region of Object.values(EVOLUTION_TRAITS)) {
+            const trait = region.find(t => t.id === id);
+            if (trait) return trait;
+        }
+        return null;
     }
 };
 
@@ -1409,6 +2051,19 @@ function showTitle() {
                 </button>
             </div>
             
+            <!-- 디버그: 스테이지 선택 -->
+            <div class="settings-section" style="margin-top: 10px;">
+                <button class="setting-btn" id="btn-phase1" style="background: rgba(0,180,216,0.3);">
+                    <span>🦠</span><span>P1</span>
+                </button>
+                <button class="setting-btn" id="btn-phase2" style="background: rgba(16,185,129,0.3);">
+                    <span>🏔️</span><span>P2</span>
+                </button>
+                <button class="setting-btn" id="btn-phase3" style="background: rgba(157,78,221,0.3);">
+                    <span>🏃</span><span>P3</span>
+                </button>
+            </div>
+            
             <!-- 버전 -->
             <div class="version-info">v1.0.0 | © 2025 BOKLUCK</div>
         </div>
@@ -1466,6 +2121,9 @@ function showTitle() {
         GameState.envId = null;
         GameState.phase1Clear = false;
         GameState.phase2Clear = false;
+        GameState.evolutionGauge = 0;
+        GameState.evolutionLevel = 0;
+        GameState.creature = null;
         GameState.reset();
         GameState.save();
         showPrologueIntro();
@@ -1504,6 +2162,40 @@ function showTitle() {
         GameState.soundOn = !GameState.soundOn;
         GameState.save();
         showTitle(); // 화면 새로고침
+    };
+    
+    // 디버그: 스테이지 직접 이동
+    document.getElementById('btn-phase1').onclick = () => {
+        if (!GameState.envId) {
+            GameState.envId = 'ocean';
+            GameState.design = { primary: '#00b4d8', secondary: '#0077b6', wobble: 0.7 };
+        }
+        GameState.phase1Clear = false;
+        GameState.save();
+        startPhase1();
+    };
+    
+    document.getElementById('btn-phase2').onclick = () => {
+        if (!GameState.envId) {
+            GameState.envId = 'ocean';
+            GameState.design = { primary: '#00b4d8', secondary: '#0077b6', wobble: 0.7 };
+        }
+        GameState.phase1Clear = true;
+        GameState.phase2Clear = false;
+        GameState.save();
+        showClimbDice();
+    };
+    
+    document.getElementById('btn-phase3').onclick = () => {
+        if (!GameState.envId) {
+            GameState.envId = 'ocean';
+            GameState.design = { primary: '#00b4d8', secondary: '#0077b6', wobble: 0.7 };
+        }
+        GameState.phase1Clear = true;
+        GameState.phase2Clear = true;
+        GameState.phase3Clear = false;
+        GameState.save();
+        showPhase3Intro();
     };
 }
 
@@ -1650,6 +2342,7 @@ function showDice() {
         btn.disabled = true;
         btn.textContent = dice.rolling;
         diceEl.classList.add('rolling');
+        SFX.play('dice'); // 주사위 효과음
         
         const anim = setInterval(() => {
             diceEl.textContent = Math.floor(Math.random() * 100) + 1;
@@ -1799,7 +2492,7 @@ function startPhase1() {
                     <div class="stat-row"><span class="stat-label">최대 크기</span><span class="stat-val" id="go-maxsize">0</span></div>
                 </div>
                 <div class="modal-btns">
-                    <button class="btn btn-primary btn-block" id="btn-retry">🎲 ${t('retry')}</button>
+                    <button class="btn btn-primary btn-block" id="btn-retry">🔄 ${t('retry')}</button>
                 </div>
             </div>
         </div>
@@ -2174,13 +2867,13 @@ function setupGameHUD() {
         showPhase2Intro();
     };
     
-    // 게임오버 시 다시 시작 -> 주사위 화면으로 (새로운 출생지 선택)
+    // 게임오버 시 다시 시작 -> 같은 출생지로 재시작
     document.getElementById('btn-retry').onclick = () => {
         document.getElementById('modal-gameover').classList.remove('show');
         if (gameLoop) pixiApp.ticker.remove(gameLoop);
         GameState.reset();
-        GameState.envId = null; // 출생지 초기화
-        showDice(); // 주사위 화면으로 이동
+        // 출생지 유지 (envId 초기화 안 함)
+        startPhase1(); // 바로 게임 시작
     };
     
     document.getElementById('btn-next').onclick = () => {
@@ -2282,6 +2975,7 @@ function updateGame(delta) {
             GameState.eaten++;
             GameState.score += Math.floor(food.size * 2 * (1 + GameState.parts.mouth * 0.15));
             GameState.maxSize = Math.max(GameState.maxSize, player.size);
+            SFX.play('eat');
             checkPartEvolution();
             pixiApp.stage.removeChild(food);
             foods.splice(i, 1);
@@ -2321,10 +3015,12 @@ function updateGame(delta) {
                 GameState.eaten++;
                 GameState.score += Math.floor(enemy.size * 5 * (1 + GameState.parts.mouth * 0.15));
                 GameState.maxSize = Math.max(GameState.maxSize, player.size);
+                SFX.play('eat');
                 checkPartEvolution();
                 pixiApp.stage.removeChild(enemy);
                 enemies.splice(i, 1);
             } else {
+                SFX.play('hit');
                 gameOver();
                 return;
             }
@@ -2344,6 +3040,7 @@ function updateGame(delta) {
 
 function gameOver() {
     gameRunning = false;
+    SFX.play('gameover');
     const t = GameState.t.bind(GameState);
     document.getElementById('go-score').textContent = GameState.score;
     document.getElementById('go-eaten').textContent = GameState.eaten;
@@ -2353,7 +3050,13 @@ function gameOver() {
 
 function stageClear() {
     gameRunning = false;
+    SFX.play('clear');
     GameState.phase1Clear = true;
+    // Phase 3 진화 상태 초기화 (새 게임 시작)
+    GameState.evolutionGauge = 0;
+    GameState.evolutionLevel = 0;
+    GameState.runnerDist = 0;
+    GameState.creature = null; // 새 크리처 생성 필요
     GameState.save();
     
     const p1PartKeys = ['eye', 'mouth', 'arm', 'leg', 'tail', 'antenna'];
@@ -2429,9 +3132,9 @@ function showClimbDice() {
             <div class="page-content">
                 <h2 class="page-title">🎲 ${t('p2DiceTitle')}</h2>
                 <p class="page-text">
-                    80+ 🌪️ 토네이도<br>
-                    60-79 ☁️ 구름<br>
-                    59- 없음
+                    60+ 🌪️ 토네이도<br>
+                    20-59 ☁️ 구름<br>
+                    19- 없음
                 </p>
                 <div class="dice-box" id="dice-box">🎲</div>
                 <div id="dice-result" style="min-height: 60px; margin: 15px 0;"></div>
@@ -2448,6 +3151,7 @@ function showClimbDice() {
         btn.disabled = true;
         btn.textContent = t('roll');
         diceBox.classList.add('rolling');
+        SFX.play('dice'); // 주사위 효과음
         
         let count = 0;
         const anim = setInterval(() => {
@@ -2464,13 +3168,13 @@ function showClimbDice() {
             
             let item = null, icon = '', msg = '';
             
-            if (roll >= 80) {
+            if (roll >= 60) {
                 item = 'tornado';
                 icon = '🌪️';
                 msg = '토네이도의 힘을 얻었다!';
                 diceBox.style.color = '#ff6b6b';
                 diceBox.style.textShadow = '0 0 20px #ff6b6b';
-            } else if (roll >= 60) {
+            } else if (roll >= 20) {
                 item = 'cloud';
                 icon = '☁️';
                 msg = '구름의 힘을 얻었다!';
@@ -2503,6 +3207,7 @@ function showClimbDice() {
 function startPhase2() {
     GameState.resetP2();
     currentEnv = getEnvById(GameState.envId);
+    climbGraphics = null; // Graphics 객체 초기화
     
     const bgColor = parseInt(currentEnv.colors.bg1.replace('#', '0x'));
     initPixi(bgColor);
@@ -2627,13 +3332,13 @@ function totalP1Parts() {
 }
 
 function generatePlatforms(fromY, toY) {
-    let y = fromY - 50;
+    let y = fromY - 40;
     
     while (y > toY) {
         const num = 1 + Math.floor(Math.random() * 2);
         
         for (let i = 0; i < num; i++) {
-            const w = 70 + Math.random() * 50;
+            const w = 75 + Math.random() * 55;
             const x = Math.random() * (pixiApp.screen.width - w);
             let type = 'normal';
             
@@ -2660,9 +3365,12 @@ function generatePlatforms(fromY, toY) {
                 });
             }
         }
-        y -= 45 + Math.random() * 25;
+        // 플랫폼 간격 줄임 (35~55px로 조정)
+        y -= 35 + Math.random() * 20;
     }
 }
+
+let wasOnGroundLastFrame = false; // 착지 감지용
 
 function setupClimbControls() {
     const joy = document.getElementById('joystick');
@@ -2696,9 +3404,11 @@ function setupClimbControls() {
             climber.onGround = false;
             wasOnGround = false;
             canDoubleJump = GameState.parts.leg >= 2;
+            SFX.play('jump');
         } else if (canDoubleJump) {
             climber.vy = -13;
             canDoubleJump = false;
+            SFX.play('jump');
         }
     };
     
@@ -2813,9 +3523,15 @@ function updateClimb(delta) {
             climber.onGround = true;
             canDoubleJump = GameState.parts.leg >= 2;
             
+            // 착지 효과음 (처음 착지할 때만)
+            if (!wasOnGroundBefore) {
+                SFX.play('land');
+            }
+            
             if (p.type === 'bouncy') {
                 climber.vy = -20;
                 climber.onGround = false;
+                SFX.play('bounce');
             } else if (p.type === 'breaking') {
                 p.timer++;
                 if (p.timer > 25) p.broken = true;
@@ -2837,6 +3553,7 @@ function updateClimb(delta) {
         const dy = (climber.y + climber.h / 2) - item.y;
         if (Math.sqrt(dx * dx + dy * dy) < 35) {
             item.collected = true;
+            SFX.play('powerup');
             if (item.type === 'tornado') {
                 climber.vy = -48;
             } else if (item.type === 'cloud') {
@@ -2883,6 +3600,8 @@ function updateClimb(delta) {
     document.getElementById('h2-height').textContent = curHeight + 'm';
 }
 
+let climbGraphics = null; // Phase 2용 Graphics 재사용
+
 function renderClimb() {
     if (!currentEnv || !currentEnv.colors) {
         currentEnv = getEnvById(GameState.envId) || ENVIRONMENTS[0];
@@ -2924,11 +3643,13 @@ function renderClimb() {
     }
     pixiApp.renderer.background.color = bgColor;
     
-    // 기존 그래픽 클리어
-    pixiApp.stage.removeChildren();
-    
-    const graphics = new PIXI.Graphics();
-    pixiApp.stage.addChild(graphics);
+    // Graphics 객체 재사용
+    if (!climbGraphics) {
+        climbGraphics = new PIXI.Graphics();
+        pixiApp.stage.addChild(climbGraphics);
+    }
+    const graphics = climbGraphics;
+    graphics.clear();
     
     // ====== 배경 효과 ======
     
@@ -3055,18 +3776,33 @@ function renderClimb() {
         }
     }
     
-    // 아이템 그리기
+    // 아이템 그리기 (Graphics로 직접 그리기)
     for (const item of climbItems) {
         if (item.collected) continue;
         const screenY = item.y + camY;
         if (screenY < -40 || screenY > h + 40) continue;
         
-        const itemText = new PIXI.Text(item.type === 'tornado' ? '🌪️' : '☁️', { fontSize: 28 });
-        itemText.anchor.set(0.5);
-        itemText.x = item.x;
-        itemText.y = screenY + Math.sin(t * 3) * 5;
-        itemText.rotation = item.type === 'tornado' ? t * 2 : 0;
-        pixiApp.stage.addChild(itemText);
+        const ix = item.x;
+        const iy = screenY + Math.sin(t * 3) * 5;
+        
+        if (item.type === 'tornado') {
+            // 토네이도 아이콘 그리기
+            graphics.beginFill(0x888888, 0.8);
+            const rot = t * 2;
+            for (let i = 0; i < 3; i++) {
+                const r = 12 - i * 3;
+                const offsetY = i * 6;
+                graphics.drawEllipse(ix, iy + offsetY, r, 4);
+            }
+            graphics.endFill();
+        } else {
+            // 구름 아이콘 그리기
+            graphics.beginFill(0xFFFFFF, 0.9);
+            graphics.drawCircle(ix, iy, 10);
+            graphics.drawCircle(ix - 8, iy + 3, 7);
+            graphics.drawCircle(ix + 8, iy + 3, 7);
+            graphics.endFill();
+        }
     }
     
     // 플레이어 그리기
@@ -3108,7 +3844,9 @@ function renderClimb() {
 }
 
 function drawClimber(graphics) {
-    const d = GameState.design || { primary: '#00b4d8', secondary: '#0077b6' };
+    // 환경 기반 색상 사용
+    const env = getEnvById(GameState.envId);
+    const envColors = env ? env.colors : { primary: '#00b4d8', secondary: '#0077b6' };
     const p = GameState.parts || {};
     const t = p2Time;
     const s = climber.w / 2;
@@ -3117,8 +3855,8 @@ function drawClimber(graphics) {
     const cx = climber.x + climber.w / 2;
     const cy = screenY + climber.h / 2;
     
-    const primary = parseInt(d.primary.replace('#', '0x'));
-    const secondary = parseInt(d.secondary.replace('#', '0x'));
+    const primary = parseInt(envColors.primary.replace('#', '0x'));
+    const secondary = parseInt(envColors.secondary.replace('#', '0x'));
     
     // 꼬리
     if (p.tail > 0) {
@@ -3226,6 +3964,7 @@ function climbFail() {
     p2GameRunning = false;
     if (gameLoop && pixiApp) pixiApp.ticker.remove(gameLoop);
     
+    SFX.play('gameover');
     document.getElementById('p2go-height').textContent = GameState.maxHeight + 'm';
     document.getElementById('modal-p2-gameover').classList.add('show');
 }
@@ -3234,11 +3973,1571 @@ function climbWin() {
     p2GameRunning = false;
     if (gameLoop && pixiApp) pixiApp.ticker.remove(gameLoop);
     
+    SFX.play('clear');
     GameState.phase2Clear = true;
+    GameState.runnerStage = 0;
+    GameState.evoTraits = [];
+    GameState.runnerDist = 0;
+    GameState.charScale = 1;
+    // Phase 3 진화 상태 초기화
+    GameState.evolutionGauge = 0;
+    GameState.evolutionLevel = 0;
     GameState.save();
     
     document.getElementById('p2cl-height').textContent = GameState.maxHeight + 'm';
     document.getElementById('modal-p2-clear').classList.add('show');
+    
+    // Phase 3으로 이동 버튼 연결
+    setTimeout(() => {
+        const nextBtn = document.querySelector('#modal-p2-clear .btn-primary');
+        if (nextBtn) {
+            nextBtn.onclick = () => {
+                document.getElementById('modal-p2-clear').classList.remove('show');
+                showPhase3Intro();
+            };
+        }
+    }, 100);
+}
+
+
+// ========================================
+// Phase 3: Runner Game (v4 - Polished)
+// ========================================
+let runner, runnerGaps, runnerItems, runnerParticles;
+let runnerSpeed, runnerDist, bgOffset;
+let lastGapTime = 0;
+let p3GameRunning = false;
+let currentCreature = null;
+let runnerHP = 3;
+let invincibleUntil = 0;
+let evolutionGauge = 0; // 진화 게이지 (100이 되면 진화)
+let evolutionLevel = 0; // 현재 진화 단계 (0~4)
+let evolutionAnimating = false;
+let sparkles = [];
+let bgParticles = []; // 배경 파티클
+let currentZoneId = '';
+let zoneTransitionTimer = 0;
+
+// 갈라진 틈 정의 (각 문명별 모양)
+const GAP_STYLES = {
+    primitive: { color: 0x2d1b0e, edgeColor: 0x8B4513 },
+    dinosaur: { color: 0x1a0a00, edgeColor: 0xff6b35 }, // 용암 느낌
+    ice: { color: 0x1a3a4a, edgeColor: 0x87ceeb },
+    human: { color: 0x1a1a1a, edgeColor: 0x8B7355 },
+    modern: { color: 0x0a0a15, edgeColor: 0x333355 }
+};
+
+// 배경 파티클 정의 (각 문명별)
+const BG_PARTICLE_STYLES = {
+    primitive: [
+        { type: 'leaf', color: 0x228B22, count: 15 },
+        { type: 'dust', color: 0xD2B48C, count: 20 },
+        { type: 'butterfly', color: 0xFFD700, count: 5 }
+    ],
+    dinosaur: [
+        { type: 'ash', color: 0x666666, count: 25 },
+        { type: 'ember', color: 0xFF4500, count: 15 },
+        { type: 'pterodactyl', color: 0x4a3728, count: 3 }
+    ],
+    ice: [
+        { type: 'snow', color: 0xFFFFFF, count: 40 },
+        { type: 'sparkle', color: 0xADD8E6, count: 20 },
+        { type: 'mist', color: 0xE0FFFF, count: 10 }
+    ],
+    human: [
+        { type: 'smoke', color: 0x888888, count: 15 },
+        { type: 'spark', color: 0xFF6600, count: 10 },
+        { type: 'dust', color: 0xC4A77D, count: 20 }
+    ],
+    modern: [
+        { type: 'neon', color: 0x00FFFF, count: 8 },
+        { type: 'data', color: 0x00FF00, count: 6 },
+        { type: 'light', color: 0xFF00FF, count: 5 }
+    ]
+};
+
+function showPhase3Intro() {
+    initPixi();
+    createStarBackground();
+    
+    const t = GameState.t.bind(GameState);
+    const intro = t('p3Intro');
+    let idx = 0;
+    
+    // 환경 기반 크리처 생성
+    const currentEnvId = GameState.envId || 'ocean';
+    
+    // Phase 3 처음 시작 (runnerDist가 0이거나 크리처가 없거나 환경이 다르면)
+    const needNewCreature = !GameState.creature || 
+                            GameState.creature.envId !== currentEnvId || 
+                            (GameState.runnerDist || 0) === 0;
+    
+    if (needNewCreature) {
+        console.log('Creating new creature, resetting evolution');
+        GameState.creature = generateCreatureFromEnv(currentEnvId);
+        GameState.badges = [];
+        GameState.runnerDist = 0;
+        GameState.evolutionGauge = 0;
+        GameState.evolutionLevel = 0;
+        GameState.save();
+    }
+    
+    function renderSlide() {
+        const slide = intro[idx];
+        const isLast = idx === intro.length - 1;
+        const env = getEnvById(currentEnvId);
+        
+        app.innerHTML = `
+            <div class="page-center">
+                <div class="page-content">
+                    <div class="page-icon">${slide.icon}</div>
+                    <h2 class="page-title">${slide.title}</h2>
+                    <p class="page-text">${slide.text}</p>
+                    <div style="display: flex; align-items: center; justify-content: center; gap: 8px; margin: 10px 0; padding: 8px 16px; background: rgba(0,0,0,0.3); border-radius: 10px;">
+                        <span style="font-size: 1.5rem;">${env?.icon || '🌊'}</span>
+                        <span style="color: #aaa; font-size: 0.85rem;">출생지: ${env?.name || '해양'}</span>
+                    </div>
+                    <div id="creature-preview" style="width: 140px; height: 140px; margin: 15px auto; background: rgba(0,0,0,0.4); border-radius: 16px; border: 2px solid rgba(79,195,247,0.3);"></div>
+                    <div class="dots">
+                        ${intro.map((_, i) => `<div class="dot ${i < idx ? 'done' : ''} ${i === idx ? 'active' : ''}"></div>`).join('')}
+                    </div>
+                    <button class="btn btn-primary btn-block" id="btn-next">${isLast ? '🏃 ' + t('p3Start') : t('next')}</button>
+                </div>
+            </div>
+        `;
+        
+        renderCreatureCanvasLevel('creature-preview', GameState.creature, GameState.evolutionLevel || 0);
+        document.getElementById('btn-next').onclick = () => isLast ? startPhase3() : (idx++, renderSlide());
+    }
+    renderSlide();
+}
+
+function renderCreatureCanvas(containerId, creature, distance = 0) {
+    const container = document.getElementById(containerId);
+    if (!container || !creature) return;
+    container.innerHTML = '';
+    
+    const cvs = document.createElement('canvas');
+    cvs.width = 140; cvs.height = 140;
+    container.appendChild(cvs);
+    
+    const ctx = cvs.getContext('2d');
+    const g = makeGraphicsWrapper(ctx);
+    const evolved = evolveCreatureByDistance(creature, distance);
+    drawCreature(g, evolved, 70, 65, 70, Date.now() * 0.001);
+}
+
+// 레벨 기반 크리처 캔버스 렌더링
+function renderCreatureCanvasLevel(containerId, creature, level) {
+    const container = document.getElementById(containerId);
+    if (!container || !creature) return;
+    container.innerHTML = '';
+    
+    const cvs = document.createElement('canvas');
+    cvs.width = 140; cvs.height = 140;
+    container.appendChild(cvs);
+    
+    const ctx = cvs.getContext('2d');
+    const g = makeGraphicsWrapper(ctx);
+    const evolved = evolveCreatureByLevel(creature, level);
+    drawCreature(g, evolved, 70, 65, 70, Date.now() * 0.001);
+}
+
+function makeGraphicsWrapper(ctx) {
+    return {
+        _fa: 1, _lw: 0,
+        beginFill(c, a = 1) { this._fa = a; ctx.fillStyle = `rgba(${(c>>16)&255},${(c>>8)&255},${c&255},${a})`; },
+        endFill() {},
+        lineStyle(w, c = 0, a = 1) { this._lw = w; ctx.strokeStyle = `rgba(${(c>>16)&255},${(c>>8)&255},${c&255},${a})`; ctx.lineWidth = w; },
+        drawCircle(x, y, r) { ctx.beginPath(); ctx.arc(x, y, Math.max(0.1, r), 0, Math.PI * 2); if (this._fa > 0) ctx.fill(); if (this._lw > 0) ctx.stroke(); },
+        drawEllipse(x, y, rx, ry) { ctx.beginPath(); ctx.ellipse(x, y, Math.max(0.1, rx), Math.max(0.1, ry), 0, 0, Math.PI * 2); if (this._fa > 0) ctx.fill(); if (this._lw > 0) ctx.stroke(); },
+        drawRoundedRect(x, y, w, h, r) { ctx.beginPath(); ctx.roundRect(x, y, w, h, r); if (this._fa > 0) ctx.fill(); if (this._lw > 0) ctx.stroke(); },
+        drawRect(x, y, w, h) { if (this._fa > 0) ctx.fillRect(x, y, w, h); if (this._lw > 0) ctx.strokeRect(x, y, w, h); },
+        moveTo(x, y) { ctx.beginPath(); ctx.moveTo(x, y); },
+        lineTo(x, y) { ctx.lineTo(x, y); if (this._lw > 0) ctx.stroke(); },
+        quadraticCurveTo(cx, cy, x, y) { ctx.quadraticCurveTo(cx, cy, x, y); },
+        arc(x, y, r, s, e, ccw) { ctx.arc(x, y, r, s, e, ccw); },
+        closePath() { ctx.closePath(); if (this._fa > 0) ctx.fill(); },
+        fillText(txt, x, y, size) { ctx.font = `${size}px Arial`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(txt, x, y); }
+    };
+}
+
+function drawBadges(g, cx, cy, size, badges) {
+    if (!badges || badges.length === 0) return;
+    const slots = [
+        { x: -0.35, y: -0.1 }, { x: 0.35, y: -0.1 },
+        { x: -0.2, y: 0.15 }, { x: 0.2, y: 0.15 },
+        { x: -0.25, y: 0.4 }, { x: 0.25, y: 0.4 }
+    ];
+    badges.slice(0, 6).forEach((badgeId, i) => {
+        const badge = BADGE_PARTS.find(b => b.id === badgeId);
+        if (!badge) return;
+        const slot = slots[i];
+        const bx = cx + slot.x * size;
+        const by = cy + slot.y * size;
+        g.beginFill(badge.color, 0.4);
+        g.drawCircle(bx, by, size * 0.12);
+        g.endFill();
+        g.beginFill(0xFFFFFF);
+        g.fillText(badge.icon, bx, by, size * 0.15);
+    });
+}
+
+function startPhase3() {
+    // Phase 3 시작 시 항상 진화 레벨 확인
+    // runnerDist가 0이면 처음 시작이므로 레벨 0
+    if ((GameState.runnerDist || 0) === 0) {
+        GameState.evolutionGauge = 0;
+        GameState.evolutionLevel = 0;
+        GameState.save();
+    }
+    
+    runnerDist = GameState.runnerDist || 0;
+    bgOffset = 0;
+    lastGapTime = 0;
+    runnerHP = 3;
+    invincibleUntil = 0;
+    evolutionGauge = GameState.evolutionGauge || 0;
+    evolutionLevel = GameState.evolutionLevel || 0;
+    evolutionAnimating = false;
+    sparkles = [];
+    bgParticles = [];
+    zoneTransitionTimer = 0;
+    runnerGraphics = null; // Graphics 객체 초기화
+    
+    // 디버그 로그
+    console.log('startPhase3: evolutionLevel =', evolutionLevel, 'runnerDist =', runnerDist);
+    
+    currentCreature = evolveCreatureByLevel(GameState.creature, evolutionLevel);
+    
+    const zone = getCurrentZone(runnerDist);
+    currentZoneId = zone.id;
+    const skyTop = parseInt(zone.sky[0].replace('#', ''), 16);
+    initPixi(skyTop);
+    
+    runner = { x: 80, y: 0, w: 50, h: 70, vy: 0, onGround: true };
+    runnerGaps = [];
+    runnerItems = [];
+    
+    // 초기 배경 파티클 생성
+    spawnBgParticles(zone.id);
+    
+    const t = GameState.t.bind(GameState);
+    const birthEnv = getEnvById(GameState.envId);
+    
+    app.innerHTML = `
+        <!-- 중앙 상단: 시대 이름 크게 -->
+        <div id="era-display" style="position: fixed; top: calc(15px + var(--safe-top)); left: 50%; transform: translateX(-50%); 
+            background: linear-gradient(135deg, rgba(0,0,0,0.7), rgba(30,30,60,0.8)); 
+            border-radius: 16px; padding: 8px 24px; backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.1); z-index: 100;">
+            <div style="font-size: 1.4rem; font-weight: 900; color: #fff; text-shadow: 0 2px 8px rgba(0,0,0,0.5);" id="era-name">${zone.name}</div>
+        </div>
+        
+        <!-- 시대 전환 알림 -->
+        <div id="zone-transition" style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            background: linear-gradient(135deg, rgba(255,215,0,0.9), rgba(255,165,0,0.9));
+            border-radius: 20px; padding: 20px 40px; z-index: 200; display: none;
+            box-shadow: 0 0 40px rgba(255,215,0,0.5);">
+            <div style="font-size: 1.2rem; font-weight: 900; color: #000; text-align: center;">🌍 문명이 전환되었습니다!</div>
+            <div style="font-size: 1.6rem; font-weight: 900; color: #333; text-align: center; margin-top: 8px;" id="new-era-name"></div>
+        </div>
+        
+        <!-- 좌측 상단: HP, 진화 게이지 -->
+        <div class="hud-top" style="display: flex; justify-content: space-between; align-items: flex-start; padding: 12px 16px; padding-top: calc(55px + var(--safe-top));">
+            <div style="background: rgba(0,0,0,0.6); border-radius: 12px; padding: 10px 14px; backdrop-filter: blur(8px);">
+                <div style="display: flex; gap: 3px; margin-bottom: 6px;" id="hp-display">${'❤️'.repeat(runnerHP)}${'🖤'.repeat(Math.max(0, 3 - runnerHP))}</div>
+                <!-- 진화 게이지 -->
+                <div>
+                    <div style="font-size: 0.65rem; color: #aaa; margin-bottom: 2px;">🧬 진화 <span id="evo-count">${Math.floor(evolutionGauge / 5)}</span>/20</div>
+                    <div style="width: 100px; height: 8px; background: rgba(0,0,0,0.5); border-radius: 4px; overflow: hidden;">
+                        <div id="evo-gauge-bar" style="width: ${evolutionGauge}%; height: 100%; background: linear-gradient(90deg, #9d4edd, #ff6b6b); transition: width 0.3s;"></div>
+                    </div>
+                    <div style="font-size: 0.6rem; color: #c77dff; margin-top: 2px;">문명 Lv.${evolutionLevel + 1}/5</div>
+                </div>
+            </div>
+            
+            <!-- 우측 상단: 출생지 + 홈 -->
+            <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 8px;">
+                <div style="display: flex; gap: 6px; align-items: center;">
+                    <div style="background: rgba(0,0,0,0.6); border-radius: 10px; padding: 6px 10px; backdrop-filter: blur(8px); display: flex; align-items: center; gap: 6px;">
+                        <span style="font-size: 1.2rem;">${birthEnv?.icon || '🌊'}</span>
+                        <span style="font-size: 0.7rem; color: #aaa;">${birthEnv?.name || '해양'}</span>
+                    </div>
+                    <button class="hud-btn" id="btn-home-p3" style="width: 36px; height: 36px; font-size: 1rem;">🏠</button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="controls">
+            <button class="action-btn" id="btn-duck" style="font-size: 1rem;">⬇️</button>
+            <button class="action-btn" id="btn-jump-p3">⬆️</button>
+        </div>
+        <div class="modal" id="modal-p3-gameover">
+            <div class="modal-box">
+                <div class="modal-icon">🕳️</div>
+                <h2 class="modal-title fail">${t('p3Gameover')}</h2>
+                <p class="modal-desc">${t('p3GameoverDesc')}</p>
+                <div class="modal-stats"><div class="stat-row"><span class="stat-label">${t('p3Distance')}</span><span class="stat-val" id="p3go-dist">0m</span></div></div>
+                <div class="modal-btns"><button class="btn btn-primary btn-block" id="btn-p3-retry">🔄 ${t('retry')}</button></div>
+            </div>
+        </div>
+        <div class="modal" id="modal-evolution">
+            <div class="modal-box">
+                <div class="modal-icon">✨</div>
+                <h2 class="modal-title" style="color: #ffd700;">진화!</h2>
+                <p class="modal-desc" id="evo-desc">새로운 형태로 진화했습니다!</p>
+                <div id="evo-preview" style="width: 140px; height: 140px; margin: 15px auto; background: rgba(0,0,0,0.4); border-radius: 16px;"></div>
+                <div class="modal-btns"><button class="btn btn-primary btn-block" id="btn-evo-continue">계속 →</button></div>
+            </div>
+        </div>
+        <div class="modal" id="modal-dice">
+            <div class="modal-box">
+                <div class="modal-icon">🎲</div>
+                <h2 class="modal-title">진화 주사위!</h2>
+                <p class="modal-desc">51 이상이면 새로운 훈장 획득!</p>
+                <div id="dice-number" style="font-size: 3rem; font-weight: 900; color: #ffd700; margin: 20px 0;">?</div>
+                <div id="dice-result"></div>
+            </div>
+        </div>
+        <div class="modal" id="modal-p3-clear">
+            <div class="modal-box">
+                <div class="modal-icon">🎉</div>
+                <h2 class="modal-title win">${t('p3Final')}</h2>
+                <p class="modal-desc">${t('p3FinalDesc')}</p>
+                <div id="final-preview" style="width: 140px; height: 140px; margin: 15px auto; background: rgba(0,0,0,0.4); border-radius: 16px;"></div>
+                <div class="modal-btns"><button class="btn btn-primary btn-block" id="btn-p3-finish">🎉 완료!</button></div>
+            </div>
+        </div>
+    `;
+    
+    setupRunnerControls();
+    setupRunnerHUD();
+    
+    gameLoop = delta => updateRunner(delta);
+    pixiApp.ticker.add(gameLoop);
+    p3GameRunning = true;
+}
+
+function setupRunnerControls() {
+    const jumpPower = CONFIG.P3_JUMP_POWER * (GameState.badges.includes('jump') ? 1.15 : 1);
+    const jump = () => { if (runner.onGround) { runner.vy = jumpPower; runner.onGround = false; SFX.play('jump'); } };
+    const duckStart = () => { if (runner.onGround) runner.h = 35; };
+    const duckEnd = () => { runner.h = 70; };
+    
+    document.getElementById('btn-jump-p3').onclick = jump;
+    document.getElementById('btn-jump-p3').ontouchstart = e => { e.preventDefault(); jump(); };
+    document.getElementById('btn-duck').ontouchstart = e => { e.preventDefault(); duckStart(); };
+    document.getElementById('btn-duck').ontouchend = duckEnd;
+    document.getElementById('btn-duck').onmousedown = duckStart;
+    document.getElementById('btn-duck').onmouseup = duckEnd;
+    
+    const keyDown = e => {
+        if (!p3GameRunning) return;
+        if (e.key === ' ' || e.key === 'ArrowUp' || e.key.toLowerCase() === 'w') jump();
+        if (e.key === 'ArrowDown' || e.key.toLowerCase() === 's') duckStart();
+    };
+    const keyUp = e => {
+        if (e.key === 'ArrowDown' || e.key.toLowerCase() === 's') duckEnd();
+    };
+    window.removeEventListener('keydown', keyDown);
+    window.removeEventListener('keyup', keyUp);
+    window.addEventListener('keydown', keyDown);
+    window.addEventListener('keyup', keyUp);
+}
+
+function setupRunnerHUD() {
+    const t = GameState.t.bind(GameState);
+    document.getElementById('btn-home-p3').onclick = () => {
+        if (confirm(t('confirmHome'))) {
+            p3GameRunning = false;
+            if (gameLoop && pixiApp) pixiApp.ticker.remove(gameLoop);
+            GameState.runnerDist = runnerDist;
+            GameState.save();
+            showTitle();
+        }
+    };
+    document.getElementById('btn-p3-retry').onclick = () => {
+        document.getElementById('modal-p3-gameover').classList.remove('show');
+        startPhase3();
+    };
+    document.getElementById('btn-evo-continue').onclick = () => {
+        document.getElementById('modal-evolution').classList.remove('show');
+        evolutionAnimating = false;
+        p3GameRunning = true;
+    };
+    document.getElementById('btn-p3-finish').onclick = () => {
+        document.getElementById('modal-p3-clear').classList.remove('show');
+        showEnding();
+    };
+}
+
+function updateRunner(delta) {
+    if (!p3GameRunning || !pixiApp || evolutionAnimating) return;
+    
+    const zone = getCurrentZone(runnerDist);
+    const groundY = pixiApp.screen.height - 80;
+    const now = Date.now();
+    const baseSpeed = CONFIG.P3_BASE_SPEED;
+    
+    // 물리
+    runner.vy += CONFIG.P3_GRAVITY;
+    runner.y += runner.vy;
+    
+    // 갈라진 틈 위에 있는지 확인
+    let onGap = false;
+    for (const gap of runnerGaps) {
+        if (runner.x + runner.w > gap.x + 10 && runner.x < gap.x + gap.w - 10) {
+            onGap = true;
+            break;
+        }
+    }
+    
+    // 땅에 착지 (틈 위가 아닐 때만)
+    if (!onGap && runner.y >= groundY - runner.h) {
+        runner.y = groundY - runner.h;
+        runner.vy = 0;
+        runner.onGround = true;
+    } else if (onGap && runner.y >= groundY - runner.h && runner.onGround) {
+        // 틈에 빠짐!
+        runner.onGround = false;
+        SFX.play('fall');
+    }
+    
+    // 틈에 빠져서 화면 아래로 떨어지면 게임오버
+    if (runner.y > pixiApp.screen.height + 100) {
+        runnerFail();
+        return;
+    }
+    
+    // 거리 진행
+    runnerDist += baseSpeed * 0.05;
+    bgOffset += baseSpeed;
+    
+    // 시대 전환 체크
+    if (zone.id !== currentZoneId) {
+        currentZoneId = zone.id;
+        showZoneTransition(zone.name);
+        spawnBgParticles(zone.id); // 새 시대 파티클 생성
+    }
+    
+    // 시대 전환 타이머
+    if (zoneTransitionTimer > 0) {
+        zoneTransitionTimer--;
+        if (zoneTransitionTimer === 0) {
+            const transEl = document.getElementById('zone-transition');
+            if (transEl) transEl.style.display = 'none';
+        }
+    }
+    
+    // 시대 이름 업데이트
+    const eraNameEl = document.getElementById('era-name');
+    if (eraNameEl) eraNameEl.textContent = zone.name;
+    
+    // 갈라진 틈 생성 (다양한 모양)
+    if (now - lastGapTime > 2200 + Math.random() * 1200) {
+        const gapW = 55 + Math.random() * 45;
+        const gapType = Math.floor(Math.random() * 4); // 0-3: 다양한 모양
+        runnerGaps.push({ 
+            x: pixiApp.screen.width + 50, 
+            w: gapW, 
+            zoneId: zone.id,
+            type: gapType,
+            seed: Math.random(), // 균열 패턴용
+            depth: 0.6 + Math.random() * 0.4 // 깊이감
+        });
+        lastGapTime = now;
+    }
+    
+    // 아이템 생성 (진화 게이지 아이템) - 출현율 높임
+    if (Math.random() < 0.035) {
+        runnerItems.push({ 
+            x: pixiApp.screen.width + 50, 
+            y: groundY - 80 - Math.random() * 60, 
+            type: 'evo'
+        });
+    }
+    
+    // 갈라진 틈 이동
+    for (let i = runnerGaps.length - 1; i >= 0; i--) {
+        const gap = runnerGaps[i];
+        gap.x -= baseSpeed * 1.8;
+        if (gap.x < -100) { 
+            runnerGaps.splice(i, 1); 
+        }
+    }
+    
+    // 아이템 수집
+    for (let i = runnerItems.length - 1; i >= 0; i--) {
+        const item = runnerItems[i];
+        item.x -= baseSpeed * 1.8;
+        if (item.x < -50) { runnerItems.splice(i, 1); continue; }
+        
+        const dx = (runner.x + runner.w / 2) - item.x;
+        const dy = (runner.y + runner.h / 2) - item.y;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        
+        if (dist < 45) {
+            runnerItems.splice(i, 1);
+            if (item.type === 'evo') {
+                SFX.play('coin');
+                
+                // 이미 최대 레벨이면 게이지 수집 무시
+                if (evolutionLevel >= 5) continue;
+                
+                evolutionGauge += 5; // 20개 모으면 100% (5% x 20)
+                
+                // 100% 초과 방지
+                if (evolutionGauge > 100) evolutionGauge = 100;
+                
+                GameState.evolutionGauge = evolutionGauge;
+                
+                // 게이지 바 및 카운트 업데이트
+                const gaugeBar = document.getElementById('evo-gauge-bar');
+                const evoCount = document.getElementById('evo-count');
+                if (gaugeBar) gaugeBar.style.width = `${evolutionGauge}%`;
+                if (evoCount) evoCount.textContent = Math.floor(evolutionGauge / 5);
+                
+                // 진화 게이지 가득 차면 진화 + 다음 문명으로!
+                if (evolutionGauge >= 100 && evolutionLevel < 5) {
+                    evolutionGauge = 0;
+                    evolutionLevel++;
+                    GameState.evolutionLevel = evolutionLevel;
+                    GameState.evolutionGauge = 0;
+                    
+                    // 다음 문명 시작 거리로 점프
+                    // 레벨 5는 현대 문명에서 클리어하므로 1200 유지
+                    const zoneStarts = [0, 300, 600, 900, 1200, 1200];
+                    runnerDist = zoneStarts[Math.min(evolutionLevel, 5)];
+                    GameState.runnerDist = runnerDist;
+                    GameState.save();
+                    triggerEvolution(evolutionLevel);
+                    return;
+                }
+            }
+        }
+    }
+    
+    // 배경 파티클 업데이트
+    updateBgParticles(baseSpeed);
+    
+    // 반짝이 파티클 생성
+    if (Math.random() < 0.03) {
+        sparkles.push({
+            x: Math.random() * pixiApp.screen.width,
+            y: Math.random() * (groundY - 50),
+            life: 1,
+            size: 2 + Math.random() * 3,
+            speed: 0.5 + Math.random() * 1
+        });
+    }
+    
+    // 크리처 업데이트
+    try {
+        currentCreature = evolveCreatureByLevel(GameState.creature, evolutionLevel);
+    } catch(e) {
+        console.error('Creature evolution error:', e);
+    }
+    
+    // 렌더링
+    try {
+        renderRunnerScene(zone, groundY);
+    } catch(e) {
+        console.error('Render error:', e);
+    }
+    
+    // 레벨 5 도달하면 클리어 (triggerEvolution에서 처리)
+}
+
+// 배경 파티클 생성
+function spawnBgParticles(zoneId) {
+    try {
+        bgParticles = [];
+        const styles = BG_PARTICLE_STYLES[zoneId] || BG_PARTICLE_STYLES.primitive;
+        if (!styles) return;
+        
+        const screenW = pixiApp?.screen?.width || 400;
+        const screenH = pixiApp?.screen?.height || 600;
+        
+        styles.forEach(style => {
+            for (let i = 0; i < style.count; i++) {
+                bgParticles.push({
+                    x: Math.random() * screenW,
+                    y: Math.random() * (screenH - 100),
+                    type: style.type,
+                    color: style.color,
+                size: 3 + Math.random() * 5,
+                speedX: -0.5 - Math.random() * 2,
+                speedY: style.type === 'snow' ? 0.5 + Math.random() : (Math.random() - 0.5) * 0.5,
+                phase: Math.random() * Math.PI * 2,
+                alpha: 0.4 + Math.random() * 0.4
+            });
+        }
+    });
+    } catch(e) {
+        console.error('spawnBgParticles error:', e);
+    }
+}
+
+// 배경 파티클 업데이트
+function updateBgParticles(baseSpeed) {
+    try {
+    const screenW = pixiApp?.screen?.width || 400;
+    const screenH = pixiApp?.screen?.height || 600;
+    
+    for (const p of bgParticles) {
+        p.x += p.speedX - baseSpeed * 0.3;
+        p.y += p.speedY;
+        p.phase += 0.05;
+        
+        // 화면 밖으로 나가면 재생성
+        if (p.x < -20) {
+            p.x = screenW + 20;
+            p.y = Math.random() * (screenH - 100);
+        }
+        if (p.y > screenH - 80) {
+            p.y = -10;
+            p.x = Math.random() * screenW;
+        }
+    }
+    } catch(e) {
+        console.error('updateBgParticles error:', e);
+    }
+}
+
+function showZoneTransition(zoneName) {
+    const transEl = document.getElementById('zone-transition');
+    const newEraEl = document.getElementById('new-era-name');
+    if (transEl && newEraEl) {
+        newEraEl.textContent = zoneName;
+        transEl.style.display = 'block';
+        zoneTransitionTimer = 120; // 약 2초
+    }
+}
+
+function triggerEvolution(level) {
+    p3GameRunning = false;
+    evolutionAnimating = true;
+    SFX.play('evolve');
+    GameState.save();
+    
+    const evoNames = {
+        1: '🦵 다리가 자랐습니다!',
+        2: '💪 팔이 자랐습니다!',
+        3: '✨ 특징이 나타났습니다!',
+        4: '🌟 완전히 진화했습니다!',
+        5: '🤖 기계와 융합했습니다!'
+    };
+    
+    // 레벨 5면 게임 클리어!
+    if (level >= 5) {
+        setTimeout(() => {
+            document.getElementById('modal-evolution').classList.remove('show');
+            runnerComplete();
+        }, 2000);
+    }
+    
+    document.getElementById('evo-desc').textContent = evoNames[level] || '진화했습니다!';
+    setTimeout(() => {
+        renderCreatureCanvasLevel('evo-preview', GameState.creature, level);
+    }, 100);
+    document.getElementById('modal-evolution').classList.add('show');
+}
+
+function rollEvoDice() {
+    document.getElementById('modal-dice').classList.add('show');
+    const diceEl = document.getElementById('dice-number');
+    const resultEl = document.getElementById('dice-result');
+    SFX.play('dice'); // 주사위 효과음
+    
+    let count = 0;
+    const anim = setInterval(() => {
+        diceEl.textContent = Math.floor(Math.random() * 100) + 1;
+        count++;
+        if (count > 20) {
+            clearInterval(anim);
+            const luckBonus = GameState.badges.includes('luck') ? 5 : 0;
+            const roll = Math.floor(Math.random() * 100) + 1 + luckBonus;
+            diceEl.textContent = Math.min(100, roll);
+            
+            if (roll >= 51) {
+                diceEl.style.color = '#10b981';
+                const owned = GameState.badges || [];
+                const available = BADGE_PARTS.filter(b => !owned.includes(b.id));
+                
+                if (available.length > 0) {
+                    const badge = available[Math.floor(Math.random() * available.length)];
+                    GameState.badges.push(badge.id);
+                    GameState.save();
+                    
+                    resultEl.innerHTML = `
+                        <div style="margin: 15px 0; text-align: center;">
+                            <div style="font-size: 2.5rem;">${badge.icon}</div>
+                            <div style="font-size: 1rem; font-weight: 700; color: #10b981; margin: 6px 0;">${badge.name} 획득!</div>
+                            <div style="font-size: 0.8rem; color: #ffd700;">${badge.effect}</div>
+                        </div>
+                        <button class="btn btn-primary btn-block" id="btn-dice-ok">확인</button>
+                    `;
+                } else {
+                    resultEl.innerHTML = `<p style="color: #888; margin: 15px 0;">모든 훈장을 획득했습니다!</p><button class="btn btn-primary btn-block" id="btn-dice-ok">확인</button>`;
+                }
+            } else {
+                diceEl.style.color = '#ff4466';
+                resultEl.innerHTML = `
+                    <div style="margin: 15px 0; text-align: center;">
+                        <div style="font-size: 2rem;">😢</div>
+                        <div style="font-size: 0.9rem; color: #888;">다음 기회에...</div>
+                    </div>
+                    <button class="btn btn-outline btn-block" id="btn-dice-ok">계속</button>
+                `;
+            }
+            
+            document.getElementById('btn-dice-ok').onclick = () => {
+                document.getElementById('modal-dice').classList.remove('show');
+                diceEl.style.color = '#ffd700';
+                p3GameRunning = true;
+            };
+        }
+    }, 50);
+}
+
+let runnerGraphics = null; // 재사용할 Graphics 객체
+
+function renderRunnerScene(zone, groundY) {
+    if (!pixiApp) return;
+    const w = pixiApp.screen.width, h = pixiApp.screen.height, t = Date.now() * 0.001, now = Date.now();
+    
+    // Graphics 객체 재사용
+    if (!runnerGraphics) {
+        runnerGraphics = new PIXI.Graphics();
+        pixiApp.stage.addChild(runnerGraphics);
+    }
+    const g = runnerGraphics;
+    g.clear(); // 이전 프레임 지우기
+    
+    // 하늘 그라데이션
+    const skyTop = parseInt(zone.sky[0].replace('#', ''), 16);
+    const skyBot = parseInt(zone.sky[1].replace('#', ''), 16);
+    for (let i = 0; i < 20; i++) {
+        g.beginFill(lerpColor(skyTop, skyBot, i / 20));
+        g.drawRect(0, i * (groundY / 20), w, groundY / 20 + 1);
+        g.endFill();
+    }
+    
+    // 배경 파티클 렌더링
+    for (const p of bgParticles) {
+        const px = p.x;
+        const py = p.y + Math.sin(p.phase) * 3;
+        g.beginFill(p.color, p.alpha);
+        
+        switch(p.type) {
+            case 'leaf':
+            case 'butterfly':
+                // 나뭇잎/나비 - 회전하는 타원
+                const rot = t * 2 + p.phase;
+                g.drawEllipse(px, py, p.size * Math.abs(Math.cos(rot)), p.size * 0.5);
+                break;
+            case 'snow':
+            case 'sparkle':
+                // 눈/반짝이 - 원
+                g.drawCircle(px, py, p.size * (0.5 + Math.sin(p.phase) * 0.3));
+                break;
+            case 'ash':
+            case 'dust':
+                // 재/먼지 - 작은 원
+                g.drawCircle(px, py, p.size * 0.5);
+                break;
+            case 'ember':
+            case 'spark':
+                // 불꽃 - 글로우 효과
+                g.endFill();
+                g.beginFill(p.color, p.alpha * 0.3);
+                g.drawCircle(px, py, p.size * 1.5);
+                g.endFill();
+                g.beginFill(0xFFFFFF, p.alpha);
+                g.drawCircle(px, py, p.size * 0.4);
+                break;
+            case 'mist':
+            case 'smoke':
+                // 안개/연기 - 큰 흐린 원
+                g.drawCircle(px, py, p.size * 2);
+                break;
+            case 'neon':
+            case 'data':
+            case 'light':
+                // 네온/데이터 - 사각형
+                g.endFill();
+                g.beginFill(p.color, p.alpha * 0.5);
+                g.drawRect(px - 1, py - p.size, 2, p.size * 2);
+                break;
+            case 'pterodactyl':
+                // 익룡 실루엣
+                g.moveTo(px, py);
+                g.lineTo(px - p.size * 2, py + p.size);
+                g.lineTo(px, py + p.size * 0.3);
+                g.lineTo(px + p.size * 2, py + p.size);
+                g.closePath();
+                break;
+            default:
+                g.drawCircle(px, py, p.size);
+        }
+        g.endFill();
+    }
+    
+    // 반짝이 파티클
+    for (let i = sparkles.length - 1; i >= 0; i--) {
+        const sp = sparkles[i];
+        sp.life -= 0.02;
+        sp.y -= sp.speed;
+        if (sp.life <= 0) { sparkles.splice(i, 1); continue; }
+        
+        const alpha = sp.life * 0.8;
+        const pulse = 0.5 + Math.sin(t * 8 + i) * 0.5;
+        g.beginFill(0xFFFFFF, alpha * pulse);
+        g.drawCircle(sp.x, sp.y, sp.size * sp.life);
+        g.endFill();
+    }
+    
+    // 배경 장식
+    drawStageBg(g, zone, w, groundY, t);
+    
+    // 땅 (갈라진 틈 제외하고 그리기)
+    const groundCol = parseInt(zone.ground.replace('#', ''), 16);
+    const groundDark = lerpColor(groundCol, 0x000000, 0.3);
+    
+    // 갈라진 틈 렌더링 (개선된 버전)
+    const gapStyle = GAP_STYLES[zone.id] || GAP_STYLES.primitive;
+    for (const gap of runnerGaps) {
+        const gType = gap.type || 0;
+        const seed = gap.seed || 0.5;
+        const depth = gap.depth || 0.8;
+        
+        // 틈 내부 그라데이션 (깊이감)
+        for (let layer = 0; layer < 4; layer++) {
+            const layerAlpha = 0.3 + layer * 0.2;
+            const layerInset = layer * 3;
+            g.beginFill(gapStyle.color, layerAlpha * depth);
+            g.drawRect(gap.x + layerInset, groundY + layer * 10, gap.w - layerInset * 2, h - groundY);
+            g.endFill();
+        }
+        
+        // 균열 패턴 (타입별로 다른 모양)
+        g.lineStyle(2, gapStyle.edgeColor, 0.7);
+        
+        if (gType === 0) {
+            // 지그재그 균열
+            const points = 5 + Math.floor(seed * 4);
+            for (let side = 0; side < 2; side++) {
+                const baseX = side === 0 ? gap.x : gap.x + gap.w;
+                g.moveTo(baseX, groundY);
+                for (let i = 1; i <= points; i++) {
+                    const zigzag = (side === 0 ? -1 : 1) * (seed * 8 + Math.sin(i * seed * 10) * 5);
+                    g.lineTo(baseX + zigzag, groundY + (i / points) * (h - groundY) * 0.6);
+                }
+            }
+        } else if (gType === 1) {
+            // 거미줄 균열
+            const cx = gap.x + gap.w / 2;
+            for (let i = 0; i < 6; i++) {
+                const angle = -Math.PI / 2 + (i - 2.5) * 0.3 + seed * 0.5;
+                const len = 15 + seed * 20;
+                g.moveTo(cx, groundY);
+                g.lineTo(cx + Math.cos(angle) * len, groundY + Math.sin(angle) * len);
+            }
+        } else if (gType === 2) {
+            // 계단식 균열
+            for (let side = 0; side < 2; side++) {
+                const baseX = side === 0 ? gap.x : gap.x + gap.w;
+                const dir = side === 0 ? -1 : 1;
+                g.moveTo(baseX, groundY);
+                for (let i = 0; i < 4; i++) {
+                    const stepY = groundY + i * 20 + 10;
+                    g.lineTo(baseX + dir * (5 + seed * 10), stepY);
+                    g.lineTo(baseX + dir * (5 + seed * 10), stepY + 15);
+                }
+            }
+        } else {
+            // 불규칙 균열
+            for (let i = 0; i < 4; i++) {
+                const sx = gap.x + seed * gap.w * 0.3 + i * gap.w * 0.2;
+                const ex = sx + (Math.random() - 0.5) * 15;
+                g.moveTo(sx, groundY);
+                g.bezierCurveTo(sx - 5, groundY - 10, ex + 5, groundY - 15, ex, groundY - 20 - i * 3);
+            }
+        }
+        g.lineStyle(0);
+        
+        // 틈 가장자리 하이라이트
+        g.lineStyle(3, gapStyle.edgeColor, 0.9);
+        g.moveTo(gap.x, groundY);
+        g.lineTo(gap.x, groundY + 30);
+        g.moveTo(gap.x + gap.w, groundY);
+        g.lineTo(gap.x + gap.w, groundY + 30);
+        g.lineStyle(0);
+        
+        // 틈에서 나오는 이펙트 (문명별)
+        if (zone.id === 'dinosaur') {
+            // 용암 불빛
+            const glowPulse = 0.3 + Math.sin(t * 4 + gap.x * 0.01) * 0.2;
+            g.beginFill(0xFF4500, glowPulse);
+            g.drawEllipse(gap.x + gap.w / 2, groundY + 15, gap.w * 0.4, 8);
+            g.endFill();
+            // 연기
+            for (let s = 0; s < 3; s++) {
+                const smokeY = groundY - 10 - s * 15 - (t * 20 + s * 10) % 40;
+                const smokeAlpha = Math.max(0, 0.3 - s * 0.1);
+                g.beginFill(0x333333, smokeAlpha);
+                g.drawCircle(gap.x + gap.w / 2 + Math.sin(t + s) * 5, smokeY, 6 + s * 2);
+                g.endFill();
+            }
+        } else if (zone.id === 'ice') {
+            // 얼음 반짝임
+            for (let i = 0; i < 3; i++) {
+                const sparkle = Math.sin(t * 6 + i * 2 + gap.x * 0.02) > 0.7;
+                if (sparkle) {
+                    g.beginFill(0xFFFFFF, 0.8);
+                    g.drawCircle(gap.x + 5 + i * gap.w * 0.4, groundY + 5, 2);
+                    g.endFill();
+                }
+            }
+            // 안개
+            g.beginFill(0xE0FFFF, 0.2);
+            g.drawEllipse(gap.x + gap.w / 2, groundY - 5, gap.w * 0.6, 10);
+            g.endFill();
+        } else if (zone.id === 'modern') {
+            // 전기 스파크
+            if (Math.random() < 0.1) {
+                g.lineStyle(1, 0x00FFFF, 0.8);
+                const sx = gap.x + Math.random() * gap.w;
+                g.moveTo(sx, groundY);
+                g.lineTo(sx + (Math.random() - 0.5) * 10, groundY - 15);
+                g.lineTo(sx + (Math.random() - 0.5) * 15, groundY - 25);
+                g.lineStyle(0);
+            }
+            // 네온 글로우
+            g.beginFill(0x00FFFF, 0.15 + Math.sin(t * 8) * 0.1);
+            g.drawRect(gap.x, groundY, gap.w, 5);
+            g.endFill();
+        } else {
+            // 기본: 먼지 파티클
+            for (let d = 0; d < 2; d++) {
+                const dustY = groundY - 5 - ((t * 15 + d * 20 + gap.x) % 30);
+                g.beginFill(0x8B7355, 0.3);
+                g.drawCircle(gap.x + gap.w * 0.3 + d * gap.w * 0.4, dustY, 3);
+                g.endFill();
+            }
+        }
+    }
+    
+    // 땅 그리기 (틈 위에 마스크)
+    g.beginFill(groundCol);
+    let lastX = 0;
+    const sortedGaps = [...runnerGaps].sort((a, b) => a.x - b.x);
+    for (const gap of sortedGaps) {
+        if (gap.x > lastX) {
+            g.drawRect(lastX, groundY, gap.x - lastX, (h - groundY) * 0.4);
+        }
+        lastX = gap.x + gap.w;
+    }
+    if (lastX < w) {
+        g.drawRect(lastX, groundY, w - lastX, (h - groundY) * 0.4);
+    }
+    g.endFill();
+    
+    // 땅 아래쪽 (어두운 부분)
+    g.beginFill(groundDark);
+    lastX = 0;
+    for (const gap of sortedGaps) {
+        if (gap.x > lastX) {
+            g.drawRect(lastX, groundY + (h - groundY) * 0.4, gap.x - lastX, (h - groundY) * 0.6);
+        }
+        lastX = gap.x + gap.w;
+    }
+    if (lastX < w) {
+        g.drawRect(lastX, groundY + (h - groundY) * 0.4, w - lastX, (h - groundY) * 0.6);
+    }
+    g.endFill();
+    
+    // 땅 패턴 (그림자)
+    g.beginFill(0x000000, 0.08);
+    for (let dx = -bgOffset % 80; dx < w; dx += 80) {
+        let inGap = false;
+        for (const gap of runnerGaps) {
+            if (dx + 20 > gap.x && dx + 20 < gap.x + gap.w) { inGap = true; break; }
+        }
+        if (!inGap) g.drawEllipse(dx + 20, groundY + 8, 25, 4);
+    }
+    g.endFill();
+    
+    // 진화 게이지 아이템
+    for (const item of runnerItems) {
+        if (item.type === 'evo') {
+            const bobY = Math.sin(t * 5 + item.x * 0.01) * 4;
+            const pulse = 0.8 + Math.sin(t * 6) * 0.2;
+            
+            // 글로우 효과
+            g.beginFill(0x9d4edd, 0.2);
+            g.drawCircle(item.x, item.y + bobY, 22 * pulse);
+            g.endFill();
+            
+            // 외부 원
+            g.beginFill(0x9d4edd, 0.8);
+            g.drawCircle(item.x, item.y + bobY, 14);
+            g.endFill();
+            
+            // 내부 원
+            g.beginFill(0xc77dff);
+            g.drawCircle(item.x, item.y + bobY, 9);
+            g.endFill();
+            
+            // DNA 이중나선 효과
+            g.lineStyle(2, 0xFFFFFF, 0.8);
+            for (let i = 0; i < 3; i++) {
+                const angle = t * 4 + i * Math.PI * 2 / 3;
+                const sx = Math.cos(angle) * 5;
+                const sy = Math.sin(angle) * 3;
+                g.moveTo(item.x + sx, item.y + bobY - 4 + sy);
+                g.lineTo(item.x - sx, item.y + bobY + 4 - sy);
+            }
+            g.lineStyle(0);
+            
+            // ✨ 반짝이
+            g.beginFill(0xFFFFFF, 0.8);
+            g.drawCircle(item.x - 4, item.y + bobY - 4, 2);
+            g.endFill();
+        }
+    }
+    
+    // 캐릭터
+    const isInvincible = now < invincibleUntil;
+    const blink = isInvincible && Math.floor(now / 100) % 2 === 0;
+    if (!blink && currentCreature) {
+        drawCreature(g, currentCreature, runner.x + runner.w / 2, runner.y + runner.h / 2 - 10, runner.h * 0.9, t);
+    }
+    if (isInvincible && !blink) {
+        g.lineStyle(3, 0x00F5D4, 0.4 + Math.sin(t * 10) * 0.2);
+        g.drawCircle(runner.x + runner.w / 2, runner.y + runner.h / 2, runner.w * 0.75);
+        g.lineStyle(0);
+    }
+}
+
+function hslToHex(h, s, l) {
+    s /= 100; l /= 100;
+    const a = s * Math.min(l, 1 - l);
+    const f = n => {
+        const k = (n + h / 30) % 12;
+        const color = l - a * Math.max(Math.min(k - 3, 9 - k, 1), -1);
+        return Math.round(255 * color);
+    };
+    return (f(0) << 16) | (f(8) << 8) | f(4);
+}
+
+function drawBadgesPixi(g, cx, cy, size, badges) {
+    if (!badges || badges.length === 0) return;
+    const slots = [
+        { x: -0.35, y: -0.1 }, { x: 0.35, y: -0.1 },
+        { x: -0.2, y: 0.15 }, { x: 0.2, y: 0.15 },
+        { x: -0.25, y: 0.4 }, { x: 0.25, y: 0.4 }
+    ];
+    badges.slice(0, 6).forEach((badgeId, i) => {
+        const badge = BADGE_PARTS.find(b => b.id === badgeId);
+        if (!badge) return;
+        const slot = slots[i];
+        const bx = cx + slot.x * size;
+        const by = cy + slot.y * size;
+        g.beginFill(badge.color, 0.5); g.drawCircle(bx, by, size * 0.1); g.endFill();
+        const text = new PIXI.Text(badge.icon, { fontSize: size * 0.15, fontFamily: 'Arial' });
+        text.anchor.set(0.5); text.x = bx; text.y = by;
+        pixiApp.stage.addChild(text);
+    });
+}
+
+function drawStageBg(g, zone, w, groundY, t) {
+    const id = zone.id;
+    
+    // 배경 레이어 (가장 먼 곳 - 흐릿하고 작음)
+    // 중간 레이어 (중간 거리 - 약간 흐림)
+    // 전경 레이어는 선명하게
+    
+    if (id === 'primitive') {
+        // 가장 먼 산들 (아주 흐림)
+        g.beginFill(0x2d4a2d, 0.15);
+        for (let i = 0; i < 4; i++) {
+            const mx = ((w + 800) - (bgOffset * 0.02 + i * 400)) % (w + 800);
+            g.moveTo(mx - 200, groundY - 50); g.lineTo(mx - 100, groundY - 180); g.lineTo(mx + 100, groundY - 150); g.lineTo(mx + 180, groundY - 50); g.closePath();
+        }
+        g.endFill();
+        
+        // 중간 산들 (약간 흐림)
+        g.beginFill(0x3d5c3d, 0.25);
+        for (let i = 0; i < 3; i++) {
+            const mx = ((w + 500) - (bgOffset * 0.04 + i * 350)) % (w + 500);
+            g.moveTo(mx - 150, groundY); g.lineTo(mx - 50, groundY - 120 - i * 15); g.lineTo(mx + 50, groundY - 100); g.lineTo(mx + 120, groundY); g.closePath();
+        }
+        g.endFill();
+        
+        // 언덕 (중간 흐림)
+        g.beginFill(0x4a6741, 0.35);
+        for (let i = 0; i < 4; i++) { const hx = ((w + 350) - (bgOffset * 0.1 + i * 250)) % (w + 350); g.drawEllipse(hx, groundY, 100, 40); }
+        g.endFill();
+        
+        // 나무 (전경 - 선명)
+        for (let i = 0; i < 3; i++) {
+            const tx = ((w + 220) - (bgOffset * 0.4 + i * 220)) % (w + 220);
+            g.beginFill(0x000000, 0.15); g.drawEllipse(tx, groundY + 3, 25, 6); g.endFill();
+            g.beginFill(0x5D4037); g.drawRect(tx - 6, groundY - 60, 12, 60); g.endFill();
+            g.beginFill(0x2E7D32, 0.9); g.drawCircle(tx, groundY - 75, 30); g.endFill();
+            g.beginFill(0x388E3C, 0.8); g.drawCircle(tx - 15, groundY - 65, 22); g.drawCircle(tx + 15, groundY - 65, 22); g.endFill();
+        }
+    } else if (id === 'dinosaur') {
+        // 아주 먼 화산 (희미)
+        for (let i = 0; i < 3; i++) {
+            const vx = ((w + 900) - (bgOffset * 0.03 + i * 600)) % (w + 900);
+            g.beginFill(0x3d2817, 0.2);
+            g.moveTo(vx - 150, groundY); g.lineTo(vx - 50, groundY - 200); g.lineTo(vx + 50, groundY - 200); g.lineTo(vx + 150, groundY); g.closePath(); g.endFill();
+            g.beginFill(0xFF4500, 0.1); g.drawEllipse(vx, groundY - 190, 30, 15); g.endFill();
+        }
+        
+        // 가까운 화산 (선명)
+        for (let i = 0; i < 2; i++) {
+            const vx = ((w + 600) - (bgOffset * 0.08 + i * 500)) % (w + 600);
+            g.beginFill(0x5D4037, 0.7);
+            g.moveTo(vx - 100, groundY); g.lineTo(vx - 30, groundY - 130); g.lineTo(vx + 30, groundY - 130); g.lineTo(vx + 100, groundY); g.closePath(); g.endFill();
+            g.beginFill(0xFF4500, 0.3 + Math.sin(t * 2 + i) * 0.15); g.drawEllipse(vx, groundY - 120, 25, 15); g.endFill();
+            g.beginFill(0x424242, 0.3 + Math.sin(t * 3) * 0.1);
+            g.drawEllipse(vx + Math.sin(t + i) * 10, groundY - 145, 20, 12);
+            g.drawEllipse(vx + Math.sin(t * 1.5 + i) * 15, groundY - 160, 15, 10);
+            g.endFill();
+        }
+    } else if (id === 'ice') {
+        // 먼 빙산 (흐림)
+        g.beginFill(0x87CEEB, 0.15);
+        for (let i = 0; i < 4; i++) {
+            const ix = ((w + 700) - (bgOffset * 0.03 + i * 450)) % (w + 700);
+            g.moveTo(ix - 120, groundY - 30); g.lineTo(ix - 60, groundY - 150); g.lineTo(ix + 60, groundY - 130); g.lineTo(ix + 100, groundY - 30); g.closePath();
+        }
+        g.endFill();
+        
+        // 가까운 빙산 (선명)
+        g.beginFill(0xB3E5FC, 0.5);
+        for (let i = 0; i < 3; i++) {
+            const ix = ((w + 450) - (bgOffset * 0.1 + i * 350)) % (w + 450);
+            g.moveTo(ix - 80, groundY); g.lineTo(ix - 40, groundY - 90); g.lineTo(ix + 20, groundY - 70); g.lineTo(ix + 60, groundY); g.closePath();
+        }
+        g.endFill();
+        
+        // 눈 (전경)
+        g.beginFill(0xFFFFFF, 0.6);
+        for (let i = 0; i < 20; i++) {
+            const sx = (i * 89 + bgOffset * 0.3 + Math.sin(t + i) * 30) % w;
+            const sy = (i * 67 + t * 15) % (groundY - 30);
+            g.drawCircle(sx, sy, 2 + (i % 3));
+        }
+        g.endFill();
+    } else if (id === 'human') {
+        // 먼 동굴 (흐림)
+        for (let i = 0; i < 3; i++) {
+            const cx = ((w + 700) - (bgOffset * 0.04 + i * 500)) % (w + 700);
+            g.beginFill(0x4a3528, 0.2); g.arc(cx, groundY - 30, 100, Math.PI, 0); g.endFill();
+        }
+        
+        // 가까운 동굴
+        for (let i = 0; i < 2; i++) {
+            const cx = ((w + 500) - (bgOffset * 0.12 + i * 400)) % (w + 500);
+            g.beginFill(0x5D4037, 0.6); g.arc(cx, groundY, 70, Math.PI, 0); g.endFill();
+            g.beginFill(0x3E2723, 0.8); g.arc(cx, groundY, 45, Math.PI, 0); g.endFill();
+        }
+        
+        // 모닥불
+        const fx = ((w + 350) - (bgOffset * 0.25)) % (w + 350);
+        g.beginFill(0xFF6F00, 0.15 + Math.sin(t * 6) * 0.1); g.drawCircle(fx, groundY - 20, 40); g.endFill();
+        g.beginFill(0xFF5722, 0.8);
+        g.moveTo(fx, groundY); g.quadraticCurveTo(fx - 12, groundY - 25, fx - 8, groundY - 35 - Math.sin(t * 10) * 5);
+        g.quadraticCurveTo(fx, groundY - 30, fx, groundY - 45 - Math.sin(t * 12) * 8);
+        g.quadraticCurveTo(fx, groundY - 30, fx + 8, groundY - 35 - Math.sin(t * 11) * 5);
+        g.quadraticCurveTo(fx + 12, groundY - 25, fx, groundY); g.endFill();
+        g.beginFill(0xFFEB3B, 0.9); g.drawEllipse(fx, groundY - 15, 8, 15); g.endFill();
+    } else if (id === 'modern') {
+        // 먼 건물 (흐림 - 실루엣) - 개수 줄임
+        for (let i = 0; i < 5; i++) {
+            const bx = ((w + 400) - (bgOffset * 0.1 + i * 250)) % (w + 400);
+            const bh = 100 + (i * 47) % 80;
+            g.beginFill(0x0a0a1a, 0.3); g.drawRect(bx - 30, groundY - bh - 50, 60, bh + 50); g.endFill();
+        }
+        
+        // 가까운 건물 (선명) - 창문 단순화
+        for (let i = 0; i < 4; i++) {
+            const bx = ((w + 250) - (bgOffset * 0.3 + i * 180)) % (w + 250);
+            const bh = 70 + (i * 37) % 60, bw = 35 + (i * 17) % 20;
+            g.beginFill(0x1a1a2e, 0.85); g.drawRect(bx - bw / 2, groundY - bh, bw, bh); g.endFill();
+            // 창문 단순화 - 4개만
+            for (let r = 0; r < 3; r++) {
+                const lit = Math.sin(t * 0.5 + i * 3 + r * 2) > 0.2;
+                g.beginFill(lit ? 0xFFF59D : 0x0d0d1a, lit ? 0.8 : 0.5);
+                g.drawRect(bx - 8, groundY - bh + 8 + r * 20, 16, 12); g.endFill();
+            }
+        }
+        
+        // 별
+        g.beginFill(0xFFFFFF, 0.5);
+        for (let i = 0; i < 6; i++) { g.drawCircle((i * 150 + t * 5) % w, 30 + (i * 60) % (groundY - 100), 1.5); }
+        g.endFill();
+    }
+}
+
+function drawObstacle(g, o, t) {
+    const cx = o.x + o.w / 2;
+    const cy = o.y + o.h / 2;
+    
+    // 그림자
+    g.beginFill(0x000000, 0.15);
+    g.drawEllipse(cx, o.y + o.h + 4, o.w * 0.4, 6);
+    g.endFill();
+    
+    const type = o.type;
+    
+    // === 원시 육지 ===
+    if (type === 'rock') {
+        // 큰 바위
+        g.beginFill(0x6B5B4F);
+        g.moveTo(o.x + 5, o.y + o.h);
+        g.lineTo(o.x + 10, o.y + o.h * 0.3);
+        g.lineTo(o.x + o.w * 0.4, o.y);
+        g.lineTo(o.x + o.w * 0.7, o.y + o.h * 0.15);
+        g.lineTo(o.x + o.w - 5, o.y + o.h * 0.4);
+        g.lineTo(o.x + o.w, o.y + o.h);
+        g.closePath(); g.endFill();
+        // 하이라이트
+        g.beginFill(0x8B7B6B, 0.6);
+        g.moveTo(o.x + 12, o.y + o.h * 0.5);
+        g.lineTo(o.x + 15, o.y + o.h * 0.35);
+        g.lineTo(o.x + o.w * 0.35, o.y + o.h * 0.25);
+        g.lineTo(o.x + o.w * 0.3, o.y + o.h * 0.45);
+        g.closePath(); g.endFill();
+        // 이끼
+        g.beginFill(0x4A6741, 0.7);
+        g.drawEllipse(o.x + o.w * 0.3, o.y + o.h * 0.7, 8, 5);
+        g.drawEllipse(o.x + o.w * 0.6, o.y + o.h * 0.8, 6, 4);
+        g.endFill();
+    } else if (type === 'bush') {
+        // 덤불
+        g.beginFill(0x2D5A27);
+        g.drawEllipse(cx, o.y + o.h * 0.7, o.w * 0.5, o.h * 0.35);
+        g.endFill();
+        g.beginFill(0x3D7A37);
+        g.drawEllipse(cx - 8, o.y + o.h * 0.5, o.w * 0.35, o.h * 0.3);
+        g.drawEllipse(cx + 8, o.y + o.h * 0.55, o.w * 0.3, o.h * 0.28);
+        g.endFill();
+        g.beginFill(0x4D8A47);
+        g.drawEllipse(cx, o.y + o.h * 0.4, o.w * 0.25, o.h * 0.2);
+        g.endFill();
+        // 열매
+        g.beginFill(0xFF6B6B);
+        g.drawCircle(cx - 5, o.y + o.h * 0.6, 3);
+        g.drawCircle(cx + 8, o.y + o.h * 0.5, 2.5);
+        g.endFill();
+    } else if (type === 'mushroom') {
+        // 버섯 줄기
+        g.beginFill(0xF5DEB3);
+        g.drawRect(cx - 6, o.y + o.h * 0.5, 12, o.h * 0.5);
+        g.endFill();
+        // 버섯 갓
+        g.beginFill(0xDC143C);
+        g.drawEllipse(cx, o.y + o.h * 0.35, o.w * 0.45, o.h * 0.35);
+        g.endFill();
+        // 점무늬
+        g.beginFill(0xFFFFFF);
+        g.drawCircle(cx - 8, o.y + o.h * 0.3, 4);
+        g.drawCircle(cx + 6, o.y + o.h * 0.25, 3);
+        g.drawCircle(cx, o.y + o.h * 0.4, 3.5);
+        g.endFill();
+    }
+    // === 공룡 시대 ===
+    else if (type === 'dino_skull') {
+        // 두개골
+        g.beginFill(0xF5F5DC);
+        g.drawEllipse(cx, cy, o.w * 0.4, o.h * 0.35);
+        g.endFill();
+        // 턱
+        g.beginFill(0xE8E8D0);
+        g.moveTo(cx - o.w * 0.3, cy + 5);
+        g.lineTo(cx - o.w * 0.35, o.y + o.h - 5);
+        g.lineTo(cx + o.w * 0.35, o.y + o.h - 5);
+        g.lineTo(cx + o.w * 0.3, cy + 5);
+        g.closePath(); g.endFill();
+        // 눈구멍
+        g.beginFill(0x2A2A2A);
+        g.drawEllipse(cx - 10, cy - 5, 8, 10);
+        g.drawEllipse(cx + 10, cy - 5, 8, 10);
+        g.endFill();
+        // 이빨
+        g.beginFill(0xFFFFFF);
+        for (let i = 0; i < 5; i++) {
+            g.moveTo(cx - 15 + i * 8, o.y + o.h - 8);
+            g.lineTo(cx - 12 + i * 8, o.y + o.h);
+            g.lineTo(cx - 18 + i * 8, o.y + o.h);
+            g.closePath();
+        }
+        g.endFill();
+    } else if (type === 'dino_egg') {
+        // 알
+        g.beginFill(0xFFFACD);
+        g.drawEllipse(cx, cy + 5, o.w * 0.38, o.h * 0.45);
+        g.endFill();
+        // 무늬
+        g.beginFill(0xE0D5A0, 0.5);
+        g.drawEllipse(cx - 5, cy, 6, 8);
+        g.drawEllipse(cx + 8, cy + 8, 5, 6);
+        g.endFill();
+        // 하이라이트
+        g.beginFill(0xFFFFFF, 0.4);
+        g.drawEllipse(cx - 8, cy - 10, 6, 8);
+        g.endFill();
+        // 금
+        g.lineStyle(2, 0x8B7355, 0.6);
+        g.moveTo(cx + 5, o.y + 5);
+        g.lineTo(cx + 2, o.y + 15);
+        g.lineTo(cx + 8, o.y + 20);
+        g.lineStyle(0);
+    } else if (type === 'fern') {
+        // 양치 줄기
+        g.beginFill(0x228B22);
+        g.drawRect(cx - 3, o.y + o.h * 0.6, 6, o.h * 0.4);
+        g.endFill();
+        // 잎
+        g.beginFill(0x32CD32);
+        for (let i = 0; i < 6; i++) {
+            const ly = o.y + 10 + i * 8;
+            const lw = 15 - i * 2;
+            g.drawEllipse(cx - lw, ly, lw, 4);
+            g.drawEllipse(cx + lw, ly, lw, 4);
+        }
+        g.endFill();
+    }
+    // === 빙하기 ===
+    else if (type === 'iceberg') {
+        // 빙산
+        g.beginFill(0xE0FFFF);
+        g.moveTo(o.x + 5, o.y + o.h);
+        g.lineTo(o.x + o.w * 0.3, o.y + 5);
+        g.lineTo(o.x + o.w * 0.5, o.y + o.h * 0.2);
+        g.lineTo(o.x + o.w * 0.7, o.y);
+        g.lineTo(o.x + o.w - 5, o.y + o.h);
+        g.closePath(); g.endFill();
+        // 음영
+        g.beginFill(0xADD8E6, 0.5);
+        g.moveTo(o.x + o.w * 0.5, o.y + o.h * 0.2);
+        g.lineTo(o.x + o.w * 0.7, o.y);
+        g.lineTo(o.x + o.w - 5, o.y + o.h);
+        g.lineTo(o.x + o.w * 0.5, o.y + o.h);
+        g.closePath(); g.endFill();
+        // 반짝임
+        g.beginFill(0xFFFFFF, 0.7);
+        g.drawCircle(o.x + o.w * 0.35, o.y + o.h * 0.3, 3);
+        g.endFill();
+    } else if (type === 'snowman') {
+        // 눈사람
+        g.beginFill(0xFFFFFF);
+        g.drawCircle(cx, o.y + o.h - 12, 12);
+        g.drawCircle(cx, o.y + o.h - 30, 10);
+        g.drawCircle(cx, o.y + o.h - 45, 8);
+        g.endFill();
+        // 눈
+        g.beginFill(0x000000);
+        g.drawCircle(cx - 3, o.y + o.h - 47, 2);
+        g.drawCircle(cx + 3, o.y + o.h - 47, 2);
+        g.endFill();
+        // 코
+        g.beginFill(0xFF6600);
+        g.moveTo(cx, o.y + o.h - 44);
+        g.lineTo(cx + 8, o.y + o.h - 42);
+        g.lineTo(cx, o.y + o.h - 40);
+        g.closePath(); g.endFill();
+        // 버튼
+        g.beginFill(0x333333);
+        g.drawCircle(cx, o.y + o.h - 28, 2);
+        g.drawCircle(cx, o.y + o.h - 22, 2);
+        g.endFill();
+    } else if (type === 'ice_spike') {
+        // 얼음 기둥
+        g.beginFill(0xB0E0E6, 0.9);
+        g.moveTo(cx, o.y);
+        g.lineTo(o.x + o.w - 5, o.y + o.h);
+        g.lineTo(o.x + 5, o.y + o.h);
+        g.closePath(); g.endFill();
+        // 하이라이트
+        g.beginFill(0xFFFFFF, 0.5);
+        g.moveTo(cx - 3, o.y + 10);
+        g.lineTo(cx + 5, o.y + o.h * 0.7);
+        g.lineTo(cx - 5, o.y + o.h * 0.6);
+        g.closePath(); g.endFill();
+    }
+    // === 원시인 ===
+    else if (type === 'campfire') {
+        // 나무
+        g.beginFill(0x5D4037);
+        g.drawRect(cx - 15, o.y + o.h - 10, 8, 10);
+        g.drawRect(cx + 7, o.y + o.h - 10, 8, 10);
+        g.drawRect(cx - 4, o.y + o.h - 8, 8, 8);
+        g.endFill();
+        // 불꽃
+        const flicker = Math.sin(t * 10) * 3;
+        g.beginFill(0xFF4500, 0.9);
+        g.moveTo(cx, o.y + 10 + flicker);
+        g.quadraticCurveTo(cx + 20, o.y + o.h * 0.5, cx + 10, o.y + o.h - 15);
+        g.lineTo(cx - 10, o.y + o.h - 15);
+        g.quadraticCurveTo(cx - 20, o.y + o.h * 0.5, cx, o.y + 10 + flicker);
+        g.endFill();
+        g.beginFill(0xFFD700, 0.9);
+        g.moveTo(cx, o.y + 20 + flicker);
+        g.quadraticCurveTo(cx + 10, o.y + o.h * 0.6, cx + 5, o.y + o.h - 15);
+        g.lineTo(cx - 5, o.y + o.h - 15);
+        g.quadraticCurveTo(cx - 10, o.y + o.h * 0.6, cx, o.y + 20 + flicker);
+        g.endFill();
+    } else if (type === 'spear') {
+        // 창대
+        g.beginFill(0x8B4513);
+        g.drawRect(cx - 3, o.y + 15, 6, o.h - 15);
+        g.endFill();
+        // 창끝
+        g.beginFill(0x808080);
+        g.moveTo(cx, o.y);
+        g.lineTo(cx + 8, o.y + 18);
+        g.lineTo(cx - 8, o.y + 18);
+        g.closePath(); g.endFill();
+        // 묶음
+        g.beginFill(0xD2691E);
+        g.drawRect(cx - 5, o.y + 15, 10, 6);
+        g.endFill();
+    } else if (type === 'tent') {
+        // 천막
+        g.beginFill(0xD2B48C);
+        g.moveTo(cx, o.y);
+        g.lineTo(o.x + o.w, o.y + o.h);
+        g.lineTo(o.x, o.y + o.h);
+        g.closePath(); g.endFill();
+        // 입구
+        g.beginFill(0x2A2A2A);
+        g.moveTo(cx, o.y + o.h * 0.4);
+        g.lineTo(cx + 10, o.y + o.h);
+        g.lineTo(cx - 10, o.y + o.h);
+        g.closePath(); g.endFill();
+        // 지지대
+        g.beginFill(0x5D4037);
+        g.drawRect(cx - 2, o.y - 5, 4, o.h + 5);
+        g.endFill();
+    }
+    // === 현대 ===
+    else if (type === 'car') {
+        // 차체
+        g.beginFill(0x4169E1);
+        g.drawRoundedRect(o.x, o.y + o.h * 0.35, o.w, o.h * 0.45, 5);
+        g.endFill();
+        g.beginFill(0x4169E1);
+        g.drawRoundedRect(o.x + o.w * 0.15, o.y + o.h * 0.1, o.w * 0.55, o.h * 0.35, 5);
+        g.endFill();
+        // 창문
+        g.beginFill(0x87CEEB, 0.8);
+        g.drawRoundedRect(o.x + o.w * 0.2, o.y + o.h * 0.15, o.w * 0.22, o.h * 0.22, 3);
+        g.drawRoundedRect(o.x + o.w * 0.45, o.y + o.h * 0.15, o.w * 0.2, o.h * 0.22, 3);
+        g.endFill();
+        // 바퀴
+        g.beginFill(0x1A1A1A);
+        g.drawCircle(o.x + o.w * 0.22, o.y + o.h, 9);
+        g.drawCircle(o.x + o.w * 0.78, o.y + o.h, 9);
+        g.endFill();
+        g.beginFill(0x808080);
+        g.drawCircle(o.x + o.w * 0.22, o.y + o.h, 5);
+        g.drawCircle(o.x + o.w * 0.78, o.y + o.h, 5);
+        g.endFill();
+        // 헤드라이트
+        g.beginFill(0xFFFF00, 0.8);
+        g.drawRect(o.x + o.w - 5, o.y + o.h * 0.45, 5, 8);
+        g.endFill();
+    } else if (type === 'hydrant') {
+        // 소화전
+        g.beginFill(0xDC143C);
+        g.drawRoundedRect(cx - 10, o.y + 10, 20, o.h - 15, 5);
+        g.endFill();
+        // 머리
+        g.beginFill(0xDC143C);
+        g.drawEllipse(cx, o.y + 10, 12, 8);
+        g.endFill();
+        // 출구
+        g.beginFill(0x8B0000);
+        g.drawRect(o.x + 3, o.y + o.h * 0.4, 10, 8);
+        g.drawRect(o.x + o.w - 13, o.y + o.h * 0.4, 10, 8);
+        g.endFill();
+        // 볼트
+        g.beginFill(0xC0C0C0);
+        g.drawCircle(cx, o.y + 8, 5);
+        g.endFill();
+    } else if (type === 'trash') {
+        // 쓰레기통
+        g.beginFill(0x2E8B57);
+        g.drawRect(o.x + 5, o.y + 10, o.w - 10, o.h - 10);
+        g.endFill();
+        // 뚜껑
+        g.beginFill(0x228B22);
+        g.drawEllipse(cx, o.y + 10, o.w * 0.45, 8);
+        g.endFill();
+        // 손잡이
+        g.beginFill(0x1A5A1A);
+        g.drawRect(cx - 5, o.y + 3, 10, 8);
+        g.endFill();
+        // 줄무늬
+        g.beginFill(0x1A5A1A, 0.5);
+        g.drawRect(o.x + 8, o.y + 25, o.w - 16, 4);
+        g.drawRect(o.x + 8, o.y + 35, o.w - 16, 4);
+        g.endFill();
+    }
+    // 기본
+    else {
+        g.beginFill(0x888888);
+        g.drawRect(o.x, o.y, o.w, o.h);
+        g.endFill();
+    }
+}
+
+function runnerFail() {
+    p3GameRunning = false;
+    SFX.play('gameover');
+    if (gameLoop && pixiApp) pixiApp.ticker.remove(gameLoop);
+    GameState.runnerDist = runnerDist;
+    GameState.save();
+    document.getElementById('p3go-dist').textContent = `${Math.floor(runnerDist)}m`;
+    document.getElementById('modal-p3-gameover').classList.add('show');
+}
+
+function runnerComplete() {
+    p3GameRunning = false;
+    SFX.play('clear');
+    if (gameLoop && pixiApp) pixiApp.ticker.remove(gameLoop);
+    GameState.phase3Clear = true;
+    GameState.runnerDist = runnerDist;
+    GameState.save();
+    
+    setTimeout(() => {
+        renderCreatureCanvasLevel('final-preview', GameState.creature, evolutionLevel);
+    }, 100);
+    document.getElementById('modal-p3-clear').classList.add('show');
+}
+
+function showEnding() {
+    app.innerHTML = `
+        <div class="page-center">
+            <div class="page-content">
+                <div class="page-icon">🎉</div>
+                <h2 class="page-title">축하합니다!</h2>
+                <p class="page-text">단세포 생물에서<br><span class="hl">완전한 진화</span>를 이루었습니다!</p>
+                <div id="final-creature" style="width: 150px; height: 150px; margin: 20px auto; background: rgba(0,0,0,0.4); border-radius: 16px;"></div>
+                <div style="color: #c77dff; font-size: 1rem; margin-bottom: 16px;">🧬 진화 완료!</div>
+                <button class="btn btn-primary btn-block" id="btn-home">🏠 홈으로</button>
+            </div>
+        </div>
+    `;
+    setTimeout(() => { if (GameState.creature) renderCreatureCanvasLevel('final-creature', GameState.creature, evolutionLevel); }, 100);
+    document.getElementById('btn-home').onclick = () => showTitle();
 }
 
 // ========================================
