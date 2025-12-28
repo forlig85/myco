@@ -6286,6 +6286,77 @@ async function saveRanking(jobType, score) {
 let arcadeState = null;
 let arcadeApp = null;
 
+// 조이스틱 설정 함수
+function setupJoystick(containerId, knobId, onMove) {
+    const container = document.getElementById(containerId);
+    const knob = document.getElementById(knobId);
+    if (!container || !knob) return;
+    
+    let isActive = false;
+    const containerRect = { x: 0, y: 0, radius: 50 };
+    
+    function updateKnob(clientX, clientY) {
+        const rect = container.getBoundingClientRect();
+        const centerX = rect.left + rect.width / 2;
+        const centerY = rect.top + rect.height / 2;
+        const radius = rect.width / 2 - 20;
+        
+        let dx = clientX - centerX;
+        let dy = clientY - centerY;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        
+        if (dist > radius) {
+            dx = (dx / dist) * radius;
+            dy = (dy / dist) * radius;
+        }
+        
+        knob.style.left = `calc(50% + ${dx}px)`;
+        knob.style.top = `calc(50% + ${dy}px)`;
+        
+        // 정규화된 값 (-1 ~ 1)
+        onMove(dx / radius, dy / radius);
+    }
+    
+    function resetKnob() {
+        knob.style.left = '50%';
+        knob.style.top = '50%';
+        onMove(0, 0);
+    }
+    
+    container.addEventListener('mousedown', (e) => {
+        isActive = true;
+        updateKnob(e.clientX, e.clientY);
+    });
+    container.addEventListener('touchstart', (e) => {
+        isActive = true;
+        e.preventDefault();
+        updateKnob(e.touches[0].clientX, e.touches[0].clientY);
+    });
+    
+    document.addEventListener('mousemove', (e) => {
+        if (isActive) updateKnob(e.clientX, e.clientY);
+    });
+    document.addEventListener('touchmove', (e) => {
+        if (isActive) {
+            e.preventDefault();
+            updateKnob(e.touches[0].clientX, e.touches[0].clientY);
+        }
+    }, { passive: false });
+    
+    document.addEventListener('mouseup', () => {
+        if (isActive) {
+            isActive = false;
+            resetKnob();
+        }
+    });
+    document.addEventListener('touchend', () => {
+        if (isActive) {
+            isActive = false;
+            resetKnob();
+        }
+    });
+}
+
 function startArcadeGame(gameType) {
     const gameInfo = {
         cell: { name: '🦠 세포 생존', desc: '4배 크기 맵에서 먹이를 먹고 생존하세요!', time: 60 },
@@ -6340,6 +6411,8 @@ function initArcadeCellGame() {
         time: 60,
         gameOver: false,
         keys: {},
+        joystickX: 0,
+        joystickY: 0,
         timerInterval: null
     };
     
@@ -6358,9 +6431,14 @@ function renderArcadeCellUI() {
                 </div>
             </div>
             <div id="arcade-canvas-wrap" style="flex: 1; width: 100%; position: relative; overflow: hidden;"></div>
-            <div style="padding: 10px; background: rgba(0,0,0,0.8); text-align: center;">
-                <div style="font-size: 0.7rem; color: #888; margin-bottom: 5px;">🟢먹이 🔴적 (크면 잡아먹기 가능)</div>
-                <button id="btn-quit-arcade" style="background: rgba(255,100,100,0.3); border: 1px solid rgba(255,100,100,0.5); border-radius: 8px; padding: 8px 20px; color: #fff; font-size: 0.8rem;">포기</button>
+            <div style="padding: 10px; background: rgba(0,0,0,0.8);">
+                <div style="font-size: 0.65rem; color: #888; text-align: center; margin-bottom: 8px;">🟢먹이 🔴적 (1.5배 이상 크면 잡아먹기)</div>
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <div id="joystick-cell" style="width: 100px; height: 100px; background: rgba(255,255,255,0.1); border-radius: 50%; position: relative; border: 2px solid rgba(100,150,255,0.3);">
+                        <div id="joystick-cell-knob" style="width: 40px; height: 40px; background: rgba(100,150,255,0.6); border-radius: 50%; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);"></div>
+                    </div>
+                    <button id="btn-quit-arcade" style="background: rgba(255,100,100,0.3); border: 1px solid rgba(255,100,100,0.5); border-radius: 8px; padding: 8px 15px; color: #fff; font-size: 0.75rem;">포기</button>
+                </div>
             </div>
         </div>
     `;
@@ -6370,6 +6448,12 @@ function renderArcadeCellUI() {
             endArcadeGame('arcade_cell', arcadeState.score);
         }
     };
+    
+    // 조이스틱 설정
+    setupJoystick('joystick-cell', 'joystick-cell-knob', (dx, dy) => {
+        arcadeState.joystickX = dx;
+        arcadeState.joystickY = dy;
+    });
 }
 
 function initArcadeCellPixi() {
@@ -6477,13 +6561,19 @@ function arcadeCellLoop() {
     
     const speed = s.player.speed + (s.player.size / 40);
     
-    // 플레이어 이동
+    // 키보드 이동
     if (s.keys['ArrowLeft'] || s.keys['a']) s.player.x -= speed;
     if (s.keys['ArrowRight'] || s.keys['d']) s.player.x += speed;
     if (s.keys['ArrowUp'] || s.keys['w']) s.player.y -= speed;
     if (s.keys['ArrowDown'] || s.keys['s']) s.player.y += speed;
     
-    // 터치 이동
+    // 조이스틱 이동
+    if (s.joystickX !== 0 || s.joystickY !== 0) {
+        s.player.x += s.joystickX * speed;
+        s.player.y += s.joystickY * speed;
+    }
+    
+    // 터치 이동 (캔버스 터치)
     if (s.touchTarget) {
         const dx = s.touchTarget.x - s.player.x;
         const dy = s.touchTarget.y - s.player.y;
@@ -6543,9 +6633,9 @@ function arcadeCellLoop() {
         const dy = e.y - s.player.y;
         const dist = Math.sqrt(dx*dx + dy*dy);
         
-        if (dist < s.player.size + e.size - 8) {
-            if (s.player.size > e.size * 1.2) {
-                // 적 제거
+        if (dist < s.player.size + e.size - 10) {
+            if (s.player.size > e.size * 1.5) {
+                // 플레이어가 1.5배 이상 크면 적 제거
                 createCellParticle(e.x, e.y, 0xff4466);
                 e.x = Math.random() * (s.worldW - 100) + 50;
                 e.y = Math.random() * (s.worldH - 100) + 50;
@@ -6553,11 +6643,12 @@ function arcadeCellLoop() {
                 s.score += 50;
                 s.player.size = Math.min(s.player.maxSize, s.player.size + 2);
                 document.getElementById('arc-score').textContent = s.score;
-            } else if (e.size > s.player.size * 1.2) {
-                // 게임 오버
+            } else if (e.size > s.player.size * 1.5) {
+                // 적이 1.5배 이상 크면 게임 오버
                 endArcadeGame('arcade_cell', s.score);
                 return;
             }
+            // 비슷한 크기면 무시 (충돌 없음)
         }
     }
     
@@ -6666,6 +6757,7 @@ function initArcadeClimbGame() {
         time: 90,
         gameOver: false,
         keys: {},
+        joystickX: 0,
         timerInterval: null,
         bgStars: []
     };
@@ -6685,13 +6777,14 @@ function renderArcadeClimbUI() {
                 </div>
             </div>
             <div id="arcade-canvas-wrap" style="flex: 1; width: 100%; position: relative;"></div>
-            <div style="padding: 10px; background: rgba(0,0,0,0.8); display: flex; justify-content: space-between; align-items: center;">
-                <button id="btn-left" style="width: 70px; height: 55px; font-size: 1.5rem; background: rgba(199,125,255,0.3); border: 1px solid rgba(199,125,255,0.5); border-radius: 12px;">⬅️</button>
-                <div style="text-align: center;">
-                    <div style="font-size: 0.6rem; color: #888; margin-bottom: 3px;">🌪️토네이도 ☁️구름</div>
-                    <button id="btn-quit-arcade" style="background: rgba(255,100,100,0.3); border: 1px solid rgba(255,100,100,0.5); border-radius: 8px; padding: 6px 12px; color: #fff; font-size: 0.7rem;">포기</button>
+            <div style="padding: 10px; background: rgba(0,0,0,0.8);">
+                <div style="font-size: 0.6rem; color: #888; text-align: center; margin-bottom: 5px;">🌪️토네이도 ☁️구름 (자동 점프)</div>
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <div id="joystick-climb" style="width: 100px; height: 100px; background: rgba(255,255,255,0.1); border-radius: 50%; position: relative; border: 2px solid rgba(199,125,255,0.3);">
+                        <div id="joystick-climb-knob" style="width: 40px; height: 40px; background: rgba(199,125,255,0.6); border-radius: 50%; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);"></div>
+                    </div>
+                    <button id="btn-quit-arcade" style="background: rgba(255,100,100,0.3); border: 1px solid rgba(255,100,100,0.5); border-radius: 8px; padding: 8px 15px; color: #fff; font-size: 0.75rem;">포기</button>
                 </div>
-                <button id="btn-right" style="width: 70px; height: 55px; font-size: 1.5rem; background: rgba(199,125,255,0.3); border: 1px solid rgba(199,125,255,0.5); border-radius: 12px;">➡️</button>
             </div>
         </div>
     `;
@@ -6702,12 +6795,10 @@ function renderArcadeClimbUI() {
         }
     };
     
-    const btnLeft = document.getElementById('btn-left');
-    const btnRight = document.getElementById('btn-right');
-    btnLeft.ontouchstart = btnLeft.onmousedown = (e) => { e.preventDefault(); arcadeState.keys['ArrowLeft'] = true; };
-    btnLeft.ontouchend = btnLeft.onmouseup = btnLeft.onmouseleave = () => { arcadeState.keys['ArrowLeft'] = false; };
-    btnRight.ontouchstart = btnRight.onmousedown = (e) => { e.preventDefault(); arcadeState.keys['ArrowRight'] = true; };
-    btnRight.ontouchend = btnRight.onmouseup = btnRight.onmouseleave = () => { arcadeState.keys['ArrowRight'] = false; };
+    // 조이스틱 설정 (좌우만 사용)
+    setupJoystick('joystick-climb', 'joystick-climb-knob', (dx, dy) => {
+        arcadeState.joystickX = dx;
+    });
 }
 
 function initArcadeClimbPixi() {
@@ -6778,9 +6869,14 @@ function arcadeClimbLoop() {
     const s = arcadeState;
     if (!s || s.gameOver) return;
     
-    // 좌우 이동
+    // 좌우 이동 (키보드)
     if (s.keys['ArrowLeft'] || s.keys['a']) s.player.x -= 6;
     if (s.keys['ArrowRight'] || s.keys['d']) s.player.x += 6;
+    
+    // 조이스틱 좌우 이동
+    if (s.joystickX !== 0) {
+        s.player.x += s.joystickX * 6;
+    }
     
     // 화면 양쪽 통과
     if (s.player.x < -s.player.size) s.player.x = s.gameW + s.player.size;
@@ -7015,6 +7111,8 @@ function initArcadeEvolveGame() {
         time: 60,
         gameOver: false,
         keys: {},
+        joystickX: 0,
+        joystickY: 0,
         timerInterval: null
     };
     
@@ -7027,15 +7125,20 @@ function renderArcadeEvolveUI() {
         <div style="width: 100%; height: 100%; display: flex; flex-direction: column; background: #0a2a1a;">
             <div style="background: rgba(0,0,0,0.8); padding: 10px 15px; display: flex; justify-content: space-between; align-items: center;">
                 <div style="font-size: 1rem; font-weight: 700; color: #88ff88;">🧬 진화 게임</div>
-                <div style="display: flex; gap: 15px; font-size: 0.85rem;">
+                <div style="display: flex; gap: 12px; font-size: 0.85rem;">
                     <div>⏱️ <span id="arc-time">1:00</span></div>
-                    <div style="color: #ffd700;">🧬 Lv.<span id="arc-level">1</span></div>
+                    <div style="color: #ffd700;">Lv.<span id="arc-level">1</span></div>
                     <div style="color: #88ff88;">⭐ <span id="arc-score">0</span></div>
                 </div>
             </div>
             <div id="arcade-canvas-wrap" style="flex: 1; width: 100%; position: relative;"></div>
-            <div style="padding: 10px; background: rgba(0,0,0,0.8); text-align: center;">
-                <button id="btn-quit-arcade" style="background: rgba(255,100,100,0.3); border: 1px solid rgba(255,100,100,0.5); border-radius: 8px; padding: 8px 20px; color: #fff; font-size: 0.8rem;">포기</button>
+            <div style="padding: 10px; background: rgba(0,0,0,0.8);">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <div id="joystick-evolve" style="width: 100px; height: 100px; background: rgba(255,255,255,0.1); border-radius: 50%; position: relative; border: 2px solid rgba(136,255,136,0.3);">
+                        <div id="joystick-evolve-knob" style="width: 40px; height: 40px; background: rgba(136,255,136,0.6); border-radius: 50%; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);"></div>
+                    </div>
+                    <button id="btn-quit-arcade" style="background: rgba(255,100,100,0.3); border: 1px solid rgba(255,100,100,0.5); border-radius: 8px; padding: 8px 15px; color: #fff; font-size: 0.75rem;">포기</button>
+                </div>
             </div>
         </div>
     `;
@@ -7045,6 +7148,12 @@ function renderArcadeEvolveUI() {
             endArcadeGame('arcade_evolve', arcadeState.score);
         }
     };
+    
+    // 조이스틱 설정
+    setupJoystick('joystick-evolve', 'joystick-evolve-knob', (dx, dy) => {
+        arcadeState.joystickX = dx;
+        arcadeState.joystickY = dy;
+    });
 }
 
 function initArcadeEvolvePixi() {
@@ -7117,7 +7226,13 @@ function arcadeEvolveLoop() {
     if (s.keys['ArrowUp'] || s.keys['w']) s.player.y -= speed;
     if (s.keys['ArrowDown'] || s.keys['s']) s.player.y += speed;
     
-    // 터치 이동
+    // 조이스틱 이동
+    if (s.joystickX !== 0 || s.joystickY !== 0) {
+        s.player.x += s.joystickX * speed;
+        s.player.y += s.joystickY * speed;
+    }
+    
+    // 터치 이동 (캔버스)
     if (s.touchTarget) {
         const dx = s.touchTarget.x - s.player.x;
         const dy = s.touchTarget.y - s.player.y;
