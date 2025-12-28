@@ -855,7 +855,26 @@ html, body {
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pixi.js/7.3.2/pixi.min.js"></script>
     
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    
     <script>
+// ========================================
+// Firebase 초기화
+// ========================================
+const firebaseConfig = {
+    apiKey: "AIzaSyBwQjuqgWM4YKnqu_gzNbeCg5alrC-jVcQ",
+    authDomain: "myco-737a0.firebaseapp.com",
+    projectId: "myco-737a0",
+    storageBucket: "myco-737a0.firebasestorage.app",
+    messagingSenderId: "942571332540",
+    appId: "1:942571332540:web:be0bb6fbdd32655501c1b9"
+};
+
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+
 // ========================================
 // AROA - Configuration
 // ========================================
@@ -6529,13 +6548,34 @@ async function saveRanking(jobType, score) {
     localStorage.setItem(key, JSON.stringify(local.slice(0, 50)));
 }
 
-// 종합 랭킹 계산 함수
+// 종합 랭킹 계산 함수 (Firebase 기반)
+async function calculateCombinedRankingsAsync(jobTypes) {
+    const playerScores = {};
+    
+    for (const jobType of jobTypes) {
+        const rankings = await fetchRankings(jobType);
+        rankings.forEach((r) => {
+            const name = r.name || '익명';
+            if (!playerScores[name]) {
+                playerScores[name] = { name, totalScore: 0, count: 0 };
+            }
+            playerScores[name].totalScore += r.score;
+            playerScores[name].count++;
+        });
+    }
+    
+    return Object.values(playerScores)
+        .sort((a, b) => b.totalScore - a.totalScore)
+        .slice(0, 5);
+}
+
+// 로컬 종합 랭킹 (폴백용)
 function calculateCombinedRankings(jobTypes) {
     const playerScores = {};
     
     for (const jobType of jobTypes) {
         const rankings = getLocalRankings(jobType);
-        rankings.forEach((r, idx) => {
+        rankings.forEach((r) => {
             const name = r.name || '익명';
             if (!playerScores[name]) {
                 playerScores[name] = { name, totalScore: 0, count: 0 };
@@ -6578,25 +6618,37 @@ function generateCombinedRankingHTML(title, icon, rankings, color) {
     `;
 }
 
-// 종합 랭킹 로드
-function loadCombinedRankings() {
+// 종합 랭킹 로드 (Firebase 기반)
+async function loadCombinedRankings() {
     const container = document.getElementById('combined-rankings');
     if (!container) return;
     
-    // 허드렛일 종합 (청소, 화물, 배선)
-    const jobRankings = calculateCombinedRankings(['cleaning', 'cargo', 'wiring']);
-    
-    // 아케이드 종합 (세포, 계단, 진화)
-    const arcadeRankings = calculateCombinedRankings(['arcade_cell', 'arcade_climb', 'arcade_evolve']);
-    
-    // 전체 종합
-    const allRankings = calculateCombinedRankings(['cleaning', 'cargo', 'wiring', 'arcade_cell', 'arcade_climb', 'arcade_evolve']);
-    
-    container.innerHTML = `
-        ${generateCombinedRankingHTML('허드렛일 종합', '💼', jobRankings, '#10b981')}
-        ${generateCombinedRankingHTML('아케이드 종합', '🎮', arcadeRankings, '#9d4edd')}
-        ${generateCombinedRankingHTML('전체 종합', '👑', allRankings, '#ffd700')}
-    `;
+    try {
+        // Firebase에서 비동기로 가져오기
+        const [jobRankings, arcadeRankings, allRankings] = await Promise.all([
+            calculateCombinedRankingsAsync(['cleaning', 'cargo', 'wiring']),
+            calculateCombinedRankingsAsync(['arcade_cell', 'arcade_climb', 'arcade_evolve']),
+            calculateCombinedRankingsAsync(['cleaning', 'cargo', 'wiring', 'arcade_cell', 'arcade_climb', 'arcade_evolve'])
+        ]);
+        
+        container.innerHTML = `
+            ${generateCombinedRankingHTML('허드렛일 종합', '💼', jobRankings, '#10b981')}
+            ${generateCombinedRankingHTML('아케이드 종합', '🎮', arcadeRankings, '#9d4edd')}
+            ${generateCombinedRankingHTML('전체 종합', '👑', allRankings, '#ffd700')}
+        `;
+    } catch (error) {
+        console.error('종합 랭킹 로드 실패:', error);
+        // 로컬 폴백
+        const jobRankings = calculateCombinedRankings(['cleaning', 'cargo', 'wiring']);
+        const arcadeRankings = calculateCombinedRankings(['arcade_cell', 'arcade_climb', 'arcade_evolve']);
+        const allRankings = calculateCombinedRankings(['cleaning', 'cargo', 'wiring', 'arcade_cell', 'arcade_climb', 'arcade_evolve']);
+        
+        container.innerHTML = `
+            ${generateCombinedRankingHTML('허드렛일 종합', '💼', jobRankings, '#10b981')}
+            ${generateCombinedRankingHTML('아케이드 종합', '🎮', arcadeRankings, '#9d4edd')}
+            ${generateCombinedRankingHTML('전체 종합', '👑', allRankings, '#ffd700')}
+        `;
+    }
 }
 
 
