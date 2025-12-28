@@ -6496,22 +6496,23 @@ async function showRankingPopup(jobType) {
     }
 }
 
-// Firebase에서 랭킹 가져오기
+// Firebase에서 랭킹 가져오기 (인덱스 불필요)
 async function fetchRankings(jobType) {
     try {
         console.log('Firebase 랭킹 조회 시도:', jobType);
         
-        // 인덱스 없이 작동하도록 단순 쿼리 사용
-        const snapshot = await db.collection('rankings')
-            .where('jobType', '==', jobType)
-            .get();
+        // 전체 rankings 컬렉션 가져오기 (인덱스 불필요)
+        const snapshot = await db.collection('rankings').get();
         
-        // 클라이언트에서 정렬
-        const rankings = snapshot.docs.map(doc => doc.data());
-        rankings.sort((a, b) => b.score - a.score);
+        // 클라이언트에서 필터링 및 정렬
+        const rankings = snapshot.docs
+            .map(doc => doc.data())
+            .filter(r => r.jobType === jobType)
+            .sort((a, b) => b.score - a.score)
+            .slice(0, 20);
         
         console.log('Firebase 랭킹 조회 성공:', jobType, rankings.length + '개');
-        return rankings.slice(0, 20);
+        return rankings;
     } catch (error) {
         console.error('Firebase 랭킹 조회 실패:', jobType, error);
         // 로컬 데이터로 대체
