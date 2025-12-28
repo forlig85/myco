@@ -1371,22 +1371,30 @@ function evolveCreatureByLevel(creature, level) {
         evolved.decoration = 0;
         evolved.pattern = 0;
     } else if (level === 1) {
-        // 다리만 추가
+        // 다리만 추가 - 다리가 없으면 기본 다리 부여
         evolved.arms = 0;
         evolved.decoration = 0;
         evolved.pattern = 0;
+        if (evolved.legs === 0) evolved.legs = 1; // 두발 다리
     } else if (level === 2) {
-        // 팔 추가 (다리 유지)
+        // 팔 추가 - 팔이 없으면 기본 팔 부여
         evolved.decoration = 0;
         evolved.pattern = 0;
+        if (evolved.legs === 0) evolved.legs = 1;
+        if (evolved.arms === 0) evolved.arms = 1; // 인간 팔
     } else if (level === 3) {
         // 장식 추가
         evolved.pattern = 0;
+        if (evolved.legs === 0) evolved.legs = 1;
+        if (evolved.arms === 0) evolved.arms = 1;
     } else if (level === 4) {
         // 완전 진화 - 모든 기본 파츠 유지 (패턴 포함)
-        // decoration과 pattern 모두 원래 값 유지
+        if (evolved.legs === 0) evolved.legs = 1;
+        if (evolved.arms === 0) evolved.arms = 1;
     } else if (level >= 5) {
         // 기계 융합 - 기계 파츠 적용
+        if (evolved.legs === 0) evolved.legs = 1;
+        if (evolved.arms === 0) evolved.arms = 1;
         if (evolved.modernDeco) {
             evolved.decoration = evolved.modernDeco;
         }
@@ -1807,6 +1815,7 @@ const GameState = {
         }
         this.evolutionGauge = parseInt(localStorage.getItem('aroa-evo-gauge')) || 0;
         this.evolutionLevel = parseInt(localStorage.getItem('aroa-evo-level')) || 0;
+        this.spaceLuck = parseInt(localStorage.getItem('aroa-space-luck')) || 0;
     },
     
     reset() {
@@ -5742,11 +5751,11 @@ function showSpaceLobby() {
             <div style="background: linear-gradient(180deg, rgba(20,20,50,0.95), rgba(10,10,30,0.9)); padding: 15px; padding-top: calc(15px + var(--safe-top)); border-bottom: 1px solid rgba(100,150,255,0.2);">
                 <div style="display: flex; justify-content: space-between; align-items: center;">
                     <div style="font-size: 1.3rem; font-weight: 900; color: #fff;">🚀 우주센터</div>
-                    <div style="display: flex; gap: 8px;">
-                        <div style="background: rgba(255,215,0,0.2); border: 1px solid rgba(255,215,0,0.4); border-radius: 20px; padding: 4px 12px; font-size: 0.8rem;">
+                    <div style="display: flex; gap: 8px; align-items: center;">
+                        <div style="background: rgba(255,215,0,0.2); border: 1px solid rgba(255,215,0,0.4); border-radius: 20px; padding: 6px 12px; font-size: 0.8rem; display: flex; align-items: center; height: 36px;">
                             💰 <span id="luck-display">${luck.toLocaleString()}</span> LUCK
                         </div>
-                        <button class="hud-btn" id="btn-home-space" style="width: 36px; height: 36px; font-size: 1rem;">🏠</button>
+                        <button class="hud-btn" id="btn-home-space" style="width: 36px; height: 36px; font-size: 1rem; display: flex; align-items: center; justify-content: center;">🏠</button>
                     </div>
                 </div>
             </div>
@@ -5925,7 +5934,7 @@ function showJobDice(jobType) {
     document.getElementById('btn-back').onclick = () => showSpaceLobby();
 }
 
-// 미니게임 시작 (임시 - 자동 완료)
+// 미니게임 시작
 function startMiniGame(jobType, diceRoll) {
     // 주사위 효과 계산
     let timeBonus = 0;
@@ -5939,57 +5948,1662 @@ function startMiniGame(jobType, diceRoll) {
         case 6: rewardMultiplier = 2; break;
     }
     
-    // 임시: 바로 완료 처리 (나중에 실제 미니게임으로 대체)
-    const baseReward = 20;
-    const envBonus = getEnvBonus(jobType);
-    const partsBonus = getPartsBonus(jobType);
-    const totalReward = Math.floor((baseReward + envBonus + partsBonus) * rewardMultiplier);
+    // 미니게임 종류에 따라 분기
+    if (jobType === 'cleaning') {
+        startCleaningGame(timeBonus, rewardMultiplier);
+    } else if (jobType === 'cargo') {
+        startCargoGame(timeBonus, rewardMultiplier);
+    } else if (jobType === 'wiring') {
+        startWiringGame(timeBonus, rewardMultiplier);
+    }
+}
+
+// ========================================
+// 미니게임 1: 청소 (PixiJS 기반)
+// ========================================
+let cleaningState = null;
+let cleaningApp = null;
+
+// 색상 팔레트
+const CL_COLORS = {
+    wallDark: 0x1a1a2e, wallMid: 0x2d2d44, wallLight: 0x4a4a6a,
+    floorDark: 0x252538, floorMid: 0x353548, floorLight: 0x454560,
+    lightOn: 0x00ffff, lightGlow: 0x66ffff,
+    trashBag: 0x3d5c3d, trashBagDark: 0x2a3d2a,
+    can: 0xc0c0c0, canDark: 0x808080,
+    poop: 0x8B4513, poopDark: 0x5D3A1A,
+    bacteria: 0x00ff00, bacteriaDark: 0x00aa00,
+    fastBacteria: 0xff00ff,
+    boxMain: 0x8B7355, boxDark: 0x5D4E3A, boxLight: 0xA08060,
+    broomHandle: 0x8B4513, broomHead: 0xDEB887, broomBristles: 0xC4A060
+};
+
+// 청소 중 말풍선 대사들
+const CLEANING_QUOTES = {
+    start: [
+        "또 청소야...", "오늘도 힘내자!", "깨끗하게 만들어야지",
+        "누가 이렇게 어질렀어?", "청소는 명상이야...", "빗자루 준비 완료!"
+    ],
+    collect: [
+        "이거 뭐야!", "으엑...", "누가 버린 거야?", "하나 치웠다!",
+        "깔끔~", "이건 또 뭐지?", "쓰레기는 쓰레기통으로!", "하...",
+        "점점 깨끗해지네", "이게 여기 왜 있어?", "분리수거 해야하나?"
+    ],
+    combo: [
+        "연속이다!", "오 잘되네!", "손이 빨라졌어!", "콤보!",
+        "내가 청소의 신?", "멈출 수 없어!", "달인의 경지..."
+    ],
+    bacteria: [
+        "세균이다 도망쳐!", "움직이는 게 있어!!", "저건 뭐야?!",
+        "잡아야 해!", "빨리빨리!", "도망가지 마!"
+    ],
+    floorClear: [
+        "한 층 끝!", "다음 층으로!", "점점 더러워지겠지...",
+        "아직 갈 길이 멀어", "휴~ 잠깐 쉬자", "거의 다 왔어!"
+    ],
+    tired: [
+        "힘들다...", "언제 끝나?", "허리 아파...", "다리가...",
+        "청소 로봇이나 사야하나", "월급 올려줘..."
+    ]
+};
+
+function getRandomQuote(category) {
+    const quotes = CLEANING_QUOTES[category];
+    return quotes[Math.floor(Math.random() * quotes.length)];
+}
+
+function startCleaningGame(timeBonus, rewardMultiplier) {
+    const baseTime = 150; // 2분 30초로 증가
+    const maxTime = baseTime + timeBonus;
     
-    GameState.spaceLuck = (GameState.spaceLuck || 0) + totalReward;
-    GameState.save();
+    // 게임 영역 크기 - 더 크게
+    const maxW = Math.min(window.innerWidth - 10, 450);
+    const maxH = Math.min(window.innerHeight - 180, 500);
+    const gameW = maxW;
+    const gameH = maxH;
     
-    // 완료 화면
+    cleaningState = {
+        floor: 1,
+        maxFloor: 10,
+        score: 0,
+        time: maxTime,
+        rewardMultiplier: rewardMultiplier,
+        player: { x: gameW / 2, y: gameH / 2 },
+        trash: [],
+        walls: [],
+        combo: 0,
+        gameOver: false,
+        paused: false,
+        gameW: gameW,
+        gameH: gameH,
+        keys: { up: false, down: false, left: false, right: false },
+        joyPos: { x: 0, y: 0 },
+        speechBubble: null,
+        speechTimer: 0,
+        lastQuoteTime: 0
+    };
+    
+    renderCleaningUI();
+    initCleaningPixi();
+}
+
+function renderCleaningUI() {
+    const s = cleaningState;
+    
+    app.innerHTML = `
+        <div style="width: 100%; height: 100%; background: #0a0a1a; display: flex; flex-direction: column; align-items: center;">
+            <!-- HUD -->
+            <div style="width: 100%; max-width: 420px; padding: 10px 15px; padding-top: calc(10px + var(--safe-top)); background: linear-gradient(180deg, rgba(0,0,0,0.9), rgba(0,0,0,0.5)); display: flex; justify-content: space-between; align-items: center; z-index: 100;">
+                <div style="display: flex; gap: 12px; align-items: center; font-size: 0.85rem;">
+                    <div>🏢 <span id="cl-floor">${s.floor}</span>/${s.maxFloor}</div>
+                    <div>🗑️ <span id="cl-trash">0</span></div>
+                </div>
+                <div style="display: flex; gap: 12px; align-items: center; font-size: 0.85rem;">
+                    <div id="cl-combo-wrap" style="color: #fff;">🔥 <span id="cl-combo">0</span></div>
+                    <div>⏱️ <span id="cl-time">${Math.floor(s.time / 60)}:${(s.time % 60).toString().padStart(2, '0')}</span></div>
+                    <div style="color: #ffd700;">💰 <span id="cl-score">0</span></div>
+                </div>
+            </div>
+            
+            <!-- 게임 캔버스 -->
+            <div id="cleaning-canvas-wrap" style="flex: 1; display: flex; align-items: center; justify-content: center; position: relative;">
+            </div>
+            
+            <!-- 하단 컨트롤 -->
+            <div style="width: 100%; padding: 15px; padding-bottom: calc(15px + var(--safe-bottom)); background: rgba(0,0,0,0.5); display: flex; justify-content: space-between; align-items: center;">
+                <div class="joystick" id="cl-joystick" style="position: relative; width: 100px; height: 100px;">
+                    <div class="joy-base"></div>
+                    <div class="joy-knob" id="cl-joy-knob"></div>
+                </div>
+                <div style="text-align: center; color: #666; font-size: 0.7rem;">
+                    PC: WASD / 방향키
+                </div>
+                <button id="btn-quit-cleaning" style="background: rgba(255,0,0,0.3); border: 1px solid rgba(255,0,0,0.5); border-radius: 8px; padding: 10px 15px; color: #fff; font-size: 0.8rem;">✕ 포기</button>
+            </div>
+            
+            <!-- 층 전환 오버레이 -->
+            <div id="cl-floor-overlay" style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.9); display: none; flex-direction: column; align-items: center; justify-content: center; z-index: 200;">
+                <div style="font-size: 3rem; margin-bottom: 10px;">🏢</div>
+                <div id="cl-floor-text" style="font-size: 1.5rem; color: #4fc3f7; margin-bottom: 5px;">2층으로 이동</div>
+                <div id="cl-floor-desc" style="font-size: 0.85rem; color: #888;">난이도 증가!</div>
+            </div>
+        </div>
+    `;
+    
+    setupCleaningControls();
+}
+
+function initCleaningPixi() {
+    const s = cleaningState;
+    const wrap = document.getElementById('cleaning-canvas-wrap');
+    
+    cleaningApp = new PIXI.Application({
+        width: s.gameW,
+        height: s.gameH,
+        backgroundColor: CL_COLORS.wallDark,
+        resolution: window.devicePixelRatio || 1,
+        autoDensity: true
+    });
+    
+    wrap.appendChild(cleaningApp.view);
+    cleaningApp.view.style.borderRadius = '8px';
+    cleaningApp.view.style.border = '2px solid #333';
+    
+    // 컨테이너들
+    s.bgContainer = new PIXI.Container();
+    s.wallContainer = new PIXI.Container();
+    s.trashContainer = new PIXI.Container();
+    s.playerContainer = new PIXI.Container();
+    s.particleContainer = new PIXI.Container();
+    
+    cleaningApp.stage.addChild(s.bgContainer);
+    cleaningApp.stage.addChild(s.wallContainer);
+    cleaningApp.stage.addChild(s.trashContainer);
+    cleaningApp.stage.addChild(s.playerContainer);
+    cleaningApp.stage.addChild(s.particleContainer);
+    
+    // 배경 그리기
+    drawCleaningBackground();
+    
+    // 첫 층 생성
+    generateFloor(s.floor);
+    
+    // 플레이어 생성
+    createCleaningPlayer();
+    
+    // 게임 루프
+    cleaningApp.ticker.add(cleaningGameLoop);
+    
+    // 타이머
+    s.timerInterval = setInterval(() => {
+        if (s.paused || s.gameOver) return;
+        s.time--;
+        updateCleaningHUD();
+        if (s.time <= 0) endCleaningGame(false);
+    }, 1000);
+}
+
+function drawCleaningBackground() {
+    const s = cleaningState;
+    const g = new PIXI.Graphics();
+    
+    // 바닥 타일
+    const tileSize = 20;
+    for (let x = 0; x < s.gameW; x += tileSize) {
+        for (let y = 0; y < s.gameH; y += tileSize) {
+            const isEven = ((x + y) / tileSize) % 2 === 0;
+            g.beginFill(isEven ? CL_COLORS.floorMid : CL_COLORS.floorDark);
+            g.drawRect(x, y, tileSize, tileSize);
+            g.endFill();
+        }
+    }
+    
+    // 천장 조명 효과
+    for (let i = 0; i < 4; i++) {
+        g.beginFill(CL_COLORS.lightGlow, 0.08);
+        g.drawEllipse(50 + i * 100, 30, 40, 25);
+        g.endFill();
+    }
+    
+    s.bgContainer.addChild(g);
+}
+
+// 미로형 층 랜덤 생성 - 더 복잡한 패턴
+function generateFloor(floorNum) {
+    const s = cleaningState;
+    
+    // 기존 오브젝트 제거
+    s.wallContainer.removeChildren();
+    s.trashContainer.removeChildren();
+    s.walls = [];
+    s.trash = [];
+    
+    const g = new PIXI.Graphics();
+    
+    // 외벽
+    const wallThick = 12;
+    const margin = 8;
+    
+    // 상단 벽
+    drawWall(g, margin, margin, s.gameW - margin * 2, wallThick);
+    s.walls.push({ x: margin, y: margin, w: s.gameW - margin * 2, h: wallThick });
+    
+    // 하단 벽
+    drawWall(g, margin, s.gameH - margin - wallThick, s.gameW - margin * 2, wallThick);
+    s.walls.push({ x: margin, y: s.gameH - margin - wallThick, w: s.gameW - margin * 2, h: wallThick });
+    
+    // 좌측 벽
+    drawWall(g, margin, margin, wallThick, s.gameH - margin * 2);
+    s.walls.push({ x: margin, y: margin, w: wallThick, h: s.gameH - margin * 2 });
+    
+    // 우측 벽
+    drawWall(g, s.gameW - margin - wallThick, margin, wallThick, s.gameH - margin * 2);
+    s.walls.push({ x: s.gameW - margin - wallThick, y: margin, w: wallThick, h: s.gameH - margin * 2 });
+    
+    const playArea = {
+        x: margin + wallThick + 10,
+        y: margin + wallThick + 10,
+        w: s.gameW - (margin + wallThick + 10) * 2,
+        h: s.gameH - (margin + wallThick + 10) * 2
+    };
+    
+    const px = s.gameW / 2, py = s.gameH / 2;
+    const safeZone = 40; // 플레이어 주변 안전 영역
+    const minGap = 35; // 최소 통과 간격
+    
+    // 벽 개수 (층이 올라갈수록 증가, 최대 제한)
+    const maxWalls = Math.min(4 + floorNum, 12);
+    
+    // 벽 생성 시도 (검증 포함)
+    let wallsCreated = 0;
+    let attempts = 0;
+    const maxAttempts = maxWalls * 5;
+    
+    while (wallsCreated < maxWalls && attempts < maxAttempts) {
+        attempts++;
+        
+        // 랜덤 벽 생성
+        const isH = Math.random() > 0.5;
+        let wx, wy, ww, wh;
+        
+        if (isH) {
+            // 수평 벽 - 반드시 양쪽에 통로 남김
+            ww = 30 + Math.random() * Math.min(60, playArea.w * 0.4);
+            wh = 10;
+            wx = playArea.x + minGap + Math.random() * (playArea.w - ww - minGap * 2);
+            wy = playArea.y + minGap + Math.random() * (playArea.h - wh - minGap * 2);
+        } else {
+            // 수직 벽 - 반드시 위아래에 통로 남김
+            ww = 10;
+            wh = 30 + Math.random() * Math.min(60, playArea.h * 0.4);
+            wx = playArea.x + minGap + Math.random() * (playArea.w - ww - minGap * 2);
+            wy = playArea.y + minGap + Math.random() * (playArea.h - wh - minGap * 2);
+        }
+        
+        // 플레이어 시작 위치 체크
+        if (Math.abs(wx + ww/2 - px) < safeZone && Math.abs(wy + wh/2 - py) < safeZone) {
+            continue;
+        }
+        
+        // 다른 벽과 너무 가깝지 않은지 체크 (통로 확보)
+        let tooClose = false;
+        for (const existingWall of s.walls.slice(4)) { // 외벽 제외
+            // 같은 방향 벽끼리는 간격 체크
+            const existingIsH = existingWall.w > existingWall.h;
+            
+            if (isH === existingIsH) {
+                // 같은 방향이면 평행 간격 체크
+                if (isH) {
+                    // 수평 벽끼리
+                    if (Math.abs(wy - existingWall.y) < minGap &&
+                        wx < existingWall.x + existingWall.w + minGap &&
+                        wx + ww > existingWall.x - minGap) {
+                        tooClose = true;
+                        break;
+                    }
+                } else {
+                    // 수직 벽끼리
+                    if (Math.abs(wx - existingWall.x) < minGap &&
+                        wy < existingWall.y + existingWall.h + minGap &&
+                        wy + wh > existingWall.y - minGap) {
+                        tooClose = true;
+                        break;
+                    }
+                }
+            } else {
+                // 다른 방향이면 교차 지점 근처 체크
+                const intersection = !(wx + ww < existingWall.x - 5 ||
+                                       wx > existingWall.x + existingWall.w + 5 ||
+                                       wy + wh < existingWall.y - 5 ||
+                                       wy > existingWall.y + existingWall.h + 5);
+                if (intersection) {
+                    // 교차하면 L자나 T자 형태가 되어 막힐 수 있음
+                    // 통로가 확보되는지 추가 검증
+                    const gapLeft = wx - playArea.x;
+                    const gapRight = playArea.x + playArea.w - (wx + ww);
+                    const gapTop = wy - playArea.y;
+                    const gapBottom = playArea.y + playArea.h - (wy + wh);
+                    
+                    if (Math.min(gapLeft, gapRight) < minGap && Math.min(gapTop, gapBottom) < minGap) {
+                        tooClose = true;
+                        break;
+                    }
+                }
+            }
+        }
+        
+        if (tooClose) continue;
+        
+        // 벽 추가
+        drawWall(g, wx, wy, ww, wh);
+        s.walls.push({ x: wx, y: wy, w: ww, h: wh });
+        wallsCreated++;
+    }
+    
+    s.wallContainer.addChild(g);
+    
+    // 쓰레기 생성 (난이도 상향)
+    const trashCount = 5 + Math.floor(floorNum * 1.2);
+    const bacteriaCount = floorNum >= 2 ? Math.floor(floorNum / 2) : 0;
+    const fastBacteriaCount = floorNum >= 5 ? Math.floor((floorNum - 3) / 2) : 0;
+    const bacteriaSpeed = 0.4 + floorNum * 0.12;
+    
+    for (let i = 0; i < trashCount; i++) {
+        let type;
+        if (i < fastBacteriaCount) {
+            type = { name: 'fastBacteria', points: 30, speed: bacteriaSpeed * 2 };
+        } else if (i < fastBacteriaCount + 2 && floorNum >= 3) {
+            type = { name: 'bacteria', points: 20, speed: bacteriaSpeed };
+        } else {
+            const types = [
+                { name: 'bag', points: 10, speed: 0 },
+                { name: 'can', points: 5, speed: 0 },
+                { name: 'poop', points: 15, speed: 0 }
+            ];
+            type = types[Math.floor(Math.random() * types.length)];
+        }
+        
+        // 벽과 겹치지 않는 위치 찾기
+        let tx, ty, valid = false, attempts = 0;
+        while (!valid && attempts < 50) {
+            tx = playArea.x + Math.random() * playArea.w;
+            ty = playArea.y + Math.random() * playArea.h;
+            valid = !isInWallCL(tx, ty, 25);
+            attempts++;
+        }
+        
+        if (valid) {
+            const trash = createTrashSprite(type, tx, ty);
+            s.trash.push(trash);
+            s.trashContainer.addChild(trash);
+        }
+    }
+    
+    updateCleaningHUD();
+    
+    // 시작 말풍선 (강제 표시)
+    showSpeechBubble(getRandomQuote('start'), true);
+}
+
+// 랜덤 벽 생성 헬퍼
+function createRandomWall(g, s, playArea, px, py, safeZone) {
+    const isH = Math.random() > 0.5;
+    let wx, wy, ww, wh;
+    
+    if (isH) {
+        ww = 35 + Math.random() * 70;
+        wh = 10;
+        wx = playArea.x + Math.random() * (playArea.w - ww);
+        wy = playArea.y + Math.random() * (playArea.h - wh);
+    } else {
+        ww = 10;
+        wh = 35 + Math.random() * 70;
+        wx = playArea.x + Math.random() * (playArea.w - ww);
+        wy = playArea.y + Math.random() * (playArea.h - wh);
+    }
+    
+    if (Math.abs(wx + ww/2 - px) > safeZone || Math.abs(wy + wh/2 - py) > safeZone) {
+        drawWall(g, wx, wy, ww, wh);
+        s.walls.push({ x: wx, y: wy, w: ww, h: wh });
+    }
+}
+
+// 말풍선 표시 - 기존 말풍선이 있으면 새로 생성하지 않음
+function showSpeechBubble(text, force = false) {
+    const s = cleaningState;
+    if (!s || !s.particleContainer) return;
+    
+    // 기존 말풍선이 있으면 새로 생성하지 않음 (force가 아닌 경우)
+    if (s.speechBubble && !force) {
+        return;
+    }
+    
+    // 기존 말풍선 제거 (force인 경우)
+    if (s.speechBubble && force) {
+        s.particleContainer.removeChild(s.speechBubble);
+        s.speechBubble = null;
+    }
+    
+    const bubble = new PIXI.Container();
+    
+    // 말풍선 배경
+    const bg = new PIXI.Graphics();
+    const padding = 8;
+    const textObj = new PIXI.Text(text, {
+        fontFamily: 'Arial', fontSize: 11, fill: 0x333333, fontWeight: 'bold'
+    });
+    const bw = textObj.width + padding * 2;
+    const bh = textObj.height + padding * 2;
+    
+    bg.beginFill(0xffffff, 0.95);
+    bg.lineStyle(2, 0x333333);
+    bg.drawRoundedRect(0, 0, bw, bh, 8);
+    bg.endFill();
+    
+    // 말풍선 꼬리
+    bg.beginFill(0xffffff, 0.95);
+    bg.lineStyle(2, 0x333333);
+    bg.moveTo(bw / 2 - 5, bh);
+    bg.lineTo(bw / 2, bh + 8);
+    bg.lineTo(bw / 2 + 5, bh);
+    bg.endFill();
+    
+    textObj.x = padding;
+    textObj.y = padding;
+    
+    bubble.addChild(bg);
+    bubble.addChild(textObj);
+    bubble.alpha = 1;
+    
+    s.speechBubble = bubble;
+    s.speechTimer = 180; // 3초
+    s.particleContainer.addChild(bubble);
+}
+
+function drawWall(g, x, y, w, h) {
+    // 벽 본체
+    g.beginFill(CL_COLORS.wallMid);
+    g.drawRect(x, y, w, h);
+    g.endFill();
+    
+    // 벽 하이라이트
+    g.beginFill(CL_COLORS.wallLight, 0.5);
+    g.drawRect(x, y, w, 3);
+    g.drawRect(x, y, 3, h);
+    g.endFill();
+    
+    // 벽 그림자
+    g.beginFill(CL_COLORS.wallDark, 0.5);
+    g.drawRect(x, y + h - 3, w, 3);
+    g.drawRect(x + w - 3, y, 3, h);
+    g.endFill();
+}
+
+function isInWallCL(x, y, margin = 15) {
+    for (const w of cleaningState.walls) {
+        if (x > w.x - margin && x < w.x + w.w + margin &&
+            y > w.y - margin && y < w.y + w.h + margin) {
+            return true;
+        }
+    }
+    return false;
+}
+
+function createTrashSprite(type, x, y) {
+    const container = new PIXI.Container();
+    container.x = x;
+    container.y = y;
+    container.trashType = type;
+    container.angle = Math.random() * Math.PI * 2;
+    
+    const g = new PIXI.Graphics();
+    
+    if (type.name === 'bag') {
+        g.beginFill(CL_COLORS.trashBagDark);
+        g.moveTo(-10, -8); g.lineTo(-8, 10); g.lineTo(8, 10); g.lineTo(10, -8);
+        g.closePath(); g.endFill();
+        g.beginFill(CL_COLORS.trashBag);
+        g.moveTo(-8, -10); g.lineTo(-6, 8); g.lineTo(6, 8); g.lineTo(8, -10);
+        g.closePath(); g.endFill();
+        g.beginFill(CL_COLORS.trashBagDark);
+        g.drawEllipse(0, -11, 5, 3); g.endFill();
+    } else if (type.name === 'can') {
+        g.beginFill(CL_COLORS.canDark);
+        g.drawRect(-6, -9, 12, 18); g.endFill();
+        g.beginFill(CL_COLORS.can);
+        g.drawRect(-5, -8, 10, 16); g.endFill();
+        g.beginFill(0xff6b6b);
+        g.drawRect(-4, -3, 8, 6); g.endFill();
+        g.beginFill(0xffffff, 0.3);
+        g.drawRect(-4, -7, 2, 12); g.endFill();
+    } else if (type.name === 'poop') {
+        g.beginFill(CL_COLORS.poopDark);
+        g.drawEllipse(0, 6, 9, 4); g.endFill();
+        g.beginFill(CL_COLORS.poop);
+        g.drawEllipse(0, 4, 8, 3);
+        g.drawEllipse(0, 0, 6, 3);
+        g.drawEllipse(0, -4, 4, 2); g.endFill();
+    } else if (type.name === 'bacteria') {
+        g.beginFill(CL_COLORS.bacteriaDark);
+        g.drawCircle(0, 0, 11); g.endFill();
+        g.beginFill(CL_COLORS.bacteria);
+        g.drawCircle(0, 0, 9); g.endFill();
+        g.beginFill(0x008800);
+        g.drawCircle(0, 0, 3); g.endFill();
+        g.lineStyle(2, CL_COLORS.bacteria);
+        for (let i = 0; i < 6; i++) {
+            const a = (i / 6) * Math.PI * 2;
+            g.moveTo(Math.cos(a) * 9, Math.sin(a) * 9);
+            g.lineTo(Math.cos(a) * 15, Math.sin(a) * 15);
+        }
+        g.lineStyle(0);
+        g.beginFill(0xffffff);
+        g.drawCircle(-3, -2, 2); g.drawCircle(3, -2, 2); g.endFill();
+        g.beginFill(0x000000);
+        g.drawCircle(-3, -2, 1); g.drawCircle(3, -2, 1); g.endFill();
+    } else if (type.name === 'fastBacteria') {
+        g.beginFill(0x880088);
+        g.drawCircle(0, 0, 11); g.endFill();
+        g.beginFill(CL_COLORS.fastBacteria);
+        g.drawCircle(0, 0, 9); g.endFill();
+        g.beginFill(0xaa00aa);
+        g.drawCircle(0, 0, 3); g.endFill();
+        g.lineStyle(2, CL_COLORS.fastBacteria);
+        for (let i = 0; i < 8; i++) {
+            const a = (i / 8) * Math.PI * 2;
+            g.moveTo(Math.cos(a) * 9, Math.sin(a) * 9);
+            g.lineTo(Math.cos(a) * 16, Math.sin(a) * 16);
+        }
+        g.lineStyle(0);
+        g.beginFill(0xffffff);
+        g.drawCircle(-3, -2, 2); g.drawCircle(3, -2, 2); g.endFill();
+        g.beginFill(0xff0000);
+        g.drawCircle(-3, -2, 1); g.drawCircle(3, -2, 1); g.endFill();
+    }
+    
+    container.addChild(g);
+    return container;
+}
+
+function createCleaningPlayer() {
+    const s = cleaningState;
+    const player = new PIXI.Container();
+    player.x = s.player.x;
+    player.y = s.player.y;
+    
+    const g = new PIXI.Graphics();
+    
+    // 실제 크리처 그리기 (레벨 5로 진화된 상태)
+    if (GameState.creature) {
+        const evolved = evolveCreatureByLevel(GameState.creature, 5);
+        drawCreature(g, evolved, 0, 0, 25, Date.now() * 0.001);
+    } else {
+        // 기본 크리처
+        g.beginFill(0x4fc3f7);
+        g.drawEllipse(0, 0, 14, 11);
+        g.endFill();
+        g.beginFill(0xffffff);
+        g.drawCircle(-5, -4, 4);
+        g.drawCircle(5, -4, 4);
+        g.endFill();
+        g.beginFill(0x000000);
+        g.drawCircle(-5, -4, 2);
+        g.drawCircle(5, -4, 2);
+        g.endFill();
+    }
+    
+    // 빗자루 손잡이
+    g.beginFill(CL_COLORS.broomHandle);
+    g.drawRect(20, -15, 3, 35);
+    g.endFill();
+    
+    // 빗자루 머리
+    g.beginFill(CL_COLORS.broomHead);
+    g.drawRect(14, 18, 14, 5);
+    g.endFill();
+    
+    // 빗살
+    g.beginFill(CL_COLORS.broomBristles);
+    for (let i = 0; i < 5; i++) {
+        g.drawRect(15 + i * 2.5, 23, 2, 8);
+    }
+    g.endFill();
+    
+    player.addChild(g);
+    s.playerSprite = player;
+    s.playerContainer.addChild(player);
+}
+
+function setupCleaningControls() {
+    const s = cleaningState;
+    
+    // 키보드
+    const keyHandler = (e, pressed) => {
+        switch(e.key.toLowerCase()) {
+            case 'w': case 'arrowup': s.keys.up = pressed; break;
+            case 's': case 'arrowdown': s.keys.down = pressed; break;
+            case 'a': case 'arrowleft': s.keys.left = pressed; break;
+            case 'd': case 'arrowright': s.keys.right = pressed; break;
+        }
+    };
+    s.keydownHandler = (e) => keyHandler(e, true);
+    s.keyupHandler = (e) => keyHandler(e, false);
+    window.addEventListener('keydown', s.keydownHandler);
+    window.addEventListener('keyup', s.keyupHandler);
+    
+    // 조이스틱
+    const joystick = document.getElementById('cl-joystick');
+    const knob = document.getElementById('cl-joy-knob');
+    let joyActive = false;
+    
+    const handleStart = (e) => { joyActive = true; handleMove(e); };
+    const handleMove = (e) => {
+        if (!joyActive) return;
+        e.preventDefault();
+        const rect = joystick.getBoundingClientRect();
+        const cx = rect.left + rect.width / 2;
+        const cy = rect.top + rect.height / 2;
+        const touch = e.touches ? e.touches[0] : e;
+        let dx = touch.clientX - cx;
+        let dy = touch.clientY - cy;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        const max = 35;
+        if (dist > max) { dx = (dx / dist) * max; dy = (dy / dist) * max; }
+        s.joyPos.x = dx / max;
+        s.joyPos.y = dy / max;
+        knob.style.transform = `translate(calc(-50% + ${dx}px), calc(-50% + ${dy}px))`;
+    };
+    const handleEnd = () => {
+        joyActive = false;
+        s.joyPos = { x: 0, y: 0 };
+        knob.style.transform = 'translate(-50%, -50%)';
+    };
+    
+    joystick.addEventListener('mousedown', handleStart);
+    joystick.addEventListener('touchstart', handleStart, { passive: false });
+    document.addEventListener('mousemove', handleMove);
+    document.addEventListener('touchmove', handleMove, { passive: false });
+    document.addEventListener('mouseup', handleEnd);
+    document.addEventListener('touchend', handleEnd);
+    
+    // 나가기
+    document.getElementById('btn-quit-cleaning').onclick = () => {
+        if (confirm('정말 포기하시겠습니까?')) endCleaningGame(false);
+    };
+}
+
+function cleaningGameLoop(delta) {
+    const s = cleaningState;
+    if (s.paused || s.gameOver) return;
+    
+    // 입력 처리
+    let kx = 0, ky = 0;
+    if (s.keys.left) kx = -1;
+    if (s.keys.right) kx = 1;
+    if (s.keys.up) ky = -1;
+    if (s.keys.down) ky = 1;
+    
+    const inputX = Math.abs(s.joyPos.x) > Math.abs(kx) ? s.joyPos.x : kx;
+    const inputY = Math.abs(s.joyPos.y) > Math.abs(ky) ? s.joyPos.y : ky;
+    
+    // 플레이어 이동
+    const speed = 3.5;
+    let newX = s.player.x + inputX * speed;
+    let newY = s.player.y + inputY * speed;
+    
+    // 벽 충돌
+    if (!isInWallCL(newX, s.player.y, 12)) s.player.x = newX;
+    if (!isInWallCL(s.player.x, newY, 12)) s.player.y = newY;
+    
+    // 경계
+    s.player.x = Math.max(35, Math.min(s.gameW - 35, s.player.x));
+    s.player.y = Math.max(35, Math.min(s.gameH - 35, s.player.y));
+    
+    s.playerSprite.x = s.player.x;
+    s.playerSprite.y = s.player.y;
+    
+    // 말풍선 위치 업데이트
+    if (s.speechBubble) {
+        s.speechBubble.x = s.player.x - s.speechBubble.width / 2;
+        s.speechBubble.y = s.player.y - 55;
+        
+        s.speechTimer--;
+        if (s.speechTimer <= 20) {
+            s.speechBubble.alpha = s.speechTimer / 20;
+        }
+        if (s.speechTimer <= 0) {
+            s.particleContainer.removeChild(s.speechBubble);
+            s.speechBubble = null;
+        }
+    }
+    
+    // 주기적으로 피로 대사 (30초마다)
+    const now = Date.now();
+    if (now - s.lastQuoteTime > 25000 && !s.speechBubble && s.time < s.time * 0.7) {
+        s.lastQuoteTime = now;
+        if (Math.random() < 0.3) {
+            showSpeechBubble(getRandomQuote('tired'));
+        }
+    }
+    
+    // 쓰레기 이동 (세균)
+    s.trash.forEach(t => {
+        if (t.trashType.speed > 0) {
+            if (Math.random() < 0.03) t.angle += (Math.random() - 0.5) * 1.5;
+            
+            let nx = t.x + Math.cos(t.angle) * t.trashType.speed;
+            let ny = t.y + Math.sin(t.angle) * t.trashType.speed;
+            
+            if (isInWallCL(nx, ny, 12)) {
+                t.angle += Math.PI * 0.5 + Math.random() * Math.PI;
+            } else {
+                t.x = nx;
+                t.y = ny;
+            }
+            
+            t.rotation += 0.02;
+        }
+    });
+    
+    // 쓰레기 수집
+    const px = s.player.x + 10; // 빗자루 위치 보정
+    const py = s.player.y + 15;
+    
+    for (let i = s.trash.length - 1; i >= 0; i--) {
+        const t = s.trash[i];
+        const dx = px - t.x;
+        const dy = py - t.y;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        
+        if (dist < 28) {
+            s.combo++;
+            const mult = s.combo >= 5 ? 2 : s.combo >= 3 ? 1.5 : 1;
+            s.score += Math.floor(t.trashType.points * mult);
+            
+            // 파티클
+            createCleaningParticle(t.x, t.y, t.trashType.points);
+            
+            // 수집 시 말풍선 (랜덤 확률)
+            if (Math.random() < 0.25 && !s.speechBubble) {
+                const isBacteria = t.trashType.name.includes('acteria');
+                if (isBacteria) {
+                    showSpeechBubble(getRandomQuote('bacteria'));
+                } else if (s.combo >= 3) {
+                    showSpeechBubble(getRandomQuote('combo'));
+                } else {
+                    showSpeechBubble(getRandomQuote('collect'));
+                }
+            }
+            
+            s.trashContainer.removeChild(t);
+            s.trash.splice(i, 1);
+            
+            SFX.play('eat');
+            updateCleaningHUD();
+            
+            // 층 클리어
+            if (s.trash.length === 0) {
+                nextCleaningFloor();
+            }
+        }
+    }
+    
+    // 파티클 업데이트 (말풍선 제외)
+    for (let i = s.particleContainer.children.length - 1; i >= 0; i--) {
+        const p = s.particleContainer.children[i];
+        if (p === s.speechBubble) continue; // 말풍선은 별도 처리
+        p.y += p.vy || -1.5;
+        p.alpha -= 0.03;
+        if (p.alpha <= 0) s.particleContainer.removeChild(p);
+    }
+}
+
+function createCleaningParticle(x, y, points) {
+    const s = cleaningState;
+    const text = new PIXI.Text(`+${points}`, {
+        fontFamily: 'Arial', fontSize: 14, fill: points >= 20 ? 0xffff00 : 0x44ff88,
+        fontWeight: 'bold', stroke: 0x000000, strokeThickness: 2
+    });
+    text.x = x; text.y = y;
+    text.anchor.set(0.5);
+    text.vy = -2;
+    s.particleContainer.addChild(text);
+}
+
+function nextCleaningFloor() {
+    const s = cleaningState;
+    s.floor++;
+    s.combo = 0;
+    
+    // 층 클리어 말풍선
+    showSpeechBubble(getRandomQuote('floorClear'));
+    
+    if (s.floor > s.maxFloor) {
+        endCleaningGame(true);
+        return;
+    }
+    
+    // 오버레이 표시
+    const overlay = document.getElementById('cl-floor-overlay');
+    document.getElementById('cl-floor-text').textContent = `${s.floor}층으로 이동`;
+    const trashNum = 5 + Math.floor(s.floor * 1.2);
+    document.getElementById('cl-floor-desc').textContent = `쓰레기 ${trashNum}개 | 난이도 ${s.floor <= 3 ? '쉬움' : s.floor <= 6 ? '보통' : s.floor <= 8 ? '어려움' : '극한'}`;
+    overlay.style.display = 'flex';
+    
+    setTimeout(() => {
+        overlay.style.display = 'none';
+        s.player.x = s.gameW / 2;
+        s.player.y = s.gameH / 2;
+        s.playerSprite.x = s.player.x;
+        s.playerSprite.y = s.player.y;
+        generateFloor(s.floor);
+    }, 1200);
+}
+
+function updateCleaningHUD() {
+    const s = cleaningState;
+    const floorEl = document.getElementById('cl-floor');
+    const trashEl = document.getElementById('cl-trash');
+    const comboEl = document.getElementById('cl-combo');
+    const comboWrap = document.getElementById('cl-combo-wrap');
+    const timeEl = document.getElementById('cl-time');
+    const scoreEl = document.getElementById('cl-score');
+    
+    if (floorEl) floorEl.textContent = s.floor;
+    if (trashEl) trashEl.textContent = s.trash.length;
+    if (comboEl) comboEl.textContent = s.combo;
+    if (comboWrap) comboWrap.style.color = s.combo >= 3 ? '#ffd700' : '#fff';
+    if (scoreEl) scoreEl.textContent = s.score;
+    
+    if (timeEl) {
+        const min = Math.floor(s.time / 60);
+        const sec = s.time % 60;
+        timeEl.textContent = `${min}:${sec.toString().padStart(2, '0')}`;
+        timeEl.style.color = s.time < 30 ? '#ff6b6b' : '#fff';
+    }
+}
+
+function endCleaningGame(success) {
+    const s = cleaningState;
+    s.gameOver = true;
+    
+    clearInterval(s.timerInterval);
+    window.removeEventListener('keydown', s.keydownHandler);
+    window.removeEventListener('keyup', s.keyupHandler);
+    
+    if (cleaningApp) {
+        cleaningApp.destroy(true, { children: true });
+        cleaningApp = null;
+    }
+    
+    if (success) {
+        const timeLeft = s.time;
+        let baseReward = 15;
+        let timeRating = '';
+        
+        if (timeLeft >= 80) { baseReward = 30; timeRating = '⭐⭐⭐'; }
+        else if (timeLeft >= 50) { baseReward = 25; timeRating = '⭐⭐'; }
+        else if (timeLeft >= 20) { baseReward = 20; timeRating = '⭐'; }
+        else { baseReward = 15; timeRating = '-'; }
+        
+        const envBonus = getEnvBonus('cleaning');
+        const partsBonus = getPartsBonus('cleaning');
+        const totalReward = Math.floor((baseReward + envBonus + partsBonus) * s.rewardMultiplier);
+        
+        GameState.spaceLuck = (GameState.spaceLuck || 0) + totalReward;
+        GameState.save();
+        
+        showMiniGameResult(true, {
+            baseReward, envBonus, partsBonus,
+            rewardMultiplier: s.rewardMultiplier,
+            totalReward, timeRating,
+            floor: s.floor,
+            score: s.score
+        });
+    } else {
+        showMiniGameResult(false, { floor: s.floor, score: s.score });
+    }
+}
+
+// ========================================
+// 미니게임 2: 화물 던지기
+// ========================================
+let cargoState = null;
+
+function startCargoGame(timeBonus, rewardMultiplier) {
+    const baseTime = 180;
+    const maxTime = baseTime + timeBonus;
+    
+    cargoState = {
+        count: 0,
+        maxCount: 100,
+        score: 0,
+        time: maxTime,
+        rewardMultiplier: rewardMultiplier,
+        currentCargo: null,
+        targets: [],
+        dragging: false,
+        dragStart: null,
+        dragEnd: null,
+        gameOver: false
+    };
+    
+    spawnCargo();
+    renderCargoGame();
+    startCargoLoop();
+}
+
+function spawnCargo() {
+    const types = [
+        { emoji: '🔧', name: '부품', target: 'blue' },
+        { emoji: '🍎', name: '식량', target: 'yellow' },
+        { emoji: '☢️', name: '위험물', target: 'red' }
+    ];
+    
+    // 특수 화물 (31개 이후)
+    if (cargoState.count >= 30 && Math.random() < 0.1) {
+        const specials = [
+            { emoji: '⭐', name: '골드', target: 'any', points: 30 },
+            { emoji: '🎁', name: '보너스', target: 'any', points: 15 }
+        ];
+        cargoState.currentCargo = specials[Math.floor(Math.random() * specials.length)];
+    } else if (cargoState.count >= 60 && Math.random() < 0.1) {
+        cargoState.currentCargo = { emoji: '💣', name: '폭탄', target: 'red', points: 20, penalty: 20 };
+    } else {
+        cargoState.currentCargo = { ...types[Math.floor(Math.random() * types.length)], points: 10 };
+    }
+}
+
+function renderCargoGame() {
+    const s = cargoState;
+    const w = window.innerWidth;
+    const h = window.innerHeight;
+    
+    // 타겟 위치 계산
+    const targetY = 180;
+    const targetW = Math.min(80, (w - 60) / 3);
+    s.targets = [
+        { id: 'blue', x: w * 0.2, y: targetY, w: targetW, h: 60, color: '#3b82f6' },
+        { id: 'yellow', x: w * 0.5, y: targetY, w: targetW, h: 60, color: '#eab308' },
+        { id: 'red', x: w * 0.8, y: targetY, w: targetW, h: 60, color: '#ef4444' }
+    ];
+    
+    app.innerHTML = `
+        <div style="width: 100%; height: 100%; background: linear-gradient(180deg, #1a1a2e, #0f0f1a); position: relative; overflow: hidden; touch-action: none;">
+            <!-- HUD -->
+            <div style="position: absolute; top: 0; left: 0; right: 0; padding: 10px; padding-top: calc(10px + var(--safe-top)); background: rgba(0,0,0,0.5); display: flex; justify-content: space-between; align-items: center; z-index: 100;">
+                <div style="font-size: 1rem;">✅ <span id="cg-count">${s.count}</span>/${s.maxCount}</div>
+                <div style="font-size: 1rem;">⏱️ <span id="cg-time">${Math.floor(s.time / 60)}:${(s.time % 60).toString().padStart(2, '0')}</span></div>
+                <div style="font-size: 1rem; color: #ffd700;">💰 <span id="cg-score">${s.score}</span></div>
+            </div>
+            
+            <!-- 타겟들 -->
+            <div style="position: absolute; top: ${targetY - 30}px; left: 0; right: 0; display: flex; justify-content: space-around; padding: 0 20px;">
+                ${s.targets.map(t => `
+                    <div id="target-${t.id}" style="width: ${t.w}px; height: ${t.h}px; background: ${t.color}; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; color: #fff; border: 3px solid rgba(255,255,255,0.3);">
+                        ${t.id === 'blue' ? '🔧 부품' : t.id === 'yellow' ? '🍎 식량' : '☢️ 위험'}
+                    </div>
+                `).join('')}
+            </div>
+            
+            <!-- 궤적 표시 -->
+            <canvas id="cargo-canvas" width="${w}" height="${h}" style="position: absolute; top: 0; left: 0; pointer-events: none;"></canvas>
+            
+            <!-- 현재 화물 -->
+            <div id="current-cargo" style="position: absolute; bottom: 150px; left: 50%; transform: translateX(-50%); font-size: 3rem; cursor: grab;">
+                ${s.currentCargo?.emoji || '📦'}
+            </div>
+            
+            <!-- 다음 화물 -->
+            <div style="position: absolute; bottom: 80px; left: 50%; transform: translateX(-50%); font-size: 0.8rem; color: #888;">
+                다음: <span id="next-cargo">🔧</span> → <span id="next-target" style="color: #3b82f6;">🟦</span>
+            </div>
+            
+            <!-- 나가기 버튼 -->
+            <button id="btn-quit-cargo" style="position: fixed; top: calc(60px + var(--safe-top)); right: 10px; background: rgba(255,0,0,0.3); border: 1px solid rgba(255,0,0,0.5); border-radius: 8px; padding: 8px 12px; color: #fff; font-size: 0.8rem; z-index: 100;">✕ 포기</button>
+        </div>
+    `;
+    
+    setupCargoControls();
+}
+
+function setupCargoControls() {
+    const cargoEl = document.getElementById('current-cargo');
+    const canvas = document.getElementById('cargo-canvas');
+    const ctx = canvas.getContext('2d');
+    
+    let startPos = null;
+    
+    const handleStart = (e) => {
+        e.preventDefault();
+        const touch = e.touches ? e.touches[0] : e;
+        startPos = { x: touch.clientX, y: touch.clientY };
+        cargoState.dragging = true;
+        cargoEl.style.cursor = 'grabbing';
+    };
+    
+    const handleMove = (e) => {
+        if (!cargoState.dragging || !startPos) return;
+        e.preventDefault();
+        
+        const touch = e.touches ? e.touches[0] : e;
+        const endPos = { x: touch.clientX, y: touch.clientY };
+        
+        // 궤적 그리기
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        
+        // 드래그 거리에 따른 궤적 표시 (튜토리얼용)
+        const showGuide = cargoState.count < 10;
+        if (showGuide) {
+            drawTrajectory(ctx, startPos, endPos, 0.8);
+        } else if (cargoState.count < 15) {
+            drawTrajectory(ctx, startPos, endPos, 0.4);
+        } else if (cargoState.count < 20) {
+            drawTrajectory(ctx, startPos, endPos, 0.2);
+        }
+        
+        cargoState.dragEnd = endPos;
+    };
+    
+    const handleEnd = (e) => {
+        if (!cargoState.dragging || !startPos) return;
+        cargoState.dragging = false;
+        cargoEl.style.cursor = 'grab';
+        
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        
+        if (cargoState.dragEnd) {
+            throwCargo(startPos, cargoState.dragEnd);
+        }
+        
+        startPos = null;
+        cargoState.dragEnd = null;
+    };
+    
+    cargoEl.addEventListener('mousedown', handleStart);
+    cargoEl.addEventListener('touchstart', handleStart, { passive: false });
+    document.addEventListener('mousemove', handleMove);
+    document.addEventListener('touchmove', handleMove, { passive: false });
+    document.addEventListener('mouseup', handleEnd);
+    document.addEventListener('touchend', handleEnd);
+    
+    document.getElementById('btn-quit-cargo').onclick = () => {
+        if (confirm('정말 포기하시겠습니까?')) {
+            endCargoGame(false);
+        }
+    };
+}
+
+function drawTrajectory(ctx, start, end, alpha) {
+    const dx = start.x - end.x;
+    const dy = start.y - end.y;
+    const power = Math.min(Math.sqrt(dx * dx + dy * dy), 200);
+    const angle = Math.atan2(dy, dx);
+    
+    ctx.strokeStyle = `rgba(255, 255, 255, ${alpha})`;
+    ctx.lineWidth = 2;
+    ctx.setLineDash([5, 5]);
+    ctx.beginPath();
+    
+    const startX = window.innerWidth / 2;
+    const startY = window.innerHeight - 150;
+    
+    for (let t = 0; t < 1; t += 0.05) {
+        const x = startX + Math.cos(angle) * power * 2 * t;
+        const y = startY + Math.sin(angle) * power * 2 * t + 0.5 * 500 * t * t;
+        
+        if (t === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+        
+        if (y < 0 || y > window.innerHeight) break;
+    }
+    
+    ctx.stroke();
+    ctx.setLineDash([]);
+}
+
+function throwCargo(start, end) {
+    const dx = start.x - end.x;
+    const dy = start.y - end.y;
+    const power = Math.min(Math.sqrt(dx * dx + dy * dy), 200);
+    const angle = Math.atan2(dy, dx);
+    
+    // 던지기 애니메이션
+    const cargoEl = document.getElementById('current-cargo');
+    const startX = window.innerWidth / 2;
+    const startY = window.innerHeight - 150;
+    
+    let t = 0;
+    const gravity = 500;
+    const vx = Math.cos(angle) * power * 2;
+    const vy = Math.sin(angle) * power * 2;
+    
+    const animInterval = setInterval(() => {
+        t += 0.02;
+        const x = startX + vx * t;
+        const y = startY + vy * t + 0.5 * gravity * t * t;
+        
+        cargoEl.style.left = x + 'px';
+        cargoEl.style.top = y + 'px';
+        cargoEl.style.transform = 'translate(-50%, -50%)';
+        
+        // 타겟 충돌 체크
+        for (const target of cargoState.targets) {
+            if (x > target.x - target.w/2 && x < target.x + target.w/2 &&
+                y > target.y - target.h/2 && y < target.y + target.h/2) {
+                clearInterval(animInterval);
+                checkCargoHit(target);
+                return;
+            }
+        }
+        
+        // 화면 밖
+        if (y > window.innerHeight || y < 0 || x < 0 || x > window.innerWidth) {
+            clearInterval(animInterval);
+            cargoMiss();
+        }
+    }, 16);
+}
+
+function checkCargoHit(target) {
+    const cargo = cargoState.currentCargo;
+    let points = 0;
+    let success = false;
+    
+    if (cargo.target === 'any') {
+        // 아무 칸이나 OK
+        points = cargo.points;
+        success = true;
+    } else if (cargo.target === target.id) {
+        // 정확히 맞춤
+        points = cargo.points;
+        success = true;
+    } else {
+        // 잘못된 칸
+        points = -5;
+        if (cargo.name === '위험물') points = -10;
+    }
+    
+    cargoState.score += points;
+    cargoState.count++;
+    
+    updateCargoUI(success, points);
+    
+    if (cargoState.count >= cargoState.maxCount) {
+        endCargoGame(true);
+    } else {
+        setTimeout(() => {
+            spawnCargo();
+            resetCargoPosition();
+        }, 300);
+    }
+}
+
+function cargoMiss() {
+    const cargo = cargoState.currentCargo;
+    let points = 0;
+    
+    if (cargo.penalty) {
+        points = -cargo.penalty;
+    }
+    
+    cargoState.score += points;
+    cargoState.count++;
+    
+    updateCargoUI(false, points);
+    
+    if (cargoState.count >= cargoState.maxCount) {
+        endCargoGame(true);
+    } else {
+        setTimeout(() => {
+            spawnCargo();
+            resetCargoPosition();
+        }, 300);
+    }
+}
+
+function updateCargoUI(success, points) {
+    const countEl = document.getElementById('cg-count');
+    const scoreEl = document.getElementById('cg-score');
+    
+    if (countEl) countEl.textContent = cargoState.count;
+    if (scoreEl) scoreEl.textContent = Math.max(0, cargoState.score);
+    
+    // 점수 피드백
+    const feedback = document.createElement('div');
+    feedback.style.cssText = `position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 2rem; font-weight: bold; color: ${points >= 0 ? '#44ff88' : '#ff6b6b'}; z-index: 200; pointer-events: none;`;
+    feedback.textContent = points >= 0 ? `+${points}` : points;
+    document.body.appendChild(feedback);
+    setTimeout(() => feedback.remove(), 500);
+}
+
+function resetCargoPosition() {
+    const cargoEl = document.getElementById('current-cargo');
+    if (cargoEl && cargoState.currentCargo) {
+        cargoEl.style.left = '50%';
+        cargoEl.style.top = '';
+        cargoEl.style.bottom = '150px';
+        cargoEl.style.transform = 'translateX(-50%)';
+        cargoEl.textContent = cargoState.currentCargo.emoji;
+    }
+}
+
+function startCargoLoop() {
+    cargoState.timerInterval = setInterval(() => {
+        if (cargoState.gameOver) return;
+        
+        cargoState.time--;
+        
+        const timeEl = document.getElementById('cg-time');
+        if (timeEl) {
+            const min = Math.floor(cargoState.time / 60);
+            const sec = cargoState.time % 60;
+            timeEl.textContent = `${min}:${sec.toString().padStart(2, '0')}`;
+            timeEl.style.color = cargoState.time < 30 ? '#ff6b6b' : '#fff';
+        }
+        
+        if (cargoState.time <= 0) {
+            endCargoGame(false);
+        }
+    }, 1000);
+}
+
+function endCargoGame(success) {
+    cargoState.gameOver = true;
+    clearInterval(cargoState.timerInterval);
+    
+    if (success) {
+        const timeLeft = cargoState.time;
+        let baseReward = 15;
+        let timeRating = '';
+        
+        if (timeLeft >= 120) { baseReward = 30; timeRating = '⭐⭐⭐'; }
+        else if (timeLeft >= 60) { baseReward = 25; timeRating = '⭐⭐'; }
+        else if (timeLeft >= 30) { baseReward = 20; timeRating = '⭐'; }
+        else { baseReward = 15; timeRating = '-'; }
+        
+        const envBonus = getEnvBonus('cargo');
+        const partsBonus = getPartsBonus('cargo');
+        const totalReward = Math.floor((baseReward + envBonus + partsBonus) * cargoState.rewardMultiplier);
+        
+        GameState.spaceLuck = (GameState.spaceLuck || 0) + totalReward;
+        GameState.save();
+        
+        showMiniGameResult(true, {
+            baseReward, envBonus, partsBonus,
+            rewardMultiplier: cargoState.rewardMultiplier,
+            totalReward, timeRating,
+            count: cargoState.count,
+            score: cargoState.score
+        });
+    } else {
+        showMiniGameResult(false, {
+            count: cargoState.count,
+            score: cargoState.score
+        });
+    }
+}
+
+// ========================================
+// 미니게임 3: 배선 정리
+// ========================================
+let wiringState = null;
+
+function startWiringGame(timeBonus, rewardMultiplier) {
+    const baseTime = 180;
+    const maxTime = baseTime + timeBonus;
+    
+    wiringState = {
+        level: 1,
+        maxLevel: 10,
+        time: maxTime,
+        rewardMultiplier: rewardMultiplier,
+        ports: [],
+        connections: [],
+        currentWire: null,
+        gameOver: false
+    };
+    
+    generateWiringLevel(wiringState.level);
+    renderWiringGame();
+    startWiringLoop();
+}
+
+function generateWiringLevel(level) {
+    const colors = ['#ef4444', '#3b82f6', '#eab308', '#22c55e', '#a855f7', '#f97316'];
+    let portCount = 3;
+    let obstacleCount = 0;
+    
+    if (level >= 4) { portCount = 4; obstacleCount = 1; }
+    if (level >= 7) { portCount = 5; obstacleCount = 2; }
+    if (level >= 9) { portCount = 6; obstacleCount = 3; }
+    
+    const w = window.innerWidth;
+    const h = window.innerHeight;
+    const startY = 150;
+    const endY = h - 200;
+    const spacing = (endY - startY) / (portCount + 1);
+    
+    wiringState.ports = [];
+    wiringState.connections = [];
+    
+    // 왼쪽 포트
+    const leftPorts = [];
+    for (let i = 0; i < portCount; i++) {
+        leftPorts.push({
+            id: `L${i}`,
+            x: 40,
+            y: startY + spacing * (i + 1),
+            color: colors[i],
+            connected: false
+        });
+    }
+    
+    // 오른쪽 포트 (셔플)
+    const rightColors = [...colors.slice(0, portCount)].sort(() => Math.random() - 0.5);
+    const rightPorts = [];
+    for (let i = 0; i < portCount; i++) {
+        rightPorts.push({
+            id: `R${i}`,
+            x: w - 40,
+            y: startY + spacing * (i + 1),
+            color: rightColors[i],
+            connected: false
+        });
+    }
+    
+    wiringState.ports = [...leftPorts, ...rightPorts];
+    
+    // 장애물 생성
+    wiringState.obstacles = [];
+    for (let i = 0; i < obstacleCount; i++) {
+        wiringState.obstacles.push({
+            x: w * 0.3 + Math.random() * (w * 0.4),
+            y: startY + Math.random() * (endY - startY),
+            w: 60, h: 60
+        });
+    }
+}
+
+function renderWiringGame() {
+    const s = wiringState;
+    const w = window.innerWidth;
+    const h = window.innerHeight;
+    
+    app.innerHTML = `
+        <div style="width: 100%; height: 100%; background: linear-gradient(180deg, #1a2a1a, #0f1a0f); position: relative; overflow: hidden; touch-action: none;">
+            <!-- HUD -->
+            <div style="position: absolute; top: 0; left: 0; right: 0; padding: 10px; padding-top: calc(10px + var(--safe-top)); background: rgba(0,0,0,0.5); display: flex; justify-content: space-between; align-items: center; z-index: 100;">
+                <div style="font-size: 1rem;">📶 Lv.<span id="wr-level">${s.level}</span>/${s.maxLevel}</div>
+                <div style="font-size: 1rem;">✅ <span id="wr-connected">${s.connections.length}</span>/${s.ports.length / 2}</div>
+                <div style="font-size: 1rem;">⏱️ <span id="wr-time">${Math.floor(s.time / 60)}:${(s.time % 60).toString().padStart(2, '0')}</span></div>
+            </div>
+            
+            <!-- 캔버스 (배선 그리기) -->
+            <canvas id="wiring-canvas" width="${w}" height="${h}" style="position: absolute; top: 0; left: 0;"></canvas>
+            
+            <!-- 포트들 -->
+            ${s.ports.map(p => `
+                <div class="wiring-port" data-id="${p.id}" style="position: absolute; left: ${p.x}px; top: ${p.y}px; width: 30px; height: 30px; background: ${p.color}; border-radius: 50%; transform: translate(-50%, -50%); border: 3px solid #fff; cursor: pointer; z-index: 50;"></div>
+            `).join('')}
+            
+            <!-- 장애물 -->
+            ${(s.obstacles || []).map(o => `
+                <div style="position: absolute; left: ${o.x}px; top: ${o.y}px; width: ${o.w}px; height: ${o.h}px; background: rgba(100,100,100,0.8); border-radius: 8px; transform: translate(-50%, -50%); display: flex; align-items: center; justify-content: center; font-size: 1.5rem;">📦</div>
+            `).join('')}
+            
+            <!-- 나가기 버튼 -->
+            <button id="btn-quit-wiring" style="position: fixed; top: calc(60px + var(--safe-top)); right: 10px; background: rgba(255,0,0,0.3); border: 1px solid rgba(255,0,0,0.5); border-radius: 8px; padding: 8px 12px; color: #fff; font-size: 0.8rem; z-index: 100;">✕ 포기</button>
+        </div>
+    `;
+    
+    drawConnections();
+    setupWiringControls();
+}
+
+function setupWiringControls() {
+    const canvas = document.getElementById('wiring-canvas');
+    const ctx = canvas.getContext('2d');
+    const ports = document.querySelectorAll('.wiring-port');
+    
+    let startPort = null;
+    let currentPos = null;
+    
+    ports.forEach(port => {
+        port.addEventListener('mousedown', startWire);
+        port.addEventListener('touchstart', startWire, { passive: false });
+    });
+    
+    function startWire(e) {
+        e.preventDefault();
+        const portId = e.target.dataset.id;
+        const port = wiringState.ports.find(p => p.id === portId);
+        
+        if (port && !port.connected) {
+            startPort = port;
+            
+            document.addEventListener('mousemove', drawWire);
+            document.addEventListener('touchmove', drawWire, { passive: false });
+            document.addEventListener('mouseup', endWire);
+            document.addEventListener('touchend', endWire);
+        }
+    }
+    
+    function drawWire(e) {
+        if (!startPort) return;
+        e.preventDefault();
+        
+        const touch = e.touches ? e.touches[0] : e;
+        currentPos = { x: touch.clientX, y: touch.clientY };
+        
+        drawConnections();
+        
+        // 현재 드래그 중인 선
+        ctx.strokeStyle = startPort.color;
+        ctx.lineWidth = 4;
+        ctx.beginPath();
+        ctx.moveTo(startPort.x, startPort.y);
+        ctx.lineTo(currentPos.x, currentPos.y);
+        ctx.stroke();
+    }
+    
+    function endWire(e) {
+        document.removeEventListener('mousemove', drawWire);
+        document.removeEventListener('touchmove', drawWire);
+        document.removeEventListener('mouseup', endWire);
+        document.removeEventListener('touchend', endWire);
+        
+        if (!startPort || !currentPos) {
+            startPort = null;
+            currentPos = null;
+            drawConnections();
+            return;
+        }
+        
+        // 끝 포트 찾기
+        const endPort = wiringState.ports.find(p => {
+            if (p.id === startPort.id) return false;
+            if (p.connected) return false;
+            const dx = p.x - currentPos.x;
+            const dy = p.y - currentPos.y;
+            return Math.sqrt(dx * dx + dy * dy) < 30;
+        });
+        
+        if (endPort && endPort.color === startPort.color) {
+            // 연결 성공!
+            startPort.connected = true;
+            endPort.connected = true;
+            wiringState.connections.push({ from: startPort, to: endPort });
+            
+            SFX.play('eat');
+            
+            // UI 업데이트
+            const connEl = document.getElementById('wr-connected');
+            if (connEl) connEl.textContent = wiringState.connections.length;
+            
+            // 레벨 클리어 체크
+            if (wiringState.connections.length >= wiringState.ports.length / 2) {
+                nextWiringLevel();
+            }
+        }
+        
+        startPort = null;
+        currentPos = null;
+        drawConnections();
+    }
+    
+    document.getElementById('btn-quit-wiring').onclick = () => {
+        if (confirm('정말 포기하시겠습니까?')) {
+            endWiringGame(false);
+        }
+    };
+}
+
+function drawConnections() {
+    const canvas = document.getElementById('wiring-canvas');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    
+    // 완료된 연결들
+    for (const conn of wiringState.connections) {
+        ctx.strokeStyle = conn.from.color;
+        ctx.lineWidth = 4;
+        ctx.beginPath();
+        ctx.moveTo(conn.from.x, conn.from.y);
+        ctx.lineTo(conn.to.x, conn.to.y);
+        ctx.stroke();
+    }
+}
+
+function nextWiringLevel() {
+    wiringState.level++;
+    
+    if (wiringState.level > wiringState.maxLevel) {
+        endWiringGame(true);
+        return;
+    }
+    
+    setTimeout(() => {
+        generateWiringLevel(wiringState.level);
+        renderWiringGame();
+    }, 500);
+}
+
+function startWiringLoop() {
+    wiringState.timerInterval = setInterval(() => {
+        if (wiringState.gameOver) return;
+        
+        wiringState.time--;
+        
+        const timeEl = document.getElementById('wr-time');
+        if (timeEl) {
+            const min = Math.floor(wiringState.time / 60);
+            const sec = wiringState.time % 60;
+            timeEl.textContent = `${min}:${sec.toString().padStart(2, '0')}`;
+            timeEl.style.color = wiringState.time < 30 ? '#ff6b6b' : '#fff';
+        }
+        
+        if (wiringState.time <= 0) {
+            endWiringGame(false);
+        }
+    }, 1000);
+}
+
+function endWiringGame(success) {
+    wiringState.gameOver = true;
+    clearInterval(wiringState.timerInterval);
+    
+    if (success) {
+        const timeLeft = wiringState.time;
+        let baseReward = 20;
+        let timeRating = '';
+        
+        if (timeLeft >= 120) { baseReward = 30; timeRating = '⭐⭐⭐'; }
+        else if (timeLeft >= 60) { baseReward = 25; timeRating = '⭐⭐'; }
+        else if (timeLeft >= 30) { baseReward = 22; timeRating = '⭐'; }
+        else { baseReward = 20; timeRating = '-'; }
+        
+        const envBonus = getEnvBonus('wiring');
+        const partsBonus = getPartsBonus('wiring');
+        const totalReward = Math.floor((baseReward + envBonus + partsBonus) * wiringState.rewardMultiplier);
+        
+        GameState.spaceLuck = (GameState.spaceLuck || 0) + totalReward;
+        GameState.save();
+        
+        showMiniGameResult(true, {
+            baseReward, envBonus, partsBonus,
+            rewardMultiplier: wiringState.rewardMultiplier,
+            totalReward, timeRating,
+            level: wiringState.level - 1
+        });
+    } else {
+        showMiniGameResult(false, {
+            level: wiringState.level
+        });
+    }
+}
+
+// ========================================
+// 미니게임 결과 화면
+// ========================================
+function showMiniGameResult(success, data) {
+    if (success) {
+        SFX.play('clear');
+    } else {
+        SFX.play('gameover');
+    }
+    
     app.innerHTML = `
         <div class="page-center" style="background: linear-gradient(180deg, #0a0a1a, #1a1a3a);">
             <div class="page-content">
-                <div class="page-icon">✅</div>
-                <h2 class="page-title">작업 완료!</h2>
-                <div style="background: rgba(0,0,0,0.3); border-radius: 12px; padding: 15px; margin: 20px 0;">
-                    <div style="font-size: 0.8rem; color: #888; margin-bottom: 10px;">보상 내역</div>
-                    <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
-                        <span style="color: #aaa;">기본 보상</span>
-                        <span style="color: #fff;">${baseReward} LUCK</span>
+                <div class="page-icon">${success ? '✅' : '❌'}</div>
+                <h2 class="page-title">${success ? '작업 완료!' : '작업 실패'}</h2>
+                
+                ${success ? `
+                    <div style="font-size: 1.5rem; color: #ffd700; margin: 10px 0;">${data.timeRating}</div>
+                    <div style="background: rgba(0,0,0,0.3); border-radius: 12px; padding: 15px; margin: 20px 0;">
+                        <div style="font-size: 0.8rem; color: #888; margin-bottom: 10px;">보상 내역</div>
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                            <span style="color: #aaa;">기본 보상</span>
+                            <span style="color: #fff;">${data.baseReward} LUCK</span>
+                        </div>
+                        ${data.envBonus !== 0 ? `
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                            <span style="color: #aaa;">환경 보너스</span>
+                            <span style="color: ${data.envBonus > 0 ? '#44ff88' : '#ff6b6b'};">${data.envBonus > 0 ? '+' : ''}${data.envBonus} LUCK</span>
+                        </div>
+                        ` : ''}
+                        ${data.partsBonus !== 0 ? `
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                            <span style="color: #aaa;">파츠 보너스</span>
+                            <span style="color: #44ff88;">+${data.partsBonus} LUCK</span>
+                        </div>
+                        ` : ''}
+                        ${data.rewardMultiplier !== 1 ? `
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                            <span style="color: #aaa;">🎲 주사위 배율</span>
+                            <span style="color: #ffd700;">×${data.rewardMultiplier}</span>
+                        </div>
+                        ` : ''}
+                        <div style="border-top: 1px solid rgba(255,255,255,0.1); margin-top: 10px; padding-top: 10px; display: flex; justify-content: space-between;">
+                            <span style="color: #fff; font-weight: 600;">총 획득</span>
+                            <span style="color: #ffd700; font-weight: 700; font-size: 1.2rem;">+${data.totalReward} LUCK</span>
+                        </div>
                     </div>
-                    ${envBonus !== 0 ? `
-                    <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
-                        <span style="color: #aaa;">환경 보너스</span>
-                        <span style="color: ${envBonus > 0 ? '#44ff88' : '#ff6b6b'};">${envBonus > 0 ? '+' : ''}${envBonus} LUCK</span>
+                    <div style="color: #888; font-size: 0.85rem; margin-bottom: 15px;">현재 보유: ${GameState.spaceLuck.toLocaleString()} LUCK</div>
+                ` : `
+                    <div style="color: #888; font-size: 0.9rem; margin: 20px 0;">
+                        시간 초과 또는 포기했습니다.<br>
+                        다시 도전해보세요!
                     </div>
-                    ` : ''}
-                    ${partsBonus !== 0 ? `
-                    <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
-                        <span style="color: #aaa;">파츠 보너스</span>
-                        <span style="color: #44ff88;">+${partsBonus} LUCK</span>
-                    </div>
-                    ` : ''}
-                    ${rewardMultiplier !== 1 ? `
-                    <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
-                        <span style="color: #aaa;">🎲 주사위 배율</span>
-                        <span style="color: #ffd700;">×${rewardMultiplier}</span>
-                    </div>
-                    ` : ''}
-                    <div style="border-top: 1px solid rgba(255,255,255,0.1); margin-top: 10px; padding-top: 10px; display: flex; justify-content: space-between;">
-                        <span style="color: #fff; font-weight: 600;">총 획득</span>
-                        <span style="color: #ffd700; font-weight: 700; font-size: 1.2rem;">+${totalReward} LUCK</span>
-                    </div>
-                </div>
-                <div style="color: #888; font-size: 0.85rem; margin-bottom: 15px;">현재 보유: ${GameState.spaceLuck.toLocaleString()} LUCK</div>
+                `}
+                
                 <button class="btn btn-primary btn-block" id="btn-continue">계속하기</button>
             </div>
         </div>
     `;
     
-    SFX.play('clear');
     document.getElementById('btn-continue').onclick = () => showSpaceLobby();
 }
 
