@@ -1816,6 +1816,8 @@ const GameState = {
         this.evolutionGauge = parseInt(localStorage.getItem('aroa-evo-gauge')) || 0;
         this.evolutionLevel = parseInt(localStorage.getItem('aroa-evo-level')) || 0;
         this.spaceLuck = parseInt(localStorage.getItem('aroa-space-luck')) || 0;
+        this.creatureName = localStorage.getItem('aroa-creature-name') || null;
+        this.spaceRank = parseInt(localStorage.getItem('aroa-space-rank')) || 1;
     },
     
     reset() {
@@ -5666,11 +5668,14 @@ function showSpaceIntro() {
     const env = getEnvById(GameState.envId);
     const envName = env?.name || '해양';
     
-    // 이름이 없으면 생성
+    // 이름이 없으면 생성 (spaceLuck은 리셋하지 않음)
     if (!GameState.creatureName) {
         GameState.creatureName = generateCreatureName();
-        GameState.spaceLuck = 0;
-        GameState.spaceRank = 1;
+        // spaceLuck이 없을 때만 초기화
+        if (GameState.spaceLuck === undefined || GameState.spaceLuck === null) {
+            GameState.spaceLuck = 0;
+        }
+        GameState.spaceRank = GameState.spaceRank || 1;
         GameState.save();
     }
     
@@ -6430,57 +6435,90 @@ function createNPCSprite(x, y, index) {
     
     const g = new PIXI.Graphics();
     
-    // NPC 색상 (인덱스별로 다르게)
-    const colors = [0x4169E1, 0x32CD32, 0xFF6347];
-    const color = colors[index % colors.length];
+    // 우주복 색상 (인덱스별로 다르게)
+    const suitColors = [0x4169E1, 0xFF6347, 0x32CD32]; // 파랑, 빨강, 초록
+    const suitColor = suitColors[index % suitColors.length];
     
-    // 다리
-    g.beginFill(0x333355);
-    g.drawRect(-8, 12, 6, 12);
-    g.drawRect(2, 12, 6, 12);
+    // 우주 부츠
+    g.beginFill(0x555555);
+    g.drawRoundedRect(-10, 18, 8, 10, 2);
+    g.drawRoundedRect(2, 18, 8, 10, 2);
     g.endFill();
     
-    // 신발
-    g.beginFill(0x222222);
-    g.drawRect(-9, 22, 8, 4);
-    g.drawRect(1, 22, 8, 4);
+    // 부츠 발목 링
+    g.beginFill(0x888888);
+    g.drawRect(-10, 16, 8, 3);
+    g.drawRect(2, 16, 8, 3);
     g.endFill();
     
-    // 몸통 (작업복)
-    g.beginFill(color);
-    g.drawRoundedRect(-12, -8, 24, 22, 4);
+    // 우주복 다리
+    g.beginFill(0xEEEEEE);
+    g.drawRect(-9, 8, 7, 10);
+    g.drawRect(2, 8, 7, 10);
     g.endFill();
     
-    // 작업복 디테일
-    g.beginFill(0x000000, 0.2);
-    g.drawRect(-2, -5, 4, 18);
+    // 우주복 몸통
+    g.beginFill(0xEEEEEE);
+    g.drawRoundedRect(-14, -12, 28, 24, 6);
     g.endFill();
     
-    // 머리
-    g.beginFill(0xFFDBB4);
-    g.drawCircle(0, -18, 12);
+    // 우주복 색상 패널
+    g.beginFill(suitColor);
+    g.drawRoundedRect(-12, -10, 24, 10, 3);
     g.endFill();
     
-    // 헬멧
+    // 생명유지장치 (등에)
+    g.beginFill(0x666666);
+    g.drawRoundedRect(-8, -8, 16, 12, 3);
+    g.endFill();
+    g.beginFill(0x44FF44, 0.8);
+    g.drawCircle(-3, -2, 3);
+    g.endFill();
+    g.beginFill(0xFF4444, 0.8);
+    g.drawCircle(3, -2, 3);
+    g.endFill();
+    
+    // 헬멧 (구형)
     g.beginFill(0xFFFFFF);
-    g.drawEllipse(0, -22, 14, 10);
+    g.drawCircle(0, -22, 14);
     g.endFill();
-    g.beginFill(color);
-    g.drawEllipse(0, -25, 12, 6);
+    
+    // 헬멧 바이저 (유리)
+    g.beginFill(0x88CCFF, 0.7);
+    g.drawEllipse(0, -20, 10, 8);
+    g.endFill();
+    
+    // 바이저 반사광
+    g.beginFill(0xFFFFFF, 0.4);
+    g.drawEllipse(-4, -23, 3, 2);
+    g.endFill();
+    
+    // 헬멧 테두리
+    g.lineStyle(2, suitColor);
+    g.drawCircle(0, -22, 14);
+    g.lineStyle(0);
+    
+    // 헬멧 안 얼굴 (살짝 보이게)
+    g.beginFill(0xFFDBB4, 0.6);
+    g.drawCircle(0, -20, 6);
     g.endFill();
     
     // 눈
     g.beginFill(0x000000);
-    g.drawCircle(-4, -18, 2);
-    g.drawCircle(4, -18, 2);
+    g.drawCircle(-2, -21, 1.5);
+    g.drawCircle(2, -21, 1.5);
     g.endFill();
     
-    // ID 카드
-    g.beginFill(0xFFFFFF);
-    g.drawRect(-10, -2, 8, 10);
+    // 팔
+    g.beginFill(0xEEEEEE);
+    g.drawRoundedRect(-18, -8, 6, 14, 3);
+    g.drawRoundedRect(12, -8, 6, 14, 3);
     g.endFill();
-    g.beginFill(0x4444FF);
-    g.drawRect(-9, 0, 6, 4);
+    
+    // 장갑
+    g.beginFill(suitColor);
+    g.drawCircle(-15, 8, 5);
+    g.drawCircle(15, 8, 5);
     g.endFill();
     
     container.addChild(g);
@@ -6736,18 +6774,28 @@ function setupCleaningControls() {
     // 조이스틱
     const joystick = document.getElementById('cl-joystick');
     const knob = document.getElementById('cl-joy-knob');
-    let joyActive = false;
     
-    const handleStart = (e) => { joyActive = true; handleMove(e); };
+    if (!joystick || !knob) return;
+    
+    let joyActive = false;
+    let joyCenterX = 0, joyCenterY = 0;
+    
+    const handleStart = (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        joyActive = true;
+        const rect = joystick.getBoundingClientRect();
+        joyCenterX = rect.left + rect.width / 2;
+        joyCenterY = rect.top + rect.height / 2;
+        handleMove(e);
+    };
+    
     const handleMove = (e) => {
         if (!joyActive) return;
         e.preventDefault();
-        const rect = joystick.getBoundingClientRect();
-        const cx = rect.left + rect.width / 2;
-        const cy = rect.top + rect.height / 2;
         const touch = e.touches ? e.touches[0] : e;
-        let dx = touch.clientX - cx;
-        let dy = touch.clientY - cy;
+        let dx = touch.clientX - joyCenterX;
+        let dy = touch.clientY - joyCenterY;
         const dist = Math.sqrt(dx * dx + dy * dy);
         const max = 35;
         if (dist > max) { dx = (dx / dist) * max; dy = (dy / dist) * max; }
@@ -6755,25 +6803,40 @@ function setupCleaningControls() {
         s.joyPos.y = dy / max;
         knob.style.transform = `translate(calc(-50% + ${dx}px), calc(-50% + ${dy}px))`;
     };
-    const handleEnd = () => {
+    
+    const handleEnd = (e) => {
         joyActive = false;
-        s.joyPos = { x: 0, y: 0 };
+        s.joyPos.x = 0;
+        s.joyPos.y = 0;
         knob.style.transform = 'translate(-50%, -50%)';
     };
     
+    // 조이스틱 이벤트
     joystick.addEventListener('mousedown', handleStart);
     joystick.addEventListener('touchstart', handleStart, { passive: false });
-    document.addEventListener('mousemove', handleMove);
-    document.addEventListener('touchmove', handleMove, { passive: false });
-    document.addEventListener('mouseup', handleEnd);
-    document.addEventListener('touchend', handleEnd);
+    joystick.addEventListener('mousemove', handleMove);
+    joystick.addEventListener('touchmove', handleMove, { passive: false });
+    joystick.addEventListener('mouseup', handleEnd);
+    joystick.addEventListener('touchend', handleEnd);
+    joystick.addEventListener('mouseleave', handleEnd);
+    joystick.addEventListener('touchcancel', handleEnd);
     
-    // 나가기 (부분 보상)
-    document.getElementById('btn-quit-cleaning').onclick = () => {
-        if (confirm('포기하시겠습니까?\n현재까지 번 점수의 50%를 받습니다.')) {
-            endCleaningGame(false, true); // 두번째 인자: 부분 보상 여부
-        }
-    };
+    // 전역 마우스업도 처리
+    s.globalMouseUp = handleEnd;
+    document.addEventListener('mouseup', s.globalMouseUp);
+    document.addEventListener('touchend', s.globalMouseUp);
+    
+    // 나가기 버튼 (부분 보상)
+    const quitBtn = document.getElementById('btn-quit-cleaning');
+    if (quitBtn) {
+        quitBtn.onclick = (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            if (confirm('포기하시겠습니까?\n현재까지 번 점수의 50%를 받습니다.')) {
+                endCleaningGame(false, true);
+            }
+        };
+    }
 }
 
 function cleaningGameLoop(delta) {
@@ -7106,6 +7169,12 @@ function endCleaningGame(success, partialReward = false) {
     clearInterval(s.timerInterval);
     window.removeEventListener('keydown', s.keydownHandler);
     window.removeEventListener('keyup', s.keyupHandler);
+    
+    // 전역 마우스 이벤트 정리
+    if (s.globalMouseUp) {
+        document.removeEventListener('mouseup', s.globalMouseUp);
+        document.removeEventListener('touchend', s.globalMouseUp);
+    }
     
     if (cleaningApp) {
         cleaningApp.destroy(true, { children: true });
