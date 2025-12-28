@@ -5736,10 +5736,9 @@ function showSpaceLobby() {
     
     // 게시판 공고 내용
     const bulletinPosts = [
-        { type: '긴급', icon: '🚨', title: '청소부 긴급 모집', desc: '3층 객실 청소 인원 필요', reward: '15 LUCK' },
-        { type: '일반', icon: '📦', title: '화물 적재 담당자 모집', desc: '보급품 정리 작업', reward: '20 LUCK' },
-        { type: '신규', icon: '🔌', title: '배선 정비 보조', desc: 'Lv.3 이상만 지원 가능', reward: '25 LUCK' },
-        { type: '공지', icon: '📢', title: '이번 주 우수 근무자 발표', desc: '열심히 일한 당신에게 보너스!', reward: '' }
+        { type: '긴급', icon: '🚨', title: '청소부 긴급 모집', desc: '객실 청소 인원 필요', reward: '15 LUCK' },
+        { type: '일반', icon: '📦', title: '화물 적재 담당자', desc: '보급품 정리 작업', reward: '20 LUCK' },
+        { type: '신규', icon: '🔌', title: '배선 정비 보조', desc: 'Lv.3 이상 지원 가능', reward: '25 LUCK' }
     ];
     
     app.innerHTML = `
@@ -5786,7 +5785,7 @@ function showSpaceLobby() {
                 <!-- 내 정보 카드 -->
                 <div style="background: linear-gradient(135deg, rgba(30,30,60,0.9), rgba(20,20,40,0.9)); border-radius: 16px; padding: 15px; border: 1px solid rgba(100,150,255,0.2); box-shadow: 0 4px 20px rgba(0,0,0,0.3);">
                     <div style="display: flex; gap: 15px; align-items: center;">
-                        <div id="my-creature" style="width: 80px; height: 80px; background: rgba(0,0,0,0.4); border-radius: 12px; border: 2px solid rgba(100,150,255,0.3);"></div>
+                        <div id="my-creature" style="width: 80px; height: 80px; background: rgba(0,0,0,0.4); border-radius: 12px; border: 2px solid rgba(100,150,255,0.3); cursor: pointer;" title="클릭하여 크게 보기"></div>
                         <div style="flex: 1;">
                             <div style="font-size: 1.1rem; font-weight: 700; color: #fff; margin-bottom: 4px;">${creatureName}</div>
                             <div style="font-size: 0.85rem; color: #aaa; margin-bottom: 8px;">${currentRank.name}</div>
@@ -5799,6 +5798,35 @@ function showSpaceLobby() {
                                 </div>
                             </div>
                         </div>
+                    </div>
+                </div>
+                
+                <!-- 크리처 팝업 -->
+                <div id="creature-popup" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.9); z-index: 1000; overflow-y: auto; padding: 20px; padding-top: calc(20px + var(--safe-top));">
+                    <div style="max-width: 400px; margin: 0 auto;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                            <h2 style="color: #fff; font-size: 1.3rem; margin: 0;">🐾 내 크리처</h2>
+                            <button id="btn-close-creature" style="background: rgba(255,255,255,0.1); border: none; border-radius: 50%; width: 36px; height: 36px; color: #fff; font-size: 1.2rem; cursor: pointer;">✕</button>
+                        </div>
+                        
+                        <!-- 크리처 큰 이미지 -->
+                        <div style="background: linear-gradient(135deg, rgba(30,50,80,0.9), rgba(20,30,50,0.9)); border-radius: 16px; padding: 20px; border: 1px solid rgba(100,150,255,0.3); text-align: center; margin-bottom: 15px;">
+                            <canvas id="creature-large" width="200" height="200" style="background: rgba(0,0,0,0.3); border-radius: 12px;"></canvas>
+                        </div>
+                        
+                        <!-- 이름 편집 -->
+                        <div style="background: rgba(30,30,60,0.8); border-radius: 12px; padding: 15px; margin-bottom: 15px; border: 1px solid rgba(100,150,255,0.2);">
+                            <div style="font-size: 0.8rem; color: #888; margin-bottom: 8px;">크리처 이름</div>
+                            <div style="display: flex; gap: 10px;">
+                                <input id="creature-name-input" type="text" value="${creatureName}" maxlength="12" style="flex: 1; background: rgba(0,0,0,0.3); border: 1px solid rgba(100,150,255,0.3); border-radius: 8px; padding: 10px; color: #fff; font-size: 1rem;">
+                                <button id="btn-save-name" style="background: linear-gradient(135deg, #4fc3f7, #29b6f6); border: none; border-radius: 8px; padding: 10px 15px; color: #000; font-weight: 600; cursor: pointer;">저장</button>
+                            </div>
+                        </div>
+                        
+                        <!-- 다운로드 버튼 -->
+                        <button id="btn-download-creature" style="width: 100%; background: linear-gradient(135deg, #66bb6a, #43a047); border: none; border-radius: 12px; padding: 15px; color: #fff; font-size: 1rem; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;">
+                            📥 이미지 다운로드
+                        </button>
                     </div>
                 </div>
                 
@@ -5868,42 +5896,67 @@ function showSpaceLobby() {
                 </div>
                 
                 <!-- 게시판 -->
-                <div style="background: linear-gradient(135deg, rgba(20,40,60,0.9), rgba(10,20,30,0.9)); border-radius: 16px; border: 1px solid rgba(100,200,255,0.2); overflow: hidden;">
-                    <div style="background: rgba(0,50,100,0.4); padding: 10px 15px; border-bottom: 1px solid rgba(100,200,255,0.2);">
-                        <div style="font-size: 0.9rem; font-weight: 700; color: #4fc3f7;">📋 구인 게시판</div>
+                <div style="background: linear-gradient(135deg, rgba(20,40,60,0.9), rgba(10,20,30,0.9)); border-radius: 12px; border: 1px solid rgba(100,200,255,0.2); overflow: hidden;">
+                    <div style="background: rgba(0,50,100,0.4); padding: 6px 12px; border-bottom: 1px solid rgba(100,200,255,0.2);">
+                        <div style="font-size: 0.8rem; font-weight: 700; color: #4fc3f7;">📋 구인 게시판</div>
                     </div>
-                    <div style="padding: 10px;">
+                    <div style="padding: 6px;">
                         ${bulletinPosts.map(post => `
-                            <div style="display: flex; align-items: center; gap: 10px; padding: 10px; background: rgba(0,0,0,0.2); border-radius: 8px; margin-bottom: 8px; ${post.type === '긴급' ? 'border-left: 3px solid #ff6b6b;' : post.type === '신규' ? 'border-left: 3px solid #4fc3f7;' : ''}">
-                                <div style="font-size: 1.5rem;">${post.icon}</div>
+                            <div style="display: flex; align-items: center; gap: 8px; padding: 6px 8px; background: rgba(0,0,0,0.2); border-radius: 6px; margin-bottom: 4px; ${post.type === '긴급' ? 'border-left: 2px solid #ff6b6b;' : post.type === '신규' ? 'border-left: 2px solid #4fc3f7;' : ''}">
+                                <div style="font-size: 1.1rem;">${post.icon}</div>
                                 <div style="flex: 1;">
-                                    <div style="font-size: 0.85rem; font-weight: 600; color: #fff;">${post.title}</div>
-                                    <div style="font-size: 0.7rem; color: #888;">${post.desc}</div>
+                                    <div style="font-size: 0.75rem; font-weight: 600; color: #fff;">${post.title}</div>
+                                    <div style="font-size: 0.6rem; color: #888;">${post.desc}</div>
                                 </div>
-                                ${post.reward ? `<div style="font-size: 0.75rem; color: #ffd700; font-weight: 600;">${post.reward}</div>` : ''}
+                                ${post.reward ? `<div style="font-size: 0.65rem; color: #ffd700; font-weight: 600;">${post.reward}</div>` : ''}
                             </div>
                         `).join('')}
                     </div>
                 </div>
                 
                 <!-- 미니게임 버튼들 -->
-                <div style="font-size: 0.85rem; color: #888; margin-top: 5px;">💼 허드렛일 선택</div>
+                <div style="font-size: 0.9rem; color: #ffd700; margin-top: 10px; font-weight: 600;">💼 허드렛일 선택</div>
                 <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;">
-                    <button class="space-job-btn" id="btn-cleaning" style="background: linear-gradient(135deg, #2d5a3d, #1a3d2a); border: 1px solid rgba(100,200,100,0.3);">
-                        <div style="font-size: 2rem; margin-bottom: 5px;">🧹</div>
-                        <div style="font-size: 0.8rem; font-weight: 600;">청소</div>
-                        <div style="font-size: 0.65rem; color: #aaa;">30~50 LUCK</div>
-                    </button>
-                    <button class="space-job-btn ${currentRank.level >= 2 ? '' : 'locked'}" id="btn-cargo" style="background: linear-gradient(135deg, #5a4a2d, #3d3a1a); border: 1px solid rgba(200,180,100,0.3); ${currentRank.level < 2 ? 'opacity: 0.5;' : ''}">
-                        <div style="font-size: 2rem; margin-bottom: 5px;">${currentRank.level >= 2 ? '📦' : '🔒'}</div>
-                        <div style="font-size: 0.8rem; font-weight: 600;">화물</div>
-                        <div style="font-size: 0.65rem; color: #aaa;">${currentRank.level >= 2 ? '50~100 LUCK' : 'Lv.2 필요'}</div>
-                    </button>
-                    <button class="space-job-btn ${currentRank.level >= 3 ? '' : 'locked'}" id="btn-wiring" style="background: linear-gradient(135deg, #2d3d5a, #1a2a3d); border: 1px solid rgba(100,150,200,0.3); ${currentRank.level < 3 ? 'opacity: 0.5;' : ''}">
-                        <div style="font-size: 2rem; margin-bottom: 5px;">${currentRank.level >= 3 ? '🔌' : '🔒'}</div>
-                        <div style="font-size: 0.8rem; font-weight: 600;">배선</div>
-                        <div style="font-size: 0.65rem; color: #aaa;">${currentRank.level >= 3 ? '150~300 LUCK' : 'Lv.3 필요'}</div>
-                    </button>
+                    <div style="position: relative;">
+                        <button class="space-job-btn" id="btn-cleaning" style="background: linear-gradient(135deg, #2d5a3d, #1a3d2a); border: 1px solid rgba(100,200,100,0.3); width: 100%;">
+                            <div style="font-size: 2rem; margin-bottom: 5px;">🧹</div>
+                            <div style="font-size: 0.8rem; font-weight: 600;">청소</div>
+                            <div style="font-size: 0.65rem; color: #aaa;">30~50 LUCK</div>
+                        </button>
+                        <button class="ranking-btn" data-job="cleaning" style="position: absolute; top: 4px; right: 4px; background: rgba(255,215,0,0.8); border: none; border-radius: 6px; padding: 2px 6px; font-size: 0.55rem; color: #000; font-weight: 600; cursor: pointer;">🏆</button>
+                    </div>
+                    <div style="position: relative;">
+                        <button class="space-job-btn ${currentRank.level >= 2 ? '' : 'locked'}" id="btn-cargo" style="background: linear-gradient(135deg, #5a4a2d, #3d3a1a); border: 1px solid rgba(200,180,100,0.3); ${currentRank.level < 2 ? 'opacity: 0.5;' : ''} width: 100%;">
+                            <div style="font-size: 2rem; margin-bottom: 5px;">${currentRank.level >= 2 ? '📦' : '🔒'}</div>
+                            <div style="font-size: 0.8rem; font-weight: 600;">화물</div>
+                            <div style="font-size: 0.65rem; color: #aaa;">${currentRank.level >= 2 ? '50~100 LUCK' : 'Lv.2 필요'}</div>
+                        </button>
+                        <button class="ranking-btn" data-job="cargo" style="position: absolute; top: 4px; right: 4px; background: rgba(255,215,0,0.8); border: none; border-radius: 6px; padding: 2px 6px; font-size: 0.55rem; color: #000; font-weight: 600; cursor: pointer;">🏆</button>
+                    </div>
+                    <div style="position: relative;">
+                        <button class="space-job-btn ${currentRank.level >= 3 ? '' : 'locked'}" id="btn-wiring" style="background: linear-gradient(135deg, #2d3d5a, #1a2a3d); border: 1px solid rgba(100,150,200,0.3); ${currentRank.level < 3 ? 'opacity: 0.5;' : ''} width: 100%;">
+                            <div style="font-size: 2rem; margin-bottom: 5px;">${currentRank.level >= 3 ? '🔌' : '🔒'}</div>
+                            <div style="font-size: 0.8rem; font-weight: 600;">배선</div>
+                            <div style="font-size: 0.65rem; color: #aaa;">${currentRank.level >= 3 ? '150~300 LUCK' : 'Lv.3 필요'}</div>
+                        </button>
+                        <button class="ranking-btn" data-job="wiring" style="position: absolute; top: 4px; right: 4px; background: rgba(255,215,0,0.8); border: none; border-radius: 6px; padding: 2px 6px; font-size: 0.55rem; color: #000; font-weight: 600; cursor: pointer;">🏆</button>
+                    </div>
+                </div>
+                
+                <!-- 랭킹 팝업 -->
+                <div id="ranking-popup" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.9); z-index: 1000; overflow-y: auto; padding: 20px; padding-top: calc(20px + var(--safe-top));">
+                    <div style="max-width: 400px; margin: 0 auto;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                            <h2 id="ranking-title" style="color: #ffd700; font-size: 1.3rem; margin: 0;">🏆 랭킹</h2>
+                            <button id="btn-close-ranking" style="background: rgba(255,255,255,0.1); border: none; border-radius: 50%; width: 36px; height: 36px; color: #fff; font-size: 1.2rem; cursor: pointer;">✕</button>
+                        </div>
+                        <div id="ranking-list" style="background: rgba(30,30,50,0.9); border-radius: 12px; overflow: hidden; border: 1px solid rgba(255,215,0,0.3);">
+                            <!-- 랭킹 목록이 여기에 표시됨 -->
+                        </div>
+                        <div style="margin-top: 15px; text-align: center; color: #888; font-size: 0.75rem;">
+                            상위 20명의 기록이 표시됩니다
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -5945,6 +5998,51 @@ function showSpaceLobby() {
         }
     };
     
+    // 크리처 팝업
+    document.getElementById('my-creature').onclick = () => {
+        document.getElementById('creature-popup').style.display = 'block';
+        renderCreatureLarge();
+    };
+    document.getElementById('btn-close-creature').onclick = () => {
+        document.getElementById('creature-popup').style.display = 'none';
+    };
+    document.getElementById('creature-popup').onclick = (e) => {
+        if (e.target.id === 'creature-popup') {
+            document.getElementById('creature-popup').style.display = 'none';
+        }
+    };
+    document.getElementById('btn-save-name').onclick = () => {
+        const newName = document.getElementById('creature-name-input').value.trim();
+        if (newName && newName.length <= 12) {
+            GameState.creatureName = newName;
+            GameState.save();
+            alert('이름이 저장되었습니다!');
+            showSpaceLobby();
+        } else {
+            alert('이름은 1~12자로 입력해주세요.');
+        }
+    };
+    document.getElementById('btn-download-creature').onclick = () => {
+        downloadCreatureImage();
+    };
+    
+    // 랭킹 버튼들
+    document.querySelectorAll('.ranking-btn').forEach(btn => {
+        btn.onclick = (e) => {
+            e.stopPropagation();
+            const job = btn.dataset.job;
+            showRankingPopup(job);
+        };
+    });
+    document.getElementById('btn-close-ranking').onclick = () => {
+        document.getElementById('ranking-popup').style.display = 'none';
+    };
+    document.getElementById('ranking-popup').onclick = (e) => {
+        if (e.target.id === 'ranking-popup') {
+            document.getElementById('ranking-popup').style.display = 'none';
+        }
+    };
+    
     // LUCK 조절 팝업
     document.getElementById('luck-container').onclick = () => {
         document.getElementById('luck-popup').style.display = 'flex';
@@ -5972,6 +6070,184 @@ function showSpaceLobby() {
             document.getElementById('luck-popup').style.display = 'none';
         }
     };
+}
+
+// 크리처 큰 이미지 렌더링
+function renderCreatureLarge() {
+    const canvas = document.getElementById('creature-large');
+    if (!canvas || !GameState.creature) return;
+    
+    const ctx = canvas.getContext('2d');
+    ctx.clearRect(0, 0, 200, 200);
+    
+    // 배경 그라데이션
+    const bgGrad = ctx.createRadialGradient(100, 100, 0, 100, 100, 100);
+    bgGrad.addColorStop(0, 'rgba(50,80,120,0.5)');
+    bgGrad.addColorStop(1, 'rgba(20,30,50,0.8)');
+    ctx.fillStyle = bgGrad;
+    ctx.fillRect(0, 0, 200, 200);
+    
+    // PixiJS로 크리처 그리기
+    const tempApp = new PIXI.Application({
+        width: 200,
+        height: 200,
+        backgroundColor: 0x000000,
+        backgroundAlpha: 0
+    });
+    
+    const g = new PIXI.Graphics();
+    const evolved = evolveCreatureByLevel(GameState.creature, 5);
+    drawCreature(g, evolved, 100, 100, 60, Date.now() * 0.001);
+    tempApp.stage.addChild(g);
+    
+    tempApp.renderer.render(tempApp.stage);
+    ctx.drawImage(tempApp.view, 0, 0);
+    tempApp.destroy(true);
+}
+
+// 크리처 이미지 다운로드
+function downloadCreatureImage() {
+    const canvas = document.getElementById('creature-large');
+    if (!canvas) return;
+    
+    // 새 캔버스에 배경 + 크리처 그리기
+    const downloadCanvas = document.createElement('canvas');
+    downloadCanvas.width = 400;
+    downloadCanvas.height = 400;
+    const ctx = downloadCanvas.getContext('2d');
+    
+    // 배경
+    const bgGrad = ctx.createRadialGradient(200, 200, 0, 200, 200, 200);
+    bgGrad.addColorStop(0, '#3a5a8a');
+    bgGrad.addColorStop(1, '#1a2a4a');
+    ctx.fillStyle = bgGrad;
+    ctx.fillRect(0, 0, 400, 400);
+    
+    // 크리처 그리기
+    const tempApp = new PIXI.Application({
+        width: 400,
+        height: 400,
+        backgroundColor: 0x000000,
+        backgroundAlpha: 0
+    });
+    
+    const g = new PIXI.Graphics();
+    const evolved = evolveCreatureByLevel(GameState.creature, 5);
+    drawCreature(g, evolved, 200, 200, 120, Date.now() * 0.001);
+    tempApp.stage.addChild(g);
+    
+    tempApp.renderer.render(tempApp.stage);
+    ctx.drawImage(tempApp.view, 0, 0);
+    tempApp.destroy(true);
+    
+    // 이름 추가
+    ctx.fillStyle = '#ffffff';
+    ctx.font = 'bold 24px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText(GameState.creatureName || '내 크리처', 200, 370);
+    
+    // 다운로드
+    const link = document.createElement('a');
+    link.download = `${GameState.creatureName || 'creature'}.png`;
+    link.href = downloadCanvas.toDataURL('image/png');
+    link.click();
+}
+
+// 랭킹 팝업 표시
+async function showRankingPopup(jobType) {
+    const jobNames = {
+        cleaning: '🧹 청소',
+        cargo: '📦 화물',
+        wiring: '🔌 배선'
+    };
+    
+    document.getElementById('ranking-title').textContent = `🏆 ${jobNames[jobType]} 랭킹`;
+    document.getElementById('ranking-popup').style.display = 'block';
+    
+    const listEl = document.getElementById('ranking-list');
+    listEl.innerHTML = '<div style="padding: 20px; text-align: center; color: #888;">로딩 중...</div>';
+    
+    try {
+        const rankings = await fetchRankings(jobType);
+        
+        if (rankings.length === 0) {
+            listEl.innerHTML = '<div style="padding: 20px; text-align: center; color: #888;">아직 기록이 없습니다.<br>첫 번째 기록을 남겨보세요!</div>';
+            return;
+        }
+        
+        listEl.innerHTML = `
+            <div style="display: grid; grid-template-columns: 40px 1fr 70px 60px; padding: 10px; background: rgba(255,215,0,0.2); font-size: 0.75rem; font-weight: 600; color: #ffd700;">
+                <div>순위</div>
+                <div>캐릭터명</div>
+                <div>날짜</div>
+                <div style="text-align: right;">점수</div>
+            </div>
+            ${rankings.map((r, i) => `
+                <div style="display: grid; grid-template-columns: 40px 1fr 70px 60px; padding: 10px; border-bottom: 1px solid rgba(255,255,255,0.1); font-size: 0.75rem; ${i < 3 ? 'background: rgba(255,215,0,0.1);' : ''}">
+                    <div style="font-weight: 600; color: ${i === 0 ? '#ffd700' : i === 1 ? '#c0c0c0' : i === 2 ? '#cd7f32' : '#888'};">
+                        ${i < 3 ? ['🥇','🥈','🥉'][i] : i + 1}
+                    </div>
+                    <div style="color: #fff; overflow: hidden; text-overflow: ellipsis;">${r.name}</div>
+                    <div style="color: #888;">${r.date}</div>
+                    <div style="text-align: right; color: #4fc3f7; font-weight: 600;">${r.score.toLocaleString()}</div>
+                </div>
+            `).join('')}
+        `;
+    } catch (error) {
+        listEl.innerHTML = '<div style="padding: 20px; text-align: center; color: #ff6b6b;">랭킹을 불러올 수 없습니다.</div>';
+    }
+}
+
+// Firebase에서 랭킹 가져오기
+async function fetchRankings(jobType) {
+    try {
+        const snapshot = await db.collection('rankings')
+            .where('jobType', '==', jobType)
+            .orderBy('score', 'desc')
+            .limit(20)
+            .get();
+        
+        return snapshot.docs.map(doc => doc.data());
+    } catch (error) {
+        console.error('랭킹 조회 실패:', error);
+        // 로컬 데이터로 대체
+        return getLocalRankings(jobType);
+    }
+}
+
+// 로컬 랭킹 데이터 (Firebase 실패 시)
+function getLocalRankings(jobType) {
+    const key = `rankings_${jobType}`;
+    const saved = localStorage.getItem(key);
+    return saved ? JSON.parse(saved) : [];
+}
+
+// 랭킹 저장
+async function saveRanking(jobType, score) {
+    const name = GameState.creatureName || '익명의 크리처';
+    const date = new Date().toLocaleDateString('ko-KR', { month: '2-digit', day: '2-digit' });
+    
+    const record = {
+        jobType,
+        name,
+        score,
+        date,
+        timestamp: Date.now()
+    };
+    
+    // Firebase 저장 시도
+    try {
+        await db.collection('rankings').add(record);
+    } catch (error) {
+        console.error('Firebase 저장 실패:', error);
+    }
+    
+    // 로컬에도 저장
+    const key = `rankings_${jobType}`;
+    const local = getLocalRankings(jobType);
+    local.push(record);
+    local.sort((a, b) => b.score - a.score);
+    localStorage.setItem(key, JSON.stringify(local.slice(0, 50)));
 }
 
 // 미니게임 시작 전 주사위
@@ -6179,7 +6455,7 @@ function startCleaningGame(timeBonus, rewardMultiplier) {
     
     cleaningState = {
         floor: 1,
-        maxFloor: 10,
+        maxFloor: 7,
         score: 0,
         time: maxTime,
         rewardMultiplier: rewardMultiplier,
@@ -7459,6 +7735,11 @@ function endCleaningGame(success, partialReward = false) {
     if (cleaningApp) {
         cleaningApp.destroy(true, { children: true });
         cleaningApp = null;
+    }
+    
+    // 랭킹 저장 (점수가 있을 때만)
+    if (s.score > 0) {
+        saveRanking('cleaning', s.score);
     }
     
     if (success) {
@@ -8896,6 +9177,11 @@ function endCargoGame(success, partialReward = false) {
         cargoApp = null;
     }
     
+    // 랭킹 저장 (점수가 있을 때만)
+    if (s.score > 0) {
+        saveRanking('cargo', s.score);
+    }
+    
     if (success) {
         // 점수 기반 보상 계산
         const scoreReward = Math.floor(s.score * 0.3);  // 점수의 30%
@@ -8931,302 +9217,1203 @@ function endCargoGame(success, partialReward = false) {
     }
 }
 
-// 미니게임 3: 배선 정리
+
+// ========================================
+// 미니게임 3: 배선 정리 (PixiJS)
 // ========================================
 let wiringState = null;
+let wiringApp = null;
+
+// 배선 색상 팔레트 (네온 컬러)
+const WIRE_COLORS = [
+    { hex: 0xff4466, name: '빨강', glow: 0xff6688 },
+    { hex: 0x44aaff, name: '파랑', glow: 0x66ccff },
+    { hex: 0xffcc00, name: '노랑', glow: 0xffdd44 },
+    { hex: 0x44ff88, name: '초록', glow: 0x66ffaa },
+    { hex: 0xcc66ff, name: '보라', glow: 0xdd88ff },
+    { hex: 0xff8844, name: '주황', glow: 0xffaa66 }
+];
+
+// 배선 게임 대사
+const WIRING_QUOTES = {
+    connect: [
+        "연결 완료!",
+        "딱 맞았어!",
+        "좋아!",
+        "완벽해!",
+        "척척!",
+        "이 정도는 껌이지"
+    ],
+    levelUp: [
+        "다음 레벨!",
+        "레벨 업!",
+        "점점 어려워진다!",
+        "잘하고 있어!",
+        "더 빠르게!"
+    ],
+    wrong: [
+        "색이 안 맞아!",
+        "다시 해봐!",
+        "색깔을 봐!",
+        "이건 아니야"
+    ]
+};
+
+function getWiringQuote(type) {
+    const quotes = WIRING_QUOTES[type];
+    return quotes[Math.floor(Math.random() * quotes.length)];
+}
 
 function startWiringGame(timeBonus, rewardMultiplier) {
-    const baseTime = 180;
-    const maxTime = baseTime + timeBonus;
-    
     wiringState = {
         level: 1,
-        maxLevel: 10,
-        time: maxTime,
+        maxLevel: 8,
+        time: 150 + timeBonus,
         rewardMultiplier: rewardMultiplier,
-        ports: [],
+        score: 0,
+        leftPorts: [],
+        rightPorts: [],
         connections: [],
-        currentWire: null,
-        gameOver: false
+        obstacles: [],
+        dragging: false,
+        dragFrom: null,
+        dragPos: null,
+        gameOver: false,
+        gameW: 0,
+        gameH: 0,
+        // 파티클
+        particles: [],
+        // 별
+        stars: [],
+        // 말풍선
+        speechBubble: null,
+        // 컨테이너
+        bgContainer: null,
+        wireContainer: null,
+        portContainer: null,
+        particleContainer: null,
+        playerContainer: null,
+        // 그래픽
+        dragLine: null
     };
     
-    generateWiringLevel(wiringState.level);
-    renderWiringGame();
-    startWiringLoop();
+    renderWiringUI();
+    initWiringPixi();
 }
 
-function generateWiringLevel(level) {
-    const colors = ['#ef4444', '#3b82f6', '#eab308', '#22c55e', '#a855f7', '#f97316'];
-    let portCount = 3;
-    let obstacleCount = 0;
-    
-    if (level >= 4) { portCount = 4; obstacleCount = 1; }
-    if (level >= 7) { portCount = 5; obstacleCount = 2; }
-    if (level >= 9) { portCount = 6; obstacleCount = 3; }
-    
-    const w = window.innerWidth;
-    const h = window.innerHeight;
-    const startY = 150;
-    const endY = h - 200;
-    const spacing = (endY - startY) / (portCount + 1);
-    
-    wiringState.ports = [];
-    wiringState.connections = [];
-    
-    // 왼쪽 포트
-    const leftPorts = [];
-    for (let i = 0; i < portCount; i++) {
-        leftPorts.push({
-            id: `L${i}`,
-            x: 40,
-            y: startY + spacing * (i + 1),
-            color: colors[i],
-            connected: false
-        });
-    }
-    
-    // 오른쪽 포트 (셔플)
-    const rightColors = [...colors.slice(0, portCount)].sort(() => Math.random() - 0.5);
-    const rightPorts = [];
-    for (let i = 0; i < portCount; i++) {
-        rightPorts.push({
-            id: `R${i}`,
-            x: w - 40,
-            y: startY + spacing * (i + 1),
-            color: rightColors[i],
-            connected: false
-        });
-    }
-    
-    wiringState.ports = [...leftPorts, ...rightPorts];
-    
-    // 장애물 생성
-    wiringState.obstacles = [];
-    for (let i = 0; i < obstacleCount; i++) {
-        wiringState.obstacles.push({
-            x: w * 0.3 + Math.random() * (w * 0.4),
-            y: startY + Math.random() * (endY - startY),
-            w: 60, h: 60
-        });
-    }
-}
-
-function renderWiringGame() {
+function renderWiringUI() {
     const s = wiringState;
-    const w = window.innerWidth;
-    const h = window.innerHeight;
     
     app.innerHTML = `
-        <div style="width: 100%; height: 100%; background: linear-gradient(180deg, #1a2a1a, #0f1a0f); position: relative; overflow: hidden; touch-action: none;">
+        <div style="width: 100%; height: 100%; background: #0a1a0a; display: flex; flex-direction: column; align-items: center;">
             <!-- HUD -->
-            <div style="position: absolute; top: 0; left: 0; right: 0; padding: 10px; padding-top: calc(10px + var(--safe-top)); background: rgba(0,0,0,0.5); display: flex; justify-content: space-between; align-items: center; z-index: 100;">
-                <div style="font-size: 1rem;">📶 Lv.<span id="wr-level">${s.level}</span>/${s.maxLevel}</div>
-                <div style="font-size: 1rem;">✅ <span id="wr-connected">${s.connections.length}</span>/${s.ports.length / 2}</div>
-                <div style="font-size: 1rem;">⏱️ <span id="wr-time">${Math.floor(s.time / 60)}:${(s.time % 60).toString().padStart(2, '0')}</span></div>
+            <div style="width: 100%; max-width: 420px; padding: 10px 15px; padding-top: calc(10px + var(--safe-top)); background: linear-gradient(180deg, rgba(0,0,0,0.9), rgba(0,0,0,0.5)); display: flex; justify-content: space-between; align-items: center; z-index: 100;">
+                <div style="display: flex; gap: 12px; align-items: center; font-size: 0.85rem;">
+                    <div>📶 Lv.<span id="wr-level">${s.level}</span>/${s.maxLevel}</div>
+                    <div>✅ <span id="wr-connected">0</span>/<span id="wr-total">3</span></div>
+                </div>
+                <div style="display: flex; gap: 12px; align-items: center; font-size: 0.85rem;">
+                    <div>⏱️ <span id="wr-time">${Math.floor(s.time / 60)}:${(s.time % 60).toString().padStart(2, '0')}</span></div>
+                    <div style="color: #44ff88;">⭐ <span id="wr-score">0</span>점</div>
+                </div>
             </div>
             
-            <!-- 캔버스 (배선 그리기) -->
-            <canvas id="wiring-canvas" width="${w}" height="${h}" style="position: absolute; top: 0; left: 0;"></canvas>
+            <!-- 게임 캔버스 -->
+            <div id="wiring-canvas-wrap" style="flex: 1; width: 100%; max-width: 420px; position: relative;"></div>
             
-            <!-- 포트들 -->
-            ${s.ports.map(p => `
-                <div class="wiring-port" data-id="${p.id}" style="position: absolute; left: ${p.x}px; top: ${p.y}px; width: 30px; height: 30px; background: ${p.color}; border-radius: 50%; transform: translate(-50%, -50%); border: 3px solid #fff; cursor: pointer; z-index: 50;"></div>
-            `).join('')}
-            
-            <!-- 장애물 -->
-            ${(s.obstacles || []).map(o => `
-                <div style="position: absolute; left: ${o.x}px; top: ${o.y}px; width: ${o.w}px; height: ${o.h}px; background: rgba(100,100,100,0.8); border-radius: 8px; transform: translate(-50%, -50%); display: flex; align-items: center; justify-content: center; font-size: 1.5rem;">📦</div>
-            `).join('')}
-            
-            <!-- 나가기 버튼 -->
-            <button id="btn-quit-wiring" style="position: fixed; top: calc(60px + var(--safe-top)); right: 10px; background: rgba(255,0,0,0.3); border: 1px solid rgba(255,0,0,0.5); border-radius: 8px; padding: 8px 12px; color: #fff; font-size: 0.8rem; z-index: 100;">✕ 포기</button>
+            <!-- 하단 -->
+            <div style="width: 100%; max-width: 420px; padding: 15px; padding-bottom: calc(15px + var(--safe-bottom)); background: rgba(0,0,0,0.9);">
+                <div style="display: flex; justify-content: space-between; align-items: center; gap: 8px;">
+                    <button id="btn-reset-wiring" style="background: rgba(255,200,50,0.3); border: 1px solid rgba(255,200,50,0.5); border-radius: 8px; padding: 6px 12px; color: #fff; font-size: 0.75rem;">🔄 전체해제</button>
+                    <div style="font-size: 0.8rem; color: #88ff88; flex: 1; text-align: center;">
+                        💡 같은 색끼리 연결!
+                    </div>
+                    <button id="btn-quit-wiring" style="background: rgba(255,100,100,0.3); border: 1px solid rgba(255,100,100,0.5); border-radius: 8px; padding: 6px 12px; color: #fff; font-size: 0.75rem;">✕ 포기</button>
+                </div>
+            </div>
         </div>
     `;
     
-    drawConnections();
-    setupWiringControls();
-}
-
-function setupWiringControls() {
-    const canvas = document.getElementById('wiring-canvas');
-    const ctx = canvas.getContext('2d');
-    const ports = document.querySelectorAll('.wiring-port');
-    
-    let startPort = null;
-    let currentPos = null;
-    
-    ports.forEach(port => {
-        port.addEventListener('mousedown', startWire);
-        port.addEventListener('touchstart', startWire, { passive: false });
-    });
-    
-    function startWire(e) {
-        e.preventDefault();
-        const portId = e.target.dataset.id;
-        const port = wiringState.ports.find(p => p.id === portId);
-        
-        if (port && !port.connected) {
-            startPort = port;
-            
-            document.addEventListener('mousemove', drawWire);
-            document.addEventListener('touchmove', drawWire, { passive: false });
-            document.addEventListener('mouseup', endWire);
-            document.addEventListener('touchend', endWire);
-        }
-    }
-    
-    function drawWire(e) {
-        if (!startPort) return;
-        e.preventDefault();
-        
-        const touch = e.touches ? e.touches[0] : e;
-        currentPos = { x: touch.clientX, y: touch.clientY };
-        
-        drawConnections();
-        
-        // 현재 드래그 중인 선
-        ctx.strokeStyle = startPort.color;
-        ctx.lineWidth = 4;
-        ctx.beginPath();
-        ctx.moveTo(startPort.x, startPort.y);
-        ctx.lineTo(currentPos.x, currentPos.y);
-        ctx.stroke();
-    }
-    
-    function endWire(e) {
-        document.removeEventListener('mousemove', drawWire);
-        document.removeEventListener('touchmove', drawWire);
-        document.removeEventListener('mouseup', endWire);
-        document.removeEventListener('touchend', endWire);
-        
-        if (!startPort || !currentPos) {
-            startPort = null;
-            currentPos = null;
-            drawConnections();
-            return;
-        }
-        
-        // 끝 포트 찾기
-        const endPort = wiringState.ports.find(p => {
-            if (p.id === startPort.id) return false;
-            if (p.connected) return false;
-            const dx = p.x - currentPos.x;
-            const dy = p.y - currentPos.y;
-            return Math.sqrt(dx * dx + dy * dy) < 30;
-        });
-        
-        if (endPort && endPort.color === startPort.color) {
-            // 연결 성공!
-            startPort.connected = true;
-            endPort.connected = true;
-            wiringState.connections.push({ from: startPort, to: endPort });
-            
-            SFX.play('eat');
-            
-            // UI 업데이트
-            const connEl = document.getElementById('wr-connected');
-            if (connEl) connEl.textContent = wiringState.connections.length;
-            
-            // 레벨 클리어 체크
-            if (wiringState.connections.length >= wiringState.ports.length / 2) {
-                nextWiringLevel();
-            }
-        }
-        
-        startPort = null;
-        currentPos = null;
-        drawConnections();
-    }
+    document.getElementById('btn-reset-wiring').onclick = () => {
+        resetWiringConnections();
+    };
     
     document.getElementById('btn-quit-wiring').onclick = () => {
-        if (confirm('정말 포기하시겠습니까?')) {
+        if (confirm('포기하시겠습니까?')) {
             endWiringGame(false);
         }
     };
 }
 
-function drawConnections() {
-    const canvas = document.getElementById('wiring-canvas');
-    if (!canvas) return;
-    const ctx = canvas.getContext('2d');
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
+function initWiringPixi() {
+    const s = wiringState;
+    const wrap = document.getElementById('wiring-canvas-wrap');
+    s.gameW = wrap.clientWidth;
+    s.gameH = wrap.clientHeight;
     
-    // 완료된 연결들
-    for (const conn of wiringState.connections) {
-        ctx.strokeStyle = conn.from.color;
-        ctx.lineWidth = 4;
-        ctx.beginPath();
-        ctx.moveTo(conn.from.x, conn.from.y);
-        ctx.lineTo(conn.to.x, conn.to.y);
-        ctx.stroke();
+    wiringApp = new PIXI.Application({
+        width: s.gameW,
+        height: s.gameH,
+        backgroundColor: 0x0a1a0a,
+        antialias: true
+    });
+    wrap.appendChild(wiringApp.view);
+    
+    // 인터랙션 활성화
+    wiringApp.stage.interactive = true;
+    wiringApp.stage.hitArea = new PIXI.Rectangle(0, 0, s.gameW, s.gameH);
+    
+    // 컨테이너 생성
+    s.bgContainer = new PIXI.Container();
+    s.wireContainer = new PIXI.Container();
+    s.portContainer = new PIXI.Container();
+    s.particleContainer = new PIXI.Container();
+    s.playerContainer = new PIXI.Container();
+    
+    wiringApp.stage.addChild(s.bgContainer);
+    wiringApp.stage.addChild(s.wireContainer);
+    wiringApp.stage.addChild(s.portContainer);
+    wiringApp.stage.addChild(s.particleContainer);
+    wiringApp.stage.addChild(s.playerContainer);
+    
+    // 배경 생성
+    createWiringBg();
+    
+    // 크리처 생성
+    createWiringPlayer();
+    
+    // 레벨 생성
+    generateWiringLevelPixi();
+    
+    // 드래그 라인
+    s.dragLine = new PIXI.Graphics();
+    s.wireContainer.addChild(s.dragLine);
+    
+    // 이벤트 설정
+    setupWiringEvents();
+    
+    // 타이머
+    s.timerInterval = setInterval(() => {
+        if (s.gameOver) return;
+        s.time--;
+        updateWiringHUD();
+        if (s.time <= 0) endWiringGame(false);
+    }, 1000);
+    
+    // 게임 루프
+    wiringApp.ticker.add(wiringGameLoop);
+}
+
+function createWiringBg() {
+    const s = wiringState;
+    const bg = s.bgContainer;
+    
+    // 배경 그라데이션
+    const spaceBg = new PIXI.Graphics();
+    spaceBg.beginFill(0x0a1a0a);
+    spaceBg.drawRect(0, 0, s.gameW, s.gameH);
+    spaceBg.endFill();
+    
+    // 회로 기판 패턴
+    spaceBg.lineStyle(1, 0x1a3a1a, 0.5);
+    for (let i = 0; i < s.gameW; i += 30) {
+        spaceBg.moveTo(i, 0);
+        spaceBg.lineTo(i, s.gameH);
+    }
+    for (let j = 0; j < s.gameH; j += 30) {
+        spaceBg.moveTo(0, j);
+        spaceBg.lineTo(s.gameW, j);
+    }
+    
+    // 회로 노드들 (랜덤 위치)
+    for (let i = 0; i < 20; i++) {
+        const x = Math.random() * s.gameW;
+        const y = Math.random() * s.gameH;
+        spaceBg.beginFill(0x2a4a2a, 0.5);
+        spaceBg.drawCircle(x, y, 3);
+        spaceBg.endFill();
+    }
+    
+    bg.addChild(spaceBg);
+    
+    // 반짝이는 별/입자들
+    for (let i = 0; i < 40; i++) {
+        const star = new PIXI.Graphics();
+        const size = 1 + Math.random() * 2;
+        star.beginFill(0x44ff88, 0.3 + Math.random() * 0.4);
+        star.drawCircle(0, 0, size);
+        star.endFill();
+        star.x = Math.random() * s.gameW;
+        star.y = Math.random() * s.gameH;
+        star.baseAlpha = star.alpha;
+        star.twinkleSpeed = 0.03 + Math.random() * 0.05;
+        star.twinkleOffset = Math.random() * Math.PI * 2;
+        bg.addChild(star);
+        s.stars.push(star);
+    }
+    
+    // 양쪽 패널
+    // 왼쪽 패널
+    const leftPanel = new PIXI.Graphics();
+    leftPanel.beginFill(0x1a2a1a);
+    leftPanel.drawRoundedRect(10, 80, 50, s.gameH - 160, 10);
+    leftPanel.endFill();
+    leftPanel.lineStyle(2, 0x3a5a3a);
+    leftPanel.drawRoundedRect(10, 80, 50, s.gameH - 160, 10);
+    // 패널 하이라이트
+    leftPanel.beginFill(0x2a3a2a, 0.5);
+    leftPanel.drawRoundedRect(15, 85, 40, 20, 5);
+    leftPanel.endFill();
+    bg.addChild(leftPanel);
+    
+    // 오른쪽 패널
+    const rightPanel = new PIXI.Graphics();
+    rightPanel.beginFill(0x1a2a1a);
+    rightPanel.drawRoundedRect(s.gameW - 60, 80, 50, s.gameH - 160, 10);
+    rightPanel.endFill();
+    rightPanel.lineStyle(2, 0x3a5a3a);
+    rightPanel.drawRoundedRect(s.gameW - 60, 80, 50, s.gameH - 160, 10);
+    rightPanel.beginFill(0x2a3a2a, 0.5);
+    rightPanel.drawRoundedRect(s.gameW - 55, 85, 40, 20, 5);
+    rightPanel.endFill();
+    bg.addChild(rightPanel);
+}
+
+function createWiringPlayer() {
+    const s = wiringState;
+    const container = s.playerContainer;
+    
+    // 화면 하단 중앙에 배치
+    container.x = s.gameW / 2;
+    container.y = s.gameH - 60;
+    
+    const g = new PIXI.Graphics();
+    
+    if (GameState.creature) {
+        const evolved = evolveCreatureByLevel(GameState.creature, 5);
+        drawCreature(g, evolved, 0, 0, 22, Date.now() * 0.001);
+    } else {
+        // 기본 크리처
+        g.beginFill(0x4fc3f7);
+        g.drawEllipse(0, 0, 16, 20);
+        g.endFill();
+        g.beginFill(0xffffff);
+        g.drawEllipse(-5, -6, 5, 6);
+        g.drawEllipse(5, -6, 5, 6);
+        g.endFill();
+        g.beginFill(0x000000);
+        g.drawCircle(-4, -6, 3);
+        g.drawCircle(6, -6, 3);
+        g.endFill();
+    }
+    
+    container.addChild(g);
+}
+
+// 컨버터 타입 정의
+const CONVERTER_TYPES = [
+    { type: 'pass', name: '통과', icon: '➡️', transform: (c) => c },  // 그대로 통과
+    { type: 'swap', name: '스왑', icon: '🔄', transform: (c, t) => t },  // 입력과 출력 색 다름
+    { type: 'split', name: '분배기', icon: '🔀', outputs: 2 },  // 하나가 둘로
+    { type: 'merge', name: '합류기', icon: '🔗', inputs: 2 },   // 둘이 하나로
+];
+
+function generateWiringLevelPixi() {
+    const s = wiringState;
+    
+    // 기존 요소 제거
+    s.portContainer.removeChildren();
+    s.wireContainer.removeChildren();
+    s.dragLine = new PIXI.Graphics();
+    s.wireContainer.addChild(s.dragLine);
+    
+    // 레벨별 설정
+    let portCount = 3;
+    let converterCount = 0;  // 변환기 수 = 변환이 필요한 연결 수
+    
+    if (s.level === 1) { portCount = 3; converterCount = 0; }
+    else if (s.level === 2) { portCount = 3; converterCount = 1; }
+    else if (s.level === 3) { portCount = 4; converterCount = 1; }
+    else if (s.level === 4) { portCount = 4; converterCount = 2; }
+    else if (s.level === 5) { portCount = 5; converterCount = 2; }
+    else if (s.level === 6) { portCount = 5; converterCount = 2; }
+    else if (s.level === 7) { portCount = 6; converterCount = 3; }
+    else { portCount = 6; converterCount = 3; }
+    
+    const startY = 100;
+    const endY = s.gameH - 100;
+    const spacing = (endY - startY) / (portCount + 1);
+    
+    s.leftPorts = [];
+    s.rightPorts = [];
+    s.converters = [];
+    s.connections = [];
+    s.activeSegments = [];
+    
+    // 사용할 색상
+    const colors = WIRE_COLORS.slice(0, portCount);
+    
+    // 왼쪽 포트 색상 인덱스 생성 (기본: 0, 1, 2, 3...)
+    let leftColorIndices = [...Array(portCount).keys()];
+    
+    // 오른쪽 포트 색상 = 왼쪽과 동일하게 시작
+    let rightColorIndices = [...leftColorIndices];
+    
+    // 변환기 정보 저장
+    const converterInfos = [];
+    
+    // converterCount 만큼 변환 필요한 쌍 생성
+    // 예: converterCount=1이면, 왼쪽의 색상 A 하나를 -> 오른쪽에서 색상 B로 바꿔야 함
+    for (let i = 0; i < converterCount; i++) {
+        // 변환할 색상 쌍 선택 (순서대로)
+        const fromColorIdx = i;  // 왼쪽에서 이 색상 중 하나가
+        const toColorIdx = (i + 1) % portCount;  // 오른쪽에서 이 색상으로 변환 필요
+        
+        // 오른쪽에서 fromColorIdx 색상 하나를 toColorIdx로 변경
+        // 단, 이미 변경된 것 제외하고 첫 번째 발견된 것 변경
+        const rightIdx = rightColorIndices.findIndex((c, idx) => 
+            c === fromColorIdx && !converterInfos.some(ci => ci.rightIdx === idx)
+        );
+        
+        if (rightIdx !== -1) {
+            rightColorIndices[rightIdx] = toColorIdx;
+            converterInfos.push({
+                inputColorIdx: fromColorIdx,
+                outputColorIdx: toColorIdx,
+                rightIdx: rightIdx
+            });
+        }
+    }
+    
+    // 왼쪽 포트 위치 셔플
+    const leftPositions = [...Array(portCount).keys()].sort(() => Math.random() - 0.5);
+    
+    // 왼쪽 포트 생성
+    for (let i = 0; i < portCount; i++) {
+        const posIndex = leftPositions[i];
+        const colorIdx = leftColorIndices[i];
+        const port = {
+            id: `L${i}`,
+            side: 'left',
+            x: 35,
+            y: startY + spacing * (posIndex + 1),
+            colorIndex: colorIdx,
+            color: colors[colorIdx],
+            connected: false,
+            sprite: null
+        };
+        s.leftPorts.push(port);
+        createPortSprite(port);
+    }
+    
+    // 오른쪽 포트 위치 셔플
+    const rightPositions = [...Array(portCount).keys()].sort(() => Math.random() - 0.5);
+    
+    // 오른쪽 포트 생성
+    for (let i = 0; i < portCount; i++) {
+        const posIndex = rightPositions[i];
+        const colorIdx = rightColorIndices[i];
+        const port = {
+            id: `R${i}`,
+            side: 'right',
+            x: s.gameW - 35,
+            y: startY + spacing * (posIndex + 1),
+            colorIndex: colorIdx,
+            color: colors[colorIdx],
+            connected: false,
+            sprite: null
+        };
+        s.rightPorts.push(port);
+        createPortSprite(port);
+    }
+    
+    // 변환기 생성
+    if (converterInfos.length > 0) {
+        const converterSpacing = (endY - startY) / (converterInfos.length + 1);
+        
+        for (let i = 0; i < converterInfos.length; i++) {
+            const info = converterInfos[i];
+            
+            const converter = {
+                id: `C${i}`,
+                type: 'swap',
+                x: s.gameW / 2 + (Math.random() - 0.5) * 40,
+                y: startY + converterSpacing * (i + 1),
+                inputColor: colors[info.inputColorIdx],
+                outputColor: colors[info.outputColorIdx],
+                inputColorIndex: info.inputColorIdx,
+                outputColorIndex: info.outputColorIdx,
+                icon: '🔄',
+                name: '변환기',
+                inputConnected: false,
+                outputConnected: false,
+                sprite: null
+            };
+            
+            s.converters.push(converter);
+            createConverterSprite(converter);
+        }
+    }
+    
+    // HUD 업데이트
+    document.getElementById('wr-total').textContent = portCount;
+    document.getElementById('wr-connected').textContent = '0';
+    
+    // 디버그: 색상 분포 확인
+    console.log('Left colors:', leftColorIndices.map(i => WIRE_COLORS[i].name));
+    console.log('Right colors:', rightColorIndices.map(i => WIRE_COLORS[i].name));
+    console.log('Converters:', converterInfos.map(c => `${WIRE_COLORS[c.inputColorIdx].name} → ${WIRE_COLORS[c.outputColorIdx].name}`));
+}
+
+function createConverterSprite(converter) {
+    const s = wiringState;
+    const container = new PIXI.Container();
+    container.x = converter.x;
+    container.y = converter.y;
+    container.interactive = true;
+    container.buttonMode = true;
+    
+    // 히트 영역
+    container.hitArea = new PIXI.Rectangle(-40, -25, 80, 50);
+    
+    // 그림자
+    const shadow = new PIXI.Graphics();
+    shadow.beginFill(0x000000, 0.3);
+    shadow.drawRoundedRect(-36, -21, 72, 46, 10);
+    shadow.endFill();
+    container.addChild(shadow);
+    
+    // 본체
+    const body = new PIXI.Graphics();
+    body.beginFill(0x2a3a2a);
+    body.lineStyle(2, 0x4a6a4a);
+    body.drawRoundedRect(-38, -23, 76, 46, 12);
+    body.endFill();
+    
+    // 상단 하이라이트
+    body.beginFill(0x3a4a3a, 0.6);
+    body.drawRoundedRect(-34, -19, 68, 15, 6);
+    body.endFill();
+    
+    container.addChild(body);
+    
+    // 입력 포트 (왼쪽)
+    const inputPort = new PIXI.Graphics();
+    if (converter.type === 'swap' && converter.inputColor) {
+        inputPort.beginFill(converter.inputColor.hex);
+        inputPort.lineStyle(2, converter.inputColor.glow);
+    } else {
+        inputPort.beginFill(0x888888);
+        inputPort.lineStyle(2, 0xaaaaaa);
+    }
+    inputPort.drawCircle(-38, 0, 10);
+    inputPort.endFill();
+    // 입력 포트 중심
+    inputPort.beginFill(0x222222);
+    inputPort.drawCircle(-38, 0, 4);
+    inputPort.endFill();
+    container.addChild(inputPort);
+    
+    // 출력 포트 (오른쪽)
+    const outputPort = new PIXI.Graphics();
+    if (converter.type === 'swap' && converter.outputColor) {
+        outputPort.beginFill(converter.outputColor.hex);
+        outputPort.lineStyle(2, converter.outputColor.glow);
+    } else {
+        outputPort.beginFill(0x888888);
+        outputPort.lineStyle(2, 0xaaaaaa);
+    }
+    outputPort.drawCircle(38, 0, 10);
+    outputPort.endFill();
+    // 출력 포트 중심
+    outputPort.beginFill(0x222222);
+    outputPort.drawCircle(38, 0, 4);
+    outputPort.endFill();
+    container.addChild(outputPort);
+    
+    // 화살표 (내부)
+    const arrow = new PIXI.Graphics();
+    arrow.lineStyle(3, 0x88ff88, 0.8);
+    arrow.moveTo(-20, 0);
+    arrow.lineTo(15, 0);
+    arrow.lineTo(8, -6);
+    arrow.moveTo(15, 0);
+    arrow.lineTo(8, 6);
+    container.addChild(arrow);
+    
+    // 아이콘/텍스트
+    const icon = new PIXI.Text(converter.icon, { fontSize: 16 });
+    icon.anchor.set(0.5);
+    icon.y = -30;
+    container.addChild(icon);
+    
+    // 이름 라벨
+    if (converter.type === 'swap') {
+        const label = new PIXI.Text(converter.name, { 
+            fontSize: 9, 
+            fill: 0xaaffaa 
+        });
+        label.anchor.set(0.5);
+        label.y = 32;
+        container.addChild(label);
+    }
+    
+    // 입력 포트 이벤트 (왼쪽 - 선이 들어오는 곳)
+    converter.inputHitArea = { x: converter.x - 38, y: converter.y, radius: 15 };
+    // 출력 포트 이벤트 (오른쪽 - 선이 나가는 곳)
+    converter.outputHitArea = { x: converter.x + 38, y: converter.y, radius: 15 };
+    
+    // 출력 포트에서 드래그 시작 가능
+    container.on('pointerdown', (e) => {
+        if (s.gameOver) return;
+        
+        const localX = e.data.global.x - converter.x;
+        
+        // 오른쪽(출력) 포트 클릭 시 - 컨버터에서 드래그 시작
+        if (localX > 20 && !converter.outputConnected) {
+            s.dragging = true;
+            s.dragFrom = converter;
+            s.dragFromOutput = true;  // 컨버터 출력에서 시작
+            s.dragPos = { x: e.data.global.x, y: e.data.global.y };
+        }
+    });
+    
+    converter.sprite = container;
+    s.portContainer.addChild(container);
+}
+
+function createPortSprite(port) {
+    const s = wiringState;
+    const container = new PIXI.Container();
+    container.x = port.x;
+    container.y = port.y;
+    container.interactive = true;
+    container.buttonMode = true;
+    container.portData = port;
+    
+    // 히트 영역 설정 (터치 영역 확대)
+    container.hitArea = new PIXI.Circle(0, 0, 35);
+    
+    // 글로우 효과
+    const glow = new PIXI.Graphics();
+    glow.beginFill(port.color.hex, 0.2);
+    glow.drawCircle(0, 0, 28);
+    glow.endFill();
+    container.addChild(glow);
+    
+    // 외곽 링
+    const ring = new PIXI.Graphics();
+    ring.lineStyle(3, port.color.hex, 0.8);
+    ring.drawCircle(0, 0, 20);
+    container.addChild(ring);
+    
+    // 메인 포트
+    const main = new PIXI.Graphics();
+    main.beginFill(port.color.hex);
+    main.drawCircle(0, 0, 15);
+    main.endFill();
+    
+    // 하이라이트
+    main.beginFill(0xffffff, 0.4);
+    main.drawCircle(-4, -4, 6);
+    main.endFill();
+    
+    // 중앙 점
+    main.beginFill(port.color.glow);
+    main.drawCircle(0, 0, 5);
+    main.endFill();
+    
+    container.addChild(main);
+    
+    // 포트에 직접 이벤트 등록
+    container.on('pointerdown', (e) => {
+        if (port.connected || s.gameOver) return;
+        s.dragging = true;
+        s.dragFrom = port;
+        s.dragPos = { x: e.data.global.x, y: e.data.global.y };
+    });
+    
+    port.sprite = container;
+    port.glow = glow;
+    s.portContainer.addChild(container);
+}
+
+function setupWiringEvents() {
+    const s = wiringState;
+    
+    // 스테이지 이벤트 (드래그 & 드롭)
+    wiringApp.stage.on('pointermove', (e) => {
+        if (!s.dragging || !s.dragFrom) return;
+        s.dragPos = { x: e.data.global.x, y: e.data.global.y };
+        drawDragLine();
+    });
+    
+    wiringApp.stage.on('pointerup', (e) => {
+        if (!s.dragging || !s.dragFrom) return;
+        
+        const endPos = { x: e.data.global.x, y: e.data.global.y };
+        const fromIsConverter = s.dragFrom.type !== undefined;  // 컨버터인지 체크
+        
+        // 1. 컨버터 입력 포트 체크 (왼쪽 포트에서 컨버터로)
+        if (!fromIsConverter && s.dragFrom.side === 'left') {
+            for (const conv of (s.converters || [])) {
+                if (conv.inputConnected) continue;
+                const dx = conv.inputHitArea.x - endPos.x;
+                const dy = conv.inputHitArea.y - endPos.y;
+                if (Math.sqrt(dx * dx + dy * dy) < 25) {
+                    // 컨버터 입력에 연결 시도
+                    if (conv.type === 'swap') {
+                        // 스왑 컨버터: 입력 색상 체크
+                        if (s.dragFrom.colorIndex === conv.inputColorIndex) {
+                            connectToConverterInput(s.dragFrom, conv);
+                        } else {
+                            showWiringSpeechBubble('입력 색이 안 맞아!');
+                            createWrongEffect(conv.inputHitArea.x, conv.inputHitArea.y);
+                        }
+                    } else {
+                        // 통과 컨버터: 아무 색이나 가능
+                        connectToConverterInput(s.dragFrom, conv);
+                    }
+                    finishDrag();
+                    return;
+                }
+            }
+        }
+        
+        // 2. 컨버터 출력에서 오른쪽 포트로
+        if (fromIsConverter && s.dragFromOutput) {
+            for (const port of s.rightPorts) {
+                if (port.connected) continue;
+                const dx = port.x - endPos.x;
+                const dy = port.y - endPos.y;
+                if (Math.sqrt(dx * dx + dy * dy) < 40) {
+                    // 색상 체크
+                    const outputColorIndex = s.dragFrom.type === 'swap' 
+                        ? s.dragFrom.outputColorIndex 
+                        : s.dragFrom.throughColorIndex;
+                    
+                    if (port.colorIndex === outputColorIndex) {
+                        connectFromConverterOutput(s.dragFrom, port);
+                    } else {
+                        showWiringSpeechBubble(getWiringQuote('wrong'));
+                        createWrongEffect(port.x, port.y);
+                    }
+                    finishDrag();
+                    return;
+                }
+            }
+        }
+        
+        // 3. 일반 포트 간 연결 (컨버터 없이 직접)
+        const allPorts = [...s.leftPorts, ...s.rightPorts];
+        let endPort = null;
+        
+        for (const port of allPorts) {
+            if (port === s.dragFrom) continue;
+            if (port.connected) continue;
+            if (fromIsConverter) continue;  // 컨버터에서 시작했으면 스킵
+            if (port.side === s.dragFrom.side) continue;
+            
+            const dx = port.x - endPos.x;
+            const dy = port.y - endPos.y;
+            if (Math.sqrt(dx * dx + dy * dy) < 40) {
+                endPort = port;
+                break;
+            }
+        }
+        
+        if (endPort) {
+            if (endPort.colorIndex === s.dragFrom.colorIndex) {
+                connectPorts(s.dragFrom, endPort);
+            } else {
+                showWiringSpeechBubble(getWiringQuote('wrong'));
+                createWrongEffect(endPort.x, endPort.y);
+            }
+        }
+        
+        finishDrag();
+    });
+    
+    function finishDrag() {
+        s.dragging = false;
+        s.dragFrom = null;
+        s.dragFromOutput = false;
+        s.dragPos = null;
+        if (s.dragLine) s.dragLine.clear();
+    }
+    
+    wiringApp.stage.on('pointerupoutside', finishDrag);
+}
+
+function connectToConverterInput(port, converter) {
+    const s = wiringState;
+    
+    port.connected = true;
+    converter.inputConnected = true;
+    
+    // 통과 컨버터는 입력 색상을 그대로 전달
+    if (converter.type === 'pass') {
+        converter.throughColorIndex = port.colorIndex;
+        converter.throughColor = port.color;
+    }
+    
+    // 연결선 그리기
+    drawConnectionLine(port, { x: converter.inputHitArea.x, y: converter.inputHitArea.y }, port.color);
+    
+    // 포트 비활성화
+    if (port.sprite) port.sprite.alpha = 0.6;
+    
+    // 점수
+    s.score += 30 + s.level * 5;
+    
+    // 이펙트
+    createConnectEffect(converter.inputHitArea.x, converter.inputHitArea.y, port.color.hex);
+    showWiringSpeechBubble('컨버터 연결!');
+    SFX.play('eat');
+    
+    updateWiringHUD();
+}
+
+function connectFromConverterOutput(converter, port) {
+    const s = wiringState;
+    
+    converter.outputConnected = true;
+    port.connected = true;
+    
+    // 출력 색상 결정
+    const outputColor = converter.type === 'swap' ? converter.outputColor : converter.throughColor;
+    
+    // 연결선 그리기
+    drawConnectionLine({ x: converter.outputHitArea.x, y: converter.outputHitArea.y }, port, outputColor);
+    
+    // 포트 비활성화
+    if (port.sprite) port.sprite.alpha = 0.6;
+    
+    // 점수 & 연결 카운트
+    s.score += 50 + s.level * 10;
+    s.connections.push({ from: converter, to: port });
+    
+    // 이펙트
+    createConnectEffect(port.x, port.y, outputColor.hex);
+    showWiringSpeechBubble(getWiringQuote('connect'));
+    SFX.play('eat');
+    
+    updateWiringHUD();
+    checkLevelClear();
+}
+
+function drawDragLine() {
+    const s = wiringState;
+    if (!s.dragFrom || !s.dragPos) return;
+    
+    // 시작 위치 결정
+    let startX, startY, color;
+    
+    if (s.dragFrom.type !== undefined) {
+        // 컨버터에서 시작
+        startX = s.dragFrom.outputHitArea.x;
+        startY = s.dragFrom.outputHitArea.y;
+        color = s.dragFrom.type === 'swap' ? s.dragFrom.outputColor : s.dragFrom.throughColor;
+        if (!color) color = { hex: 0x888888 };
+    } else {
+        // 포트에서 시작
+        startX = s.dragFrom.x;
+        startY = s.dragFrom.y;
+        color = s.dragFrom.color;
+    }
+    
+    s.dragLine.clear();
+    s.dragLine.lineStyle(6, color.hex, 0.8);
+    s.dragLine.moveTo(startX, startY);
+    s.dragLine.lineTo(s.dragPos.x, s.dragPos.y);
+    
+    // 글로우 효과
+    s.dragLine.lineStyle(12, color.hex, 0.2);
+    s.dragLine.moveTo(startX, startY);
+    s.dragLine.lineTo(s.dragPos.x, s.dragPos.y);
+}
+
+function connectPorts(from, to) {
+    const s = wiringState;
+    
+    from.connected = true;
+    to.connected = true;
+    
+    // 연결 저장
+    s.connections.push({ from, to });
+    
+    // 연결선 그리기
+    drawConnectionLine(from, to, from.color);
+    
+    // 포트 비활성화 표시
+    if (from.sprite) from.sprite.alpha = 0.6;
+    if (to.sprite) to.sprite.alpha = 0.6;
+    
+    // 점수 추가
+    s.score += 50 + s.level * 10;
+    
+    // 이펙트
+    createConnectEffect(from.x, from.y, from.color.hex);
+    createConnectEffect(to.x, to.y, to.color.hex);
+    showWiringSpeechBubble(getWiringQuote('connect'));
+    
+    SFX.play('eat');
+    
+    // HUD 업데이트
+    updateWiringHUD();
+    
+    // 레벨 클리어 체크
+    checkLevelClear();
+}
+
+function checkLevelClear() {
+    const s = wiringState;
+    
+    // 모든 오른쪽 포트가 연결되었는지 체크
+    const allRightConnected = s.rightPorts.every(p => p.connected);
+    
+    if (allRightConnected) {
+        setTimeout(() => nextWiringLevelPixi(), 800);
     }
 }
 
-function nextWiringLevel() {
-    wiringState.level++;
+function resetWiringConnections() {
+    const s = wiringState;
+    if (!s || s.gameOver) return;
     
-    if (wiringState.level > wiringState.maxLevel) {
-        endWiringGame(true);
+    // 모든 연결선 제거 (dragLine 제외)
+    const children = [...s.wireContainer.children];
+    children.forEach(child => {
+        if (child !== s.dragLine) {
+            s.wireContainer.removeChild(child);
+        }
+    });
+    
+    // 모든 포트 연결 해제
+    s.leftPorts.forEach(port => {
+        port.connected = false;
+        if (port.sprite) port.sprite.alpha = 1;
+    });
+    
+    s.rightPorts.forEach(port => {
+        port.connected = false;
+        if (port.sprite) port.sprite.alpha = 1;
+    });
+    
+    // 모든 컨버터 연결 해제
+    (s.converters || []).forEach(conv => {
+        conv.inputConnected = false;
+        conv.outputConnected = false;
+        conv.throughColorIndex = undefined;
+        conv.throughColor = undefined;
+    });
+    
+    // 연결 목록 초기화
+    s.connections = [];
+    
+    // HUD 업데이트
+    updateWiringHUD();
+    
+    // 피드백
+    showWiringSpeechBubble('전체 해제!');
+}
+
+function drawConnectionLine(from, to, color) {
+    const s = wiringState;
+    
+    const line = new PIXI.Graphics();
+    
+    // from이 좌표만 있는 경우 처리
+    const fromX = from.x;
+    const fromY = from.y;
+    const toX = to.x;
+    const toY = to.y;
+    
+    // 글로우 (뒤에)
+    line.lineStyle(14, color.hex, 0.15);
+    line.moveTo(fromX, fromY);
+    
+    // 베지어 커브로 곡선 연결
+    const midX = (fromX + toX) / 2;
+    const controlY1 = fromY;
+    const controlY2 = toY;
+    line.bezierCurveTo(midX, controlY1, midX, controlY2, toX, toY);
+    
+    // 메인 라인
+    line.lineStyle(6, color.hex, 0.9);
+    line.moveTo(fromX, fromY);
+    line.bezierCurveTo(midX, controlY1, midX, controlY2, toX, toY);
+    
+    // 밝은 중앙선
+    line.lineStyle(2, color.glow || color.hex, 0.6);
+    line.moveTo(fromX, fromY);
+    line.bezierCurveTo(midX, controlY1, midX, controlY2, toX, toY);
+    
+    // dragLine 앞에 추가 (인덱스 0에)
+    s.wireContainer.addChildAt(line, 0);
+}
+
+function createConnectEffect(x, y, color) {
+    const s = wiringState;
+    
+    // 파티클 폭발
+    for (let i = 0; i < 15; i++) {
+        const p = new PIXI.Graphics();
+        p.beginFill(color);
+        if (Math.random() > 0.5) {
+            drawStar(p, 0, 0, 5, 4 + Math.random() * 4, 2);
+        } else {
+            p.drawCircle(0, 0, 2 + Math.random() * 3);
+        }
+        p.endFill();
+        p.x = x;
+        p.y = y;
+        const angle = (i / 15) * Math.PI * 2;
+        p.vx = Math.cos(angle) * (4 + Math.random() * 4);
+        p.vy = Math.sin(angle) * (4 + Math.random() * 4);
+        p.life = 40;
+        s.particleContainer.addChild(p);
+        s.particles.push(p);
+    }
+    
+    // 충격파
+    const ring = new PIXI.Graphics();
+    ring.lineStyle(3, color, 0.8);
+    ring.drawCircle(0, 0, 10);
+    ring.x = x;
+    ring.y = y;
+    ring.life = 30;
+    ring.isRing = true;
+    ring.vx = 0;
+    ring.vy = 0;
+    s.particleContainer.addChild(ring);
+    s.particles.push(ring);
+}
+
+function createWrongEffect(x, y) {
+    const s = wiringState;
+    
+    // X 표시
+    const wrongText = new PIXI.Text('✕', {
+        fontSize: 40,
+        fill: 0xff4444,
+        fontWeight: 'bold'
+    });
+    wrongText.anchor.set(0.5);
+    wrongText.x = x;
+    wrongText.y = y;
+    wrongText.life = 40;
+    wrongText.isText = true;
+    wrongText.vy = -1;
+    wrongText.vx = 0;
+    s.particleContainer.addChild(wrongText);
+    s.particles.push(wrongText);
+    
+    // 빨간 파티클
+    for (let i = 0; i < 8; i++) {
+        const p = new PIXI.Graphics();
+        p.beginFill(0xff4444);
+        p.drawCircle(0, 0, 2 + Math.random() * 2);
+        p.endFill();
+        p.x = x;
+        p.y = y;
+        const angle = (i / 8) * Math.PI * 2;
+        p.vx = Math.cos(angle) * 3;
+        p.vy = Math.sin(angle) * 3;
+        p.life = 25;
+        s.particleContainer.addChild(p);
+        s.particles.push(p);
+    }
+}
+
+function showWiringSpeechBubble(text) {
+    const s = wiringState;
+    if (s.speechBubble) {
+        s.particleContainer.removeChild(s.speechBubble);
+    }
+    
+    const bubble = new PIXI.Container();
+    
+    const textObj = new PIXI.Text(text, {
+        fontSize: 14,
+        fill: 0x000000,
+        fontWeight: 'bold'
+    });
+    textObj.anchor.set(0.5);
+    
+    const padding = 12;
+    const bgWidth = textObj.width + padding * 2;
+    const bgHeight = textObj.height + padding * 2;
+    
+    // 그림자
+    const shadow = new PIXI.Graphics();
+    shadow.beginFill(0x000000, 0.2);
+    shadow.drawRoundedRect(-bgWidth/2 + 2, -bgHeight/2 + 2, bgWidth, bgHeight, 12);
+    shadow.endFill();
+    bubble.addChild(shadow);
+    
+    // 배경
+    const bg = new PIXI.Graphics();
+    bg.beginFill(0xffffff, 0.95);
+    bg.lineStyle(2, 0x44ff88, 0.6);
+    bg.drawRoundedRect(-bgWidth/2, -bgHeight/2, bgWidth, bgHeight, 12);
+    bg.endFill();
+    
+    // 꼬리
+    bg.beginFill(0xffffff, 0.95);
+    bg.moveTo(-6, bgHeight/2 - 2);
+    bg.lineTo(6, bgHeight/2 - 2);
+    bg.lineTo(0, bgHeight/2 + 10);
+    bg.closePath();
+    bg.endFill();
+    
+    bubble.addChild(bg);
+    bubble.addChild(textObj);
+    
+    bubble.x = s.gameW / 2;
+    bubble.y = s.gameH - 100;
+    bubble.life = 120;
+    bubble.isBubble = true;
+    bubble.isText = true;
+    bubble.vy = 0;
+    bubble.vx = 0;
+    
+    s.particleContainer.addChild(bubble);
+    s.speechBubble = bubble;
+    s.particles.push(bubble);
+}
+
+function nextWiringLevelPixi() {
+    const s = wiringState;
+    
+    // 레벨업 이펙트
+    showWiringSpeechBubble(getWiringQuote('levelUp'));
+    
+    // 보너스 점수
+    s.score += 100 * s.level;
+    
+    s.level++;
+    
+    if (s.level > s.maxLevel) {
+        setTimeout(() => endWiringGame(true), 500);
         return;
     }
     
+    // 다음 레벨 생성
     setTimeout(() => {
-        generateWiringLevel(wiringState.level);
-        renderWiringGame();
+        generateWiringLevelPixi();
+        document.getElementById('wr-level').textContent = s.level;
     }, 500);
 }
 
-function startWiringLoop() {
-    wiringState.timerInterval = setInterval(() => {
-        if (wiringState.gameOver) return;
+function updateWiringHUD() {
+    const s = wiringState;
+    
+    document.getElementById('wr-connected').textContent = s.connections.length;
+    document.getElementById('wr-score').textContent = s.score;
+    
+    const timeEl = document.getElementById('wr-time');
+    if (timeEl) {
+        const min = Math.floor(s.time / 60);
+        const sec = s.time % 60;
+        timeEl.textContent = `${min}:${sec.toString().padStart(2, '0')}`;
+        timeEl.style.color = s.time < 30 ? '#ff6b6b' : '#fff';
+    }
+}
+
+function wiringGameLoop(delta) {
+    const s = wiringState;
+    if (!s || s.gameOver) return;
+    
+    // 별 반짝임
+    const time = Date.now() * 0.001;
+    s.stars.forEach(star => {
+        const twinkle = Math.sin(time * star.twinkleSpeed * 10 + star.twinkleOffset);
+        star.alpha = star.baseAlpha * (0.3 + 0.7 * Math.abs(twinkle));
+    });
+    
+    // 연결되지 않은 포트 글로우 애니메이션
+    [...s.leftPorts, ...s.rightPorts].forEach(port => {
+        if (!port.connected && port.glow) {
+            const pulse = 0.15 + 0.1 * Math.sin(time * 3 + port.y * 0.01);
+            port.glow.alpha = pulse;
+        }
+    });
+    
+    // 파티클
+    for (let i = s.particles.length - 1; i >= 0; i--) {
+        const p = s.particles[i];
+        p.x += p.vx || 0;
+        p.y += p.vy || 0;
+        if (!p.isText && !p.isRing && !p.isBubble) p.vy = (p.vy || 0) + 0.15;
         
-        wiringState.time--;
-        
-        const timeEl = document.getElementById('wr-time');
-        if (timeEl) {
-            const min = Math.floor(wiringState.time / 60);
-            const sec = wiringState.time % 60;
-            timeEl.textContent = `${min}:${sec.toString().padStart(2, '0')}`;
-            timeEl.style.color = wiringState.time < 30 ? '#ff6b6b' : '#fff';
+        if (p.isBubble) {
+            if (p.life < 20) p.alpha -= 0.05;
+        } else {
+            p.alpha -= 0.025;
         }
         
-        if (wiringState.time <= 0) {
-            endWiringGame(false);
+        p.life--;
+        if (p.isRing) { p.scale.x += 0.15; p.scale.y += 0.15; }
+        
+        if (p.life <= 0 || p.alpha <= 0) {
+            s.particleContainer.removeChild(p);
+            s.particles.splice(i, 1);
+            if (p === s.speechBubble) s.speechBubble = null;
         }
-    }, 1000);
+    }
 }
 
 function endWiringGame(success) {
-    wiringState.gameOver = true;
-    clearInterval(wiringState.timerInterval);
+    const s = wiringState;
+    s.gameOver = true;
+    clearInterval(s.timerInterval);
+    
+    if (wiringApp) {
+        wiringApp.destroy(true);
+        wiringApp = null;
+    }
+    
+    // 랭킹 저장 (점수가 있을 때만)
+    if (s.score > 0) {
+        saveRanking('wiring', s.score);
+    }
     
     if (success) {
-        const timeLeft = wiringState.time;
-        let baseReward = 150;
-        let timeRating = '';
+        // 점수 기반 보상
+        const scoreReward = Math.floor(s.score * 0.2);
+        const timeLeft = s.time;
+        let timeBonus = 0, timeRating = '';
         
-        if (timeLeft >= 120) { baseReward = 300; timeRating = '⭐⭐⭐'; }
-        else if (timeLeft >= 60) { baseReward = 220; timeRating = '⭐⭐'; }
-        else if (timeLeft >= 30) { baseReward = 180; timeRating = '⭐'; }
-        else { baseReward = 150; timeRating = '-'; }
+        if (timeLeft >= 100) { timeBonus = 50; timeRating = '⭐⭐⭐'; }
+        else if (timeLeft >= 60) { timeBonus = 30; timeRating = '⭐⭐'; }
+        else if (timeLeft >= 30) { timeBonus = 15; timeRating = '⭐'; }
+        else { timeBonus = 0; timeRating = '-'; }
         
+        const baseReward = Math.max(50, scoreReward + timeBonus);
         const envBonus = getEnvBonus('wiring');
         const partsBonus = getPartsBonus('wiring');
-        const totalReward = Math.floor((baseReward + envBonus + partsBonus) * wiringState.rewardMultiplier);
+        const totalReward = Math.floor((baseReward + envBonus + partsBonus) * s.rewardMultiplier);
         
         GameState.spaceLuck = (GameState.spaceLuck || 0) + totalReward;
         GameState.save();
         
         showMiniGameResult(true, {
             baseReward, envBonus, partsBonus,
-            rewardMultiplier: wiringState.rewardMultiplier,
+            rewardMultiplier: s.rewardMultiplier,
             totalReward, timeRating,
-            level: wiringState.level - 1
+            level: s.level, score: s.score
         });
     } else {
-        showMiniGameResult(false, {
-            level: wiringState.level
-        });
+        // 부분 보상
+        if (s.score > 0) {
+            const partialLuck = Math.floor(s.score * 0.1);
+            GameState.spaceLuck = (GameState.spaceLuck || 0) + partialLuck;
+            GameState.save();
+            showMiniGameResult(false, { level: s.level, score: s.score, partialReward: partialLuck });
+        } else {
+            showMiniGameResult(false, { level: s.level, score: s.score });
+        }
     }
 }
 
