@@ -3071,7 +3071,7 @@ function stageClear() {
         SFX.play('evolve');
         // 점수 보너스
         GameState.score += 500;
-        updateP1UI();
+        updateHUD();
         return; // 게임 종료 없이 계속
     }
     
@@ -6475,7 +6475,7 @@ function startArcadeP2() {
         }
         // 아케이드 모드: 주사위 건너뛰고 바로 게임 시작
         climbItem = null; // 아이템은 게임 중 랜덤 생성
-        startClimbGame();
+        startPhase2();
     };
     document.getElementById('btn-back-arcade').onclick = () => showSpaceLobby();
 }
@@ -6517,8 +6517,8 @@ function startArcadeP3() {
     document.getElementById('btn-start-arcade-p3').onclick = () => {
         arcadeMode = true;
         arcadeScore = 0;
-        // 아케이드 모드: 랜덤 크리처 생성
-        const envIds = ['ocean', 'volcanic', 'ice', 'forest', 'desert'];
+        // 아케이드 모드: 랜덤 크리처 생성 (올바른 환경 ID 사용)
+        const envIds = ['ocean', 'hydrothermal', 'ice', 'magma', 'atmosphere', 'toxic'];
         const randomEnv = envIds[Math.floor(Math.random() * envIds.length)];
         GameState.envId = randomEnv;
         GameState.creature = generateCreatureFromEnv(randomEnv);
