@@ -6499,15 +6499,21 @@ async function showRankingPopup(jobType) {
 // Firebase에서 랭킹 가져오기
 async function fetchRankings(jobType) {
     try {
+        console.log('Firebase 랭킹 조회 시도:', jobType);
+        
+        // 인덱스 없이 작동하도록 단순 쿼리 사용
         const snapshot = await db.collection('rankings')
             .where('jobType', '==', jobType)
-            .orderBy('score', 'desc')
-            .limit(20)
             .get();
         
-        return snapshot.docs.map(doc => doc.data());
+        // 클라이언트에서 정렬
+        const rankings = snapshot.docs.map(doc => doc.data());
+        rankings.sort((a, b) => b.score - a.score);
+        
+        console.log('Firebase 랭킹 조회 성공:', jobType, rankings.length + '개');
+        return rankings.slice(0, 20);
     } catch (error) {
-        console.error('랭킹 조회 실패:', error);
+        console.error('Firebase 랭킹 조회 실패:', jobType, error);
         // 로컬 데이터로 대체
         return getLocalRankings(jobType);
     }
@@ -6535,7 +6541,9 @@ async function saveRanking(jobType, score) {
     
     // Firebase 저장 시도
     try {
-        await db.collection('rankings').add(record);
+        console.log('Firebase 랭킹 저장 시도:', record);
+        const docRef = await db.collection('rankings').add(record);
+        console.log('Firebase 랭킹 저장 성공:', docRef.id);
     } catch (error) {
         console.error('Firebase 저장 실패:', error);
     }
