@@ -2858,42 +2858,67 @@ function tryDash() {
 }
 
 function setupGameHUD() {
-    document.getElementById('btn-home').onclick = () => {
-        if (confirm('홈으로 돌아가시겠습니까?')) {
+    const homeBtn = document.getElementById('btn-home');
+    const pauseBtn = document.getElementById('btn-pause');
+    const skipBtn = document.getElementById('btn-skip-phase');
+    const retryBtn = document.getElementById('btn-retry');
+    const nextBtn = document.getElementById('btn-next');
+    
+    if (homeBtn) {
+        homeBtn.onclick = () => {
+            // 아케이드 모드면 결과 화면으로
+            if (arcadeMode) {
+                if (confirm('게임을 종료하시겠습니까?')) {
+                    gameRunning = false;
+                    if (gameLoop) pixiApp.ticker.remove(gameLoop);
+                    endArcadeMode('arcade_cell', GameState.score);
+                }
+                return;
+            }
+            if (confirm('홈으로 돌아가시겠습니까?')) {
+                gameRunning = false;
+                if (gameLoop) pixiApp.ticker.remove(gameLoop);
+                showTitle();
+            }
+        };
+    }
+    
+    if (pauseBtn) {
+        pauseBtn.onclick = () => {
+            gameRunning = !gameRunning;
+            pauseBtn.textContent = gameRunning ? '⏸️' : '▶️';
+        };
+    }
+    
+    // 테스트용: 다음 Phase로 스킵 (아케이드 모드에서는 숨김)
+    if (skipBtn) {
+        skipBtn.onclick = () => {
             gameRunning = false;
             if (gameLoop) pixiApp.ticker.remove(gameLoop);
-            showTitle();
-        }
-    };
-    
-    document.getElementById('btn-pause').onclick = () => {
-        gameRunning = !gameRunning;
-        document.getElementById('btn-pause').textContent = gameRunning ? '⏸️' : '▶️';
-    };
-    
-    // 테스트용: 다음 Phase로 스킵
-    document.getElementById('btn-skip-phase').onclick = () => {
-        gameRunning = false;
-        if (gameLoop) pixiApp.ticker.remove(gameLoop);
-        GameState.phase1Clear = true;
-        GameState.save();
-        showPhase2Intro();
-    };
+            GameState.phase1Clear = true;
+            GameState.save();
+            showPhase2Intro();
+        };
+    }
     
     // 게임오버 시 다시 시작 -> 같은 출생지로 재시작
-    document.getElementById('btn-retry').onclick = () => {
-        document.getElementById('modal-gameover').classList.remove('show');
-        if (gameLoop) pixiApp.ticker.remove(gameLoop);
-        GameState.reset();
-        // 출생지 유지 (envId 초기화 안 함)
-        startPhase1(); // 바로 게임 시작
-    };
+    if (retryBtn) {
+        retryBtn.onclick = () => {
+            document.getElementById('modal-gameover').classList.remove('show');
+            if (gameLoop) pixiApp.ticker.remove(gameLoop);
+            GameState.reset();
+            // 출생지 유지 (envId 초기화 안 함)
+            startPhase1(); // 바로 게임 시작
+        };
+    }
     
-    document.getElementById('btn-next').onclick = () => {
-        document.getElementById('modal-clear').classList.remove('show');
-        if (gameLoop) pixiApp.ticker.remove(gameLoop);
-        showPhase2Intro();
-    };
+    if (nextBtn) {
+        nextBtn.onclick = () => {
+            document.getElementById('modal-clear').classList.remove('show');
+            if (gameLoop) pixiApp.ticker.remove(gameLoop);
+            showPhase2Intro();
+        };
+    }
 }
 
 function updateHUD() {
@@ -2902,27 +2927,39 @@ function updateHUD() {
     document.getElementById('h-sizeN').textContent = Math.round(player.size);
     document.getElementById('h-size').style.width = `${(player.size / CONFIG.MAX_SIZE) * 100}%`;
     
-    // Phase 1 파츠만 카운트
-    const p1PartKeys = ['eye', 'mouth', 'arm', 'leg', 'tail', 'antenna'];
-    const totalP1Parts = p1PartKeys.reduce((sum, k) => sum + GameState.parts[k], 0);
-    const partBase = totalP1Parts * CONFIG.GROWTH_THRESHOLD;
-    const partProgress = ((GameState.eaten - partBase) / CONFIG.GROWTH_THRESHOLD) * 100;
-    document.getElementById('h-partB').style.width = `${Math.min(100, Math.max(0, partProgress))}%`;
-    document.getElementById('h-partP').textContent = `${Math.max(0, GameState.eaten - partBase)}/${CONFIG.GROWTH_THRESHOLD}`;
-    
-    document.getElementById('h-stageB').style.width = `${Math.min(100, (GameState.score / CONFIG.STAGE_THRESHOLD) * 100)}%`;
-    document.getElementById('h-stageP').textContent = `${GameState.score}/${CONFIG.STAGE_THRESHOLD}`;
-    
-    // Phase 1 파츠만 표시
-    let partsHtml = '';
-    p1PartKeys.forEach(k => {
-        if (GameState.parts[k] > 0) {
-            partsHtml += `<div class="part-badge active"><span>${BODY_PARTS[k].icon}</span><span class="part-cnt">×${GameState.parts[k]}</span></div>`;
+    // 아케이드 모드가 아닐 때만 파츠/스테이지 바 업데이트
+    if (!arcadeMode) {
+        // Phase 1 파츠만 카운트
+        const p1PartKeys = ['eye', 'mouth', 'arm', 'leg', 'tail', 'antenna'];
+        const totalP1Parts = p1PartKeys.reduce((sum, k) => sum + GameState.parts[k], 0);
+        const partBase = totalP1Parts * CONFIG.GROWTH_THRESHOLD;
+        const partProgress = ((GameState.eaten - partBase) / CONFIG.GROWTH_THRESHOLD) * 100;
+        
+        const partB = document.getElementById('h-partB');
+        const partP = document.getElementById('h-partP');
+        const stageB = document.getElementById('h-stageB');
+        const stageP = document.getElementById('h-stageP');
+        const partsEl = document.getElementById('h-parts');
+        
+        if (partB) partB.style.width = `${Math.min(100, Math.max(0, partProgress))}%`;
+        if (partP) partP.textContent = `${Math.max(0, GameState.eaten - partBase)}/${CONFIG.GROWTH_THRESHOLD}`;
+        if (stageB) stageB.style.width = `${Math.min(100, (GameState.score / CONFIG.STAGE_THRESHOLD) * 100)}%`;
+        if (stageP) stageP.textContent = `${GameState.score}/${CONFIG.STAGE_THRESHOLD}`;
+        
+        // Phase 1 파츠만 표시
+        if (partsEl) {
+            let partsHtml = '';
+            p1PartKeys.forEach(k => {
+                if (GameState.parts[k] > 0) {
+                    partsHtml += `<div class="part-badge active"><span>${BODY_PARTS[k].icon}</span><span class="part-cnt">×${GameState.parts[k]}</span></div>`;
+                }
+            });
+            partsEl.innerHTML = partsHtml || '<span style="font-size: 0.65rem; color: #666;">없음</span>';
         }
-    });
-    document.getElementById('h-parts').innerHTML = partsHtml || '<span style="font-size: 0.65rem; color: #666;">없음</span>';
+    }
     
-    document.getElementById('btn-dash').classList.toggle('disabled', GameState.parts.tail === 0);
+    const dashBtn = document.getElementById('btn-dash');
+    if (dashBtn) dashBtn.classList.toggle('disabled', GameState.parts.tail === 0);
 }
 
 function checkPartEvolution() {
@@ -4305,10 +4342,27 @@ function startPhase3() {
     zoneTransitionTimer = 0;
     runnerGraphics = null; // Graphics 객체 초기화
     
+    // 크리처가 없으면 생성 (아케이드 모드 등)
+    if (!GameState.creature) {
+        console.log('크리처 없음 - 새로 생성');
+        GameState.creature = generateCreatureFromEnv(GameState.envId || 'ocean');
+    }
+    
     // 디버그 로그
-    console.log('startPhase3: evolutionLevel =', evolutionLevel, 'runnerDist =', runnerDist);
+    console.log('startPhase3: evolutionLevel =', evolutionLevel, 'runnerDist =', runnerDist, 'creature =', GameState.creature);
     
     currentCreature = evolveCreatureByLevel(GameState.creature, evolutionLevel);
+    
+    // 크리처가 여전히 없으면 기본 크리처 생성
+    if (!currentCreature) {
+        console.log('currentCreature 없음 - 기본 크리처 생성');
+        currentCreature = {
+            head: 0, eyes: 0, body: 0, arms: 0, legs: 0,
+            decoration: 0, pattern: 0,
+            colors: { primary: 0x00b4d8, secondary: 0x0077b6, accent: 0x90e0ef },
+            envId: 'ocean'
+        };
+    }
     
     const zone = getCurrentZone(runnerDist);
     currentZoneId = zone.id;
@@ -4326,13 +4380,24 @@ function startPhase3() {
     const birthEnv = getEnvById(GameState.envId);
     
     app.innerHTML = `
-        <!-- 중앙 상단: 시대 이름 크게 -->
+        <!-- 중앙 상단: 시대 이름 / 아케이드 타이머 -->
+        ${arcadeMode ? `
+        <div id="arcade-timer-display" style="position: fixed; top: calc(15px + var(--safe-top)); left: 50%; transform: translateX(-50%); 
+            background: linear-gradient(135deg, rgba(0,0,0,0.8), rgba(157,78,221,0.3)); 
+            border-radius: 16px; padding: 10px 24px; backdrop-filter: blur(10px);
+            border: 1px solid rgba(157,78,221,0.5); z-index: 100; text-align: center;">
+            <div style="font-size: 0.7rem; color: #9d4edd;">⏱️ 남은 시간</div>
+            <div style="font-size: 1.8rem; font-weight: 900; color: #fff; font-family: monospace;" id="p3-timer">03:00</div>
+            <div style="font-size: 0.65rem; color: #ffd700; margin-top: 2px;">🎯 목표: 1000점</div>
+        </div>
+        ` : `
         <div id="era-display" style="position: fixed; top: calc(15px + var(--safe-top)); left: 50%; transform: translateX(-50%); 
             background: linear-gradient(135deg, rgba(0,0,0,0.7), rgba(30,30,60,0.8)); 
             border-radius: 16px; padding: 8px 24px; backdrop-filter: blur(10px);
             border: 1px solid rgba(255,255,255,0.1); z-index: 100;">
             <div style="font-size: 1.4rem; font-weight: 900; color: #fff; text-shadow: 0 2px 8px rgba(0,0,0,0.5);" id="era-name">${zone.name}</div>
         </div>
+        `}
         
         <!-- 시대 전환 알림 -->
         <div id="zone-transition" style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
@@ -4348,8 +4413,8 @@ function startPhase3() {
             <div style="background: rgba(0,0,0,0.6); border-radius: 12px; padding: 10px 14px; backdrop-filter: blur(8px);">
                 ${arcadeMode ? `
                     <!-- 아케이드 모드: 에너지 점수 표시 -->
-                    <div style="font-size: 0.7rem; color: #9d4edd; margin-bottom: 4px;">🎮 아케이드</div>
-                    <div style="font-size: 1.5rem; font-weight: 700; color: #ffd700;">⭐ <span id="arcade-score-display">${arcadeScore}</span></div>
+                    <div style="font-size: 0.7rem; color: #9d4edd; margin-bottom: 4px;">🎮 에너지 수집</div>
+                    <div style="font-size: 1.5rem; font-weight: 700; color: #ffd700;">⭐ <span id="arcade-score-display">${arcadeScore}</span><span style="font-size: 0.8rem; color: #aaa;">/1000</span></div>
                     <div style="font-size: 0.6rem; color: #ff6b6b; margin-top: 4px;">⚠️ 구멍 = 점수 리셋!</div>
                 ` : `
                     <!-- 일반 모드: HP, 진화 게이지 -->
@@ -4427,17 +4492,25 @@ function startPhase3() {
 }
 
 function setupRunnerControls() {
-    const jumpPower = CONFIG.P3_JUMP_POWER * (GameState.badges.includes('jump') ? 1.15 : 1);
+    const badges = GameState.badges || [];
+    const jumpPower = CONFIG.P3_JUMP_POWER * (badges.includes('jump') ? 1.15 : 1);
     const jump = () => { if (runner.onGround) { runner.vy = jumpPower; runner.onGround = false; SFX.play('jump'); } };
     const duckStart = () => { if (runner.onGround) runner.h = 35; };
     const duckEnd = () => { runner.h = 70; };
     
-    document.getElementById('btn-jump-p3').onclick = jump;
-    document.getElementById('btn-jump-p3').ontouchstart = e => { e.preventDefault(); jump(); };
-    document.getElementById('btn-duck').ontouchstart = e => { e.preventDefault(); duckStart(); };
-    document.getElementById('btn-duck').ontouchend = duckEnd;
-    document.getElementById('btn-duck').onmousedown = duckStart;
-    document.getElementById('btn-duck').onmouseup = duckEnd;
+    const jumpBtn = document.getElementById('btn-jump-p3');
+    const duckBtn = document.getElementById('btn-duck');
+    
+    if (jumpBtn) {
+        jumpBtn.onclick = jump;
+        jumpBtn.ontouchstart = e => { e.preventDefault(); jump(); };
+    }
+    if (duckBtn) {
+        duckBtn.ontouchstart = e => { e.preventDefault(); duckStart(); };
+        duckBtn.ontouchend = duckEnd;
+        duckBtn.onmousedown = duckStart;
+        duckBtn.onmouseup = duckEnd;
+    }
     
     const keyDown = e => {
         if (!p3GameRunning) return;
@@ -4455,42 +4528,56 @@ function setupRunnerControls() {
 
 function setupRunnerHUD() {
     const t = GameState.t.bind(GameState);
-    document.getElementById('btn-home-p3').onclick = () => {
-        // 아케이드 모드면 현재 점수로 종료
-        if (arcadeMode) {
-            if (confirm('게임을 종료하시겠습니까?')) {
+    
+    const homeBtn = document.getElementById('btn-home-p3');
+    const retryBtn = document.getElementById('btn-p3-retry');
+    const evoBtn = document.getElementById('btn-evo-continue');
+    const finishBtn = document.getElementById('btn-p3-finish');
+    
+    if (homeBtn) {
+        homeBtn.onclick = () => {
+            // 아케이드 모드면 현재 점수로 종료
+            if (arcadeMode) {
+                if (confirm('게임을 종료하시겠습니까?')) {
+                    p3GameRunning = false;
+                    if (gameLoop && pixiApp) pixiApp.ticker.remove(gameLoop);
+                    endArcadeMode('arcade_evolve', arcadeScore);
+                }
+                return;
+            }
+            
+            if (confirm(t('confirmHome'))) {
                 p3GameRunning = false;
                 if (gameLoop && pixiApp) pixiApp.ticker.remove(gameLoop);
-                endArcadeMode('arcade_evolve', arcadeScore);
+                GameState.runnerDist = runnerDist;
+                GameState.save();
+                showTitle();
             }
-            return;
-        }
-        
-        if (confirm(t('confirmHome'))) {
-            p3GameRunning = false;
-            if (gameLoop && pixiApp) pixiApp.ticker.remove(gameLoop);
-            GameState.runnerDist = runnerDist;
-            GameState.save();
-            showTitle();
-        }
-    };
-    document.getElementById('btn-p3-retry').onclick = () => {
-        document.getElementById('modal-p3-gameover').classList.remove('show');
-        // 아케이드 모드면 점수 리셋
-        if (arcadeMode) {
-            arcadeScore = 0;
-        }
-        startPhase3();
-    };
-    document.getElementById('btn-evo-continue').onclick = () => {
-        document.getElementById('modal-evolution').classList.remove('show');
-        evolutionAnimating = false;
-        p3GameRunning = true;
-    };
-    document.getElementById('btn-p3-finish').onclick = () => {
-        document.getElementById('modal-p3-clear').classList.remove('show');
-        showEnding();
-    };
+        };
+    }
+    if (retryBtn) {
+        retryBtn.onclick = () => {
+            document.getElementById('modal-p3-gameover').classList.remove('show');
+            // 아케이드 모드면 점수 리셋
+            if (arcadeMode) {
+                arcadeScore = 0;
+            }
+            startPhase3();
+        };
+    }
+    if (evoBtn) {
+        evoBtn.onclick = () => {
+            document.getElementById('modal-evolution').classList.remove('show');
+            evolutionAnimating = false;
+            p3GameRunning = true;
+        };
+    }
+    if (finishBtn) {
+        finishBtn.onclick = () => {
+            document.getElementById('modal-p3-clear').classList.remove('show');
+            showEnding();
+        };
+    }
 }
 
 function updateRunner(delta) {
@@ -4500,6 +4587,46 @@ function updateRunner(delta) {
     const groundY = pixiApp.screen.height - 80;
     const now = Date.now();
     const baseSpeed = CONFIG.P3_BASE_SPEED;
+    
+    // 아케이드 모드: 타이머 업데이트 및 승리/패배 체크
+    if (arcadeMode) {
+        const elapsed = Math.floor((now - arcadeStartTime) / 1000);
+        const remaining = Math.max(0, 180 - elapsed); // 3분 = 180초
+        const mins = Math.floor(remaining / 60);
+        const secs = remaining % 60;
+        
+        const timerEl = document.getElementById('p3-timer');
+        if (timerEl) {
+            timerEl.textContent = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+            // 30초 이하면 빨간색
+            if (remaining <= 30) {
+                timerEl.style.color = '#ff6b6b';
+            } else if (remaining <= 60) {
+                timerEl.style.color = '#ffd700';
+            }
+        }
+        
+        // 1000점 달성 시 승리!
+        if (arcadeScore >= 1000) {
+            p3GameRunning = false;
+            SFX.play('clear');
+            if (gameLoop && pixiApp) pixiApp.ticker.remove(gameLoop);
+            // 점수 = 남은 시간 보너스 + 1000 (빠를수록 고득점)
+            const timeBonus = remaining * 10;
+            const finalScore = 1000 + timeBonus;
+            endArcadeMode('arcade_evolve', finalScore);
+            return;
+        }
+        
+        // 시간 초과 시 게임오버
+        if (remaining <= 0) {
+            p3GameRunning = false;
+            SFX.play('gameover');
+            if (gameLoop && pixiApp) pixiApp.ticker.remove(gameLoop);
+            endArcadeMode('arcade_evolve', arcadeScore); // 현재 점수로 기록
+            return;
+        }
+    }
     
     // 물리
     runner.vy += CONFIG.P3_GRAVITY;
@@ -5993,25 +6120,6 @@ function showSpaceLobby() {
                     </div>
                 </div>
                 
-                <!-- 게시판 -->
-                <div style="background: linear-gradient(135deg, rgba(20,40,60,0.9), rgba(10,20,30,0.9)); border-radius: 12px; border: 1px solid rgba(100,200,255,0.2); overflow: hidden;">
-                    <div style="background: rgba(0,50,100,0.4); padding: 6px 12px; border-bottom: 1px solid rgba(100,200,255,0.2);">
-                        <div style="font-size: 0.8rem; font-weight: 700; color: #4fc3f7;">📋 구인 게시판</div>
-                    </div>
-                    <div style="padding: 6px;">
-                        ${bulletinPosts.map(post => `
-                            <div style="display: flex; align-items: center; gap: 8px; padding: 6px 8px; background: rgba(0,0,0,0.2); border-radius: 6px; margin-bottom: 4px; ${post.type === '긴급' ? 'border-left: 2px solid #ff6b6b;' : post.type === '신규' ? 'border-left: 2px solid #4fc3f7;' : ''}">
-                                <div style="font-size: 1.1rem;">${post.icon}</div>
-                                <div style="flex: 1;">
-                                    <div style="font-size: 0.75rem; font-weight: 600; color: #fff;">${post.title}</div>
-                                    <div style="font-size: 0.6rem; color: #888;">${post.desc}</div>
-                                </div>
-                                ${post.reward ? `<div style="font-size: 0.65rem; color: #ffd700; font-weight: 600;">${post.reward}</div>` : ''}
-                            </div>
-                        `).join('')}
-                    </div>
-                </div>
-                
                 <!-- 미니게임 버튼들 -->
                 <div style="font-size: 0.9rem; color: #ffd700; margin-top: 10px; font-weight: 600;">💼 허드렛일 선택</div>
                 <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;">
@@ -6070,6 +6178,16 @@ function showSpaceLobby() {
                     </div>
                 </div>
                 
+                <!-- Ranking (종합 랭킹) -->
+                <div style="background: linear-gradient(135deg, rgba(20,40,60,0.9), rgba(10,20,30,0.9)); border-radius: 12px; border: 1px solid rgba(255,215,0,0.2); overflow: hidden; margin-top: 15px;">
+                    <div style="background: rgba(100,80,0,0.4); padding: 6px 12px; border-bottom: 1px solid rgba(255,215,0,0.2);">
+                        <div style="font-size: 0.8rem; font-weight: 700; color: #ffd700;">🏆 Ranking</div>
+                    </div>
+                    <div style="padding: 8px;" id="combined-rankings">
+                        <div style="text-align: center; padding: 10px; color: #888;">로딩 중...</div>
+                    </div>
+                </div>
+                
                 <!-- 랭킹 팝업 -->
                 <div id="ranking-popup" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.9); z-index: 1000; overflow-y: auto; padding: 20px; padding-top: calc(20px + var(--safe-top));">
                     <div style="max-width: 400px; margin: 0 auto;">
@@ -6111,6 +6229,9 @@ function showSpaceLobby() {
             alert('Lv.3 일반 정비공 이상만 지원 가능합니다!');
         }
     };
+    
+    // 종합 랭킹 로드
+    loadCombinedRankings();
     
     // 전체 목표 팝업
     document.getElementById('btn-all-goals').onclick = () => {
@@ -6408,6 +6529,76 @@ async function saveRanking(jobType, score) {
     localStorage.setItem(key, JSON.stringify(local.slice(0, 50)));
 }
 
+// 종합 랭킹 계산 함수
+function calculateCombinedRankings(jobTypes) {
+    const playerScores = {};
+    
+    for (const jobType of jobTypes) {
+        const rankings = getLocalRankings(jobType);
+        rankings.forEach((r, idx) => {
+            const name = r.name || '익명';
+            if (!playerScores[name]) {
+                playerScores[name] = { name, totalScore: 0, count: 0 };
+            }
+            playerScores[name].totalScore += r.score;
+            playerScores[name].count++;
+        });
+    }
+    
+    return Object.values(playerScores)
+        .sort((a, b) => b.totalScore - a.totalScore)
+        .slice(0, 5);
+}
+
+// 종합 랭킹 HTML 생성
+function generateCombinedRankingHTML(title, icon, rankings, color) {
+    const medals = ['🥇', '🥈', '🥉', '4️⃣', '5️⃣'];
+    if (rankings.length === 0) {
+        return `
+            <div style="background: linear-gradient(135deg, ${color}22, ${color}11); border-radius: 8px; padding: 8px; margin-bottom: 8px; border: 1px solid ${color}33;">
+                <div style="font-size: 0.75rem; font-weight: 700; color: ${color}; margin-bottom: 6px;">${icon} ${title}</div>
+                <div style="font-size: 0.65rem; color: #666; text-align: center; padding: 5px;">기록 없음</div>
+            </div>
+        `;
+    }
+    
+    const rankingsHTML = rankings.map((r, i) => `
+        <div style="display: flex; align-items: center; gap: 6px; padding: 3px 0; ${i < rankings.length - 1 ? 'border-bottom: 1px solid rgba(255,255,255,0.05);' : ''}">
+            <span style="font-size: 0.8rem;">${medals[i]}</span>
+            <span style="flex: 1; font-size: 0.7rem; color: #fff; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${r.name}</span>
+            <span style="font-size: 0.65rem; color: #ffd700; font-weight: 600;">${r.totalScore.toLocaleString()}</span>
+        </div>
+    `).join('');
+    
+    return `
+        <div style="background: linear-gradient(135deg, ${color}22, ${color}11); border-radius: 8px; padding: 8px; margin-bottom: 8px; border: 1px solid ${color}33;">
+            <div style="font-size: 0.75rem; font-weight: 700; color: ${color}; margin-bottom: 6px;">${icon} ${title}</div>
+            ${rankingsHTML}
+        </div>
+    `;
+}
+
+// 종합 랭킹 로드
+function loadCombinedRankings() {
+    const container = document.getElementById('combined-rankings');
+    if (!container) return;
+    
+    // 허드렛일 종합 (청소, 화물, 배선)
+    const jobRankings = calculateCombinedRankings(['cleaning', 'cargo', 'wiring']);
+    
+    // 아케이드 종합 (세포, 계단, 진화)
+    const arcadeRankings = calculateCombinedRankings(['arcade_cell', 'arcade_climb', 'arcade_evolve']);
+    
+    // 전체 종합
+    const allRankings = calculateCombinedRankings(['cleaning', 'cargo', 'wiring', 'arcade_cell', 'arcade_climb', 'arcade_evolve']);
+    
+    container.innerHTML = `
+        ${generateCombinedRankingHTML('허드렛일 종합', '💼', jobRankings, '#10b981')}
+        ${generateCombinedRankingHTML('아케이드 종합', '🎮', arcadeRankings, '#9d4edd')}
+        ${generateCombinedRankingHTML('전체 종합', '👑', allRankings, '#ffd700')}
+    `;
+}
+
 
 // ========================================
 // 아케이드 모드 (기존 게임 재활용 + 조건 분기)
@@ -6448,10 +6639,10 @@ function startArcadeP1() {
     
     document.getElementById('btn-start-arcade-p1').onclick = () => {
         arcadeMode = true;
-        if (!GameState.envId) {
-            GameState.envId = 'ocean';
-            GameState.design = { primary: '#00b4d8', secondary: '#0077b6', wobble: 0.7 };
-        }
+        // 아케이드 모드: 환경 강제 설정
+        GameState.envId = 'ocean';
+        GameState.design = { primary: '#00b4d8', secondary: '#0077b6', wobble: 0.7 };
+        console.log('P1 아케이드 시작:', GameState.envId);
         startPhase1();
     };
     document.getElementById('btn-back-arcade').onclick = () => showSpaceLobby();
@@ -6494,12 +6685,12 @@ function startArcadeP2() {
     document.getElementById('btn-start-arcade-p2').onclick = () => {
         arcadeMode = true;
         arcadeStartTime = Date.now();
-        if (!GameState.envId) {
-            GameState.envId = 'ocean';
-            GameState.design = { primary: '#00b4d8', secondary: '#0077b6', wobble: 0.7 };
-        }
+        // 아케이드 모드: 환경 강제 설정
+        GameState.envId = 'ocean';
+        GameState.design = { primary: '#00b4d8', secondary: '#0077b6', wobble: 0.7 };
         // 아케이드 모드: 주사위 건너뛰고 바로 게임 시작
         climbItem = null; // 아이템은 게임 중 랜덤 생성
+        console.log('P2 아케이드 시작:', GameState.envId);
         startPhase2();
     };
     document.getElementById('btn-back-arcade').onclick = () => showSpaceLobby();
@@ -6512,12 +6703,12 @@ function startArcadeP3() {
             <div class="page-content" style="max-width: 350px;">
                 <div style="font-size: 0.9rem; color: #9d4edd; margin-bottom: 10px;">🎮 아케이드 모드</div>
                 <h2 class="page-title" style="font-size: 1.5rem; margin-bottom: 8px;">🏃 진화 달리기</h2>
-                <p style="font-size: 0.85rem; color: #aaa; margin-bottom: 20px;">진화 에너지를 모으세요! 구멍 주의!</p>
+                <p style="font-size: 0.85rem; color: #aaa; margin-bottom: 20px;">3분 안에 1000점을 달성하세요!</p>
                 
                 <div style="background: rgba(0,0,0,0.3); border-radius: 16px; padding: 20px; margin-bottom: 20px;">
                     <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
-                        <span style="color: #888;">게임 방식</span>
-                        <span style="color: #9d4edd;">에너지 수집</span>
+                        <span style="color: #888;">목표</span>
+                        <span style="color: #ffd700;">⏱️ 3분 내 1000점</span>
                     </div>
                     <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
                         <span style="color: #888;">주의</span>
@@ -6525,7 +6716,7 @@ function startArcadeP3() {
                     </div>
                     <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
                         <span style="color: #888;">랭킹 기준</span>
-                        <span style="color: #ffd700;">최종 에너지</span>
+                        <span style="color: #ffd700;">빨리 클리어할수록 ↑</span>
                     </div>
                     <div style="display: flex; justify-content: space-between;">
                         <span style="color: #888;">보상</span>
@@ -6542,17 +6733,32 @@ function startArcadeP3() {
     document.getElementById('btn-start-arcade-p3').onclick = () => {
         arcadeMode = true;
         arcadeScore = 0;
-        // 아케이드 모드: 랜덤 크리처 생성 (올바른 환경 ID 사용)
+        arcadeStartTime = Date.now(); // 타이머 시작!
+        // 아케이드 모드: 랜덤 환경 선택
         const envIds = ['ocean', 'hydrothermal', 'ice', 'magma', 'atmosphere', 'toxic'];
         const randomEnv = envIds[Math.floor(Math.random() * envIds.length)];
+        
+        // 상태 초기화
         GameState.envId = randomEnv;
         GameState.design = { primary: '#00b4d8', secondary: '#0077b6', wobble: 0.7 };
-        GameState.creature = generateCreatureFromEnv(randomEnv);
         GameState.evolutionLevel = 0;
         GameState.evolutionGauge = 0;
         GameState.runnerDist = 0;
         GameState.runnerStage = 0;
-        // 디버그 로그
+        
+        // 크리처 생성 (반드시!)
+        GameState.creature = generateCreatureFromEnv(randomEnv);
+        
+        // 생성 실패 시 기본 크리처
+        if (!GameState.creature) {
+            GameState.creature = {
+                head: 0, eyes: 0, body: 0, arms: 0, legs: 0,
+                decoration: 0, pattern: 0,
+                colors: { primary: 0x00b4d8, secondary: 0x0077b6, accent: 0x90e0ef },
+                envId: randomEnv
+            };
+        }
+        
         console.log('P3 아케이드 시작:', { envId: randomEnv, creature: GameState.creature });
         // intro 건너뛰고 바로 게임 시작
         startPhase3();
@@ -6589,6 +6795,9 @@ function endArcadeMode(gameType, score) {
     // 계단 오르기: 시간 기반 점수 설명
     let scoreLabel = '최종 점수';
     let scoreExplain = '';
+    let resultIcon = '🎮';
+    let resultTitle = '게임 종료!';
+    
     if (gameType === 'arcade_climb') {
         const elapsedSec = Math.floor((Date.now() - arcadeStartTime) / 1000);
         const minutes = Math.floor(elapsedSec / 60);
@@ -6596,14 +6805,25 @@ function endArcadeMode(gameType, score) {
         scoreLabel = '타임 점수';
         scoreExplain = `<div style="font-size: 0.75rem; color: #aaa; margin-top: 5px;">⏱️ ${minutes}분 ${seconds}초 (빠를수록 고득점)</div>`;
     } else if (gameType === 'arcade_evolve') {
-        scoreLabel = '에너지 점수';
+        if (score >= 1000) {
+            resultIcon = '🏆';
+            resultTitle = '클리어!';
+            scoreLabel = '최종 점수';
+            const bonusPoints = score - 1000;
+            scoreExplain = `<div style="font-size: 0.75rem; color: #10b981; margin-top: 5px;">🎯 1000점 달성! +${bonusPoints} 시간 보너스</div>`;
+        } else {
+            resultIcon = '⏰';
+            resultTitle = '시간 초과!';
+            scoreLabel = '획득 에너지';
+            scoreExplain = `<div style="font-size: 0.75rem; color: #ff6b6b; margin-top: 5px;">3분 내 1000점 미달성</div>`;
+        }
     }
     
     app.innerHTML = `
         <div class="page-center" style="background: linear-gradient(180deg, #0a0a1a, #1a1a3a);">
             <div class="page-content" style="max-width: 350px; text-align: center;">
-                <div style="font-size: 3rem; margin-bottom: 15px;">🎮</div>
-                <h2 style="color: #fff; font-size: 1.5rem; margin-bottom: 10px;">게임 종료!</h2>
+                <div style="font-size: 3rem; margin-bottom: 15px;">${resultIcon}</div>
+                <h2 style="color: #fff; font-size: 1.5rem; margin-bottom: 10px;">${resultTitle}</h2>
                 <div style="font-size: 1rem; color: #888; margin-bottom: 20px;">${gameNames[gameType]}</div>
                 
                 <div style="background: rgba(0,0,0,0.3); border-radius: 16px; padding: 20px; margin-bottom: 15px;">
