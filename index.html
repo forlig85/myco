@@ -5749,10 +5749,35 @@ function showSpaceLobby() {
                 <div style="display: flex; justify-content: space-between; align-items: center;">
                     <div style="font-size: 1.3rem; font-weight: 900; color: #fff;">🚀 우주센터</div>
                     <div style="display: flex; gap: 8px; align-items: center;">
-                        <div style="background: rgba(255,215,0,0.2); border: 1px solid rgba(255,215,0,0.4); border-radius: 20px; padding: 6px 12px; font-size: 0.8rem; display: flex; align-items: center; height: 36px;">
+                        <div id="luck-container" style="background: rgba(255,215,0,0.2); border: 1px solid rgba(255,215,0,0.4); border-radius: 20px; padding: 6px 12px; font-size: 0.8rem; display: flex; align-items: center; height: 36px; cursor: pointer;">
                             💰 <span id="luck-display">${luck.toLocaleString()}</span> LUCK
                         </div>
                         <button class="hud-btn" id="btn-home-space" style="width: 36px; height: 36px; font-size: 1rem; display: flex; align-items: center; justify-content: center;">🏠</button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- LUCK 조절 팝업 -->
+            <div id="luck-popup" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.8); z-index: 1000; display: none; align-items: center; justify-content: center;">
+                <div style="background: linear-gradient(135deg, #1a1a3a, #0a0a2a); border-radius: 16px; padding: 20px; max-width: 300px; width: 90%; border: 1px solid rgba(255,215,0,0.3);">
+                    <div style="text-align: center; margin-bottom: 15px;">
+                        <div style="font-size: 1.2rem; color: #ffd700; font-weight: bold;">💰 LUCK 조절</div>
+                        <div style="font-size: 0.75rem; color: #888; margin-top: 5px;">⚠️ 디버그용</div>
+                    </div>
+                    <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+                        <input type="number" id="luck-input" value="${luck}" style="flex: 1; padding: 10px; border-radius: 8px; border: 1px solid rgba(255,215,0,0.3); background: rgba(0,0,0,0.3); color: #fff; font-size: 1rem; text-align: center;">
+                    </div>
+                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 15px;">
+                        <button class="luck-btn" data-add="100" style="padding: 8px; border-radius: 8px; border: 1px solid rgba(100,255,100,0.3); background: rgba(100,255,100,0.2); color: #44ff88; font-size: 0.8rem;">+100</button>
+                        <button class="luck-btn" data-add="500" style="padding: 8px; border-radius: 8px; border: 1px solid rgba(100,255,100,0.3); background: rgba(100,255,100,0.2); color: #44ff88; font-size: 0.8rem;">+500</button>
+                        <button class="luck-btn" data-add="1000" style="padding: 8px; border-radius: 8px; border: 1px solid rgba(100,255,100,0.3); background: rgba(100,255,100,0.2); color: #44ff88; font-size: 0.8rem;">+1000</button>
+                        <button class="luck-btn" data-add="-100" style="padding: 8px; border-radius: 8px; border: 1px solid rgba(255,100,100,0.3); background: rgba(255,100,100,0.2); color: #ff6b6b; font-size: 0.8rem;">-100</button>
+                        <button class="luck-btn" data-add="-500" style="padding: 8px; border-radius: 8px; border: 1px solid rgba(255,100,100,0.3); background: rgba(255,100,100,0.2); color: #ff6b6b; font-size: 0.8rem;">-500</button>
+                        <button class="luck-btn" data-add="10000" style="padding: 8px; border-radius: 8px; border: 1px solid rgba(255,215,0,0.3); background: rgba(255,215,0,0.2); color: #ffd700; font-size: 0.8rem;">+10K</button>
+                    </div>
+                    <div style="display: flex; gap: 10px;">
+                        <button id="btn-luck-apply" style="flex: 1; padding: 12px; border-radius: 8px; border: none; background: linear-gradient(135deg, #44aa44, #228822); color: #fff; font-weight: bold;">적용</button>
+                        <button id="btn-luck-close" style="flex: 1; padding: 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.2); background: rgba(255,255,255,0.1); color: #fff;">닫기</button>
                     </div>
                 </div>
             </div>
@@ -5917,6 +5942,34 @@ function showSpaceLobby() {
     document.getElementById('goals-popup').onclick = (e) => {
         if (e.target.id === 'goals-popup') {
             document.getElementById('goals-popup').style.display = 'none';
+        }
+    };
+    
+    // LUCK 조절 팝업
+    document.getElementById('luck-container').onclick = () => {
+        document.getElementById('luck-popup').style.display = 'flex';
+        document.getElementById('luck-input').value = GameState.spaceLuck;
+    };
+    document.getElementById('btn-luck-close').onclick = () => {
+        document.getElementById('luck-popup').style.display = 'none';
+    };
+    document.getElementById('btn-luck-apply').onclick = () => {
+        const newLuck = parseInt(document.getElementById('luck-input').value) || 0;
+        GameState.spaceLuck = Math.max(0, newLuck);
+        GameState.save();
+        document.getElementById('luck-popup').style.display = 'none';
+        showSpaceLobby(); // 새로고침
+    };
+    document.querySelectorAll('.luck-btn').forEach(btn => {
+        btn.onclick = () => {
+            const add = parseInt(btn.dataset.add);
+            const input = document.getElementById('luck-input');
+            input.value = Math.max(0, parseInt(input.value) + add);
+        };
+    });
+    document.getElementById('luck-popup').onclick = (e) => {
+        if (e.target.id === 'luck-popup') {
+            document.getElementById('luck-popup').style.display = 'none';
         }
     };
 }
@@ -7449,386 +7502,1435 @@ function endCleaningGame(success, partialReward = false) {
     }
 }
 
+
 // ========================================
-// 미니게임 2: 화물 던지기
+
+// ========================================
+// 미니게임 2: 화물 던지기 (타이밍 게임)
 // ========================================
 let cargoState = null;
+let cargoApp = null;
 
-function startCargoGame(timeBonus, rewardMultiplier) {
-    const baseTime = 180;
-    const maxTime = baseTime + timeBonus;
-    
-    cargoState = {
-        count: 0,
-        maxCount: 100,
-        score: 0,
-        time: maxTime,
-        rewardMultiplier: rewardMultiplier,
-        currentCargo: null,
-        targets: [],
-        dragging: false,
-        dragStart: null,
-        dragEnd: null,
-        gameOver: false
-    };
-    
-    spawnCargo();
-    renderCargoGame();
-    startCargoLoop();
+// 화물 게임 대사
+const CARGO_QUOTES = {
+    success: [
+        "좋았어!",
+        "나이스~!",
+        "이 정도는 껌이지!",
+        "완벽해!",
+        "감 잡았다!",
+        "역시 나야!",
+        "쏙 들어갔네!",
+        "정확해!",
+        "이게 실력이야!",
+        "가즈아!"
+    ],
+    perfect: [
+        "퍼펙트!!!",
+        "와 대박!",
+        "천재인가?!",
+        "이게 가능하다고?!",
+        "미쳤다!!",
+        "레전드 각도!",
+        "프로인가요?",
+        "손맛 좋다!"
+    ],
+    miss: [
+        "아 아깝다...",
+        "다음엔 맞춘다!",
+        "손이 미끄러졌어",
+        "으악!",
+        "이런...",
+        "집중 집중!",
+        "실수야 실수"
+    ],
+    wrongTarget: [
+        "어? 거기 아닌데...",
+        "잘못 들어갔다!",
+        "아 헷갈려!",
+        "색깔 좀 보자...",
+        "실수했네..."
+    ],
+    combo: [
+        "${combo}콤보다!",
+        "연속 ${combo}개!",
+        "멈출 수 없어!",
+        "${combo}연속 성공!",
+        "콤보가 터진다!"
+    ]
+};
+
+function getCargoQuote(type) {
+    const quotes = CARGO_QUOTES[type];
+    return quotes[Math.floor(Math.random() * quotes.length)];
 }
 
-function spawnCargo() {
-    const types = [
-        { emoji: '🔧', name: '부품', target: 'blue' },
-        { emoji: '🍎', name: '식량', target: 'yellow' },
-        { emoji: '☢️', name: '위험물', target: 'red' }
-    ];
+function startCargoGame(timeBonus, rewardMultiplier) {
+    cargoState = {
+        count: 0,
+        maxCount: 10,  // 10개로 변경
+        score: 0,
+        time: 90 + timeBonus,  // 시간도 줄임
+        rewardMultiplier: rewardMultiplier,
+        currentCargo: null,
+        nextCargo: null,
+        gameOver: false,
+        gameW: 0,
+        gameH: 0,
+        // 게이지 상태
+        phase: 'angle',
+        angleValue: 0,
+        angleDir: 1,
+        angleSpeed: 2.2,
+        angleLocked: false,
+        powerValue: 0,
+        powerDir: 1,
+        powerSpeed: 3,
+        powerLocked: false,
+        // 정답 구간 (화물별로 다름)
+        anglePerfectMin: 40,
+        anglePerfectMax: 60,
+        powerPerfectMin: 60,
+        powerPerfectMax: 80,
+        // 던지기
+        throwing: false,
+        cargoSprite: null,
+        throwVx: 0,
+        throwVy: 0,
+        throwTime: 0,
+        // 타겟
+        targets: [],
+        // 파티클
+        particles: [],
+        // 콤보 & 퍼펙트
+        combo: 0,
+        perfectCount: 0,
+        // 말풍선
+        speechBubble: null,
+        // 별 반짝임
+        stars: [],
+        // 컨테이너
+        particleContainer: null,
+        trajectoryGraphics: null,
+        playerContainer: null,
+        targetContainer: null,
+        bgContainer: null,
+        gaugeContainer: null
+    };
     
-    // 특수 화물 (31개 이후)
-    if (cargoState.count >= 30 && Math.random() < 0.1) {
-        const specials = [
-            { emoji: '⭐', name: '골드', target: 'any', points: 30 },
-            { emoji: '🎁', name: '보너스', target: 'any', points: 15 }
-        ];
-        cargoState.currentCargo = specials[Math.floor(Math.random() * specials.length)];
-    } else if (cargoState.count >= 60 && Math.random() < 0.1) {
-        cargoState.currentCargo = { emoji: '💣', name: '폭탄', target: 'red', points: 20, penalty: 20 };
-    } else {
-        cargoState.currentCargo = { ...types[Math.floor(Math.random() * types.length)], points: 10 };
+    spawnCargoCG();
+    spawnNextCargoCG();
+    renderCargoUI();
+    initCargoPixi();
+}
+
+// 화물 타입별 정답 구간 설정
+function getCargoZones(cargo) {
+    // 각 타겟 위치에 맞는 각도/파워 설정
+    // 왼쪽(blue): 낮은 각도, 중간 파워
+    // 중앙(yellow): 중간 각도, 높은 파워  
+    // 오른쪽(red): 높은 각도, 높은 파워
+    // any: 중간 각도, 중간 파워
+    
+    switch(cargo.target) {
+        case 'blue':   // 왼쪽 타겟
+            return { angleMin: 20, angleMax: 35, powerMin: 50, powerMax: 65 };
+        case 'yellow': // 중앙 타겟
+            return { angleMin: 45, angleMax: 60, powerMin: 65, powerMax: 80 };
+        case 'red':    // 오른쪽 타겟
+            return { angleMin: 65, angleMax: 80, powerMin: 70, powerMax: 85 };
+        case 'any':    // 아무데나
+            return { angleMin: 40, angleMax: 65, powerMin: 55, powerMax: 75 };
+        default:
+            return { angleMin: 40, angleMax: 60, powerMin: 60, powerMax: 80 };
     }
 }
 
-function renderCargoGame() {
+function spawnCargoCG() {
     const s = cargoState;
-    const w = window.innerWidth;
-    const h = window.innerHeight;
-    
-    // 타겟 위치 계산
-    const targetY = 180;
-    const targetW = Math.min(80, (w - 60) / 3);
-    s.targets = [
-        { id: 'blue', x: w * 0.2, y: targetY, w: targetW, h: 60, color: '#3b82f6' },
-        { id: 'yellow', x: w * 0.5, y: targetY, w: targetW, h: 60, color: '#eab308' },
-        { id: 'red', x: w * 0.8, y: targetY, w: targetW, h: 60, color: '#ef4444' }
+    const types = [
+        { emoji: '🔧', name: '부품', target: 'blue', color: 0x3b82f6, points: 50 },
+        { emoji: '🍎', name: '식량', target: 'yellow', color: 0xeab308, points: 50 },
+        { emoji: '☢️', name: '위험물', target: 'red', color: 0xef4444, points: 50 }
     ];
     
+    // 특수 화물 (5개 이후 등장 확률)
+    if (s.count >= 5 && Math.random() < 0.25) {
+        const specials = [
+            { emoji: '⭐', name: '골드', target: 'any', points: 150, color: 0xffd700 },
+            { emoji: '🎁', name: '보너스', target: 'any', points: 100, color: 0xff88ff }
+        ];
+        s.currentCargo = specials[Math.floor(Math.random() * specials.length)];
+    } else {
+        s.currentCargo = { ...types[Math.floor(Math.random() * types.length)] };
+    }
+    
+    // 정답 구간 설정
+    const zones = getCargoZones(s.currentCargo);
+    s.anglePerfectMin = zones.angleMin;
+    s.anglePerfectMax = zones.angleMax;
+    s.powerPerfectMin = zones.powerMin;
+    s.powerPerfectMax = zones.powerMax;
+}
+
+function spawnNextCargoCG() {
+    const types = [
+        { emoji: '🔧', name: '부품', target: 'blue', color: 0x3b82f6, points: 50 },
+        { emoji: '🍎', name: '식량', target: 'yellow', color: 0xeab308, points: 50 },
+        { emoji: '☢️', name: '위험물', target: 'red', color: 0xef4444, points: 50 }
+    ];
+    cargoState.nextCargo = { ...types[Math.floor(Math.random() * types.length)] };
+}
+
+function renderCargoUI() {
+    const s = cargoState;
+    
     app.innerHTML = `
-        <div style="width: 100%; height: 100%; background: linear-gradient(180deg, #1a1a2e, #0f0f1a); position: relative; overflow: hidden; touch-action: none;">
+        <div style="width: 100%; height: 100%; background: #0a0a1a; display: flex; flex-direction: column; align-items: center;">
             <!-- HUD -->
-            <div style="position: absolute; top: 0; left: 0; right: 0; padding: 10px; padding-top: calc(10px + var(--safe-top)); background: rgba(0,0,0,0.5); display: flex; justify-content: space-between; align-items: center; z-index: 100;">
-                <div style="font-size: 1rem;">✅ <span id="cg-count">${s.count}</span>/${s.maxCount}</div>
-                <div style="font-size: 1rem;">⏱️ <span id="cg-time">${Math.floor(s.time / 60)}:${(s.time % 60).toString().padStart(2, '0')}</span></div>
-                <div style="font-size: 1rem; color: #ffd700;">💰 <span id="cg-score">${s.score}</span></div>
+            <div style="width: 100%; max-width: 420px; padding: 10px 15px; padding-top: calc(10px + var(--safe-top)); background: linear-gradient(180deg, rgba(0,0,0,0.9), rgba(0,0,0,0.5)); display: flex; justify-content: space-between; align-items: center; z-index: 100;">
+                <div style="display: flex; gap: 12px; align-items: center; font-size: 0.85rem;">
+                    <div>📦 적재 <span id="cg-count">${s.count}</span>/${s.maxCount}</div>
+                    <div id="cg-combo-wrap" style="color: #fff;">🔥 콤보 <span id="cg-combo">0</span></div>
+                </div>
+                <div style="display: flex; gap: 12px; align-items: center; font-size: 0.85rem;">
+                    <div>⏱️ <span id="cg-time">${Math.floor(s.time / 60)}:${(s.time % 60).toString().padStart(2, '0')}</span></div>
+                    <div style="color: #44ff88;">⭐ <span id="cg-score">0</span>점</div>
+                </div>
             </div>
             
-            <!-- 타겟들 -->
-            <div style="position: absolute; top: ${targetY - 30}px; left: 0; right: 0; display: flex; justify-content: space-around; padding: 0 20px;">
-                ${s.targets.map(t => `
-                    <div id="target-${t.id}" style="width: ${t.w}px; height: ${t.h}px; background: ${t.color}; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; color: #fff; border: 3px solid rgba(255,255,255,0.3);">
-                        ${t.id === 'blue' ? '🔧 부품' : t.id === 'yellow' ? '🍎 식량' : '☢️ 위험'}
+            <!-- 게임 캔버스 -->
+            <div id="cargo-canvas-wrap" style="flex: 1; width: 100%; max-width: 420px; position: relative;"></div>
+            
+            <!-- 하단 컨트롤 -->
+            <div style="width: 100%; max-width: 420px; padding: 15px; padding-bottom: calc(15px + var(--safe-bottom)); background: rgba(0,0,0,0.9);">
+                <!-- 현재/다음 화물 -->
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <div style="font-size: 2.5rem;" id="cg-current-emoji">${s.currentCargo?.emoji || '📦'}</div>
+                        <div>
+                            <div style="font-size: 0.9rem; color: #fff; font-weight: bold;" id="cg-target-hint">→ 🟦 부품함</div>
+                            <div style="font-size: 0.7rem; color: #888;">다음: <span id="cg-next-emoji">${s.nextCargo?.emoji || '🔧'}</span></div>
+                        </div>
                     </div>
-                `).join('')}
+                    <button id="btn-quit-cargo" style="background: rgba(255,100,100,0.3); border: 1px solid rgba(255,100,100,0.5); border-radius: 8px; padding: 6px 12px; color: #fff; font-size: 0.75rem;">✕ 포기</button>
+                </div>
+                
+                <!-- 안내 텍스트 -->
+                <div id="cg-instruction" style="text-align: center; font-size: 1rem; color: #ffd700; margin-bottom: 12px; font-weight: bold;">
+                    🎯 초록 구간에 맞춰 터치!
+                </div>
+                
+                <!-- 발사 버튼 -->
+                <button id="btn-cargo-action" style="width: 100%; padding: 18px; font-size: 1.3rem; font-weight: bold; background: linear-gradient(135deg, #4488ff, #2266dd); border: none; border-radius: 16px; color: #fff; cursor: pointer; box-shadow: 0 4px 20px rgba(68,136,255,0.5); transition: transform 0.1s;">
+                    🎯 각도 고정!
+                </button>
             </div>
-            
-            <!-- 궤적 표시 -->
-            <canvas id="cargo-canvas" width="${w}" height="${h}" style="position: absolute; top: 0; left: 0; pointer-events: none;"></canvas>
-            
-            <!-- 현재 화물 -->
-            <div id="current-cargo" style="position: absolute; bottom: 150px; left: 50%; transform: translateX(-50%); font-size: 3rem; cursor: grab;">
-                ${s.currentCargo?.emoji || '📦'}
-            </div>
-            
-            <!-- 다음 화물 -->
-            <div style="position: absolute; bottom: 80px; left: 50%; transform: translateX(-50%); font-size: 0.8rem; color: #888;">
-                다음: <span id="next-cargo">🔧</span> → <span id="next-target" style="color: #3b82f6;">🟦</span>
-            </div>
-            
-            <!-- 나가기 버튼 -->
-            <button id="btn-quit-cargo" style="position: fixed; top: calc(60px + var(--safe-top)); right: 10px; background: rgba(255,0,0,0.3); border: 1px solid rgba(255,0,0,0.5); border-radius: 8px; padding: 8px 12px; color: #fff; font-size: 0.8rem; z-index: 100;">✕ 포기</button>
         </div>
     `;
     
-    setupCargoControls();
+    setupCargoControlsCG();
 }
 
-function setupCargoControls() {
-    const cargoEl = document.getElementById('current-cargo');
-    const canvas = document.getElementById('cargo-canvas');
-    const ctx = canvas.getContext('2d');
+function initCargoPixi() {
+    const s = cargoState;
+    const wrap = document.getElementById('cargo-canvas-wrap');
+    s.gameW = wrap.clientWidth;
+    s.gameH = wrap.clientHeight;
     
-    let startPos = null;
+    cargoApp = new PIXI.Application({
+        width: s.gameW,
+        height: s.gameH,
+        backgroundColor: 0x05051a,
+        antialias: true
+    });
+    wrap.appendChild(cargoApp.view);
     
-    const handleStart = (e) => {
-        e.preventDefault();
-        const touch = e.touches ? e.touches[0] : e;
-        startPos = { x: touch.clientX, y: touch.clientY };
-        cargoState.dragging = true;
-        cargoEl.style.cursor = 'grabbing';
-    };
+    // 배경 컨테이너
+    s.bgContainer = new PIXI.Container();
+    cargoApp.stage.addChild(s.bgContainer);
+    createCargoBgCG();
     
-    const handleMove = (e) => {
-        if (!cargoState.dragging || !startPos) return;
-        e.preventDefault();
-        
-        const touch = e.touches ? e.touches[0] : e;
-        const endPos = { x: touch.clientX, y: touch.clientY };
-        
-        // 궤적 그리기
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        
-        // 드래그 거리에 따른 궤적 표시 (튜토리얼용)
-        const showGuide = cargoState.count < 10;
-        if (showGuide) {
-            drawTrajectory(ctx, startPos, endPos, 0.8);
-        } else if (cargoState.count < 15) {
-            drawTrajectory(ctx, startPos, endPos, 0.4);
-        } else if (cargoState.count < 20) {
-            drawTrajectory(ctx, startPos, endPos, 0.2);
-        }
-        
-        cargoState.dragEnd = endPos;
-    };
+    // 타겟 컨테이너
+    s.targetContainer = new PIXI.Container();
+    cargoApp.stage.addChild(s.targetContainer);
+    createCargoTargetsCG();
     
-    const handleEnd = (e) => {
-        if (!cargoState.dragging || !startPos) return;
-        cargoState.dragging = false;
-        cargoEl.style.cursor = 'grab';
-        
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        
-        if (cargoState.dragEnd) {
-            throwCargo(startPos, cargoState.dragEnd);
-        }
-        
-        startPos = null;
-        cargoState.dragEnd = null;
-    };
+    // 궤적
+    s.trajectoryGraphics = new PIXI.Graphics();
+    cargoApp.stage.addChild(s.trajectoryGraphics);
     
-    cargoEl.addEventListener('mousedown', handleStart);
-    cargoEl.addEventListener('touchstart', handleStart, { passive: false });
-    document.addEventListener('mousemove', handleMove);
-    document.addEventListener('touchmove', handleMove, { passive: false });
-    document.addEventListener('mouseup', handleEnd);
-    document.addEventListener('touchend', handleEnd);
+    // 파티클
+    s.particleContainer = new PIXI.Container();
+    cargoApp.stage.addChild(s.particleContainer);
     
-    document.getElementById('btn-quit-cargo').onclick = () => {
-        if (confirm('정말 포기하시겠습니까?')) {
-            endCargoGame(false);
-        }
-    };
+    // 플레이어
+    s.playerContainer = new PIXI.Container();
+    cargoApp.stage.addChild(s.playerContainer);
+    createCargoPlayerCG();
+    
+    // 게이지 UI
+    s.gaugeContainer = new PIXI.Container();
+    cargoApp.stage.addChild(s.gaugeContainer);
+    createGaugesCG();
+    
+    // 타이머
+    s.timerInterval = setInterval(() => {
+        if (s.gameOver) return;
+        s.time--;
+        updateCargoHUDCG();
+        if (s.time <= 0) endCargoGame(false);
+    }, 1000);
+    
+    // 게임 루프
+    cargoApp.ticker.add(cargoGameLoopCG);
 }
 
-function drawTrajectory(ctx, start, end, alpha) {
-    const dx = start.x - end.x;
-    const dy = start.y - end.y;
-    const power = Math.min(Math.sqrt(dx * dx + dy * dy), 200);
-    const angle = Math.atan2(dy, dx);
+function createCargoBgCG() {
+    const s = cargoState;
+    const bg = s.bgContainer;
     
-    ctx.strokeStyle = `rgba(255, 255, 255, ${alpha})`;
-    ctx.lineWidth = 2;
-    ctx.setLineDash([5, 5]);
-    ctx.beginPath();
+    // 우주 배경 그라데이션 (여러 레이어)
+    const spaceBg = new PIXI.Graphics();
     
-    const startX = window.innerWidth / 2;
-    const startY = window.innerHeight - 150;
+    // 깊은 우주 배경
+    spaceBg.beginFill(0x05051a);
+    spaceBg.drawRect(0, 0, s.gameW, s.gameH);
+    spaceBg.endFill();
     
-    for (let t = 0; t < 1; t += 0.05) {
-        const x = startX + Math.cos(angle) * power * 2 * t;
-        const y = startY + Math.sin(angle) * power * 2 * t + 0.5 * 500 * t * t;
+    // 은하수 효과 (여러 개)
+    spaceBg.beginFill(0x1a1a5a, 0.25);
+    spaceBg.drawEllipse(s.gameW * 0.6, s.gameH * 0.25, s.gameW * 0.6, 70);
+    spaceBg.endFill();
+    
+    spaceBg.beginFill(0x2a1a4a, 0.2);
+    spaceBg.drawEllipse(s.gameW * 0.3, s.gameH * 0.4, s.gameW * 0.4, 40);
+    spaceBg.endFill();
+    
+    // 성운 효과 (다양한 색상)
+    spaceBg.beginFill(0x4a1a6a, 0.12);
+    spaceBg.drawEllipse(s.gameW * 0.15, s.gameH * 0.15, 90, 60);
+    spaceBg.endFill();
+    
+    spaceBg.beginFill(0x1a4a6a, 0.1);
+    spaceBg.drawEllipse(s.gameW * 0.8, s.gameH * 0.35, 70, 45);
+    spaceBg.endFill();
+    
+    spaceBg.beginFill(0x6a3a4a, 0.08);
+    spaceBg.drawEllipse(s.gameW * 0.5, s.gameH * 0.5, 100, 50);
+    spaceBg.endFill();
+    
+    bg.addChild(spaceBg);
+    
+    // 반짝이는 별들 (다양한 크기와 색상)
+    for (let i = 0; i < 120; i++) {
+        const star = new PIXI.Graphics();
+        const size = 0.5 + Math.random() * 2.5;
+        const brightness = 0.4 + Math.random() * 0.6;
         
-        if (t === 0) ctx.moveTo(x, y);
-        else ctx.lineTo(x, y);
+        // 별 색상 다양화
+        const colors = [0xffffff, 0xffffee, 0xeeeeff, 0xffeedd, 0xddeeff, 0xffddff];
+        const color = colors[Math.floor(Math.random() * colors.length)];
         
-        if (y < 0 || y > window.innerHeight) break;
+        star.beginFill(color, brightness);
+        star.drawCircle(0, 0, size);
+        star.endFill();
+        
+        // 큰 별은 글로우 효과
+        if (size > 1.8) {
+            star.beginFill(color, 0.2);
+            star.drawCircle(0, 0, size * 2);
+            star.endFill();
+        }
+        
+        star.x = Math.random() * s.gameW;
+        star.y = Math.random() * (s.gameH * 0.58);
+        star.baseAlpha = brightness;
+        star.twinkleSpeed = 0.03 + Math.random() * 0.06;
+        star.twinkleOffset = Math.random() * Math.PI * 2;
+        
+        bg.addChild(star);
+        s.stars.push(star);
     }
     
-    ctx.stroke();
-    ctx.setLineDash([]);
+    // 큰 빛나는 별 (십자형 + 글로우)
+    for (let i = 0; i < 8; i++) {
+        const bigStar = new PIXI.Graphics();
+        const x = 25 + Math.random() * (s.gameW - 50);
+        const y = 25 + Math.random() * (s.gameH * 0.45);
+        const len = 8 + Math.random() * 12;
+        
+        // 글로우 효과
+        bigStar.beginFill(0xffffff, 0.15);
+        bigStar.drawCircle(x, y, len * 1.5);
+        bigStar.endFill();
+        
+        // 광선 효과
+        bigStar.lineStyle(2, 0xffffff, 0.8);
+        bigStar.moveTo(x - len, y); bigStar.lineTo(x + len, y);
+        bigStar.moveTo(x, y - len); bigStar.lineTo(x, y + len);
+        
+        // 대각선
+        bigStar.lineStyle(1.5, 0xffffff, 0.5);
+        const diagLen = len * 0.6;
+        bigStar.moveTo(x - diagLen, y - diagLen); bigStar.lineTo(x + diagLen, y + diagLen);
+        bigStar.moveTo(x + diagLen, y - diagLen); bigStar.lineTo(x - diagLen, y + diagLen);
+        
+        // 중심
+        bigStar.beginFill(0xffffff, 1);
+        bigStar.drawCircle(x, y, 3);
+        bigStar.endFill();
+        
+        bg.addChild(bigStar);
+    }
+    
+    // 행성 (더 디테일하게)
+    const planet = new PIXI.Graphics();
+    const px = s.gameW * 0.88, py = s.gameH * 0.13;
+    
+    // 행성 그림자
+    planet.beginFill(0x331144, 0.5);
+    planet.drawCircle(px + 3, py + 3, 24);
+    planet.endFill();
+    
+    // 행성 본체
+    planet.beginFill(0x6644aa);
+    planet.drawCircle(px, py, 24);
+    planet.endFill();
+    
+    // 행성 무늬
+    planet.beginFill(0x5533aa, 0.6);
+    planet.drawEllipse(px - 5, py + 5, 15, 8);
+    planet.endFill();
+    
+    // 하이라이트
+    planet.beginFill(0xaa88dd, 0.6);
+    planet.drawCircle(px - 8, py - 8, 10);
+    planet.endFill();
+    planet.beginFill(0xffffff, 0.3);
+    planet.drawCircle(px - 10, py - 10, 5);
+    planet.endFill();
+    
+    // 고리 (그라데이션 효과)
+    planet.lineStyle(4, 0x9988cc, 0.4);
+    planet.drawEllipse(px, py, 42, 10);
+    planet.lineStyle(2, 0xbbaadd, 0.6);
+    planet.drawEllipse(px, py, 38, 8);
+    
+    bg.addChild(planet);
+    
+    // 작은 행성/달
+    const moon = new PIXI.Graphics();
+    moon.beginFill(0x888899, 0.7);
+    moon.drawCircle(s.gameW * 0.12, s.gameH * 0.25, 12);
+    moon.endFill();
+    moon.beginFill(0xaaaaaa, 0.4);
+    moon.drawCircle(s.gameW * 0.12 - 3, s.gameH * 0.25 - 3, 6);
+    moon.endFill();
+    // 크레이터
+    moon.beginFill(0x666677, 0.5);
+    moon.drawCircle(s.gameW * 0.12 + 3, s.gameH * 0.25 + 2, 3);
+    moon.drawCircle(s.gameW * 0.12 - 2, s.gameH * 0.25 + 4, 2);
+    moon.endFill();
+    bg.addChild(moon);
+    
+    // 우주선 바닥 (화물창) - 더 디테일하게
+    const floor = new PIXI.Graphics();
+    
+    // 메인 바닥 (그라데이션 느낌)
+    floor.beginFill(0x1a1a3a);
+    floor.drawRect(0, s.gameH - 100, s.gameW, 100);
+    floor.endFill();
+    
+    floor.beginFill(0x252545);
+    floor.drawRect(0, s.gameH - 100, s.gameW, 50);
+    floor.endFill();
+    
+    // 상단 하이라이트 (메탈릭)
+    floor.beginFill(0x4a4a7a);
+    floor.drawRect(0, s.gameH - 100, s.gameW, 6);
+    floor.endFill();
+    floor.beginFill(0x6a6a9a);
+    floor.drawRect(0, s.gameH - 100, s.gameW, 2);
+    floor.endFill();
+    
+    // 격자 패턴 (더 섬세하게)
+    floor.lineStyle(1, 0x3a3a6a, 0.4);
+    for (let i = 0; i < s.gameW; i += 20) {
+        floor.moveTo(i, s.gameH - 94);
+        floor.lineTo(i, s.gameH);
+    }
+    for (let j = s.gameH - 80; j < s.gameH; j += 15) {
+        floor.moveTo(0, j);
+        floor.lineTo(s.gameW, j);
+    }
+    
+    // 바닥 장식 패널들
+    floor.beginFill(0x3a3a6a);
+    floor.drawRoundedRect(10, s.gameH - 92, 60, 12, 4);
+    floor.drawRoundedRect(s.gameW - 70, s.gameH - 92, 60, 12, 4);
+    floor.endFill();
+    
+    // 환기구/장식
+    floor.beginFill(0x2a2a5a);
+    floor.drawRoundedRect(s.gameW/2 - 40, s.gameH - 90, 80, 8, 3);
+    floor.endFill();
+    floor.lineStyle(1, 0x4a4a7a);
+    for (let i = 0; i < 7; i++) {
+        floor.moveTo(s.gameW/2 - 35 + i * 11, s.gameH - 88);
+        floor.lineTo(s.gameW/2 - 35 + i * 11, s.gameH - 84);
+    }
+    
+    // 코너 조명
+    floor.beginFill(0x88ff88, 0.3);
+    floor.drawCircle(15, s.gameH - 85, 4);
+    floor.drawCircle(s.gameW - 15, s.gameH - 85, 4);
+    floor.endFill();
+    
+    bg.addChild(floor);
 }
 
-function throwCargo(start, end) {
-    const dx = start.x - end.x;
-    const dy = start.y - end.y;
-    const power = Math.min(Math.sqrt(dx * dx + dy * dy), 200);
-    const angle = Math.atan2(dy, dx);
+function createCargoTargetsCG() {
+    const s = cargoState;
+    const targetY = 80;
+    const targetW = 75;
+    const targetH = 60;
+    const gap = (s.gameW - targetW * 3) / 4;
     
-    // 던지기 애니메이션
-    const cargoEl = document.getElementById('current-cargo');
-    const startX = window.innerWidth / 2;
-    const startY = window.innerHeight - 150;
+    s.targets = [
+        { id: 'blue', x: gap + targetW/2, y: targetY, w: targetW, h: targetH, 
+          color: 0x3b82f6, darkColor: 0x1e40af, lightColor: 0x60a5fa, label: '🔧', name: '부품함' },
+        { id: 'yellow', x: gap * 2 + targetW * 1.5, y: targetY, w: targetW, h: targetH, 
+          color: 0xeab308, darkColor: 0xa16207, lightColor: 0xfacc15, label: '🍎', name: '식량함' },
+        { id: 'red', x: gap * 3 + targetW * 2.5, y: targetY, w: targetW, h: targetH, 
+          color: 0xef4444, darkColor: 0xb91c1c, lightColor: 0xf87171, label: '☢️', name: '위험함' }
+    ];
     
-    let t = 0;
-    const gravity = 500;
-    const vx = Math.cos(angle) * power * 2;
-    const vy = Math.sin(angle) * power * 2;
-    
-    const animInterval = setInterval(() => {
-        t += 0.02;
-        const x = startX + vx * t;
-        const y = startY + vy * t + 0.5 * gravity * t * t;
+    s.targets.forEach(t => {
+        const container = new PIXI.Container();
+        container.x = t.x;
+        container.y = t.y;
         
-        cargoEl.style.left = x + 'px';
-        cargoEl.style.top = y + 'px';
-        cargoEl.style.transform = 'translate(-50%, -50%)';
+        // 글로우 효과
+        const glow = new PIXI.Graphics();
+        glow.beginFill(t.color, 0.15);
+        glow.drawRoundedRect(-t.w/2 - 8, -t.h/2 - 8, t.w + 16, t.h + 16, 18);
+        glow.endFill();
+        container.addChild(glow);
         
-        // 타겟 충돌 체크
-        for (const target of cargoState.targets) {
-            if (x > target.x - target.w/2 && x < target.x + target.w/2 &&
-                y > target.y - target.h/2 && y < target.y + target.h/2) {
-                clearInterval(animInterval);
-                checkCargoHit(target);
+        // 그림자
+        const shadow = new PIXI.Graphics();
+        shadow.beginFill(0x000000, 0.4);
+        shadow.drawRoundedRect(-t.w/2 + 6, -t.h/2 + 8, t.w, t.h, 14);
+        shadow.endFill();
+        container.addChild(shadow);
+        
+        // 박스 뒷면 (3D 깊이감)
+        const boxBack = new PIXI.Graphics();
+        boxBack.beginFill(t.darkColor);
+        boxBack.drawRoundedRect(-t.w/2 + 4, -t.h/2 + 4, t.w, t.h, 14);
+        boxBack.endFill();
+        container.addChild(boxBack);
+        
+        // 박스 본체
+        const box = new PIXI.Graphics();
+        
+        // 메인 박스
+        box.beginFill(t.color);
+        box.drawRoundedRect(-t.w/2, -t.h/2, t.w, t.h, 14);
+        box.endFill();
+        
+        // 상단 밝은 부분
+        box.beginFill(t.lightColor, 0.4);
+        box.drawRoundedRect(-t.w/2 + 4, -t.h/2 + 4, t.w - 8, t.h/3, 8);
+        box.endFill();
+        
+        // 최상단 하이라이트
+        box.beginFill(0xffffff, 0.35);
+        box.drawRoundedRect(-t.w/2 + 6, -t.h/2 + 6, t.w - 12, 12, 6);
+        box.endFill();
+        
+        // 테두리 (메탈릭)
+        box.lineStyle(3, 0xffffff, 0.4);
+        box.drawRoundedRect(-t.w/2, -t.h/2, t.w, t.h, 14);
+        box.lineStyle(2, t.lightColor, 0.6);
+        box.drawRoundedRect(-t.w/2 + 2, -t.h/2 + 2, t.w - 4, t.h - 4, 12);
+        
+        // 금속 볼트
+        const boltPositions = [
+            [-t.w/2 + 10, -t.h/2 + 10],
+            [t.w/2 - 10, -t.h/2 + 10],
+            [-t.w/2 + 10, t.h/2 - 10],
+            [t.w/2 - 10, t.h/2 - 10]
+        ];
+        boltPositions.forEach(([bx, by]) => {
+            box.beginFill(0xcccccc, 0.9);
+            box.drawCircle(bx, by, 5);
+            box.endFill();
+            box.beginFill(0x666666, 0.8);
+            box.drawCircle(bx, by, 2.5);
+            box.endFill();
+            box.lineStyle(1.5, 0x444444, 0.8);
+            box.moveTo(bx - 2, by); box.lineTo(bx + 2, by);
+            box.moveTo(bx, by - 2); box.lineTo(bx, by + 2);
+        });
+        
+        // 중앙 장식 라인
+        box.lineStyle(2, t.darkColor, 0.4);
+        box.moveTo(-t.w/2 + 15, 0);
+        box.lineTo(t.w/2 - 15, 0);
+        
+        container.addChild(box);
+        
+        // 라벨 (이모지)
+        const label = new PIXI.Text(t.label, { fontSize: 28 });
+        label.anchor.set(0.5);
+        label.y = -2;
+        container.addChild(label);
+        
+        // 이름 라벨 배경
+        const nameBg = new PIXI.Graphics();
+        nameBg.beginFill(0x000000, 0.5);
+        nameBg.drawRoundedRect(-25, t.h/2 + 6, 50, 16, 6);
+        nameBg.endFill();
+        container.addChild(nameBg);
+        
+        const nameLabel = new PIXI.Text(t.name, {
+            fontSize: 10,
+            fill: 0xffffff,
+            fontWeight: 'bold'
+        });
+        nameLabel.anchor.set(0.5);
+        nameLabel.y = t.h/2 + 14;
+        container.addChild(nameLabel);
+        
+        t.sprite = container;
+        s.targetContainer.addChild(container);
+    });
+}
+
+function createCargoPlayerCG() {
+    const s = cargoState;
+    const container = s.playerContainer;
+    container.x = s.gameW / 2;  // 가운데 배치
+    container.y = s.gameH - 125;
+    
+    // 크리처 그래픽
+    const creatureG = new PIXI.Graphics();
+    
+    if (GameState.creature) {
+        // 실제 크리처를 정확히 그리기
+        const evolved = evolveCreatureByLevel(GameState.creature, 5);
+        drawCreature(creatureG, evolved, 0, 0, 28, Date.now() * 0.001);
+    } else {
+        // 기본 크리처
+        creatureG.beginFill(0x4fc3f7);
+        creatureG.drawEllipse(0, 0, 20, 26);
+        creatureG.endFill();
+        
+        // 하이라이트
+        creatureG.beginFill(0xffffff, 0.2);
+        creatureG.drawEllipse(-5, -5, 8, 12);
+        creatureG.endFill();
+        
+        // 눈
+        creatureG.beginFill(0xffffff);
+        creatureG.drawEllipse(-6, -8, 7, 8);
+        creatureG.drawEllipse(6, -8, 7, 8);
+        creatureG.endFill();
+        creatureG.beginFill(0x000000);
+        creatureG.drawCircle(-4, -8, 4);
+        creatureG.drawCircle(8, -8, 4);
+        creatureG.endFill();
+        creatureG.beginFill(0xffffff);
+        creatureG.drawCircle(-6, -10, 2);
+        creatureG.drawCircle(6, -10, 2);
+        creatureG.endFill();
+    }
+    
+    container.addChild(creatureG);
+    s.creatureGraphic = creatureG;
+    
+    // 손에 들고 있는 화물
+    s.holdingCargo = new PIXI.Container();
+    s.holdingCargo.x = 38;
+    s.holdingCargo.y = -8;
+    updateHoldingCargoCG();
+    container.addChild(s.holdingCargo);
+    
+    s.playerSprite = container;
+}
+
+function createGaugesCG() {
+    const s = cargoState;
+    const g = s.gaugeContainer;
+    
+    // === 각도 게이지 (호 형태) - 왼쪽에 배치 ===
+    const gaugeCenterX = 55;
+    const gaugeCenterY = s.gameH - 125;
+    s.gaugeCenterX = gaugeCenterX;
+    s.gaugeCenterY = gaugeCenterY;
+    
+    // 배경 호
+    s.angleGaugeBg = new PIXI.Graphics();
+    s.angleGaugeBg.lineStyle(12, 0x222244, 0.8);
+    s.angleGaugeBg.arc(gaugeCenterX, gaugeCenterY, 80, -Math.PI * 0.85, -Math.PI * 0.15, false);
+    g.addChild(s.angleGaugeBg);
+    
+    // 각도 정답 구간 (초록색) - 동적으로 업데이트됨
+    s.anglePerfectZone = new PIXI.Graphics();
+    g.addChild(s.anglePerfectZone);
+    
+    // 각도 인디케이터
+    s.angleIndicator = new PIXI.Graphics();
+    g.addChild(s.angleIndicator);
+    
+    // === 파워 게이지 (세로 바) ===
+    // 배경
+    s.powerGaugeBg = new PIXI.Graphics();
+    s.powerGaugeBg.beginFill(0x222244, 0.8);
+    s.powerGaugeBg.drawRoundedRect(s.gameW - 45, 110, 30, 180, 10);
+    s.powerGaugeBg.endFill();
+    // 테두리
+    s.powerGaugeBg.lineStyle(2, 0x444466, 0.8);
+    s.powerGaugeBg.drawRoundedRect(s.gameW - 45, 110, 30, 180, 10);
+    g.addChild(s.powerGaugeBg);
+    
+    // 파워 정답 구간 (초록색) - 동적으로 업데이트됨
+    s.powerPerfectZone = new PIXI.Graphics();
+    g.addChild(s.powerPerfectZone);
+    
+    // 파워 바 (채워지는 부분)
+    s.powerBar = new PIXI.Graphics();
+    g.addChild(s.powerBar);
+    
+    // 파워 인디케이터 (화살표)
+    s.powerIndicator = new PIXI.Graphics();
+    g.addChild(s.powerIndicator);
+    
+    // 라벨
+    const angleLabel = new PIXI.Text('각도', { fontSize: 12, fill: 0x88aaff, fontWeight: 'bold' });
+    angleLabel.x = 28; angleLabel.y = s.gameH - 45;
+    g.addChild(angleLabel);
+    
+    const powerLabel = new PIXI.Text('파워', { fontSize: 12, fill: 0xffaa88, fontWeight: 'bold' });
+    powerLabel.x = s.gameW - 50; powerLabel.y = 295;
+    g.addChild(powerLabel);
+    
+    // 정답 구간 업데이트
+    updatePerfectZones();
+    updateGaugesCG();
+}
+
+function updatePerfectZones() {
+    const s = cargoState;
+    const cx = s.gaugeCenterX || 55;
+    const cy = s.gaugeCenterY || (s.gameH - 125);
+    
+    // 각도 정답 구간
+    if (s.anglePerfectZone) {
+        s.anglePerfectZone.clear();
+        s.anglePerfectZone.lineStyle(12, 0x44ff88, 0.7);
+        const startAngle = -Math.PI * 0.85 + (s.anglePerfectMin / 100) * Math.PI * 0.7;
+        const endAngle = -Math.PI * 0.85 + (s.anglePerfectMax / 100) * Math.PI * 0.7;
+        s.anglePerfectZone.arc(cx, cy, 80, startAngle, endAngle, false);
+    }
+    
+    // 파워 정답 구간
+    if (s.powerPerfectZone) {
+        s.powerPerfectZone.clear();
+        s.powerPerfectZone.beginFill(0x44ff88, 0.6);
+        const barHeight = 170;
+        const topY = 285 - (s.powerPerfectMax / 100) * barHeight;
+        const height = ((s.powerPerfectMax - s.powerPerfectMin) / 100) * barHeight;
+        s.powerPerfectZone.drawRoundedRect(s.gameW - 43, topY, 26, height, 5);
+        s.powerPerfectZone.endFill();
+    }
+}
+
+function updateGaugesCG() {
+    const s = cargoState;
+    const cx = s.gaugeCenterX || 55;
+    const cy = s.gaugeCenterY || (s.gameH - 125);
+    
+    // 각도 인디케이터
+    if (s.angleIndicator) {
+        s.angleIndicator.clear();
+        const angleRad = -Math.PI * 0.85 + (s.angleValue / 100) * Math.PI * 0.7;
+        const r = 80;
+        
+        // 현재 각도 선
+        const color = s.angleLocked ? 0x44ff88 : 0xffff00;
+        s.angleIndicator.lineStyle(5, color, 1);
+        s.angleIndicator.moveTo(cx, cy);
+        s.angleIndicator.lineTo(cx + Math.cos(angleRad) * r, cy + Math.sin(angleRad) * r);
+        
+        // 끝 원
+        s.angleIndicator.beginFill(color);
+        s.angleIndicator.drawCircle(cx + Math.cos(angleRad) * r, cy + Math.sin(angleRad) * r, 12);
+        s.angleIndicator.endFill();
+        
+        // 끝 원 테두리
+        s.angleIndicator.lineStyle(2, 0xffffff, 0.8);
+        s.angleIndicator.drawCircle(cx + Math.cos(angleRad) * r, cy + Math.sin(angleRad) * r, 12);
+        
+        // 중심 원
+        s.angleIndicator.beginFill(0x333355);
+        s.angleIndicator.lineStyle(2, 0x555577);
+        s.angleIndicator.drawCircle(cx, cy, 10);
+        s.angleIndicator.endFill();
+    }
+    
+    // 파워 바 (power 페이즈에서만)
+    if (s.powerBar && (s.phase === 'power' || s.phase === 'throwing')) {
+        s.powerBar.clear();
+        const barH = (s.powerValue / 100) * 170;
+        const color = s.powerLocked ? 0x44ff88 : 0xff8844;
+        s.powerBar.beginFill(color, 0.9);
+        s.powerBar.drawRoundedRect(s.gameW - 43, 285 - barH, 26, barH, 5);
+        s.powerBar.endFill();
+    }
+    
+    // 파워 인디케이터 화살표
+    if (s.powerIndicator && (s.phase === 'power' || s.phase === 'throwing')) {
+        s.powerIndicator.clear();
+        const indY = 285 - (s.powerValue / 100) * 170;
+        s.powerIndicator.beginFill(0xffffff);
+        s.powerIndicator.moveTo(s.gameW - 50, indY);
+        s.powerIndicator.lineTo(s.gameW - 62, indY - 10);
+        s.powerIndicator.lineTo(s.gameW - 62, indY + 10);
+        s.powerIndicator.endFill();
+    }
+}
+
+function setupCargoControlsCG() {
+    const s = cargoState;
+    
+    const actionBtn = document.getElementById('btn-cargo-action');
+    actionBtn.onclick = () => {
+        if (s.gameOver || s.throwing) return;
+        
+        if (s.phase === 'angle') {
+            s.angleLocked = true;
+            s.phase = 'power';
+            
+            // 퍼펙트 체크
+            const isPerfect = s.angleValue >= s.anglePerfectMin && s.angleValue <= s.anglePerfectMax;
+            if (isPerfect) {
+                createPerfectEffectCG(55, s.gameH - 125);
+                s.perfectCount++;
+            }
+            
+            actionBtn.textContent = '💪 파워 고정!';
+            actionBtn.style.background = 'linear-gradient(135deg, #ff8844, #dd6622)';
+            document.getElementById('cg-instruction').textContent = '💪 초록 구간에 맞춰 터치!';
+            
+        } else if (s.phase === 'power') {
+            s.powerLocked = true;
+            
+            // 퍼펙트 체크
+            const isPerfect = s.powerValue >= s.powerPerfectMin && s.powerValue <= s.powerPerfectMax;
+            if (isPerfect) {
+                createPerfectEffectCG(s.gameW - 30, 200);
+                s.perfectCount++;
+            }
+            
+            s.phase = 'throwing';
+            throwCargoCG();
+            
+            actionBtn.disabled = true;
+            actionBtn.style.opacity = '0.5';
+            document.getElementById('cg-instruction').textContent = '🚀 발사!';
+        }
+    };
+    
+    document.getElementById('btn-quit-cargo').onclick = () => {
+        if (confirm('포기하시겠습니까?\n현재까지 번 점수의 50%를 받습니다.')) {
+            endCargoGame(false, true);
+        }
+    };
+    
+    updateCargoHintCG();
+}
+
+function throwCargoCG() {
+    const s = cargoState;
+    s.throwing = true;
+    
+    // 플레이어 애니메이션
+    if (s.playerSprite) {
+        s.playerSprite.rotation = -0.3;
+    }
+    
+    // 화물 스프라이트 생성
+    const cargo = new PIXI.Container();
+    
+    // 박스 그림자
+    const boxShadow = new PIXI.Graphics();
+    boxShadow.beginFill(0x000000, 0.3);
+    boxShadow.drawRoundedRect(-13, -13, 30, 30, 5);
+    boxShadow.endFill();
+    cargo.addChild(boxShadow);
+    
+    // 박스 본체
+    const box = new PIXI.Graphics();
+    box.beginFill(s.currentCargo?.color || 0x888888);
+    box.lineStyle(2, 0xffffff, 0.6);
+    box.drawRoundedRect(-15, -15, 30, 30, 6);
+    box.endFill();
+    // 하이라이트
+    box.beginFill(0xffffff, 0.25);
+    box.drawRoundedRect(-12, -12, 24, 10, 3);
+    box.endFill();
+    cargo.addChild(box);
+    
+    const emoji = new PIXI.Text(s.currentCargo?.emoji || '📦', { fontSize: 18 });
+    emoji.anchor.set(0.5);
+    cargo.addChild(emoji);
+    
+    // 가운데에서 시작
+    s.throwStartX = s.gameW / 2 + 30;
+    s.throwStartY = s.gameH - 133;
+    cargo.x = s.throwStartX;
+    cargo.y = s.throwStartY;
+    cargoApp.stage.addChild(cargo);
+    s.cargoSprite = cargo;
+    
+    // 손에 든 화물 숨기기
+    if (s.holdingCargo) s.holdingCargo.visible = false;
+    
+    // 속도 계산
+    const angleRad = -Math.PI * 0.85 + (s.angleValue / 100) * Math.PI * 0.7;
+    const power = 280 + s.powerValue * 5;
+    s.throwVx = Math.cos(angleRad) * power;
+    s.throwVy = Math.sin(angleRad) * power;
+    s.throwTime = 0;
+    
+    // 발사 이펙트
+    createThrowEffectCG(cargo.x, cargo.y);
+}
+
+function createThrowEffectCG(x, y) {
+    const s = cargoState;
+    for (let i = 0; i < 25; i++) {
+        const p = new PIXI.Graphics();
+        const colors = [0xffffff, 0xffff88, 0x88ffff, 0xff88ff, 0x88ff88];
+        p.beginFill(colors[Math.floor(Math.random() * colors.length)]);
+        
+        if (Math.random() > 0.6) {
+            drawStar(p, 0, 0, 5, 3 + Math.random() * 4, 1.5);
+        } else {
+            p.drawCircle(0, 0, 2 + Math.random() * 4);
+        }
+        p.endFill();
+        p.x = x; p.y = y;
+        p.vx = (Math.random() - 0.5) * 14;
+        p.vy = (Math.random() - 0.5) * 14;
+        p.life = 40;
+        s.particleContainer.addChild(p);
+        s.particles.push(p);
+    }
+}
+
+function createPerfectEffectCG(x, y) {
+    const s = cargoState;
+    
+    // PERFECT 텍스트
+    const text = new PIXI.Text('PERFECT!', {
+        fontSize: 24,
+        fill: 0xffd700,
+        fontWeight: 'bold',
+        stroke: 0x000000,
+        strokeThickness: 4
+    });
+    text.anchor.set(0.5);
+    text.x = x; text.y = y - 30;
+    text.vy = -2; text.life = 55;
+    text.isText = true; text.vx = 0;
+    s.particleContainer.addChild(text);
+    s.particles.push(text);
+    
+    // 별 파티클
+    for (let i = 0; i < 15; i++) {
+        const p = new PIXI.Graphics();
+        p.beginFill(0xffd700);
+        drawStar(p, 0, 0, 5, 7, 3);
+        p.endFill();
+        p.x = x; p.y = y;
+        const angle = (i / 15) * Math.PI * 2;
+        p.vx = Math.cos(angle) * 6;
+        p.vy = Math.sin(angle) * 6;
+        p.life = 45;
+        s.particleContainer.addChild(p);
+        s.particles.push(p);
+    }
+    
+    // 충격파
+    const ring = new PIXI.Graphics();
+    ring.lineStyle(4, 0xffd700, 0.9);
+    ring.drawCircle(0, 0, 15);
+    ring.x = x; ring.y = y;
+    ring.life = 35; ring.isRing = true; ring.vx = 0; ring.vy = 0;
+    s.particleContainer.addChild(ring);
+    s.particles.push(ring);
+}
+
+function showCargoSpeechBubble(text) {
+    const s = cargoState;
+    if (s.speechBubble) {
+        s.particleContainer.removeChild(s.speechBubble);
+    }
+    
+    const bubble = new PIXI.Container();
+    
+    // 말풍선 텍스트
+    const textObj = new PIXI.Text(text, {
+        fontSize: 16,
+        fill: 0x333333,
+        fontWeight: 'bold'
+    });
+    textObj.anchor.set(0.5);
+    
+    const padding = 16;
+    const bgWidth = textObj.width + padding * 2;
+    const bgHeight = textObj.height + padding * 2;
+    
+    // 말풍선 그림자
+    const shadow = new PIXI.Graphics();
+    shadow.beginFill(0x000000, 0.2);
+    shadow.drawRoundedRect(-bgWidth/2 + 3, -bgHeight/2 + 3, bgWidth, bgHeight, 15);
+    shadow.endFill();
+    bubble.addChild(shadow);
+    
+    // 말풍선 배경 (그라데이션 효과)
+    const bg = new PIXI.Graphics();
+    bg.beginFill(0xffffff);
+    bg.lineStyle(3, 0x88aaff, 0.6);
+    bg.drawRoundedRect(-bgWidth/2, -bgHeight/2, bgWidth, bgHeight, 15);
+    bg.endFill();
+    
+    // 상단 하이라이트
+    bg.beginFill(0xeeffff, 0.5);
+    bg.drawRoundedRect(-bgWidth/2 + 4, -bgHeight/2 + 4, bgWidth - 8, bgHeight/3, 10);
+    bg.endFill();
+    
+    // 꼬리
+    bg.beginFill(0xffffff);
+    bg.lineStyle(3, 0x88aaff, 0.6);
+    bg.moveTo(-10, bgHeight/2 - 3);
+    bg.lineTo(10, bgHeight/2 - 3);
+    bg.lineTo(0, bgHeight/2 + 15);
+    bg.closePath();
+    bg.endFill();
+    
+    bubble.addChild(bg);
+    bubble.addChild(textObj);
+    
+    // 캐릭터 위에 표시
+    bubble.x = s.gameW / 2;
+    bubble.y = s.gameH - 205;
+    bubble.life = 180;  // 100 -> 180 (약 2배)
+    bubble.isText = true;
+    bubble.isBubble = true;  // 말풍선 전용 플래그
+    bubble.vy = 0;
+    bubble.vx = 0;
+    
+    s.particleContainer.addChild(bubble);
+    s.speechBubble = bubble;
+    s.particles.push(bubble);
+}
+
+function cargoGameLoopCG(delta) {
+    const s = cargoState;
+    if (!s || s.gameOver) return;
+    
+    // 별 반짝임 (더 극적으로)
+    const time = Date.now() * 0.001;
+    s.stars.forEach(star => {
+        const twinkle = Math.sin(time * star.twinkleSpeed * 15 + star.twinkleOffset);
+        // 0.1 ~ 1.0 범위로 더 극적인 반짝임
+        star.alpha = star.baseAlpha * (0.15 + 0.85 * Math.abs(twinkle));
+        // 크기도 살짝 변화
+        const scaleVar = 1 + 0.2 * Math.abs(twinkle);
+        star.scale.set(scaleVar);
+    });
+    
+    // 게이지 애니메이션
+    if (s.phase === 'angle' && !s.angleLocked) {
+        s.angleValue += s.angleDir * s.angleSpeed * delta;
+        if (s.angleValue >= 100) { s.angleValue = 100; s.angleDir = -1; }
+        if (s.angleValue <= 0) { s.angleValue = 0; s.angleDir = 1; }
+    }
+    
+    if (s.phase === 'power' && !s.powerLocked) {
+        s.powerValue += s.powerDir * s.powerSpeed * delta;
+        if (s.powerValue >= 100) { s.powerValue = 100; s.powerDir = -1; }
+        if (s.powerValue <= 0) { s.powerValue = 0; s.powerDir = 1; }
+    }
+    
+    updateGaugesCG();
+    
+    // 던지기 물리
+    if (s.throwing && s.cargoSprite) {
+        const gravity = 500;
+        s.throwTime += delta / 60;
+        
+        const startX = s.throwStartX || (s.gameW / 2 + 30);
+        const startY = s.throwStartY || (s.gameH - 133);
+        const newX = startX + s.throwVx * s.throwTime;
+        const newY = startY + s.throwVy * s.throwTime + 0.5 * gravity * s.throwTime * s.throwTime;
+        
+        s.cargoSprite.x = newX;
+        s.cargoSprite.y = newY;
+        s.cargoSprite.rotation += 0.15 * delta;
+        
+        // 충돌 체크
+        for (const target of s.targets) {
+            if (newX > target.x - target.w/2 - 10 && newX < target.x + target.w/2 + 10 &&
+                newY > target.y - target.h/2 - 10 && newY < target.y + target.h/2 + 10) {
+                cargoHitCG(target);
                 return;
             }
         }
         
         // 화면 밖
-        if (y > window.innerHeight || y < 0 || x < 0 || x > window.innerWidth) {
-            clearInterval(animInterval);
-            cargoMiss();
+        if (newY > s.gameH || newX > s.gameW + 50 || newX < -50) {
+            cargoMissCG();
         }
-    }, 16);
+    }
+    
+    // 파티클
+    for (let i = s.particles.length - 1; i >= 0; i--) {
+        const p = s.particles[i];
+        p.x += p.vx || 0;
+        p.y += p.vy || 0;
+        if (!p.isText && !p.isRing) p.vy = (p.vy || 0) + 0.25;
+        
+        // 말풍선은 더 천천히 사라짐
+        if (p.isBubble) {
+            if (p.life < 30) p.alpha -= 0.03;  // 마지막 30프레임에서만 페이드아웃
+        } else {
+            p.alpha -= 0.018;
+        }
+        
+        p.life--;
+        if (p.isRing) { p.scale.x += 0.14; p.scale.y += 0.14; }
+        if (p.life <= 0 || p.alpha <= 0) {
+            s.particleContainer.removeChild(p);
+            s.particles.splice(i, 1);
+            if (p === s.speechBubble) s.speechBubble = null;
+        }
+    }
 }
 
-function checkCargoHit(target) {
-    const cargo = cargoState.currentCargo;
+function cargoHitCG(target) {
+    const s = cargoState;
+    const cargo = s.currentCargo;
     let points = 0;
     let success = false;
+    let quoteType = 'miss';
     
     if (cargo.target === 'any') {
-        // 아무 칸이나 OK
         points = cargo.points;
         success = true;
+        quoteType = s.perfectCount >= 2 ? 'perfect' : 'success';
     } else if (cargo.target === target.id) {
-        // 정확히 맞춤
         points = cargo.points;
         success = true;
+        s.combo++;
+        
+        if (s.perfectCount >= 2) {
+            quoteType = 'perfect';
+            points = Math.floor(points * 1.5);
+        } else if (s.combo >= 3) {
+            quoteType = 'combo';
+            points = Math.floor(points * 1.3);
+        } else {
+            quoteType = 'success';
+        }
+        
+        if (s.combo >= 5) points = Math.floor(points * 1.2);
     } else {
-        // 잘못된 칸
-        points = -5;
-        if (cargo.name === '위험물') points = -10;
+        points = -20;
+        s.combo = 0;
+        quoteType = 'wrongTarget';
     }
     
-    cargoState.score += points;
-    cargoState.count++;
+    s.score += points;
+    s.count++;
     
-    updateCargoUI(success, points);
+    createHitEffectCG(target.x, target.y, success, points);
     
-    if (cargoState.count >= cargoState.maxCount) {
-        endCargoGame(true);
+    // 대사 표시
+    let quote = getCargoQuote(quoteType);
+    if (quoteType === 'combo') {
+        quote = quote.replace('${combo}', s.combo);
+    }
+    showCargoSpeechBubble(quote);
+    
+    // 타겟 반응
+    if (target.sprite) {
+        target.sprite.scale.set(1.25);
+        setTimeout(() => { if (target.sprite) target.sprite.scale.set(1); }, 200);
+    }
+    
+    finishThrowCG();
+}
+
+function cargoMissCG() {
+    const s = cargoState;
+    s.score -= 15;
+    s.count++;
+    s.combo = 0;
+    
+    if (s.cargoSprite) {
+        createMissEffectCG(s.cargoSprite.x, Math.min(s.cargoSprite.y, s.gameH - 60));
+    }
+    
+    // 실패 대사
+    showCargoSpeechBubble(getCargoQuote('miss'));
+    
+    finishThrowCG();
+}
+
+function createHitEffectCG(x, y, success, points) {
+    const s = cargoState;
+    const colors = success ? [0x44ff88, 0xffff00, 0x88ffff, 0xff88ff] : [0xff6666, 0xff8888];
+    
+    for (let i = 0; i < (success ? 30 : 12); i++) {
+        const p = new PIXI.Graphics();
+        p.beginFill(colors[Math.floor(Math.random() * colors.length)]);
+        if (Math.random() > 0.5) drawStar(p, 0, 0, 5, 5 + Math.random() * 6, 2);
+        else p.drawCircle(0, 0, 2 + Math.random() * 5);
+        p.endFill();
+        p.x = x; p.y = y;
+        const angle = (i / (success ? 30 : 12)) * Math.PI * 2;
+        const speed = 4 + Math.random() * 7;
+        p.vx = Math.cos(angle) * speed;
+        p.vy = Math.sin(angle) * speed;
+        p.life = 50;
+        s.particleContainer.addChild(p);
+        s.particles.push(p);
+    }
+    
+    // 충격파 (성공 시)
+    if (success) {
+        const ring = new PIXI.Graphics();
+        ring.lineStyle(5, s.combo >= 3 ? 0xffd700 : 0x44ff88, 0.9);
+        ring.drawCircle(0, 0, 15);
+        ring.x = x; ring.y = y;
+        ring.life = 35; ring.isRing = true; ring.vx = 0; ring.vy = 0;
+        s.particleContainer.addChild(ring);
+        s.particles.push(ring);
+    }
+    
+    // 점수 텍스트
+    const scoreText = new PIXI.Text((points >= 0 ? '+' : '') + points, {
+        fontSize: points >= 70 ? 36 : 28,
+        fill: success ? 0x44ff88 : 0xff6666,
+        fontWeight: 'bold',
+        stroke: 0x000000,
+        strokeThickness: 5
+    });
+    scoreText.anchor.set(0.5);
+    scoreText.x = x; scoreText.y = y - 35;
+    scoreText.vy = -3; scoreText.life = 65; scoreText.isText = true; scoreText.vx = 0;
+    s.particleContainer.addChild(scoreText);
+    s.particles.push(scoreText);
+}
+
+function createMissEffectCG(x, y) {
+    const s = cargoState;
+    const miss = new PIXI.Text('MISS!', {
+        fontSize: 30,
+        fill: 0xff4444,
+        fontWeight: 'bold',
+        stroke: 0x000000,
+        strokeThickness: 4
+    });
+    miss.anchor.set(0.5);
+    miss.x = x; miss.y = y;
+    miss.life = 50; miss.isText = true; miss.vy = -2; miss.vx = 0;
+    s.particleContainer.addChild(miss);
+    s.particles.push(miss);
+}
+
+function finishThrowCG() {
+    const s = cargoState;
+    
+    if (s.cargoSprite) {
+        cargoApp.stage.removeChild(s.cargoSprite);
+        s.cargoSprite = null;
+    }
+    
+    s.throwing = false;
+    s.perfectCount = 0;
+    
+    if (s.playerSprite) s.playerSprite.rotation = 0;
+    
+    updateCargoHUDCG();
+    
+    if (s.count >= s.maxCount) {
+        setTimeout(() => endCargoGame(true), 900);
     } else {
-        setTimeout(() => {
-            spawnCargo();
-            resetCargoPosition();
-        }, 300);
+        setTimeout(() => resetForNextCG(), 700);
     }
 }
 
-function cargoMiss() {
-    const cargo = cargoState.currentCargo;
-    let points = 0;
+function resetForNextCG() {
+    const s = cargoState;
     
-    if (cargo.penalty) {
-        points = -cargo.penalty;
+    s.currentCargo = s.nextCargo;
+    spawnNextCargoCG();
+    
+    // 정답 구간 업데이트
+    const zones = getCargoZones(s.currentCargo);
+    s.anglePerfectMin = zones.angleMin;
+    s.anglePerfectMax = zones.angleMax;
+    s.powerPerfectMin = zones.powerMin;
+    s.powerPerfectMax = zones.powerMax;
+    updatePerfectZones();
+    
+    s.phase = 'angle';
+    s.angleLocked = false;
+    s.powerLocked = false;
+    s.angleValue = 50;
+    s.powerValue = 0;
+    
+    // 파워바 초기화
+    if (s.powerBar) s.powerBar.clear();
+    if (s.powerIndicator) s.powerIndicator.clear();
+    
+    updateCargoHintCG();
+    updateHoldingCargoCG();
+    
+    const btn = document.getElementById('btn-cargo-action');
+    if (btn) {
+        btn.disabled = false;
+        btn.style.opacity = '1';
+        btn.textContent = '🎯 각도 고정!';
+        btn.style.background = 'linear-gradient(135deg, #4488ff, #2266dd)';
     }
+    document.getElementById('cg-instruction').textContent = '🎯 초록 구간에 맞춰 터치!';
+}
+
+function updateHoldingCargoCG() {
+    const s = cargoState;
+    if (!s.holdingCargo || !s.currentCargo) return;
     
-    cargoState.score += points;
-    cargoState.count++;
+    s.holdingCargo.visible = true;
+    s.holdingCargo.removeChildren();
     
-    updateCargoUI(false, points);
+    // 박스 그림자
+    const shadow = new PIXI.Graphics();
+    shadow.beginFill(0x000000, 0.3);
+    shadow.drawRoundedRect(-10, -10, 24, 24, 4);
+    shadow.endFill();
+    s.holdingCargo.addChild(shadow);
     
-    if (cargoState.count >= cargoState.maxCount) {
-        endCargoGame(true);
-    } else {
-        setTimeout(() => {
-            spawnCargo();
-            resetCargoPosition();
-        }, 300);
+    // 박스
+    const box = new PIXI.Graphics();
+    box.beginFill(s.currentCargo.color || 0x888888);
+    box.lineStyle(2, 0xffffff, 0.5);
+    box.drawRoundedRect(-12, -12, 24, 24, 5);
+    box.endFill();
+    box.beginFill(0xffffff, 0.2);
+    box.drawRoundedRect(-9, -9, 18, 8, 3);
+    box.endFill();
+    s.holdingCargo.addChild(box);
+    
+    const emoji = new PIXI.Text(s.currentCargo.emoji, { fontSize: 14 });
+    emoji.anchor.set(0.5);
+    s.holdingCargo.addChild(emoji);
+}
+
+function updateCargoHintCG() {
+    const s = cargoState;
+    const hintEl = document.getElementById('cg-target-hint');
+    const currentEl = document.getElementById('cg-current-emoji');
+    const nextEl = document.getElementById('cg-next-emoji');
+    
+    if (currentEl && s.currentCargo) currentEl.textContent = s.currentCargo.emoji;
+    if (nextEl && s.nextCargo) nextEl.textContent = s.nextCargo.emoji;
+    
+    if (hintEl && s.currentCargo) {
+        const map = {
+            'blue': '→ 🟦 부품함 (왼쪽)',
+            'yellow': '→ 🟨 식량함 (중앙)',
+            'red': '→ 🟥 위험함 (오른쪽)',
+            'any': '→ ⭐ 아무데나!'
+        };
+        hintEl.textContent = map[s.currentCargo.target] || '';
+        hintEl.style.color = s.currentCargo.target === 'any' ? '#ffd700' : '#fff';
     }
 }
 
-function updateCargoUI(success, points) {
+function updateCargoHUDCG() {
+    const s = cargoState;
     const countEl = document.getElementById('cg-count');
     const scoreEl = document.getElementById('cg-score');
+    const timeEl = document.getElementById('cg-time');
+    const comboEl = document.getElementById('cg-combo');
+    const comboWrap = document.getElementById('cg-combo-wrap');
     
-    if (countEl) countEl.textContent = cargoState.count;
-    if (scoreEl) scoreEl.textContent = Math.max(0, cargoState.score);
+    if (countEl) countEl.textContent = s.count;
+    if (scoreEl) scoreEl.textContent = Math.max(0, s.score);
+    if (comboEl) comboEl.textContent = s.combo;
+    if (comboWrap) comboWrap.style.color = s.combo >= 3 ? '#ffd700' : '#fff';
     
-    // 점수 피드백
-    const feedback = document.createElement('div');
-    feedback.style.cssText = `position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 2rem; font-weight: bold; color: ${points >= 0 ? '#44ff88' : '#ff6b6b'}; z-index: 200; pointer-events: none;`;
-    feedback.textContent = points >= 0 ? `+${points}` : points;
-    document.body.appendChild(feedback);
-    setTimeout(() => feedback.remove(), 500);
-}
-
-function resetCargoPosition() {
-    const cargoEl = document.getElementById('current-cargo');
-    if (cargoEl && cargoState.currentCargo) {
-        cargoEl.style.left = '50%';
-        cargoEl.style.top = '';
-        cargoEl.style.bottom = '150px';
-        cargoEl.style.transform = 'translateX(-50%)';
-        cargoEl.textContent = cargoState.currentCargo.emoji;
+    if (timeEl) {
+        const min = Math.floor(s.time / 60);
+        const sec = s.time % 60;
+        timeEl.textContent = `${min}:${sec.toString().padStart(2, '0')}`;
+        timeEl.style.color = s.time < 30 ? '#ff6b6b' : '#fff';
     }
 }
 
-function startCargoLoop() {
-    cargoState.timerInterval = setInterval(() => {
-        if (cargoState.gameOver) return;
-        
-        cargoState.time--;
-        
-        const timeEl = document.getElementById('cg-time');
-        if (timeEl) {
-            const min = Math.floor(cargoState.time / 60);
-            const sec = cargoState.time % 60;
-            timeEl.textContent = `${min}:${sec.toString().padStart(2, '0')}`;
-            timeEl.style.color = cargoState.time < 30 ? '#ff6b6b' : '#fff';
-        }
-        
-        if (cargoState.time <= 0) {
-            endCargoGame(false);
-        }
-    }, 1000);
-}
-
-function endCargoGame(success) {
-    cargoState.gameOver = true;
-    clearInterval(cargoState.timerInterval);
+function endCargoGame(success, partialReward = false) {
+    const s = cargoState;
+    s.gameOver = true;
+    clearInterval(s.timerInterval);
+    
+    if (cargoApp) {
+        cargoApp.destroy(true);
+        cargoApp = null;
+    }
     
     if (success) {
-        const timeLeft = cargoState.time;
-        let baseReward = 50;
-        let timeRating = '';
+        // 점수 기반 보상 계산
+        const scoreReward = Math.floor(s.score * 0.3);  // 점수의 30%
+        const timeLeft = s.time;
+        let timeBonus = 0, timeRating = '';
         
-        if (timeLeft >= 120) { baseReward = 100; timeRating = '⭐⭐⭐'; }
-        else if (timeLeft >= 60) { baseReward = 80; timeRating = '⭐⭐'; }
-        else if (timeLeft >= 30) { baseReward = 60; timeRating = '⭐'; }
-        else { baseReward = 50; timeRating = '-'; }
+        if (timeLeft >= 60) { timeBonus = 30; timeRating = '⭐⭐⭐'; }
+        else if (timeLeft >= 30) { timeBonus = 20; timeRating = '⭐⭐'; }
+        else if (timeLeft >= 10) { timeBonus = 10; timeRating = '⭐'; }
+        else { timeBonus = 0; timeRating = '-'; }
         
+        const baseReward = Math.max(20, scoreReward + timeBonus);
         const envBonus = getEnvBonus('cargo');
         const partsBonus = getPartsBonus('cargo');
-        const totalReward = Math.floor((baseReward + envBonus + partsBonus) * cargoState.rewardMultiplier);
+        const totalReward = Math.floor((baseReward + envBonus + partsBonus) * s.rewardMultiplier);
         
         GameState.spaceLuck = (GameState.spaceLuck || 0) + totalReward;
         GameState.save();
         
         showMiniGameResult(true, {
             baseReward, envBonus, partsBonus,
-            rewardMultiplier: cargoState.rewardMultiplier,
+            rewardMultiplier: s.rewardMultiplier,
             totalReward, timeRating,
-            count: cargoState.count,
-            score: cargoState.score
+            count: s.count, score: s.score
         });
+    } else if (partialReward && s.score > 0) {
+        const partialLuck = Math.floor(s.score * 0.15);
+        GameState.spaceLuck = (GameState.spaceLuck || 0) + partialLuck;
+        GameState.save();
+        showMiniGameResult(false, { count: s.count, score: s.score, partialReward: partialLuck });
     } else {
-        showMiniGameResult(false, {
-            count: cargoState.count,
-            score: cargoState.score
-        });
+        showMiniGameResult(false, { count: s.count, score: s.score });
     }
 }
 
-// ========================================
 // 미니게임 3: 배선 정리
 // ========================================
 let wiringState = null;
