@@ -2129,12 +2129,6 @@ function showTitle() {
         showPrologueIntro();
     };
     
-    document.getElementById('guest-modal').onclick = (e) => {
-        if (e.target.id === 'guest-modal') {
-            document.getElementById('guest-modal').classList.remove('show');
-        }
-    };
-    
     document.getElementById('btn-language').onclick = () => {
         document.getElementById('lang-modal').classList.add('show');
     };
@@ -5720,7 +5714,7 @@ function showSpaceLobby() {
             </div>
             
             <!-- LUCK 조절 팝업 -->
-            <div id="luck-popup" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.8); z-index: 1000; display: none; align-items: center; justify-content: center;">
+            <div id="luck-popup" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.8); z-index: 1000; align-items: center; justify-content: center;">
                 <div style="background: linear-gradient(135deg, #1a1a3a, #0a0a2a); border-radius: 16px; padding: 20px; max-width: 300px; width: 90%; border: 1px solid rgba(255,215,0,0.3);">
                     <div style="text-align: center; margin-bottom: 15px;">
                         <div style="font-size: 1.2rem; color: #ffd700; font-weight: bold;">💰 LUCK 조절</div>
