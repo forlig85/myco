@@ -2,471 +2,399 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="mobile-web-app-capable" content="yes">
-    <meta name="theme-color" content="#f0f4ff">
-    <title>BOKLUCK - 행운의 게임 플랫폼</title>
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🍀</text></svg>">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>BOKLUCK - Radiant</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800&family=Noto+Sans+KR:wght@300;400;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;700;900&family=Noto+Sans+KR:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
-*, *::before, *::after {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-}
+        :root {
+            --bg-light: #f8fafc;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --primary-grad: linear-gradient(135deg, #6366f1, #a855f7, #ec4899);
+            --rainbow-grad: linear-gradient(45deg, #ff0000, #ff7300, #fffb00, #48ff00, #00ffd5, #002bff, #7a00ff, #ff00c8, #ff0000);
+        }
 
-:root {
-    --bg-light: #f0f4ff;
-    --bg-surface: #ffffff;
-    --primary: #6366f1;
-    --primary-light: #818cf8;
-    --secondary: #10b981;
-    --accent: #f59e0b;
-    --text: #1e293b;
-    --text-muted: #64748b;
-    --safe-top: env(safe-area-inset-top, 0px);
-    --safe-bottom: env(safe-area-inset-bottom, 0px);
-}
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Noto Sans KR', sans-serif;
+            background-color: var(--bg-light);
+            color: var(--text-main);
+            overflow-x: hidden;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
 
-html, body {
-    width: 100%;
-    height: 100%;
-    overflow-x: hidden;
-    background: var(--bg-light);
-    color: var(--text);
-    font-family: 'Noto Sans KR', sans-serif;
-    -webkit-tap-highlight-color: transparent;
-}
+        /* === 1. 배경: 오로라 & 무빙 메쉬 (밝은 버전) === */
+        .aurora-bg {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            z-index: -2;
+            background: 
+                radial-gradient(at 0% 0%, rgba(255, 169, 169, 0.4) 0px, transparent 50%),
+                radial-gradient(at 100% 0%, rgba(162, 230, 255, 0.4) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(255, 235, 153, 0.4) 0px, transparent 50%),
+                radial-gradient(at 0% 100%, rgba(206, 178, 255, 0.4) 0px, transparent 50%);
+            background-size: 150% 150%;
+            animation: auroraMove 15s ease infinite alternate;
+            filter: blur(40px);
+        }
 
-/* 배경 */
-.bg-container {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    z-index: -1;
-    overflow: hidden;
-    background: linear-gradient(180deg, #e0e7ff 0%, #f0f4ff 50%, #fef3c7 100%);
-}
+        @keyframes auroraMove {
+            0% { background-position: 0% 0%; }
+            100% { background-position: 100% 100%; }
+        }
 
-.bg-shapes {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-}
+        /* 밝은 격자무늬 오버레이 */
+        .grid-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-image: linear-gradient(rgba(99, 102, 241, 0.05) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(99, 102, 241, 0.05) 1px, transparent 1px);
+            background-size: 30px 30px;
+            z-index: -1;
+            mask-image: radial-gradient(circle, black 40%, transparent 100%);
+            -webkit-mask-image: radial-gradient(circle, black 40%, transparent 100%);
+        }
 
-.bg-circle {
-    position: absolute;
-    border-radius: 50%;
-    opacity: 0.5;
-    animation: float-shape 20s ease-in-out infinite;
-}
+        /* === 2. 헤더 === */
+        header {
+            position: sticky;
+            top: 0;
+            width: 100%;
+            padding: 15px 20px;
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border-bottom: 1px solid rgba(255,255,255,0.5);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 100;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.03);
+        }
 
-.bg-circle:nth-child(1) {
-    width: 300px;
-    height: 300px;
-    background: linear-gradient(135deg, #c7d2fe, #a5b4fc);
-    top: -100px;
-    right: -100px;
-    animation-delay: 0s;
-}
+        .logo {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.6rem;
+            font-weight: 900;
+            background: var(--primary-grad);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
 
-.bg-circle:nth-child(2) {
-    width: 200px;
-    height: 200px;
-    background: linear-gradient(135deg, #fde68a, #fcd34d);
-    bottom: 100px;
-    left: -50px;
-    animation-delay: -5s;
-}
+        .luck-pill {
+            background: #fff;
+            padding: 6px 14px;
+            border-radius: 30px;
+            font-weight: 800;
+            font-size: 0.9rem;
+            color: #f59e0b;
+            box-shadow: 0 4px 15px rgba(245, 158, 11, 0.15);
+            border: 2px solid rgba(245, 158, 11, 0.1);
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
 
-.bg-circle:nth-child(3) {
-    width: 150px;
-    height: 150px;
-    background: linear-gradient(135deg, #a7f3d0, #6ee7b7);
-    top: 40%;
-    right: -30px;
-    animation-delay: -10s;
-}
+        /* === 3. 메인 콘텐츠 === */
+        main {
+            padding: 60px 20px;
+            max-width: 600px;
+            width: 100%;
+            text-align: center;
+            perspective: 1000px; /* 3D 효과 */
+        }
 
-@keyframes float-shape {
-    0%, 100% { transform: translate(0, 0) scale(1); }
-    50% { transform: translate(-20px, 20px) scale(1.05); }
-}
+        .hero h1 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 3.5rem;
+            margin: 0;
+            line-height: 1.1;
+            background: linear-gradient(to right, #6366f1, #ec4899, #f59e0b);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            /* 밝은 배경에서 글자 가독성을 위한 Drop Shadow */
+            filter: drop-shadow(0 2px 10px rgba(99, 102, 241, 0.3));
+            animation: textShine 3s linear infinite;
+            background-size: 200% auto;
+        }
 
-/* 헤더 */
-header {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    padding: calc(15px + var(--safe-top)) 20px 15px;
-    background: linear-gradient(180deg, rgba(240,244,255,0.98), rgba(240,244,255,0.8));
-    backdrop-filter: blur(10px);
-    z-index: 100;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
+        @keyframes textShine {
+            to { background-position: 200% center; }
+        }
 
-.logo {
-    font-family: 'Outfit', sans-serif;
-    font-size: 1.5rem;
-    font-weight: 800;
-    color: var(--primary);
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
+        .hero p {
+            color: var(--text-muted);
+            margin-top: 15px;
+            font-size: 1.1rem;
+            font-weight: 500;
+            margin-bottom: 50px;
+        }
 
-.logo-icon {
-    font-size: 1.8rem;
-}
+        /* === 4. 홀로그램 카드 (핵심 화려함) === */
+        .card-wrapper {
+            position: relative;
+            margin-bottom: 30px;
+            border-radius: 24px;
+            transition: transform 0.2s;
+            transform-style: preserve-3d;
+        }
 
-.header-luck {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    background: linear-gradient(135deg, #fef3c7, #fde68a);
-    border: 1px solid #fcd34d;
-    border-radius: 20px;
-    padding: 6px 14px;
-    font-size: 0.9rem;
-    color: #92400e;
-    font-weight: 700;
-    box-shadow: 0 2px 8px rgba(251,191,36,0.3);
-}
+        /* 무지개 회전 테두리 */
+        .card-wrapper::before {
+            content: '';
+            position: absolute;
+            inset: -4px;
+            border-radius: 28px;
+            background: var(--rainbow-grad);
+            background-size: 400%;
+            z-index: -1;
+            animation: borderRun 10s linear infinite;
+            opacity: 0.7;
+            filter: blur(8px);
+        }
 
-/* 메인 컨텐츠 */
-main {
-    min-height: 100vh;
-    padding: calc(80px + var(--safe-top)) 20px calc(30px + var(--safe-bottom));
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
+        @keyframes borderRun {
+            0% { background-position: 0 0; }
+            50% { background-position: 400% 0; }
+            100% { background-position: 0 0; }
+        }
 
-/* 히어로 섹션 */
-.hero {
-    text-align: center;
-    margin-bottom: 40px;
-    animation: fadeInUp 0.8s ease-out;
-}
+        .game-card {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 24px;
+            padding: 24px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            /* 카드가 살짝 떠있는 느낌 */
+            box-shadow: 
+                0 10px 30px rgba(0,0,0,0.05),
+                inset 0 0 20px rgba(255,255,255,1);
+            transform: translateZ(20px); /* 3D 효과 */
+        }
 
-@keyframes fadeInUp {
-    from {
-        opacity: 0;
-        transform: translateY(20px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
+        /* 카드 위를 지나가는 광택 효과 (Shine) */
+        .game-card::after {
+            content: '';
+            position: absolute;
+            top: 0; left: -100%;
+            width: 100%; height: 100%;
+            background: linear-gradient(
+                90deg, 
+                transparent, 
+                rgba(255, 255, 255, 0.8), 
+                transparent
+            );
+            transform: skewX(-25deg);
+            transition: 0.5s;
+        }
 
-.hero-title {
-    font-family: 'Outfit', sans-serif;
-    font-size: 2.8rem;
-    font-weight: 800;
-    margin-bottom: 12px;
-    color: var(--primary);
-}
+        .card-wrapper:hover .game-card::after {
+            left: 150%;
+            transition: 0.7s;
+        }
 
-.hero-subtitle {
-    font-size: 1rem;
-    color: var(--text-muted);
-    margin-bottom: 8px;
-}
+        .game-icon {
+            width: 72px; height: 72px;
+            border-radius: 20px;
+            background: #f1f5f9;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            box-shadow: 
+                5px 5px 10px rgba(166, 180, 205, 0.3),
+                -5px -5px 10px rgba(255, 255, 255, 0.8);
+        }
 
-.hero-tagline {
-    font-size: 1.1rem;
-    color: var(--secondary);
-    font-weight: 600;
-}
+        .game-info {
+            text-align: left;
+            flex: 1;
+        }
 
-/* 게임 카드 섹션 */
-.games-section {
-    width: 100%;
-    max-width: 500px;
-}
+        .game-title {
+            font-size: 1.3rem;
+            font-weight: 800;
+            color: #1e293b;
+            margin-bottom: 5px;
+        }
 
-.section-title {
-    font-size: 0.85rem;
-    color: var(--text-muted);
-    text-align: center;
-    margin-bottom: 20px;
-    font-weight: 600;
-    letter-spacing: 0.5px;
-}
+        .game-desc {
+            font-size: 0.9rem;
+            color: #64748b;
+            margin-bottom: 10px;
+        }
 
-/* 게임 카드 */
-.game-card {
-    position: relative;
-    background: var(--bg-surface);
-    border-radius: 20px;
-    overflow: hidden;
-    margin-bottom: 16px;
-    border: 1px solid rgba(0,0,0,0.06);
-    cursor: pointer;
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.06);
-    animation: fadeInUp 0.8s ease-out backwards;
-}
+        .tags { display: flex; gap: 8px; }
+        .tag {
+            font-size: 0.7rem;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-weight: 700;
+        }
+        
+        .tag.hot { background: #fee2e2; color: #ef4444; }
+        .tag.new { background: #e0e7ff; color: #6366f1; }
+        .tag.lock { background: #f1f5f9; color: #94a3b8; }
 
-.game-card:nth-child(1) { animation-delay: 0.1s; }
-.game-card:nth-child(2) { animation-delay: 0.2s; }
-.game-card:nth-child(3) { animation-delay: 0.3s; }
+        .arrow-btn {
+            width: 40px; height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            box-shadow: 0 4px 10px rgba(99, 102, 241, 0.3);
+            transition: transform 0.3s;
+        }
 
-.game-card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 12px 40px rgba(99,102,241,0.15);
-}
+        .card-wrapper:hover .arrow-btn {
+            transform: translateX(5px) scale(1.1);
+        }
 
-.game-card:active {
-    transform: scale(0.98);
-}
+        /* 잠긴 카드 스타일 (그레이스케일) */
+        .card-wrapper.locked {
+            filter: grayscale(1);
+            opacity: 0.7;
+        }
+        .card-wrapper.locked::before {
+            animation: none;
+            background: #cbd5e1; /* 회색 테두리 */
+        }
+        .card-wrapper.locked .game-card {
+            cursor: not-allowed;
+            transform: none !important;
+        }
 
-.game-card-accent {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 5px;
-    height: 100%;
-    background: var(--card-color, var(--primary));
-}
+        /* 반응형 */
+        @media (max-width: 400px) {
+            .hero h1 { font-size: 2.8rem; }
+            .game-card { padding: 18px; gap: 15px; }
+            .game-icon { width: 60px; height: 60px; font-size: 2rem; }
+        }
 
-.game-card-content {
-    position: relative;
-    padding: 20px;
-    display: flex;
-    align-items: center;
-    gap: 16px;
-}
-
-.game-icon {
-    width: 70px;
-    height: 70px;
-    border-radius: 16px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 2.2rem;
-    background: linear-gradient(135deg, var(--card-bg, #e0e7ff), var(--card-bg2, #c7d2fe));
-    flex-shrink: 0;
-}
-
-.game-info {
-    flex: 1;
-}
-
-.game-title {
-    font-family: 'Outfit', sans-serif;
-    font-size: 1.2rem;
-    font-weight: 700;
-    color: var(--text);
-    margin-bottom: 4px;
-}
-
-.game-desc {
-    font-size: 0.8rem;
-    color: var(--text-muted);
-    margin-bottom: 8px;
-    line-height: 1.4;
-}
-
-.game-tags {
-    display: flex;
-    gap: 6px;
-    flex-wrap: wrap;
-}
-
-.game-tag {
-    font-size: 0.65rem;
-    padding: 3px 8px;
-    border-radius: 8px;
-    background: #f1f5f9;
-    color: var(--text-muted);
-    font-weight: 500;
-}
-
-.game-tag.featured {
-    background: linear-gradient(135deg, #fef3c7, #fde68a);
-    color: #92400e;
-}
-
-.game-arrow {
-    font-size: 1.3rem;
-    color: #cbd5e1;
-    transition: all 0.3s ease;
-}
-
-.game-card:hover .game-arrow {
-    transform: translateX(4px);
-    color: var(--primary);
-}
-
-/* 게임별 색상 */
-.game-card.aroa { 
-    --card-color: #6366f1; 
-    --card-bg: #e0e7ff;
-    --card-bg2: #c7d2fe;
-}
-.game-card.card-rpg { 
-    --card-color: #f59e0b; 
-    --card-bg: #fef3c7;
-    --card-bg2: #fde68a;
-}
-.game-card.battle { 
-    --card-color: #ef4444; 
-    --card-bg: #fee2e2;
-    --card-bg2: #fecaca;
-}
-
-.game-card.coming-soon {
-    opacity: 0.5;
-    cursor: not-allowed;
-}
-
-.game-card.coming-soon:hover {
-    transform: none;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.06);
-}
-
-/* 푸터 */
-footer {
-    margin-top: 40px;
-    text-align: center;
-    color: var(--text-muted);
-    font-size: 0.75rem;
-    padding-bottom: 20px;
-}
-
-/* 반응형 */
-@media (max-width: 400px) {
-    .hero-title {
-        font-size: 2.2rem;
-    }
-    
-    .game-card-content {
-        padding: 16px;
-        gap: 12px;
-    }
-    
-    .game-icon {
-        width: 56px;
-        height: 56px;
-        font-size: 1.8rem;
-    }
-    
-    .game-title {
-        font-size: 1.05rem;
-    }
-}
     </style>
 </head>
 <body>
-    <div class="bg-container">
-        <div class="bg-shapes">
-            <div class="bg-circle"></div>
-            <div class="bg-circle"></div>
-            <div class="bg-circle"></div>
-        </div>
-    </div>
-    
+
+    <div class="aurora-bg"></div>
+    <div class="grid-overlay"></div>
+
     <header>
         <div class="logo">
-            <span class="logo-icon">🍀</span>
-            <span>BOKLUCK</span>
+            <span style="font-size:1.8rem;">🍀</span> BOKLUCK
         </div>
-        <div class="header-luck" id="total-luck">
-            💰 <span id="luck-amount">0</span> LUCK
+        <div class="luck-pill">
+            💰 <span id="luck-score">0</span>
         </div>
     </header>
-    
+
     <main>
-        <section class="hero">
-            <h1 class="hero-title">BOKLUCK</h1>
-            <p class="hero-subtitle">행운의 게임 플랫폼</p>
-            <p class="hero-tagline">🎲 게임하고, LUCK 모으고, 운을 시험하세요!</p>
-        </section>
-        
-        <section class="games-section">
-            <div class="section-title">🎮 게임 선택</div>
-            
-            <!-- AROA 게임 카드 -->
-            <div class="game-card aroa" onclick="location.href='aroa.html'">
-                <div class="game-card-accent"></div>
-                <div class="game-card-content">
-                    <div class="game-icon">🚀</div>
-                    <div class="game-info">
-                        <div class="game-title">AROA</div>
-                        <div class="game-desc">세포에서 우주까지! 진화의 여정을 떠나세요.</div>
-                        <div class="game-tags">
-                            <span class="game-tag featured">🔥 인기</span>
-                            <span class="game-tag">진화</span>
-                            <span class="game-tag">러너</span>
-                            <span class="game-tag">아케이드</span>
-                        </div>
+        <div class="hero">
+            <h1>LUCK<br>UNLEASHED</h1>
+            <p>빛나는 운의 세계로 초대합니다.</p>
+        </div>
+
+        <div class="card-wrapper tilt-card" onclick="location.href='aroa.html'">
+            <div class="game-card">
+                <div class="game-icon">🚀</div>
+                <div class="game-info">
+                    <div class="game-title">AROA ORIGIN</div>
+                    <div class="game-desc">무한한 우주로 뻗어나가는 여정</div>
+                    <div class="tags">
+                        <span class="tag hot">🔥 POPULAR</span>
+                        <span class="tag new">✨ UPDATE</span>
                     </div>
-                    <div class="game-arrow">→</div>
                 </div>
+                <div class="arrow-btn">➜</div>
             </div>
-            
-            <!-- 카드 RPG -->
-            <div class="game-card card-rpg coming-soon">
-                <div class="game-card-accent"></div>
-                <div class="game-card-content">
-                    <div class="game-icon">🃏</div>
-                    <div class="game-info">
-                        <div class="game-title">CARD QUEST</div>
-                        <div class="game-desc">운명의 카드를 뽑아 던전을 정복하세요!</div>
-                        <div class="game-tags">
-                            <span class="game-tag">⏳ 준비중</span>
-                            <span class="game-tag">카드RPG</span>
-                            <span class="game-tag">덱빌딩</span>
-                        </div>
+        </div>
+
+        <div class="card-wrapper locked">
+            <div class="game-card">
+                <div class="game-icon">⚔️</div>
+                <div class="game-info">
+                    <div class="game-title">BATTLE ARENA</div>
+                    <div class="game-desc">준비중인 컨텐츠입니다.</div>
+                    <div class="tags">
+                        <span class="tag lock">🔒 LOCKED</span>
                     </div>
-                    <div class="game-arrow">🔒</div>
                 </div>
+                <div style="color:#cbd5e1; font-size:1.5rem;">🔒</div>
             </div>
-            
-            <!-- 배틀 -->
-            <div class="game-card battle coming-soon">
-                <div class="game-card-accent"></div>
-                <div class="game-card-content">
-                    <div class="game-icon">⚔️</div>
-                    <div class="game-info">
-                        <div class="game-title">BATTLE LUCK</div>
-                        <div class="game-desc">실시간 PvP 배틀! 운과 전략의 대결.</div>
-                        <div class="game-tags">
-                            <span class="game-tag">⏳ 준비중</span>
-                            <span class="game-tag">PvP</span>
-                        </div>
-                    </div>
-                    <div class="game-arrow">🔒</div>
-                </div>
-            </div>
-        </section>
-        
-        <footer>
-            <p>© 2024 BOKLUCK. All rights reserved.</p>
-            <p style="margin-top: 5px;">Made with 🍀 for lucky players</p>
-        </footer>
+        </div>
     </main>
-    
+
     <script>
-        // LUCK 총합 표시
-        function updateTotalLuck() {
-            const spaceLuck = parseInt(localStorage.getItem('aroa-spaceLuck')) || 0;
-            document.getElementById('luck-amount').textContent = spaceLuck.toLocaleString();
-        }
-        
-        updateTotalLuck();
-        window.addEventListener('focus', updateTotalLuck);
+        // 1. 점수 로딩 로직 (안전하게)
+        document.addEventListener('DOMContentLoaded', () => {
+            try {
+                const savedLuck = localStorage.getItem('aroa-spaceLuck');
+                const scoreEl = document.getElementById('luck-score');
+                if (savedLuck) {
+                    // 숫자 카운팅 효과
+                    let current = 0;
+                    const target = parseInt(savedLuck);
+                    const diff = target / 50; // 속도 조절
+                    
+                    const timer = setInterval(() => {
+                        current += diff;
+                        if (current >= target) {
+                            current = target;
+                            clearInterval(timer);
+                        }
+                        scoreEl.innerText = Math.floor(current).toLocaleString();
+                    }, 20);
+                }
+            } catch (e) { console.log('Storage Error'); }
+        });
+
+        // 2. 3D 틸트 효과 (카드 기울이기)
+        const tiltCards = document.querySelectorAll('.tilt-card');
+
+        tiltCards.forEach(card => {
+            card.addEventListener('mousemove', (e) => {
+                const rect = card.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                
+                const centerX = rect.width / 2;
+                const centerY = rect.height / 2;
+                
+                // 각도 계산 (너무 과하지 않게 / 15 등분)
+                const rotateX = ((y - centerY) / centerY) * -10; 
+                const rotateY = ((x - centerX) / centerX) * 10;
+
+                card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale(1.02)`;
+            });
+
+            card.addEventListener('mouseleave', () => {
+                card.style.transform = 'perspective(1000px) rotateX(0) rotateY(0) scale(1)';
+            });
+            
+            // 모바일 터치 효과
+            card.addEventListener('touchstart', () => {
+                card.style.transform = 'scale(0.98)';
+            });
+            card.addEventListener('touchend', () => {
+                card.style.transform = 'scale(1)';
+            });
+        });
     </script>
 </body>
 </html>
