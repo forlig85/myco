@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>이미지 자르기 - Image Crop Tool</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans KR', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 1000px;
+            width: 100%;
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 1rem;
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        .upload-area {
+            border: 3px dashed #667eea;
+            border-radius: 15px;
+            padding: 60px 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: #f8f9ff;
+        }
+
+        .upload-area:hover {
+            background: #eef1ff;
+            border-color: #764ba2;
+        }
+
+        .upload-area.drag-over {
+            background: #e0e7ff;
+            border-color: #4c1d95;
+        }
+
+        .upload-icon {
+            font-size: 4rem;
+            margin-bottom: 20px;
+        }
+
+        .upload-text {
+            font-size: 1.2rem;
+            color: #667eea;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        .upload-hint {
+            color: #6b7280;
+            font-size: 0.9rem;
+        }
+
+        #fileInput {
+            display: none;
+        }
+
+        .canvas-area {
+            display: none;
+            margin-top: 30px;
+        }
+
+        .canvas-container {
+            position: relative;
+            display: inline-block;
+            max-width: 100%;
+            margin: 0 auto;
+            display: block;
+        }
+
+        #imageCanvas {
+            max-width: 100%;
+            border: 2px solid #e5e7eb;
+            border-radius: 10px;
+            cursor: crosshair;
+        }
+
+        .crop-overlay {
+            position: absolute;
+            border: 2px solid #667eea;
+            background: rgba(102, 126, 234, 0.1);
+            cursor: move;
+            box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.5);
+        }
+
+        .resize-handle {
+            position: absolute;
+            width: 12px;
+            height: 12px;
+            background: white;
+            border: 2px solid #667eea;
+            border-radius: 50%;
+        }
+
+        .handle-tl { top: -6px; left: -6px; cursor: nw-resize; }
+        .handle-tr { top: -6px; right: -6px; cursor: ne-resize; }
+        .handle-bl { bottom: -6px; left: -6px; cursor: sw-resize; }
+        .handle-br { bottom: -6px; right: -6px; cursor: se-resize; }
+
+        .controls {
+            margin-top: 20px;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-secondary {
+            background: #f3f4f6;
+            color: #374151;
+        }
+
+        .btn-secondary:hover {
+            background: #e5e7eb;
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .aspect-ratio-btns {
+            margin-top: 15px;
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .ratio-btn {
+            padding: 8px 16px;
+            border: 2px solid #e5e7eb;
+            background: white;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s;
+        }
+
+        .ratio-btn:hover {
+            border-color: #667eea;
+            color: #667eea;
+        }
+
+        .ratio-btn.active {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+
+        .preview {
+            display: none;
+            margin-top: 30px;
+            text-align: center;
+        }
+
+        .preview h3 {
+            margin-bottom: 15px;
+            color: #374151;
+        }
+
+        #previewCanvas {
+            max-width: 100%;
+            border: 2px solid #e5e7eb;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 1.5rem;
+            }
+
+            .upload-area {
+                padding: 40px 20px;
+            }
+
+            .upload-icon {
+                font-size: 3rem;
+            }
+
+            .controls {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>✂️ 이미지 자르기</h1>
+            <p>이미지를 업로드하고 원하는 영역을 잘라보세요</p>
+        </div>
+
+        <div class="content">
+            <div class="upload-area" id="uploadArea">
+                <div class="upload-icon">📁</div>
+                <div class="upload-text">클릭하거나 이미지를 드래그하세요</div>
+                <div class="upload-hint">JPG, PNG, GIF 파일을 지원합니다</div>
+            </div>
+            <input type="file" id="fileInput" accept="image/*">
+
+            <div class="canvas-area" id="canvasArea">
+                <div class="canvas-container" id="canvasContainer">
+                    <canvas id="imageCanvas"></canvas>
+                </div>
+
+                <div class="aspect-ratio-btns">
+                    <button class="ratio-btn" data-ratio="free">자유 비율</button>
+                    <button class="ratio-btn" data-ratio="1:1">1:1 (정사각형)</button>
+                    <button class="ratio-btn" data-ratio="4:3">4:3</button>
+                    <button class="ratio-btn" data-ratio="16:9">16:9</button>
+                    <button class="ratio-btn" data-ratio="9:16">9:16 (세로)</button>
+                </div>
+
+                <div class="controls">
+                    <button class="btn btn-primary" id="cropBtn">
+                        ✂️ 자르기
+                    </button>
+                    <button class="btn btn-secondary" id="resetBtn">
+                        🔄 다시 선택
+                    </button>
+                </div>
+            </div>
+
+            <div class="preview" id="previewArea">
+                <h3>✨ 잘린 이미지</h3>
+                <canvas id="previewCanvas"></canvas>
+                <div class="controls">
+                    <button class="btn btn-primary" id="downloadBtn">
+                        💾 다운로드
+                    </button>
+                    <button class="btn btn-secondary" id="newImageBtn">
+                        📁 새 이미지
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const uploadArea = document.getElementById('uploadArea');
+        const fileInput = document.getElementById('fileInput');
+        const canvasArea = document.getElementById('canvasArea');
+        const canvas = document.getElementById('imageCanvas');
+        const ctx = canvas.getContext('2d');
+        const previewArea = document.getElementById('previewArea');
+        const previewCanvas = document.getElementById('previewCanvas');
+        const previewCtx = previewCanvas.getContext('2d');
+        const cropBtn = document.getElementById('cropBtn');
+        const resetBtn = document.getElementById('resetBtn');
+        const downloadBtn = document.getElementById('downloadBtn');
+        const newImageBtn = document.getElementById('newImageBtn');
+        const canvasContainer = document.getElementById('canvasContainer');
+
+        let image = null;
+        let cropArea = { x: 50, y: 50, width: 200, height: 200 };
+        let isDragging = false;
+        let isResizing = false;
+        let resizeHandle = null;
+        let dragStart = { x: 0, y: 0 };
+        let aspectRatio = null;
+
+        // 파일 업로드
+        uploadArea.addEventListener('click', () => fileInput.click());
+        fileInput.addEventListener('change', handleFileSelect);
+
+        // 드래그 앤 드롭
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.classList.add('drag-over');
+        });
+
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.classList.remove('drag-over');
+        });
+
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.classList.remove('drag-over');
+            const file = e.dataTransfer.files[0];
+            if (file && file.type.startsWith('image/')) {
+                loadImage(file);
+            }
+        });
+
+        function handleFileSelect(e) {
+            const file = e.target.files[0];
+            if (file) {
+                loadImage(file);
+            }
+        }
+
+        function loadImage(file) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                image = new Image();
+                image.onload = () => {
+                    setupCanvas();
+                    uploadArea.style.display = 'none';
+                    canvasArea.style.display = 'block';
+                    previewArea.style.display = 'none';
+                };
+                image.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function setupCanvas() {
+            const maxWidth = canvasArea.offsetWidth - 60;
+            const maxHeight = 600;
+            let width = image.width;
+            let height = image.height;
+
+            if (width > maxWidth) {
+                height = (maxWidth / width) * height;
+                width = maxWidth;
+            }
+            if (height > maxHeight) {
+                width = (maxHeight / height) * width;
+                height = maxHeight;
+            }
+
+            canvas.width = width;
+            canvas.height = height;
+
+            drawCanvas();
+
+            // 초기 crop 영역 설정
+            cropArea = {
+                x: width * 0.1,
+                y: height * 0.1,
+                width: width * 0.8,
+                height: height * 0.8
+            };
+
+            createCropOverlay();
+        }
+
+        function drawCanvas() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
+        }
+
+        function createCropOverlay() {
+            let existingOverlay = document.querySelector('.crop-overlay');
+            if (existingOverlay) {
+                existingOverlay.remove();
+            }
+
+            const overlay = document.createElement('div');
+            overlay.className = 'crop-overlay';
+            updateOverlayPosition(overlay);
+
+            // 리사이즈 핸들 추가
+            ['tl', 'tr', 'bl', 'br'].forEach(pos => {
+                const handle = document.createElement('div');
+                handle.className = `resize-handle handle-${pos}`;
+                handle.dataset.handle = pos;
+                overlay.appendChild(handle);
+
+                handle.addEventListener('mousedown', (e) => {
+                    e.stopPropagation();
+                    isResizing = true;
+                    resizeHandle = pos;
+                    dragStart = { x: e.clientX, y: e.clientY };
+                });
+            });
+
+            overlay.addEventListener('mousedown', (e) => {
+                if (!isResizing) {
+                    isDragging = true;
+                    const rect = overlay.getBoundingClientRect();
+                    dragStart = {
+                        x: e.clientX - rect.left,
+                        y: e.clientY - rect.top
+                    };
+                }
+            });
+
+            canvasContainer.appendChild(overlay);
+        }
+
+        function updateOverlayPosition(overlay) {
+            overlay.style.left = cropArea.x + 'px';
+            overlay.style.top = cropArea.y + 'px';
+            overlay.style.width = cropArea.width + 'px';
+            overlay.style.height = cropArea.height + 'px';
+        }
+
+        document.addEventListener('mousemove', (e) => {
+            const overlay = document.querySelector('.crop-overlay');
+            if (!overlay) return;
+
+            if (isDragging) {
+                const rect = canvasContainer.getBoundingClientRect();
+                let newX = e.clientX - rect.left - dragStart.x;
+                let newY = e.clientY - rect.top - dragStart.y;
+
+                newX = Math.max(0, Math.min(newX, canvas.width - cropArea.width));
+                newY = Math.max(0, Math.min(newY, canvas.height - cropArea.height));
+
+                cropArea.x = newX;
+                cropArea.y = newY;
+                updateOverlayPosition(overlay);
+            } else if (isResizing) {
+                const rect = canvasContainer.getBoundingClientRect();
+                const mouseX = e.clientX - rect.left;
+                const mouseY = e.clientY - rect.top;
+
+                const startRight = cropArea.x + cropArea.width;
+                const startBottom = cropArea.y + cropArea.height;
+
+                if (resizeHandle.includes('l')) {
+                    const newWidth = startRight - mouseX;
+                    if (newWidth > 20) {
+                        cropArea.x = mouseX;
+                        cropArea.width = newWidth;
+                    }
+                }
+                if (resizeHandle.includes('r')) {
+                    cropArea.width = Math.max(20, mouseX - cropArea.x);
+                }
+                if (resizeHandle.includes('t')) {
+                    const newHeight = startBottom - mouseY;
+                    if (newHeight > 20) {
+                        cropArea.y = mouseY;
+                        cropArea.height = newHeight;
+                    }
+                }
+                if (resizeHandle.includes('b')) {
+                    cropArea.height = Math.max(20, mouseY - cropArea.y);
+                }
+
+                // 비율 고정
+                if (aspectRatio) {
+                    if (resizeHandle.includes('r') || resizeHandle.includes('l')) {
+                        cropArea.height = cropArea.width / aspectRatio;
+                    } else {
+                        cropArea.width = cropArea.height * aspectRatio;
+                    }
+                }
+
+                cropArea.x = Math.max(0, cropArea.x);
+                cropArea.y = Math.max(0, cropArea.y);
+                cropArea.width = Math.min(cropArea.width, canvas.width - cropArea.x);
+                cropArea.height = Math.min(cropArea.height, canvas.height - cropArea.y);
+
+                updateOverlayPosition(overlay);
+            }
+        });
+
+        document.addEventListener('mouseup', () => {
+            isDragging = false;
+            isResizing = false;
+            resizeHandle = null;
+        });
+
+        // 비율 버튼
+        document.querySelectorAll('.ratio-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.ratio-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+
+                const ratio = btn.dataset.ratio;
+                if (ratio === 'free') {
+                    aspectRatio = null;
+                } else {
+                    const [w, h] = ratio.split(':').map(Number);
+                    aspectRatio = w / h;
+                    cropArea.height = cropArea.width / aspectRatio;
+                    const overlay = document.querySelector('.crop-overlay');
+                    if (overlay) updateOverlayPosition(overlay);
+                }
+            });
+        });
+
+        // 자르기
+        cropBtn.addEventListener('click', () => {
+            const scaleX = image.width / canvas.width;
+            const scaleY = image.height / canvas.height;
+
+            const sourceX = cropArea.x * scaleX;
+            const sourceY = cropArea.y * scaleY;
+            const sourceWidth = cropArea.width * scaleX;
+            const sourceHeight = cropArea.height * scaleY;
+
+            previewCanvas.width = sourceWidth;
+            previewCanvas.height = sourceHeight;
+
+            previewCtx.drawImage(
+                image,
+                sourceX, sourceY, sourceWidth, sourceHeight,
+                0, 0, sourceWidth, sourceHeight
+            );
+
+            canvasArea.style.display = 'none';
+            previewArea.style.display = 'block';
+        });
+
+        // 다운로드
+        downloadBtn.addEventListener('click', () => {
+            const link = document.createElement('a');
+            link.download = 'cropped-image.png';
+            link.href = previewCanvas.toDataURL();
+            link.click();
+        });
+
+        // 리셋
+        resetBtn.addEventListener('click', () => {
+            canvasArea.style.display = 'none';
+            uploadArea.style.display = 'block';
+            fileInput.value = '';
+        });
+
+        newImageBtn.addEventListener('click', () => {
+            previewArea.style.display = 'none';
+            uploadArea.style.display = 'block';
+            fileInput.value = '';
+        });
+    </script>
+</body>
+</html>
