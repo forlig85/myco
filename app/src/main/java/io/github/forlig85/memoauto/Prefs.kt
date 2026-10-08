@@ -66,6 +66,14 @@ object Prefs {
         get() = sp.getBoolean("tile_state_by_color", true)
         set(v) = putBool("tile_state_by_color", v)
 
+    /** AI 기록이 켜져 있을 때만 보이는 창의 패키지(쉼표 구분). 보이면 "이미 켜짐". */
+    var aiIndicatorPackagesText: String
+        get() = str("ai_indicator_packages", "com.lenovo.levoice.caption")
+        set(v) = putStr("ai_indicator_packages", v)
+
+    val aiIndicatorPackages: Set<String>
+        get() = aiIndicatorPackagesText.split(',', ' ', '\n').map { it.trim() }.filter { it.isNotEmpty() }.toSet()
+
     /** 색으로도 판단이 안 될 때, 다른 앱이 마이크로 녹음 중인지로 AI 기록 켜짐을 판단. */
     var tileStateByMic: Boolean
         get() = sp.getBoolean("tile_state_by_mic", true)

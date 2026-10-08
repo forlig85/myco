@@ -49,6 +49,7 @@ fun SettingsScreen(resumeTick: Int) {
     var unknownClick by remember { mutableStateOf(Prefs.clickUnknownTile) }
     var stateByMic by remember { mutableStateOf(Prefs.tileStateByMic) }
     var stateByColor by remember { mutableStateOf(Prefs.tileStateByColor) }
+    var indicatorPkgs by remember { mutableStateOf(Prefs.aiIndicatorPackagesText) }
     var startMode by remember { mutableStateOf(Prefs.startMode) }
     var location by remember(resumeTick) { mutableStateOf(OutputStore.describeLocation(ctx)) }
     var project by remember { mutableStateOf(Prefs.projectName) }
@@ -101,6 +102,14 @@ fun SettingsScreen(resumeTick: Int) {
                 modifier = Modifier.fillMaxWidth(),
             )
             Hint("빠른 설정에 보이는 글자 그대로. 띄어쓰기는 무시하고 비교합니다.")
+            OutlinedTextField(
+                value = indicatorPkgs,
+                onValueChange = { indicatorPkgs = it; Prefs.aiIndicatorPackagesText = it },
+                label = { Text("AI 기록 켜짐 표시 창(패키지)") },
+                singleLine = true,
+                modifier = Modifier.fillMaxWidth(),
+            )
+            Hint("이 앱의 창(예: AI 기록 자막 창)이 화면에 있으면 이미 켜진 것으로 보고 빠른 설정을 열지 않습니다. 비우면 사용 안 함.")
             SwitchRow(
                 "타일 상태를 색으로 판단", stateByColor,
                 hint = "켬(권장): 타일이 켜짐/꺼짐을 알려주지 않으면 화면을 캡처해 같은 패널의 켜진/꺼진 타일 색과 비교"

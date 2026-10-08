@@ -35,6 +35,10 @@ enum class TileResult(val message: String) {
  * 알림창 닫기 전용 동작으로 패널을 닫는다. 좌표 클릭/BACK 은 쓰지 않는다.
  */
 class QuickSettingsAutomator(private val svc: AccessibilityService) {
+    companion object {
+        private const val SYSTEMUI = "com.android.systemui"
+    }
+
     private val mutex = Mutex()
     private val tag = "빠른설정"
 
@@ -52,9 +56,22 @@ class QuickSettingsAutomator(private val svc: AccessibilityService) {
             if (w.type != AccessibilityWindowInfo.TYPE_SYSTEM) return@filter false
             w.getBoundsInScreen(r)
             if (r.height() < minH) return@filter false
+            // 빠른 설정은 시스템 UI 창만 인정(AI 기록 자막 창 같은 다른 시스템 창을 패널로 착각하지 않도록)
             val pkg = runCatching { w.root?.packageName?.toString() }.getOrNull()
-            pkg != null && pkg != own
+            pkg == SYSTEMUI && pkg != own
         }
+    }
+
+    /** AI 기록이 켜져 있을 때 뜨는 창(예: ZUI 자막 창 com.lenovo.levoice.caption)이 보이는지. */
+    fun indicatorWindow(): String? {
+        val pkgs = Prefs.aiIndicatorPackages
+        if (pkgs.isEmpty()) return null
+        val windows = runCatching { svc.windows }.getOrNull() ?: return null
+        for (w in windows) {
+            val pkg = runCatching { w.root?.packageName?.toString() }.getOrNull() ?: continue
+            if (pkg in pkgs) return pkg
+        }
+        return null
     }
 
     fun isPanelOpen(): Boolean = panelWindows().isNotEmpty()
@@ -218,6 +235,10 @@ class QuickSettingsAutomator(private val svc: AccessibilityService) {
     private suspend fun doEnsureTileOn(name: String): TileResult {
         if (svc.getSystemService(KeyguardManager::class.java)?.isKeyguardLocked == true) return TileResult.Locked
         AppLog.i(tag, "'$name' 타일 켜기 시작")
+        indicatorWindow()?.let {
+            AppLog.i(tag, "AI 기록 표시 창($it)이 떠 있음 → 이미 켜진 것으로 판단, 패널을 열지 않음")
+            return TileResult.AlreadyOn
+        }
         if (!openPanel()) return TileResult.PanelNotOpened
 
         val deadline = SystemClock.uptimeMillis() + 8000
@@ -287,6 +308,8 @@ class QuickSettingsAutomator(private val svc: AccessibilityService) {
         val verifyEnd = SystemClock.uptimeMillis() + 4000
         delay(500)
         while (SystemClock.uptimeMillis() < verifyEnd) {
+            indicatorWindow()?.let { AppLog.i(tag, "클릭 후 AI 기록 표시 창($it) 확인"); after = true }
+            if (after == true) break
             if (!isPanelOpen()) { panelClosed = true; break }
             after = currentState(name)
             if (after == true) break
@@ -296,7 +319,8 @@ class QuickSettingsAutomator(private val svc: AccessibilityService) {
             AppLog.i(tag, "클릭 후 패널이 닫힘(타일이 화면을 띄웠을 수 있음): " +
                 io.github.forlig85.memoauto.monitor.ForegroundTracker.describeWindows(svc))
             delay(800)
-            if (openPanel()) after = currentState(name)
+            if (indicatorWindow() != null) after = true
+            else if (openPanel()) after = currentState(name)
         }
         if (after != true && micBefore >= 0) {
             val recs = otherRecordings()
