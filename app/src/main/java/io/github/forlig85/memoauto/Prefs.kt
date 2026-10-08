@@ -61,7 +61,12 @@ object Prefs {
         get() = sp.getBoolean("click_unknown_tile", false)
         set(v) = putBool("click_unknown_tile", v)
 
-    /** 타일이 상태를 알려주지 않으면, 다른 앱이 마이크로 녹음 중인지로 AI 기록 켜짐을 판단. */
+    /** 타일이 상태를 알려주지 않으면, 화면 캡처로 타일 색을 같은 패널의 켜짐/꺼짐 타일과 비교해 판단. */
+    var tileStateByColor: Boolean
+        get() = sp.getBoolean("tile_state_by_color", true)
+        set(v) = putBool("tile_state_by_color", v)
+
+    /** 색으로도 판단이 안 될 때, 다른 앱이 마이크로 녹음 중인지로 AI 기록 켜짐을 판단. */
     var tileStateByMic: Boolean
         get() = sp.getBoolean("tile_state_by_mic", true)
         set(v) = putBool("tile_state_by_mic", v)

@@ -250,16 +250,21 @@ class QuickSettingsAutomator(private val svc: AccessibilityService) {
         val tileState = readState(cand.target)
         AppLog.i(tag, "타일 발견(점수 ${cand.score}, 페이지 ${pages + 1}): ${cand.desc} → 상태 ${stateText(tileState)}")
 
-        // 타일이 상태를 알려주지 않으면(ZUI AI 기록은 Button + 빈 상태) 마이크 사용 여부로 판단
+        // 타일이 상태를 알려주지 않으면(ZUI AI 기록은 Button + 빈 상태) ① 색 ② 마이크 사용 순으로 판단
         var state = tileState
         var micBefore = -1
         if (state == null) {
             AppLog.i(tag, "상태를 노출하지 않는 타일(class=${cand.target.className}, stateDescription='${cand.target.stateDescription}')")
-            if (Prefs.tileStateByMic && !RecorderService.isActive) {
+            if (Prefs.tileStateByColor) {
+                val v = colorReader.judge(panelRoots(), cand.target)
+                state = v.on
+                AppLog.i(tag, "색으로 판단: ${stateText(v.on)} — ${v.detail}")
+            }
+            if (state == null && Prefs.tileStateByMic && !RecorderService.isActive) {
                 val recs = otherRecordings()
                 micBefore = recs.size
                 state = recs.isNotEmpty()
-                AppLog.i(tag, "마이크로 판단: 다른 녹음 ${recs.size}개 ${describeRecs(recs)} → AI 기록 ${if (state == true) "켜져 있는 것으로 봄" else "꺼져 있는 것으로 봄"}")
+                AppLog.i(tag, "마이크로 판단: 다른 녹음 ${recs.size}개 ${describeRecs(recs)} → ${stateText(state)}")
             }
         }
         if (state == true) {
@@ -276,34 +281,27 @@ class QuickSettingsAutomator(private val svc: AccessibilityService) {
         }
         AppLog.i(tag, "타일 클릭")
 
-        if (micBefore >= 0) {
-            // 마이크 기준 확인: 새 녹음이 생기면 켜진 것
-            var turnedOn = false
-            waitUntil(7000, 300) {
-                turnedOn = otherRecordings().size > micBefore
-                turnedOn
-            }
-            AppLog.i(tag, "클릭 후 " + io.github.forlig85.memoauto.monitor.ForegroundTracker.describeWindows(svc))
-            val after = otherRecordings()
-            AppLog.i(tag, "클릭 후 다른 녹음 ${after.size}개 ${describeRecs(after)}")
-            dismissPanel()
-            return if (turnedOn) TileResult.TurnedOn else TileResult.ClickedUnverified
-        }
-
-        // 결과 확인: 패널이 열려 있으면 상태가 켜짐으로 바뀌는지 폴링
+        // 결과 확인: 패널이 열려 있는 동안 상태(또는 색)가 켜짐으로 바뀌는지 폴링
         var after: Boolean? = null
         var panelClosed = false
-        waitUntil(2500, 250) {
-            if (!isPanelOpen()) { panelClosed = true; return@waitUntil true }
-            after = findTile(name)?.let { readState(it.target) }
-            after == true
+        val verifyEnd = SystemClock.uptimeMillis() + 4000
+        delay(500)
+        while (SystemClock.uptimeMillis() < verifyEnd) {
+            if (!isPanelOpen()) { panelClosed = true; break }
+            after = currentState(name)
+            if (after == true) break
+            delay(500)
         }
         if (panelClosed) {
-            AppLog.i(tag, "클릭 후 패널이 닫힘(타일이 화면을 띄웠을 수 있음) → 상태 확인을 위해 다시 열기")
+            AppLog.i(tag, "클릭 후 패널이 닫힘(타일이 화면을 띄웠을 수 있음): " +
+                io.github.forlig85.memoauto.monitor.ForegroundTracker.describeWindows(svc))
             delay(800)
-            if (openPanel()) {
-                after = findTile(name)?.let { readState(it.target) }
-            }
+            if (openPanel()) after = currentState(name)
+        }
+        if (after != true && micBefore >= 0) {
+            val recs = otherRecordings()
+            AppLog.i(tag, "클릭 후 다른 녹음 ${recs.size}개 ${describeRecs(recs)}")
+            if (recs.size > micBefore) after = true
         }
         dismissPanel()
         AppLog.i(tag, "클릭 후 상태: ${stateText(after)}")
@@ -312,6 +310,21 @@ class QuickSettingsAutomator(private val svc: AccessibilityService) {
             false -> TileResult.StillOff
             null -> TileResult.ClickedUnverified
         }
+    }
+
+    private val colorReader = TileColorReader(svc)
+
+    private fun panelRoots(): List<AccessibilityNodeInfo> =
+        panelWindows().mapNotNull { runCatching { it.root }.getOrNull() }
+
+    /** 타일을 다시 찾아 상태 → (설정 시) 색 순으로 판단. */
+    private suspend fun currentState(name: String): Boolean? {
+        val c = findTile(name) ?: return null
+        readState(c.target)?.let { return it }
+        if (!Prefs.tileStateByColor) return null
+        val v = colorReader.judge(panelRoots(), c.target)
+        AppLog.i(tag, "색 확인: ${stateText(v.on)} — ${v.detail}")
+        return v.on
     }
 
     /** 이 앱이 녹음 중이 아닐 때 호출: 기기에서 진행 중인 (다른 앱의) 녹음 목록. 일반 앱에는 익명으로 보인다. */
@@ -348,6 +361,10 @@ class QuickSettingsAutomator(private val svc: AccessibilityService) {
                 }
                 val c = findTile(Prefs.tileName)
                 sb.appendLine(">> 이 페이지 타일 탐색: ${c?.let { "${it.desc} 점수 ${it.score} 상태 ${stateText(readState(it.target))}" } ?: "없음"}")
+                if (c != null && readState(c.target) == null) {
+                    val v = colorReader.judge(panelRoots(), c.target)
+                    sb.appendLine(">> 색 판단: ${stateText(v.on)} — ${v.detail}")
+                }
                 if (page == 3 || !scrollPanel(forward = true)) break
                 delay(600)
             }

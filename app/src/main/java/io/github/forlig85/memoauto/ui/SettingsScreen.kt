@@ -48,6 +48,7 @@ fun SettingsScreen(resumeTick: Int) {
     var customAway by remember { mutableStateOf(Prefs.awaySeconds.toString()) }
     var unknownClick by remember { mutableStateOf(Prefs.clickUnknownTile) }
     var stateByMic by remember { mutableStateOf(Prefs.tileStateByMic) }
+    var stateByColor by remember { mutableStateOf(Prefs.tileStateByColor) }
     var startMode by remember { mutableStateOf(Prefs.startMode) }
     var location by remember(resumeTick) { mutableStateOf(OutputStore.describeLocation(ctx)) }
     var project by remember { mutableStateOf(Prefs.projectName) }
@@ -101,8 +102,12 @@ fun SettingsScreen(resumeTick: Int) {
             )
             Hint("빠른 설정에 보이는 글자 그대로. 띄어쓰기는 무시하고 비교합니다.")
             SwitchRow(
-                "타일 상태를 마이크 사용으로 판단", stateByMic,
-                hint = "켬(권장): 타일이 켜짐/꺼짐을 알려주지 않으면, 다른 앱이 녹음 중일 때 AI 기록이 켜진 것으로 보고 누르지 않음"
+                "타일 상태를 색으로 판단", stateByColor,
+                hint = "켬(권장): 타일이 켜짐/꺼짐을 알려주지 않으면 화면을 캡처해 같은 패널의 켜진/꺼진 타일 색과 비교"
+            ) { stateByColor = it; Prefs.tileStateByColor = it }
+            SwitchRow(
+                "색으로도 모르면 마이크 사용으로 판단", stateByMic,
+                hint = "다른 앱이 녹음 중이면 AI 기록이 켜진 것으로 봄(통화·음성비서도 녹음으로 잡힐 수 있음)"
             ) { stateByMic = it; Prefs.tileStateByMic = it }
             SwitchRow(
                 "상태를 모르면 누르기", unknownClick,
