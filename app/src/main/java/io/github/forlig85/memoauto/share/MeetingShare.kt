@@ -64,7 +64,8 @@ object MeetingShare {
                     ctx.startActivity(i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
                     AppLog.i(TAG, "ChatGPT 로 공유: type=$type activity=${target.name}")
                     Notifier.toast(ctx, "ChatGPT로 넘겼습니다. 프롬프트는 클립보드에도 복사돼 있습니다(안 보이면 입력창을 길게 눌러 붙여넣기).")
-                    if (Prefs.sendMode != io.github.forlig85.memoauto.SendMode.MANUAL) armAutoSend(prompt)
+                    RecordingHistory.setStatus(info.uri, SendStatus.SHARED)
+                    if (Prefs.sendMode != io.github.forlig85.memoauto.SendMode.MANUAL) armAutoSend(prompt, info)
                     return true
                 } catch (e: Exception) {
                     AppLog.w(TAG, "ChatGPT 공유 실행 실패(type=$type)", e)
@@ -79,6 +80,7 @@ object MeetingShare {
             val chooser = Intent.createChooser(sendIntent(info, prompt, info.mime), "회의록 만들기 — 앱 선택")
                 .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_GRANT_READ_URI_PERMISSION)
             ctx.startActivity(chooser)
+            RecordingHistory.setStatus(info.uri, SendStatus.SHARED)
             Notifier.toast(ctx, "ChatGPT로 바로 넘기지 못해 공유 선택창을 엽니다. 프롬프트는 클립보드에 복사돼 있습니다.")
             false
         } catch (e: Exception) {
@@ -87,13 +89,13 @@ object MeetingShare {
         }
     }
 
-    private fun armAutoSend(prompt: String) {
+    private fun armAutoSend(prompt: String, info: RecordingInfo) {
         val s = AutomationService.instance
         if (s == null) {
             AppLog.w(TAG, "접근성 서비스가 없어 자동 전송을 할 수 없음 — ChatGPT에서 직접 전송하세요")
             return
         }
-        s.armChatGptAutoSend(prompt)
+        s.armChatGptAutoSend(prompt) { RecordingHistory.setStatus(info.uri, SendStatus.SENT) }
     }
 
     /** 파일만 다른 앱으로 공유. */

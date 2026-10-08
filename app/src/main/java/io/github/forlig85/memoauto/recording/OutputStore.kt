@@ -106,7 +106,7 @@ object OutputStore {
         }
     }.getOrNull()
 
-    private fun querySize(ctx: Context, uri: Uri): Long = runCatching {
+    fun querySize(ctx: Context, uri: Uri): Long = runCatching {
         ctx.contentResolver.openFileDescriptor(uri, "r")?.use { it.statSize } ?: -1L
     }.getOrDefault(-1L)
 

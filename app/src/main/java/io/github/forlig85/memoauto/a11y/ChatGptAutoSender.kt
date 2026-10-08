@@ -25,9 +25,9 @@ class ChatGptAutoSender(private val svc: AccessibilityService) {
     private val sendWords = listOf("보내기", "전송", "send", "submit")
     private val excludeWords = listOf("음성", "voice", "받아쓰기", "dictat", "마이크", "mic", "녹음", "record", "중지", "stop")
 
-    fun arm(scope: CoroutineScope, prompt: String, timeoutMs: Long = 180_000) {
+    fun arm(scope: CoroutineScope, prompt: String, timeoutMs: Long = 180_000, onSent: () -> Unit = {}) {
         job?.cancel()
-        job = scope.launch { run(prompt, timeoutMs) }
+        job = scope.launch { run(prompt, timeoutMs, onSent) }
     }
 
     fun cancel() {
@@ -98,7 +98,7 @@ class ChatGptAutoSender(private val svc: AccessibilityService) {
         return p
     }
 
-    private suspend fun run(prompt: String, timeoutMs: Long) {
+    private suspend fun run(prompt: String, timeoutMs: Long, onSent: () -> Unit) {
         AppLog.i(tag, "ChatGPT 전송 대기 시작(최대 ${timeoutMs / 1000}초)")
         val start = SystemClock.uptimeMillis()
         val end = start + timeoutMs
@@ -161,6 +161,7 @@ class ChatGptAutoSender(private val svc: AccessibilityService) {
                 val after = chatGptRoot()?.let { findEditable(it) }
                 AppLog.i(tag, "전송 후 입력창: '${after?.text?.toString()?.take(30) ?: "(없음)"}'")
                 Notifier.toast(svc, "ChatGPT로 회의록 요청을 전송했습니다")
+                onSent()
                 return
             }
             break

@@ -32,6 +32,7 @@ object PostRecording {
     private suspend fun onSaved(app: Context, e: RecEvent.Saved) {
         val info = RecordingInfo(e.uri, e.name, e.mime, e.durationMs, e.bytes, e.isMediaStore)
         Prefs.lastRecording = info
+        RecordingHistory.add(info)
         Notifier.saved(app, info)
         if (!e.automatic) {
             AppLog.i(TAG, "직접 시작한 녹음이라 결과 화면/ChatGPT 자동 실행은 하지 않음")

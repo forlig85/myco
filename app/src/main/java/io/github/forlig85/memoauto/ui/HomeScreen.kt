@@ -45,7 +45,7 @@ import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-fun HomeScreen(resumeTick: Int, onOpenLog: () -> Unit) {
+fun HomeScreen(resumeTick: Int, onOpenLog: () -> Unit, onOpenList: () -> Unit = {}) {
     val ctx = LocalContext.current
     val scope = rememberCoroutineScope()
     val rec by RecorderService.state.collectAsState()
@@ -130,6 +130,14 @@ fun HomeScreen(resumeTick: Int, onOpenLog: () -> Unit) {
             }
         }
 
+        val history by io.github.forlig85.memoauto.share.RecordingHistory.items.collectAsState()
+        val pendingCount = history.count { it.status == io.github.forlig85.memoauto.share.SendStatus.NOT_SENT }
+        if (pendingCount > 0) {
+            Section("전송 대기 ${pendingCount}건") {
+                Text("ChatGPT로 아직 보내지 않은 회의 녹음이 있습니다.")
+                Button(onClick = onOpenList) { Text("녹음 목록 보기") }
+            }
+        }
         val last = remember(resumeTick, rec) { Prefs.lastRecording }
         if (last != null && rec !is RecState.Recording) {
             Section("최근 녹음") {

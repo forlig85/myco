@@ -28,6 +28,7 @@ class MainActivity : ComponentActivity() {
         const val TAB_HOME = 0
         const val TAB_SETTINGS = 1
         const val TAB_LOG = 2
+        const val TAB_LIST = 3
     }
 
     /** onResume 마다 증가 → 권한 상태 등을 다시 읽게 한다. */
@@ -71,29 +72,22 @@ fun AppTheme(content: @Composable () -> Unit) {
 
 @Composable
 private fun Root(tab: Int, onTab: (Int) -> Unit, resumeTick: Int) {
-    val ctx = androidx.compose.ui.platform.LocalContext.current
-    val titles = listOf("홈", "설정", "로그", "녹음 결과")
+    val titles = listOf("홈", "설정", "로그", "녹음 목록")
     Scaffold(
         topBar = {
             TabRow(selectedTabIndex = tab, modifier = Modifier.statusBarsPadding()) {
                 titles.forEachIndexed { i, t ->
-                    Tab(selected = tab == i, onClick = {
-                        if (i == 3) {
-                            // 최근 녹음 결과 화면 열기
-                            val last = io.github.forlig85.memoauto.Prefs.lastRecording
-                            if (last != null) ctx.startActivity(ResultActivity.intent(ctx, last, autoShare = false))
-                            else io.github.forlig85.memoauto.Notifier.toast(ctx, "아직 저장된 녹음이 없습니다")
-                        } else onTab(i)
-                    }, text = { Text(t) })
+                    Tab(selected = tab == i, onClick = { onTab(i) }, text = { Text(t) })
                 }
             }
         }
     ) { pad ->
         Column(Modifier.fillMaxSize().padding(pad)) {
             when (tab) {
-                MainActivity.TAB_HOME -> HomeScreen(resumeTick, onOpenLog = { onTab(MainActivity.TAB_LOG) })
+                MainActivity.TAB_HOME -> HomeScreen(resumeTick, onOpenLog = { onTab(MainActivity.TAB_LOG) }, onOpenList = { onTab(MainActivity.TAB_LIST) })
                 MainActivity.TAB_SETTINGS -> SettingsScreen(resumeTick)
-                else -> LogScreen()
+                MainActivity.TAB_LOG -> LogScreen()
+                else -> RecordingsScreen()
             }
         }
     }

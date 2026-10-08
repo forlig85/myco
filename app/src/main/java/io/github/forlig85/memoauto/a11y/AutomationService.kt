@@ -70,9 +70,9 @@ class AutomationService : AccessibilityService() {
 
     private var chatGptSender: ChatGptAutoSender? = null
 
-    fun armChatGptAutoSend(prompt: String) {
+    fun armChatGptAutoSend(prompt: String, onSent: () -> Unit = {}) {
         val s = chatGptSender ?: ChatGptAutoSender(this).also { chatGptSender = it }
-        s.arm(scope, prompt)
+        s.arm(scope, prompt, onSent = onSent)
     }
 
     fun runTileTest() {

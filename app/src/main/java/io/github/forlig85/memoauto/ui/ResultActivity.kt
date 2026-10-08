@@ -136,6 +136,7 @@ class ResultActivity : ComponentActivity() {
                 deleted = true
                 AppLog.i("결과화면", "삭제 완료(시스템 확인 후)")
                 if (Prefs.lastRecording?.uri == r?.uri) Prefs.lastRecording = null
+                r?.let { io.github.forlig85.memoauto.share.RecordingHistory.remove(it.uri) }
             }
         }
 
@@ -145,6 +146,7 @@ class ResultActivity : ComponentActivity() {
                     deleted = true
                     AppLog.i("결과화면", "삭제: ${rec.name}")
                     if (Prefs.lastRecording?.uri == rec.uri) Prefs.lastRecording = null
+                    io.github.forlig85.memoauto.share.RecordingHistory.remove(rec.uri)
                 } else {
                     Notifier.alert(this, "삭제 실패", "파일이 이미 없거나 삭제할 수 없습니다.")
                 }
@@ -181,6 +183,7 @@ class ResultActivity : ComponentActivity() {
                     TextButton(onClick = {
                         askSend.value = false
                         AppLog.i("결과화면", "사용자가 전송 보류(나중에)")
+                        Notifier.toast(this@ResultActivity, "녹음 목록에 '미전송'으로 남겨뒀습니다. 목록에서 언제든 보낼 수 있습니다.")
                     }) { Text("나중에") }
                 },
             )
@@ -200,8 +203,8 @@ class ResultActivity : ComponentActivity() {
             topBar = {
                 // 메인 화면과 같은 탭. 다른 탭을 누르면 메인 화면의 해당 탭으로 이동
                 TabRow(selectedTabIndex = 3, modifier = Modifier.statusBarsPadding()) {
-                    listOf("홈", "설정", "로그", "녹음 결과").forEachIndexed { i, t ->
-                        Tab(selected = i == 3, onClick = { if (i != 3) goTab(i) }, text = { Text(t) })
+                    listOf("홈", "설정", "로그", "녹음 목록").forEachIndexed { i, t ->
+                        Tab(selected = i == 3, onClick = { goTab(i) }, text = { Text(t) })
                     }
                 }
             }
