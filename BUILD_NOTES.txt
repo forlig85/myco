@@ -1,0 +1,19 @@
+권장 빌드 환경
+- Android Studio (최근 버전)
+- JDK 17 이상
+- Android SDK Platform 35
+
+APK 생성
+- Android Studio > Build > Build APK(s)
+
+테스트 순서
+1. 앱 실행
+2. 마이크/알림 권한 허용
+3. 다른 앱 위에 표시 허용
+4. 접근성 서비스 켜기
+5. 메모 앱 선택
+6. AI 기록 타일 텍스트 확인
+7. 자동화 사용 ON 후 저장
+8. '테스트: AI 기록 타일 누르기'
+9. '테스트: 15초 녹음' 후 Recordings/MemoAuto 확인
+10. 메모 앱을 열고 자동 시작/60초 이탈 종료 확인
