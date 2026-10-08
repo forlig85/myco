@@ -7,6 +7,12 @@ import android.os.Bundle
 import android.provider.DocumentsContract
 import android.provider.MediaStore
 import androidx.activity.ComponentActivity
+import androidx.activity.addCallback
+import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Tab
+import androidx.compose.material3.TabRow
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -20,7 +26,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.foundation.verticalScroll
@@ -28,7 +33,6 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -75,6 +79,8 @@ class ResultActivity : ComponentActivity() {
         info.value = RecordingInfo.from(intent) ?: Prefs.lastRecording
         if (savedInstanceState == null) maybeAutoShare(intent)
         else askSend.value = savedInstanceState.getBoolean(STATE_ASK, false)
+        // 뒤로가기 = 홈 탭으로(백그라운드에서 열린 경우 뒤로가기로 앱 밖으로 나가버리지 않게)
+        onBackPressedDispatcher.addCallback(this) { goTab(MainActivity.TAB_HOME) }
         setContent { AppTheme { ResultScreen() } }
     }
 
@@ -101,6 +107,16 @@ class ResultActivity : ComponentActivity() {
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
         outState.putBoolean(STATE_ASK, askSend.value)
+    }
+
+    /** 메인 화면의 탭으로 이동하고 결과 화면은 닫는다. */
+    private fun goTab(tab: Int) {
+        startActivity(
+            Intent(this, MainActivity::class.java)
+                .putExtra(MainActivity.EXTRA_TAB, tab)
+                .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP)
+        )
+        finish()
     }
 
     private fun deleteDirect(r: RecordingInfo): Boolean {
@@ -180,9 +196,18 @@ class ResultActivity : ComponentActivity() {
             )
         }
 
-        Surface(Modifier.fillMaxSize()) {
+        Scaffold(
+            topBar = {
+                // 메인 화면과 같은 탭. 다른 탭을 누르면 메인 화면의 해당 탭으로 이동
+                TabRow(selectedTabIndex = 3, modifier = Modifier.statusBarsPadding()) {
+                    listOf("홈", "설정", "로그", "녹음 결과").forEachIndexed { i, t ->
+                        Tab(selected = i == 3, onClick = { if (i != 3) goTab(i) }, text = { Text(t) })
+                    }
+                }
+            }
+        ) { pad ->
             Column(
-                Modifier.fillMaxSize().safeDrawingPadding().verticalScroll(rememberScrollState()).padding(20.dp),
+                Modifier.fillMaxSize().padding(pad).navigationBarsPadding().verticalScroll(rememberScrollState()).padding(20.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 Text("회의 녹음 완료", style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold)
@@ -191,7 +216,7 @@ class ResultActivity : ComponentActivity() {
                 } else if (deleted) {
                     Text(r.name, style = MaterialTheme.typography.titleMedium)
                     Text("삭제되었습니다.", color = MaterialTheme.colorScheme.error)
-                    OutlinedButton(onClick = { finish() }) { Text("닫기") }
+                    OutlinedButton(onClick = { goTab(MainActivity.TAB_HOME) }) { Text("홈으로") }
                 } else {
                 Text(r.name, style = MaterialTheme.typography.titleMedium)
                 Text("길이 ${r.durationText} · ${r.sizeText}", style = MaterialTheme.typography.bodyMedium)
