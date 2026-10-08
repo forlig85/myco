@@ -108,7 +108,9 @@ class QuickSettingsAutomator(private val svc: AccessibilityService) {
                 if ("switch" in cls || "button" in cls || "tile" in cls || "tile" in vid || "qs" in vid) score += 2
                 if (target.isCheckable || target.stateDescription != null) score += 1
                 if (target.isVisibleToUser) score += 1
-                if (hasAncestorId(node, "notification")) score -= 6
+                // 알림 목록 안의 글자(예: 이 앱의 "AI 기록 타일" 알림)는 제외. ZUI 는 빠른 설정 자체가
+                // notification_panel 안에 있으므로 "notification" 전체가 아니라 알림 행만 본다.
+                if (hasAncestorId(node, "notification_stack_scroller") || hasAncestorId(node, "expandablenotificationrow")) score -= 6
                 val c = Candidate(target, score, "${target.className} id=${target.viewIdResourceName} t='${node.text}' d='${node.contentDescription}'")
                 if (best == null || score > best!!.score) best = c
             }
@@ -244,6 +246,9 @@ class QuickSettingsAutomator(private val svc: AccessibilityService) {
 
         val state = readState(cand.target)
         AppLog.i(tag, "타일 발견(점수 ${cand.score}, 페이지 ${pages + 1}): ${cand.desc} → 상태 ${stateText(state)}")
+        if (state == null) {
+            AppLog.i(tag, "상태를 노출하지 않는 타일(class=${cand.target.className}, stateDescription='${cand.target.stateDescription}')")
+        }
         if (state == true) {
             dismissPanel()
             return TileResult.AlreadyOn
