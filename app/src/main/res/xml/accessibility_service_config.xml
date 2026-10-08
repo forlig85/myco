@@ -2,9 +2,8 @@
 <accessibility-service xmlns:android="http://schemas.android.com/apk/res/android"
     android:accessibilityEventTypes="typeWindowStateChanged|typeWindowsChanged"
     android:accessibilityFeedbackType="feedbackGeneric"
-    android:notificationTimeout="80"
+    android:accessibilityFlags="flagReportViewIds|flagRetrieveInteractiveWindows|flagIncludeNotImportantViews"
     android:canRetrieveWindowContent="true"
-    android:canPerformGestures="true"
-    android:accessibilityFlags="flagReportViewIds|flagRetrieveInteractiveWindows"
     android:description="@string/accessibility_desc"
-    android:settingsActivity="com.openai.memoautorecorder.MainActivity" />
+    android:notificationTimeout="100"
+    android:settingsActivity="io.github.forlig85.memoauto.ui.MainActivity" />
