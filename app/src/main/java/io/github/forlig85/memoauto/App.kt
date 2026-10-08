@@ -23,6 +23,7 @@ class App : Application() {
         // 이 시점에 녹음 서비스는 절대 돌고 있지 않다(새 프로세스). 남은 작성 중 파일은 고아.
         OutputStore.recoverOrphan(this)
         SessionController.init(this)
+        io.github.forlig85.memoauto.share.PostRecording.init(this)
     }
 
     private fun installCrashLogger() {

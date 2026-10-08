@@ -32,6 +32,8 @@ import io.github.forlig85.memoauto.AppLog
 import io.github.forlig85.memoauto.Prefs
 import io.github.forlig85.memoauto.StartMode
 import io.github.forlig85.memoauto.recording.OutputStore
+import io.github.forlig85.memoauto.share.PromptBuilder
+import androidx.compose.ui.text.font.FontWeight
 
 @Composable
 fun SettingsScreen(resumeTick: Int) {
@@ -47,6 +49,12 @@ fun SettingsScreen(resumeTick: Int) {
     var unknownClick by remember { mutableStateOf(Prefs.clickUnknownTile) }
     var startMode by remember { mutableStateOf(Prefs.startMode) }
     var location by remember(resumeTick) { mutableStateOf(OutputStore.describeLocation(ctx)) }
+    var project by remember { mutableStateOf(Prefs.projectName) }
+    var notion by remember { mutableStateOf(Prefs.notionPath) }
+    var meetingType by remember { mutableStateOf(Prefs.meetingType) }
+    var template by remember { mutableStateOf(Prefs.promptTemplate) }
+    var autoOpen by remember { mutableStateOf(Prefs.autoOpenChatGpt) }
+    var autoSend by remember { mutableStateOf(Prefs.autoSendChatGpt) }
 
     val folderLauncher = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocumentTree()) { uri: Uri? ->
         if (uri != null) {
@@ -136,6 +144,48 @@ fun SettingsScreen(resumeTick: Int) {
                     )
                 }
             }
+        }
+
+        Section("회의록 (ChatGPT)") {
+            SwitchRow(
+                "녹음이 끝나면 ChatGPT 공유 자동 열기", autoOpen,
+                hint = "자동 녹음이 끝나면 결과 화면과 ChatGPT를 엽니다. 백그라운드 제한으로 못 열면 알림으로 대신 알려줍니다."
+            ) { autoOpen = it; Prefs.autoOpenChatGpt = it }
+            SwitchRow(
+                "ChatGPT 전송 버튼 자동 누르기", autoSend,
+                hint = "접근성으로 첨부 업로드가 끝나길 기다렸다가 전송을 한 번 누릅니다. 못 누르면 알림으로 알려줍니다."
+            ) { autoSend = it; Prefs.autoSendChatGpt = it }
+            OutlinedTextField(
+                value = project, onValueChange = { project = it; Prefs.projectName = it },
+                label = { Text("프로젝트명 {프로젝트}") }, singleLine = true, modifier = Modifier.fillMaxWidth(),
+            )
+            OutlinedTextField(
+                value = notion, onValueChange = { notion = it; Prefs.notionPath = it },
+                label = { Text("Notion 경로 {Notion 경로}") }, singleLine = true, modifier = Modifier.fillMaxWidth(),
+            )
+            OutlinedTextField(
+                value = meetingType, onValueChange = { meetingType = it; Prefs.meetingType = it },
+                label = { Text("회의 유형 {회의 유형}") }, singleLine = true, modifier = Modifier.fillMaxWidth(),
+            )
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                listOf("정기 회의", "고객 미팅", "내부 검토").forEach { t ->
+                    OutlinedButton(onClick = { meetingType = t; Prefs.meetingType = t }) { Text(t) }
+                }
+            }
+            OutlinedTextField(
+                value = template, onValueChange = { template = it; Prefs.promptTemplate = it },
+                label = { Text("프롬프트") }, minLines = 5, modifier = Modifier.fillMaxWidth(),
+            )
+            Hint("자동으로 채워지는 칸: " + PromptBuilder.PLACEHOLDERS.joinToString(" "))
+            OutlinedButton(onClick = {
+                template = PromptBuilder.DEFAULT_TEMPLATE
+                Prefs.promptTemplate = ""
+            }) { Text("기본 프롬프트로 되돌리기") }
+            Text("미리보기", fontWeight = FontWeight.Bold)
+            val preview = remember(template, project, notion, meetingType) {
+                PromptBuilder.build(OutputStore.fileName(io.github.forlig85.memoauto.recording.RecFormat.M4A))
+            }
+            Hint(preview)
         }
 
         Section("저장 폴더") {

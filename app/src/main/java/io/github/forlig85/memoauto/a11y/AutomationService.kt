@@ -68,6 +68,13 @@ class AutomationService : AccessibilityService() {
         }
     }
 
+    private var chatGptSender: ChatGptAutoSender? = null
+
+    fun armChatGptAutoSend(prompt: String) {
+        val s = chatGptSender ?: ChatGptAutoSender(this).also { chatGptSender = it }
+        s.arm(scope, prompt)
+    }
+
     fun runTileTest() {
         scope.launch { SessionController.reportTile(quickSettings.ensureTileOn(Prefs.tileName)) }
     }

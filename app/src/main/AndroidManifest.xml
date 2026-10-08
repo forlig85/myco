@@ -40,6 +40,12 @@
         </activity>
 
         <activity
+            android:name=".ui.ResultActivity"
+            android:exported="false"
+            android:label="회의 녹음 결과"
+            android:launchMode="singleTop" />
+
+        <activity
             android:name=".recording.RecorderKickActivity"
             android:configChanges="orientation|screenSize|screenLayout|smallestScreenSize|keyboard|keyboardHidden|navigation|uiMode|density"
             android:excludeFromRecents="true"

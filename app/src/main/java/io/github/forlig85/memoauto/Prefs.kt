@@ -88,6 +88,61 @@ object Prefs {
         sp.edit().remove("pending_uri").remove("pending_name").remove("pending_mediastore").apply()
     }
 
+    // ── 회의록 (ChatGPT 공유) ─────────────────────────
+    var promptTemplate: String
+        get() = str("prompt_template", "").ifBlank { io.github.forlig85.memoauto.share.PromptBuilder.DEFAULT_TEMPLATE }
+        set(v) = putStr("prompt_template", v)
+
+    var projectName: String
+        get() = str("project_name", "다이렉트")
+        set(v) = putStr("project_name", v)
+
+    var notionPath: String
+        get() = str("notion_path", "업무 허브 / 10 과제·프로젝트 / 다이렉트 / 회의록")
+        set(v) = putStr("notion_path", v)
+
+    var meetingType: String
+        get() = str("meeting_type", "정기 회의")
+        set(v) = putStr("meeting_type", v)
+
+    /** 자동 녹음이 끝나면 결과 화면을 열고 ChatGPT 공유까지 바로 실행. */
+    var autoOpenChatGpt: Boolean
+        get() = sp.getBoolean("auto_open_chatgpt", true)
+        set(v) = putBool("auto_open_chatgpt", v)
+
+    /** ChatGPT 화면에서 전송 버튼을 접근성으로 자동 탭. */
+    var autoSendChatGpt: Boolean
+        get() = sp.getBoolean("auto_send_chatgpt", true)
+        set(v) = putBool("auto_send_chatgpt", v)
+
+    // ── 최근 녹음 ───────────────────────────────────────
+    var lastRecording: io.github.forlig85.memoauto.share.RecordingInfo?
+        get() {
+            val uri = sp.getString("last_rec_uri", null) ?: return null
+            return io.github.forlig85.memoauto.share.RecordingInfo(
+                uri = android.net.Uri.parse(uri),
+                name = str("last_rec_name", "?"),
+                mime = str("last_rec_mime", "audio/mp4"),
+                durationMs = sp.getLong("last_rec_duration", 0),
+                bytes = sp.getLong("last_rec_bytes", 0),
+                isMediaStore = sp.getBoolean("last_rec_mediastore", true),
+            )
+        }
+        set(v) {
+            val e = sp.edit()
+            if (v == null) {
+                e.remove("last_rec_uri")
+            } else {
+                e.putString("last_rec_uri", v.uri.toString())
+                    .putString("last_rec_name", v.name)
+                    .putString("last_rec_mime", v.mime)
+                    .putLong("last_rec_duration", v.durationMs)
+                    .putLong("last_rec_bytes", v.bytes)
+                    .putBoolean("last_rec_mediastore", v.isMediaStore)
+            }
+            e.apply()
+        }
+
     var lastExitInfoTime: Long
         get() = sp.getLong("last_exit_info_time", 0L)
         set(v) = sp.edit().putLong("last_exit_info_time", v).apply()

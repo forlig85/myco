@@ -130,6 +130,17 @@ fun HomeScreen(resumeTick: Int, onOpenLog: () -> Unit) {
             }
         }
 
+        val last = remember(resumeTick, rec) { Prefs.lastRecording }
+        if (last != null && rec !is RecState.Recording) {
+            Section("최근 녹음") {
+                Text("${last.name} · ${last.durationText} · ${last.sizeText}")
+                FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Button(onClick = { ctx.startActivity(ResultActivity.intent(ctx, last, autoShare = false)) }) { Text("결과 화면") }
+                    OutlinedButton(onClick = { ctx.startActivity(ResultActivity.intent(ctx, last, autoShare = true)) }) { Text("회의록 만들기") }
+                }
+            }
+        }
+
         Section("준비 (위에서부터 차례로)") {
             CheckRow(
                 "메모 앱", checks.target.isNotEmpty(),

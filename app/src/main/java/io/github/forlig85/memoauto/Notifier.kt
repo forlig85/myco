@@ -7,12 +7,14 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.graphics.drawable.Icon
-import android.net.Uri
 import android.os.Handler
 import android.os.Looper
 import android.widget.Toast
 import io.github.forlig85.memoauto.recording.RecorderService
+import io.github.forlig85.memoauto.share.MeetingShare
+import io.github.forlig85.memoauto.share.RecordingInfo
 import io.github.forlig85.memoauto.ui.MainActivity
+import io.github.forlig85.memoauto.ui.ResultActivity
 import java.util.concurrent.atomic.AtomicInteger
 
 /** 알림·토스트. 실패는 조용히 넘기지 않고 여기로 모은다. */
@@ -92,19 +94,43 @@ object Notifier {
         runCatching { ctx.getSystemService(NotificationManager::class.java).cancel(id) }
     }
 
-    fun saved(ctx: Context, name: String, uri: Uri, mime: String) {
-        val play = Intent(Intent.ACTION_VIEW).setDataAndType(uri, mime)
-            .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_ACTIVITY_NEW_TASK)
-        val playPi = PendingIntent.getActivity(ctx, 20, play, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
+    private fun pi(ctx: Context, req: Int, i: Intent): PendingIntent =
+        PendingIntent.getActivity(ctx, req, i, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
+
+    private fun action(ctx: Context, title: String, p: PendingIntent) =
+        Notification.Action.Builder(Icon.createWithResource(ctx, R.drawable.ic_mic), title, p).build()
+
+    /** 완료 알림: 탭 = 결과 화면, 버튼 = 재생 / 회의록 만들기 / 공유 (삭제는 결과 화면에서). */
+    fun saved(ctx: Context, info: RecordingInfo) {
+        val share = Intent.createChooser(
+            Intent(Intent.ACTION_SEND).setType(info.mime).putExtra(Intent.EXTRA_STREAM, info.uri)
+                .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION),
+            "녹음 파일 공유"
+        )
         val n = Notification.Builder(ctx, CH_DONE)
             .setSmallIcon(R.drawable.ic_mic)
             .setContentTitle("회의 녹음 완료")
-            .setContentText(name)
+            .setContentText("${info.name} · ${info.durationText} · ${info.sizeText}")
             .setAutoCancel(true)
-            .setContentIntent(openAppIntent(ctx))
-            .addAction(Notification.Action.Builder(Icon.createWithResource(ctx, R.drawable.ic_mic), "재생", playPi).build())
+            .setContentIntent(pi(ctx, 30, ResultActivity.intent(ctx, info, autoShare = false)))
+            .addAction(action(ctx, "재생", pi(ctx, 31, MeetingShare.playIntent(info))))
+            .addAction(action(ctx, "회의록 만들기", pi(ctx, 32, ResultActivity.intent(ctx, info, autoShare = true))))
+            .addAction(action(ctx, "파일 공유", pi(ctx, 33, share)))
             .build()
         runCatching { ctx.getSystemService(NotificationManager::class.java).notify(ID_DONE, n) }
+    }
+
+    /** 결과 화면을 자동으로 못 열었을 때: 눈에 띄는 알림으로 회의록 만들기를 안내. */
+    fun minutesReminder(ctx: Context, info: RecordingInfo) {
+        val n = Notification.Builder(ctx, CH_ALERT)
+            .setSmallIcon(R.drawable.ic_mic)
+            .setContentTitle("회의 녹음 완료 — 회의록을 만들까요?")
+            .setContentText("눌러서 ChatGPT로 회의록 요청: ${info.name}")
+            .setAutoCancel(true)
+            .setContentIntent(pi(ctx, 34, ResultActivity.intent(ctx, info, autoShare = true)))
+            .addAction(action(ctx, "회의록 만들기", pi(ctx, 35, ResultActivity.intent(ctx, info, autoShare = true))))
+            .build()
+        runCatching { ctx.getSystemService(NotificationManager::class.java).notify(ID_DONE + 1, n) }
     }
 
     fun toast(ctx: Context, text: String) {

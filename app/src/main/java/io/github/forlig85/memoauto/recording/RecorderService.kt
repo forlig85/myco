@@ -48,7 +48,16 @@ sealed interface RecEvent {
     /** 시작 후 약 2.5초간 검증(무음 처리 여부)까지 통과. */
     data class Started(val name: String, val via: String) : RecEvent
     data class Failed(val reason: FailReason, val message: String, val via: String) : RecEvent
-    data class Saved(val name: String, val uri: Uri, val mime: String, val durationMs: Long, val bytes: Long) : RecEvent
+    data class Saved(
+        val name: String,
+        val uri: Uri,
+        val mime: String,
+        val durationMs: Long,
+        val bytes: Long,
+        val isMediaStore: Boolean,
+        /** 자동화(메모 앱 감지)로 시작된 녹음인지. 앱 화면에서 직접 시작한 테스트 녹음은 false. */
+        val automatic: Boolean,
+    ) : RecEvent
 }
 
 /**
@@ -410,8 +419,12 @@ class RecorderService : Service() {
             try {
                 OutputStore.finishSuccess(this, out)
                 AppLog.i(TAG, "녹음 저장 완료($reason): ${out.displayName}, ${duration / 1000}초, ${bytes / 1024}KB")
-                _events.tryEmit(RecEvent.Saved(out.displayName, out.uri, out.mime, duration, bytes))
-                Notifier.saved(this, out.displayName, out.uri, out.mime)
+                _events.tryEmit(
+                    RecEvent.Saved(
+                        out.displayName, out.uri, out.mime, duration, bytes, out.isMediaStore,
+                        automatic = via == RecordStarter.VIA_DIRECT || via == RecordStarter.VIA_KICK,
+                    )
+                )
             } catch (e: Exception) {
                 AppLog.e(TAG, "파일 마무리 실패", e)
                 Notifier.alert(this, "녹음 저장 실패", "파일 마무리 중 오류: ${e.message}")
