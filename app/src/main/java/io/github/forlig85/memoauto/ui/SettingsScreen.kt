@@ -47,6 +47,7 @@ fun SettingsScreen(resumeTick: Int) {
     var away by remember { mutableStateOf(Prefs.awaySeconds) }
     var customAway by remember { mutableStateOf(Prefs.awaySeconds.toString()) }
     var unknownClick by remember { mutableStateOf(Prefs.clickUnknownTile) }
+    var stateByMic by remember { mutableStateOf(Prefs.tileStateByMic) }
     var startMode by remember { mutableStateOf(Prefs.startMode) }
     var location by remember(resumeTick) { mutableStateOf(OutputStore.describeLocation(ctx)) }
     var project by remember { mutableStateOf(Prefs.projectName) }
@@ -99,6 +100,10 @@ fun SettingsScreen(resumeTick: Int) {
                 modifier = Modifier.fillMaxWidth(),
             )
             Hint("빠른 설정에 보이는 글자 그대로. 띄어쓰기는 무시하고 비교합니다.")
+            SwitchRow(
+                "타일 상태를 마이크 사용으로 판단", stateByMic,
+                hint = "켬(권장): 타일이 켜짐/꺼짐을 알려주지 않으면, 다른 앱이 녹음 중일 때 AI 기록이 켜진 것으로 보고 누르지 않음"
+            ) { stateByMic = it; Prefs.tileStateByMic = it }
             SwitchRow(
                 "상태를 모르면 누르기", unknownClick,
                 hint = "끔(권장): 켜짐/꺼짐을 읽을 수 없으면 누르지 않음. 켜면 이미 켜진 AI 기록이 꺼질 수 있음"

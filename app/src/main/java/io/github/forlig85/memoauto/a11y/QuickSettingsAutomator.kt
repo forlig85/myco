@@ -10,6 +10,9 @@ import android.view.accessibility.AccessibilityNodeInfo.AccessibilityAction
 import android.view.accessibility.AccessibilityWindowInfo
 import io.github.forlig85.memoauto.AppLog
 import io.github.forlig85.memoauto.Prefs
+import io.github.forlig85.memoauto.recording.RecorderService
+import android.media.AudioManager
+import android.media.AudioRecordingConfiguration
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
@@ -244,10 +247,20 @@ class QuickSettingsAutomator(private val svc: AccessibilityService) {
             return TileResult.NotFound
         }
 
-        val state = readState(cand.target)
-        AppLog.i(tag, "타일 발견(점수 ${cand.score}, 페이지 ${pages + 1}): ${cand.desc} → 상태 ${stateText(state)}")
+        val tileState = readState(cand.target)
+        AppLog.i(tag, "타일 발견(점수 ${cand.score}, 페이지 ${pages + 1}): ${cand.desc} → 상태 ${stateText(tileState)}")
+
+        // 타일이 상태를 알려주지 않으면(ZUI AI 기록은 Button + 빈 상태) 마이크 사용 여부로 판단
+        var state = tileState
+        var micBefore = -1
         if (state == null) {
             AppLog.i(tag, "상태를 노출하지 않는 타일(class=${cand.target.className}, stateDescription='${cand.target.stateDescription}')")
+            if (Prefs.tileStateByMic && !RecorderService.isActive) {
+                val recs = otherRecordings()
+                micBefore = recs.size
+                state = recs.isNotEmpty()
+                AppLog.i(tag, "마이크로 판단: 다른 녹음 ${recs.size}개 ${describeRecs(recs)} → AI 기록 ${if (state == true) "켜져 있는 것으로 봄" else "꺼져 있는 것으로 봄"}")
+            }
         }
         if (state == true) {
             dismissPanel()
@@ -262,6 +275,20 @@ class QuickSettingsAutomator(private val svc: AccessibilityService) {
             return TileResult.ClickFailed
         }
         AppLog.i(tag, "타일 클릭")
+
+        if (micBefore >= 0) {
+            // 마이크 기준 확인: 새 녹음이 생기면 켜진 것
+            var turnedOn = false
+            waitUntil(7000, 300) {
+                turnedOn = otherRecordings().size > micBefore
+                turnedOn
+            }
+            AppLog.i(tag, "클릭 후 " + io.github.forlig85.memoauto.monitor.ForegroundTracker.describeWindows(svc))
+            val after = otherRecordings()
+            AppLog.i(tag, "클릭 후 다른 녹음 ${after.size}개 ${describeRecs(after)}")
+            dismissPanel()
+            return if (turnedOn) TileResult.TurnedOn else TileResult.ClickedUnverified
+        }
 
         // 결과 확인: 패널이 열려 있으면 상태가 켜짐으로 바뀌는지 폴링
         var after: Boolean? = null
@@ -286,6 +313,13 @@ class QuickSettingsAutomator(private val svc: AccessibilityService) {
             null -> TileResult.ClickedUnverified
         }
     }
+
+    /** 이 앱이 녹음 중이 아닐 때 호출: 기기에서 진행 중인 (다른 앱의) 녹음 목록. 일반 앱에는 익명으로 보인다. */
+    private fun otherRecordings(): List<AudioRecordingConfiguration> =
+        runCatching { svc.getSystemService(AudioManager::class.java).activeRecordingConfigurations }.getOrDefault(emptyList())
+
+    private fun describeRecs(list: List<AudioRecordingConfiguration>): String =
+        list.joinToString(prefix = "[", postfix = "]") { "source=${it.clientAudioSource} silenced=${it.isClientSilenced}" }
 
     private fun stateText(s: Boolean?) = when (s) { true -> "켜짐"; false -> "꺼짐"; null -> "알 수 없음" }
 

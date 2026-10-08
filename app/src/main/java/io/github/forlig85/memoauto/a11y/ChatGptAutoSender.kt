@@ -72,6 +72,9 @@ class ChatGptAutoSender(private val svc: AccessibilityService) {
         return null
     }
 
+    /** 마지막으로 전송 버튼으로 판단한 근거 글자(로그용). */
+    private var lastSendLabel = ""
+
     private fun findSend(root: AccessibilityNodeInfo): AccessibilityNodeInfo? {
         var found: AccessibilityNodeInfo? = null
         walk(root) { n ->
@@ -82,6 +85,7 @@ class ChatGptAutoSender(private val svc: AccessibilityService) {
             if (excludeWords.any { it in label }) return@walk
             if (sendWords.none { it in label }) return@walk
             found = clickable(n)
+            if (found != null) lastSendLabel = "d='${n.contentDescription}' t='${n.text}' cls=${n.className}"
         }
         return found
     }
@@ -151,7 +155,7 @@ class ChatGptAutoSender(private val svc: AccessibilityService) {
             val send2 = findSend(root2)?.takeIf { it.isEnabled } ?: continue
             val desc = "${send2.className} d='${send2.contentDescription}' t='${send2.text}' id=${send2.viewIdResourceName}"
             val ok = send2.performAction(AccessibilityNodeInfo.ACTION_CLICK)
-            AppLog.i(tag, "전송 버튼 탭: ${if (ok) "성공" else "거부됨"} — $desc")
+            AppLog.i(tag, "전송 버튼 탭: ${if (ok) "성공" else "거부됨"} — 대상 $desc / 근거 $lastSendLabel")
             if (ok) {
                 delay(2000)
                 val after = chatGptRoot()?.let { findEditable(it) }

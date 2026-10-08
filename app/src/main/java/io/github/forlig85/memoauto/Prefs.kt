@@ -61,6 +61,11 @@ object Prefs {
         get() = sp.getBoolean("click_unknown_tile", false)
         set(v) = putBool("click_unknown_tile", v)
 
+    /** 타일이 상태를 알려주지 않으면, 다른 앱이 마이크로 녹음 중인지로 AI 기록 켜짐을 판단. */
+    var tileStateByMic: Boolean
+        get() = sp.getBoolean("tile_state_by_mic", true)
+        set(v) = putBool("tile_state_by_mic", v)
+
     var startMode: StartMode
         get() = runCatching { StartMode.valueOf(str("start_mode", StartMode.AUTO.name)) }.getOrDefault(StartMode.AUTO)
         set(v) = putStr("start_mode", v.name)
@@ -98,7 +103,7 @@ object Prefs {
         set(v) = putStr("project_name", v)
 
     var notionPath: String
-        get() = str("notion_path", "업무 허브 / 10 과제·프로젝트 / 다이렉트 / 회의록")
+        get() = str("notion_path", "업무 허브 / 10 과제·프로젝트")
         set(v) = putStr("notion_path", v)
 
     var meetingType: String
