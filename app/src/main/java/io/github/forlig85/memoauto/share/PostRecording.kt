@@ -43,7 +43,7 @@ object PostRecording {
         // 접근성 서비스 컨텍스트는 백그라운드 Activity 시작이 허용될 가능성이 높다
         val launcher: Context = AutomationService.instance ?: app
         try {
-            launcher.startActivity(ResultActivity.intent(app, info, autoShare))
+            launcher.startActivity(ResultActivity.intent(app, info, autoShare, fromAutomation = true))
             AppLog.i(TAG, "결과 화면 실행 요청 (ChatGPT 자동 열기=$autoShare)")
         } catch (ex: Exception) {
             AppLog.w(TAG, "결과 화면 실행 실패", ex)

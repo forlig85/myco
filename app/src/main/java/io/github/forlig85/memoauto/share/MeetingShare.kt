@@ -64,7 +64,7 @@ object MeetingShare {
                     ctx.startActivity(i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
                     AppLog.i(TAG, "ChatGPT 로 공유: type=$type activity=${target.name}")
                     Notifier.toast(ctx, "ChatGPT로 넘겼습니다. 프롬프트는 클립보드에도 복사돼 있습니다(안 보이면 입력창을 길게 눌러 붙여넣기).")
-                    if (Prefs.autoSendChatGpt) armAutoSend(prompt)
+                    if (Prefs.sendMode != io.github.forlig85.memoauto.SendMode.MANUAL) armAutoSend(prompt)
                     return true
                 } catch (e: Exception) {
                     AppLog.w(TAG, "ChatGPT 공유 실행 실패(type=$type)", e)

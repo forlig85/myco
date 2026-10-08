@@ -3,6 +3,13 @@ package io.github.forlig85.memoauto
 import android.content.Context
 import android.content.SharedPreferences
 
+/** 녹음이 끝난 뒤 ChatGPT 전송 방식. */
+enum class SendMode(val label: String) {
+    ASK("물어보고 전송 — 녹음이 끝나면 확인창, '보내기'를 누르면 전송까지 자동"),
+    AUTO("자동 전송 — 묻지 않고 전송까지 자동"),
+    MANUAL("직접 전송 — 파일·프롬프트만 채우고 전송 버튼은 직접"),
+}
+
 /** 녹음 시작 방식. */
 enum class StartMode(val label: String) {
     AUTO("자동 (직접 시작 → 실패하면 보조 화면)"),
@@ -128,10 +135,10 @@ object Prefs {
         get() = sp.getBoolean("auto_open_chatgpt", true)
         set(v) = putBool("auto_open_chatgpt", v)
 
-    /** ChatGPT 화면에서 전송 버튼을 접근성으로 자동 탭. */
-    var autoSendChatGpt: Boolean
-        get() = sp.getBoolean("auto_send_chatgpt", true)
-        set(v) = putBool("auto_send_chatgpt", v)
+    /** ChatGPT 전송 방식. */
+    var sendMode: SendMode
+        get() = runCatching { SendMode.valueOf(str("send_mode", SendMode.ASK.name)) }.getOrDefault(SendMode.ASK)
+        set(v) = putStr("send_mode", v.name)
 
     // ── 최근 녹음 ───────────────────────────────────────
     var lastRecording: io.github.forlig85.memoauto.share.RecordingInfo?

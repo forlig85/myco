@@ -57,7 +57,7 @@ fun SettingsScreen(resumeTick: Int) {
     var meetingType by remember { mutableStateOf(Prefs.meetingType) }
     var template by remember { mutableStateOf(Prefs.promptTemplate) }
     var autoOpen by remember { mutableStateOf(Prefs.autoOpenChatGpt) }
-    var autoSend by remember { mutableStateOf(Prefs.autoSendChatGpt) }
+    var sendMode by remember { mutableStateOf(Prefs.sendMode) }
 
     val folderLauncher = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocumentTree()) { uri: Uri? ->
         if (uri != null) {
@@ -170,10 +170,11 @@ fun SettingsScreen(resumeTick: Int) {
                 "녹음이 끝나면 ChatGPT 공유 자동 열기", autoOpen,
                 hint = "자동 녹음이 끝나면 결과 화면과 ChatGPT를 엽니다. 백그라운드 제한으로 못 열면 알림으로 대신 알려줍니다."
             ) { autoOpen = it; Prefs.autoOpenChatGpt = it }
-            SwitchRow(
-                "ChatGPT 전송 버튼 자동 누르기", autoSend,
-                hint = "접근성으로 첨부 업로드가 끝나길 기다렸다가 전송을 한 번 누릅니다. 못 누르면 알림으로 알려줍니다."
-            ) { autoSend = it; Prefs.autoSendChatGpt = it }
+            Text("ChatGPT 전송 방식")
+            RadioGroup(io.github.forlig85.memoauto.SendMode.entries.map { it to it.label }, sendMode) {
+                sendMode = it; Prefs.sendMode = it
+            }
+            Hint("전송은 접근성으로 첨부 업로드가 끝나길 기다렸다가 '메시지 보내기'를 한 번 누릅니다. 알림·결과 화면에서 '회의록 만들기'를 직접 누른 경우에는 묻지 않습니다.")
             OutlinedTextField(
                 value = project, onValueChange = { project = it; Prefs.projectName = it },
                 label = { Text("프로젝트명 {프로젝트}") }, singleLine = true, modifier = Modifier.fillMaxWidth(),

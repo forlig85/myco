@@ -42,6 +42,7 @@ import androidx.compose.ui.unit.dp
 import io.github.forlig85.memoauto.AppLog
 import io.github.forlig85.memoauto.Notifier
 import io.github.forlig85.memoauto.Prefs
+import io.github.forlig85.memoauto.SendMode
 import io.github.forlig85.memoauto.share.MeetingShare
 import io.github.forlig85.memoauto.share.PromptBuilder
 import io.github.forlig85.memoauto.share.RecordingInfo
@@ -50,17 +51,22 @@ import io.github.forlig85.memoauto.share.RecordingInfo
 class ResultActivity : ComponentActivity() {
     companion object {
         private const val EXTRA_AUTO_SHARE = "auto_share"
+        private const val EXTRA_FROM_AUTOMATION = "from_automation"
+        private const val STATE_ASK = "ask_send"
 
         @Volatile var createdCount = 0
             private set
 
-        fun intent(ctx: Context, info: RecordingInfo, autoShare: Boolean): Intent =
+        /** @param fromAutomation 회의가 끝나 자동으로 연 경우(전송 방식이 '물어보고 전송'이면 확인창) */
+        fun intent(ctx: Context, info: RecordingInfo, autoShare: Boolean, fromAutomation: Boolean = false): Intent =
             info.putInto(Intent(ctx, ResultActivity::class.java))
                 .putExtra(EXTRA_AUTO_SHARE, autoShare)
+                .putExtra(EXTRA_FROM_AUTOMATION, fromAutomation)
                 .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP)
     }
 
     private val info = mutableStateOf<RecordingInfo?>(null)
+    private val askSend = mutableStateOf(false)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -68,6 +74,7 @@ class ResultActivity : ComponentActivity() {
         enableEdgeToEdge()
         info.value = RecordingInfo.from(intent) ?: Prefs.lastRecording
         if (savedInstanceState == null) maybeAutoShare(intent)
+        else askSend.value = savedInstanceState.getBoolean(STATE_ASK, false)
         setContent { AppTheme { ResultScreen() } }
     }
 
@@ -82,8 +89,18 @@ class ResultActivity : ComponentActivity() {
         if (!i.getBooleanExtra(EXTRA_AUTO_SHARE, false)) return
         i.removeExtra(EXTRA_AUTO_SHARE) // 회전 등으로 다시 실행되지 않게
         val r = info.value ?: return
+        if (i.getBooleanExtra(EXTRA_FROM_AUTOMATION, false) && Prefs.sendMode == SendMode.ASK) {
+            AppLog.i("결과화면", "ChatGPT 전송 여부 확인창 표시")
+            askSend.value = true
+            return
+        }
         AppLog.i("결과화면", "회의록 만들기 자동 실행")
         MeetingShare.makeMinutes(this, r)
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putBoolean(STATE_ASK, askSend.value)
     }
 
     private fun deleteDirect(r: RecordingInfo): Boolean {
@@ -127,6 +144,32 @@ class ResultActivity : ComponentActivity() {
             }
         }
 
+        if (askSend.value && r != null) {
+            AlertDialog(
+                onDismissRequest = { },
+                title = { Text("ChatGPT로 회의록 요청을 보낼까요?") },
+                text = {
+                    Text(
+                        "${r.name} (${r.durationText})\n\n'보내기'를 누르면 ChatGPT에 녹음 파일과 프롬프트를 넘기고 전송까지 자동으로 합니다. " +
+                            "'나중에'를 누르면 보내지 않습니다(이 화면이나 알림의 '회의록 만들기'로 언제든 보낼 수 있음)."
+                    )
+                },
+                confirmButton = {
+                    TextButton(onClick = {
+                        askSend.value = false
+                        AppLog.i("결과화면", "사용자가 전송 확인 → 회의록 만들기")
+                        MeetingShare.makeMinutes(this@ResultActivity, r)
+                    }) { Text("보내기") }
+                },
+                dismissButton = {
+                    TextButton(onClick = {
+                        askSend.value = false
+                        AppLog.i("결과화면", "사용자가 전송 보류(나중에)")
+                    }) { Text("나중에") }
+                },
+            )
+        }
+
         if (confirmDelete && r != null) {
             AlertDialog(
                 onDismissRequest = { confirmDelete = false },
@@ -164,7 +207,7 @@ class ResultActivity : ComponentActivity() {
                 Text("ChatGPT로 보낼 프롬프트", fontWeight = FontWeight.Bold)
                 Hint(
                     "'회의록 만들기'를 누르면 ChatGPT 앱에 녹음 파일과 이 프롬프트를 넘기고, 클립보드에도 복사합니다." +
-                        if (Prefs.autoSendChatGpt) " 설정에 따라 전송 버튼도 자동으로 누릅니다." else ""
+                        if (Prefs.sendMode != SendMode.MANUAL) " 전송 버튼도 자동으로 누릅니다." else " 전송 버튼은 직접 누르세요."
                 )
                 val prompt = remember(r.name) { PromptBuilder.build(r.name) }
                 SelectionContainer { Text(prompt, style = MaterialTheme.typography.bodySmall) }
